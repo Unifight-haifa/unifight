@@ -1,0 +1,27 @@
+{
+ "id": "maxim-gushin",
+ "order": 6,
+ "group": "lead",
+ "name": {
+  "he": "מקסים גושין",
+  "ru": "Максим Гушин",
+  "en": "Maxim Gushin"
+ },
+ "bio": {
+  "he": "ספורטאי ומאמן ותיק, שופט בינלאומי מוביל בישראל.",
+  "ru": "Спортсмен и тренер с опытом, ведущий судья Израиля международной категории.",
+  "en": "Experienced athlete and coach, one of Israel's leading international-category referees."
+ },
+ "photo": {
+  "src": "coaches/maxim.jpg",
+  "source": "owner 2026-10-17",
+  "alt": {
+   "he": "מקסים גושין",
+   "ru": "Максим Гушин",
+   "en": "Maxim Gushin"
+  }
+ },
+ "sources": [
+  "Lazar Kaplun, Facebook post, text supplied by owner 2026-10-17; he/en spellings are transliterations, unverified"
+ ]
+}

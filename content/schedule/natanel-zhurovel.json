@@ -58,64 +58,6 @@
    "Friday"
   ]
  },
- "venues": {
-  "leo-baeck-hadar": {
-   "he": "ליאו בק הדר",
-   "ru": "Лео Бек (Адар)",
-   "en": "Leo Baeck (Hadar)",
-   "icon": "pin-blue",
-   "address": {
-    "he": "שדרות אליהו גולומב 4, חיפה",
-    "ru": "бульв. Элияху Голомб, 4, Хайфа",
-    "en": "4 Eliyahu Golomb Blvd, Haifa"
-   },
-   "address_source": "https://www.d.co.il/6967160/8240/",
-   "address_note": "Leo Baeck elementary, Hadar (d.co.il + school FB page); madlan says no. 10",
-   "address_checked": "2026-10-17"
-  },
-  "dror-school": {
-   "he": "בית ספר דרור",
-   "ru": "Школа «Дрор»",
-   "en": "Dror School",
-   "icon": "school",
-   "address": {
-    "he": "דרור 19, חיפה",
-    "ru": "ул. Дрор, 19, Хайфа",
-    "en": "19 Dror St, Haifa"
-   },
-   "address_source": "https://dror.edu-haifa.org.il/",
-   "address_note": "Dror school (school site contact page)",
-   "address_checked": "2026-10-17"
-  },
-  "ein-hayam": {
-   "he": "עין הים",
-   "ru": "Эйн-ха-Ям",
-   "en": "Ein HaYam",
-   "icon": "waves",
-   "address": {
-    "he": "יציאת אירופה 17, חיפה",
-    "ru": "ул. Йециат Эйропа, 17, Хайфа",
-    "en": "17 Yetziat Eropa St, Haifa"
-   },
-   "address_source": "https://einhayam.edu-haifa.org.il/",
-   "address_note": "Ein HaYam school (site: contact page)",
-   "address_checked": "2026-10-17"
-  },
-  "ironi-alef": {
-   "he": "עירוני א׳",
-   "ru": "Ирони Алеф",
-   "en": "Ironi Alef",
-   "icon": "pin-red",
-   "address": {
-    "he": "תל אביב 27, חיפה",
-    "ru": "ул. Тель-Авив, 27, Хайфа",
-    "en": "27 Tel Aviv St, Haifa"
-   },
-   "address_source": "https://www.d.co.il/6933580/8780/",
-   "address_note": "Ironi Alef school (directories d.co.il, allschool)",
-   "address_checked": "2026-10-17"
-  }
- },
  "kinds": {
   "regular": {
    "he": "",

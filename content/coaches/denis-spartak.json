@@ -1,0 +1,27 @@
+{
+ "id": "denis-spartak",
+ "order": 5,
+ "group": "lead",
+ "name": {
+  "he": "דניס ספרטק",
+  "ru": "Денис Спартак",
+  "en": "Denis Spartak"
+ },
+ "bio": {
+  "he": "זוכה ומדליסט בטורנירים בינלאומיים ובגביעי אירופה, מדליסט באליפויות אירופה.",
+  "ru": "Победитель и призёр международных турниров и кубков Европы, призёр чемпионатов Европы.",
+  "en": "Winner and medallist at international tournaments and European Cups, European championship medallist."
+ },
+ "photo": {
+  "src": "coaches/denis.jpg",
+  "source": "owner 2026-10-17",
+  "alt": {
+   "he": "דניס ספרטק",
+   "ru": "Денис Спартак",
+   "en": "Denis Spartak"
+  }
+ },
+ "sources": [
+  "Lazar Kaplun, Facebook post, text supplied by owner 2026-10-17; he/en spellings are transliterations, unverified"
+ ]
+}

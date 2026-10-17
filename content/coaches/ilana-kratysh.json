@@ -1,0 +1,70 @@
+{
+ "id": "ilana-kratysh",
+ "order": 1,
+ "group": "main",
+ "name": {
+  "he": "אילנה קרטיש",
+  "ru": "Илана Кратыш",
+  "en": "Ilana Kratysh"
+ },
+ "role": {
+  "he": "יו״ר העמותה ומאמנת ראשית",
+  "ru": "Председатель амуты и главный тренер",
+  "en": "Club chair and head coach"
+ },
+ "bio": {
+  "he": "גדלה על המזרן שלנו: התחילה ג׳ודו בגיל חמש. בהמשך עברה להיאבקות, זכתה בארבע מדליות כסף באליפויות אירופה (2013–2016) וייצגה את ישראל באולימפיאדת ריו 2016. ב־2023 זכתה בכסף באליפות אירופה בסומו — המדליה הראשונה אי פעם של ישראל בענף, וב־2026 במדליית זהב בהיאבקות חופים במכביה. היום היא עומדת בראש המועדון ומאמנת ג׳ודו והיאבקות.",
+  "ru": "Выросла на нашем татами: начала заниматься дзюдо в пять лет. Потом перешла в борьбу — четыре серебряные медали чемпионатов Европы (2013–2016) и Олимпиада в Рио-2016. В 2023 году взяла серебро чемпионата Европы по сумо — первую в истории медаль Израиля в этом виде, а в 2026-м — золото Маккабиады по пляжной борьбе. Сегодня возглавляет клуб и тренирует дзюдоистов и борцов.",
+  "en": "She grew up on our mat: started judo at five. She later moved to wrestling, won four European silver medals (2013–2016) and represented Israel at the Rio 2016 Olympics. In 2023 she took silver at the European Sumo Championships — Israel's first-ever medal in the sport — and in 2026 Maccabiah gold in beach wrestling. Today she chairs the club and coaches judo and wrestling."
+ },
+ "dan_rank": {
+  "placeholder": true,
+  "he": "[דרגת דאן — לאישור]",
+  "ru": "[Дан — уточнить]",
+  "en": "[Dan rank — to confirm]"
+ },
+ "photo": {
+  "src": "coaches/ilana.jpg",
+  "w": 800,
+  "h": 1200,
+  "source": "owner 2026-10-17",
+  "alt": {
+   "he": "אילנה קרטיש בחליפת ג׳ודו וחגורה שחורה",
+   "ru": "Илана Кратыш в кимоно с чёрным поясом",
+   "en": "Ilana Kratysh in a judogi with a black belt"
+  }
+ },
+ "sources": [
+  {
+   "fact": "chair of the amuta, head coach",
+   "source": "https://1075.fm/item/207044/",
+   "confidence": "confirmed"
+  },
+  {
+   "fact": "started judo at 5 with her father; trained at the club",
+   "source": "https://www.davar1.co.il/452598/",
+   "confidence": "confirmed"
+  },
+  {
+   "fact": "four European wrestling silvers 2013–2016",
+   "source": "https://www.davar1.co.il/452598/",
+   "also": "https://en.wikipedia.org/wiki/Ilana_Kratysh",
+   "confidence": "confirmed"
+  },
+  {
+   "fact": "Rio 2016 Olympian (wrestling)",
+   "source": "https://haipo.co.il/item/116382",
+   "confidence": "confirmed"
+  },
+  {
+   "fact": "European sumo silver 2023 (Krotoszyn, Poland), Israel's first",
+   "source": "https://www.davar1.co.il/451513/",
+   "confidence": "confirmed"
+  },
+  {
+   "fact": "Maccabiah 2026 beach wrestling gold",
+   "source": "https://nws.report/sport/150802/",
+   "confidence": "confirmed"
+  }
+ ]
+}

@@ -1,0 +1,27 @@
+{
+ "id": "irina-legkaya",
+ "order": 7,
+ "group": "lead",
+ "name": {
+  "he": "אירנה ליוהקי",
+  "ru": "Ирина Лёгкая",
+  "en": "Irina Legkaya"
+ },
+ "bio": {
+  "he": "מאמנת ותיקה, מדליסטית באליפויות אירופה והעולם.",
+  "ru": "Опытный тренер, неоднократный призёр чемпионатов Европы и мира.",
+  "en": "Experienced coach, multiple European and World championship medallist."
+ },
+ "photo": {
+  "src": "coaches/irina-2.jpg",
+  "source": "owner 2026-10-17 (replaces first portrait)",
+  "alt": {
+   "he": "אירנה ליוהקי בחליפת ג׳ודו כחולה וחגורה שחורה",
+   "ru": "Ирина Лёгкая в синем кимоно с чёрным поясом",
+   "en": "Irina Legkaya in a blue judogi with a black belt"
+  }
+ },
+ "sources": [
+  "Lazar Kaplun, Facebook post, text supplied by owner 2026-10-17; he/en spellings are transliterations, unverified"
+ ]
+}

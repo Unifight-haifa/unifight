@@ -1,0 +1,27 @@
+{
+ "id": "tommy-artem-arshansky",
+ "order": 4,
+ "group": "lead",
+ "name": {
+  "he": "טומי ארשנסקי",
+  "ru": "Томи Аршански",
+  "en": "Tommy (Artem) Arshansky"
+ },
+ "bio": {
+  "he": "משתתף אולימפיאדת לונדון, מדליסט באליפויות אירופה והעולם, מאמן נבחרת ישראל לנוער. מאמן היום בקריות.",
+  "ru": "Участник Олимпийских игр в Лондоне, неоднократный призёр чемпионатов Европы и мира, тренер юниорской сборной Израиля по дзюдо. Сегодня тренирует в Крайот.",
+  "en": "London Olympian, multiple European and World championship medallist, coach of Israel's junior judo team. Coaches in the Krayot today."
+ },
+ "photo": {
+  "src": "coaches/tommy.jpg",
+  "source": "owner 2026-10-17",
+  "alt": {
+   "he": "טומי ארשנסקי",
+   "ru": "Томи Аршански",
+   "en": "Tommy Arshansky"
+  }
+ },
+ "sources": [
+  "Lazar Kaplun, Facebook post, text supplied by owner 2026-10-17; he/en spellings are transliterations, unverified"
+ ]
+}

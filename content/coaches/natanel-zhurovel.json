@@ -1,0 +1,75 @@
+{
+ "id": "natanel-zhurovel",
+ "order": 3,
+ "group": "main",
+ "name": {
+  "he": "נתנאל ז׳ורובל",
+  "ru": "Натанель Журовель",
+  "en": "Natanel Zhurovel"
+ },
+ "role": {
+  "he": "מאמן",
+  "ru": "Тренер",
+  "en": "Coach"
+ },
+ "bio": {
+  "he": "בוגר המועדון: כבר כנער היה מהבולטים בקבוצה שלנו באליפויות ישראל לקבוצות. אלוף ישראל עד גיל 23 שלוש פעמים (2019, 2021, 2022), פעמיים כסף בגביע אירופה (2022), והתחרה בסבב הגרנד פרי. היום הוא מאמן במועדון.",
+  "ru": "Воспитанник клуба: ещё подростком выделялся в нашей команде на командных чемпионатах Израиля. Трёхкратный чемпион Израиля до 23 лет (2019, 2021, 2022), дважды серебряный призёр Кубка Европы (2022), выступал на этапах Гран-при. Сейчас тренирует в клубе.",
+  "en": "Raised in the club: as a teenager he was already one of our standouts at Israel's team championships. Three-time Israeli U23 champion (2019, 2021, 2022), two-time European Cup silver medallist (2022), he went on to compete on the Grand Prix circuit. Now a club coach."
+ },
+ "dan_rank": {
+  "placeholder": true,
+  "he": "[דרגת דאן — לאישור]",
+  "ru": "[Дан — уточнить]",
+  "en": "[Dan rank — to confirm]"
+ },
+ "photo": {
+  "src": "coaches/natanel.jpg",
+  "w": 800,
+  "h": 1102,
+  "source": "owner 2026-10-17 (studio portrait, replaces camp photo)",
+  "alt": {
+   "he": "נתנאל ז׳ורובל בחליפת ג׳ודו לבנה וחגורה שחורה",
+   "ru": "Натанель Журовель в белом кимоно с чёрным поясом",
+   "en": "Natanel Zhurovel in a white judogi with a black belt"
+  }
+ },
+ "sources": [
+  {
+   "fact": "club judo coach (own Instagram bio)",
+   "source": "https://www.instagram.com/natanel_z/",
+   "confidence": "confirmed"
+  },
+  {
+   "fact": "named in the club's coach list, Nov 2025",
+   "source": "https://1075.fm/item/207044/",
+   "confidence": "confirmed"
+  },
+  {
+   "fact": "club standout 2013 U15 / 2015 U17 team championships",
+   "source": "https://haifainfo.com/?p=51439",
+   "confidence": "likely"
+  },
+  {
+   "fact": "Israeli U23 champion 2019, 2021, 2022",
+   "source": "https://www.judoinside.com/judoka/113150/Natanel_Zhurovel/judo-results",
+   "confidence": "confirmed"
+  },
+  {
+   "fact": "European Cup silver Sarajevo and Riga 2022",
+   "source": "https://www.judoinside.com/judoka/113150/Natanel_Zhurovel/judo-results",
+   "confidence": "confirmed"
+  },
+  {
+   "fact": "Grand Prix Linz and Zagreb 2023",
+   "source": "https://sports.walla.co.il/item/3602721",
+   "confidence": "confirmed"
+  },
+  {
+   "fact": "personal coach of Gal Kloda with Alexander Kratysh",
+   "source": "https://www.facebook.com/unifightjudoclub/",
+   "confidence": "likely",
+   "note": "club FB post 15 Dec 2025"
+  }
+ ]
+}

@@ -1,0 +1,68 @@
+{
+ "id": "alexander-kratysh",
+ "order": 2,
+ "group": "main",
+ "name": {
+  "he": "אלכסנדר קרטיש",
+  "ru": "Александр Кратыш",
+  "en": "Alexander Kratysh"
+ },
+ "role": {
+  "he": "מאמן בכיר, ראש בית הספר לג׳ודו",
+  "ru": "Старший тренер, руководитель школы дзюдо",
+  "en": "Senior coach, head of the judo school"
+ },
+ "bio": {
+  "ru": "Мастер спорта и старший тренер, бывший вице-чемпион СССР по дзюдо. Более 30 лет назад основал клуб и до сих пор тренирует в нём. Его школа воспитала олимпийцев и призёров чемпионатов Европы и мира.",
+  "he": "מאסטר ספורט ומאמן בכיר, סגן אלוף ברית המועצות בג׳ודו לשעבר. לפני יותר מ־30 שנה הקים את המועדון, והוא מאמן בו עד היום. מבית הספר שלו יצאו אולימפיים ומדליסטים באליפויות אירופה והעולם.",
+  "en": "Master of Sport and senior coach, a former USSR judo vice-champion. He founded the club over 30 years ago and still coaches here today. His school has produced Olympians and European and World championship medallists."
+ },
+ "dan_rank": {
+  "placeholder": true,
+  "he": "[דרגת דאן — לאישור]",
+  "ru": "[Дан — уточнить]",
+  "en": "[Dan rank — to confirm]"
+ },
+ "photo": {
+  "src": "coaches/alexander-2.jpg",
+  "w": 800,
+  "h": 1200,
+  "source": "owner 2026-10-17 (replaces first portrait)",
+  "alt": {
+   "he": "אלכסנדר קרטיש בחליפת ג׳ודו כחולה וחגורה שחורה",
+   "ru": "Александр Кратыш в синем кимоно с чёрным поясом",
+   "en": "Alexander Kratysh in a blue judogi with a black belt"
+  }
+ },
+ "sources": [
+  {
+   "fact": "USSR judo vice-champion",
+   "source": "https://www.davar1.co.il/452598/",
+   "confidence": "confirmed",
+   "note": "single news source; owner to confirm wording"
+  },
+  {
+   "fact": "coaching in Haifa since at least 2001",
+   "source": "https://web.archive.org/web/2019/http://unifight.info/?p=118",
+   "confidence": "confirmed",
+   "note": "Haifa municipality press release, Jun 2001, reproduced on archived club site"
+  },
+  {
+   "fact": "club coach",
+   "source": "https://haipo.co.il/item/122821",
+   "confidence": "confirmed"
+  },
+  {
+   "fact": "Olympians Arshansky and Kratysh trained at the club",
+   "source": "https://haipo.co.il/item/116382",
+   "confidence": "confirmed"
+  },
+  {
+   "fact": "personal coach of Gal Kloda",
+   "source": "https://www.facebook.com/unifightjudoclub/",
+   "confidence": "likely",
+   "note": "club FB post 15 Dec 2025"
+  },
+  "Kaplun article (owner-supplied 2026-10-17) + earlier CLUB-FACTS; owner rule: a coach's text is only about that coach"
+ ]
+}

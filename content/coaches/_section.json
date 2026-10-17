@@ -1,0 +1,72 @@
+{
+ "title": {
+  "he": "המאמנים שלנו",
+  "ru": "Наши тренера",
+  "en": "Our coaches"
+ },
+ "intro": {
+  "he": "מאמנים שהיו בעצמם על הפודיום — ויודעים איך להביא לשם גם אחרים.",
+  "ru": "Тренера, которые сами стояли на пьедестале — и знают, как привести туда других.",
+  "en": "Coaches who have stood on the podium themselves — and know how to get others there."
+ },
+ "more_coaches": {
+  "placeholder": true,
+  "he": "[מאמנים נוספים — רשימה מלאה מהבעלים]",
+  "ru": "[Другие тренера — полный список от владельца]",
+  "en": "[Other coaches — full roster from owner]"
+ },
+ "team_photo": {
+  "src": "coaches/team.jpg",
+  "w": 1600,
+  "h": 884,
+  "source": "owner 2026-10-17 ('all the club's coaches')",
+  "people_left_to_right": [
+   "?",
+   "?",
+   "?",
+   "alexander-kratysh",
+   "?",
+   "ilana-kratysh"
+  ],
+  "alt": {
+   "he": "צוות המאמנים של יוניפייט חיפה",
+   "ru": "Тренерский состав «Юнифайт Хайфа»",
+   "en": "The Unifight Haifa coaching team"
+  }
+ },
+ "team_count": 6,
+ "founded_note": {
+  "he": "לפני יותר מ־30 שנה הקים את המועדון אלכסנדר קרטיש, מאסטר ספורט ומאמן בכיר — והוא מאמן בו עד היום.",
+  "ru": "Более 30 лет назад мастер спорта и старший тренер Александр Кратыш создал клуб — и до сих пор тренирует в нём.",
+  "en": "Over 30 years ago Alexander Kratysh, Master of Sport and senior coach, founded the club, and he still coaches here today.",
+  "source": "Lazar Kaplun, Facebook post, text supplied by owner 2026-10-17; he/en spellings are transliterations, unverified"
+ },
+ "roster": [
+  {
+   "group": "club",
+   "title": {
+    "he": "מאמנים ותיקים",
+    "ru": "Тренера клуба",
+    "en": "Club coaches"
+   },
+   "text": {
+    "he": "שנים רבות על המזרן, כל יום.",
+    "ru": "Много лет каждый день на татами.",
+    "en": "On the tatami every day, for many years."
+   }
+  },
+  {
+   "group": "young",
+   "title": {
+    "he": "הדור הצעיר",
+    "ru": "Молодые тренера",
+    "en": "Young coaches"
+   },
+   "text": {
+    "he": "אחרי השירות בצה״ל — מאמנים, ועדיין מתחרים ברמה בינלאומית.",
+    "ru": "После службы в ЦАХАЛе — тренера и действующие спортсмены международного уровня.",
+    "en": "Back from IDF service: coaching, and still competing internationally."
+   }
+  }
+ ]
+}

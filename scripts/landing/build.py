@@ -11,8 +11,15 @@ from PIL import Image
 R = Path(__file__).resolve().parents[2]
 HERE = Path(__file__).parent
 PUB = R / "public"
-C = json.loads((R / "content/content.json").read_text())
-SC = json.loads((R / "content/schedule-natanel.json").read_text())
+
+
+def load(name):
+    return json.loads((R / "content" / name).read_text())
+
+
+C, CO, VENUES = load("site.json"), load("coaches/_section.json"), load("venues.json")
+COACHES = sorted((load(f"coaches/{p.name}") for p in (R / "content/coaches").glob("[!_]*.json")), key=lambda c: c["order"])
+SC = load("schedule/natanel-zhurovel.json")
 LANGS = ("he", "ru", "en")
 WA = "https://wa.me/972545664663"
 WA_NUM = "054-566-4663"
@@ -214,16 +221,18 @@ def initials(n):
 def rail_card(n, grp, grp_label):
     ph = n.get("photo")
     face = (img(ph["src"], "portrait", alt="") if ph else
-            f'<span class="mono" aria-hidden="true">{t(initials(n["name"] if "name" in n else n))}</span>')
-    name = n["name"] if "name" in n else {l: n[l] for l in LANGS}
+            f'<span class="mono" aria-hidden="true">{t(initials(n["name"]))}</span>')
     bio = f'<p class="rc-bio">{t(n["bio"])}</p>' if n.get("bio") else ""
     return (f'<li class="rc" data-grp="{grp}"><div class="rc-ph{" has-img" if ph else ""}">{face}</div>'
-            f'<span class="rc-tag">{t(grp_label)}</span><h4 class="rc-n">{t(name)}</h4>{bio}</li>')
+            f'<span class="rc-tag">{t(grp_label)}</span><h4 class="rc-n">{t(n["name"])}</h4>{bio}</li>')
 
 
 def coaches():
-    co = C["coaches"]
+    co = CO
     ks = ["師", "道", "技"]
+
+    def grp(g):
+        return [c for c in COACHES if c["group"] == g]
 
     def photo(c, k):
         ph = c["photo"]
@@ -235,9 +244,8 @@ def coaches():
     {photo(c, k)}
     <div class="coach-b"><h3 class="h3 coach-n">{t(c["name"])}</h3><p class="role">{t(c["role"])}</p>
     <p class="bio">{t(c["bio"])}</p><p class="dan">{t(c["dan_rank"])}</p></div></article>'''
-                    for c, k in zip(co["items"], ks))
-    groups = [("lead", RAIL_UI["lead"], co["lead_more"])] + [
-        (k, r["title"], r["names"]) for k, r in zip(("club", "young"), co["roster"])]
+                    for c, k in zip(grp("main"), ks))
+    groups = [("lead", RAIL_UI["lead"], grp("lead"))] + [(r["group"], r["title"], grp(r["group"])) for r in co["roster"]]
     rail = "".join(rail_card(n, k, lab) for k, lab, ns in groups for n in ns)
     chips = (f'<button type="button" class="chip" data-grp="" aria-pressed="true">{t(RAIL_UI["all"])}</button>'
              + "".join(f'<button type="button" class="chip" data-grp="{k}" aria-pressed="false">{t(lab)}</button>' for k, lab, _ in groups))
@@ -384,7 +392,7 @@ def grade_label(g):
 
 def schedule():
     sc, U = C["schedule"], SCHED_UI
-    nat = C["coaches"]["items"][2]
+    nat = next(c for c in COACHES if c["id"] == "natanel-zhurovel")
     days = ""
     for d in range(6):
         cards = ""
@@ -395,7 +403,7 @@ def schedule():
             if s.get("subgroup"):
                 badge += f'<span class="ses-kind">{t({l: {"he": "קבוצה", "ru": "Группа", "en": "Group"}[l] + " " + str(s["subgroup"]) for l in LANGS})}</span>'
             note = f'<span class="ses-note">{t(s["note"])}</span>' if s.get("note") else ""
-            v = SC["venues"][s["venue"]]
+            v = VENUES[s["venue"]]
             cards += (f'<li class="ses" data-v="{s["venue"]}" data-g="{hi}-{lo}" style="--vc:{VENUE_COLOR[s["venue"]]}">'
                       f'<span class="ses-time">{ltr(s["start"] + "–" + s["end"])}</span>'
                       f'<span class="ses-grade">{t(grade_label(s["grades"]))}</span>'
@@ -410,7 +418,7 @@ def schedule():
     gchips = "".join(f'<button type="button" class="chip" data-grade="{g}" aria-pressed="{str(g == -1).lower()}">{t(lab)}</button>' for g, lab in grades)
     vchips = f'<button type="button" class="chip" data-venue="" aria-pressed="true">{t(U["all"])}</button>' + "".join(
         f'<button type="button" class="chip" data-venue="{k}" aria-pressed="false" style="--vc:{VENUE_COLOR[k]}"><i aria-hidden="true"></i>{t({l: v[l] for l in LANGS})}</button>'
-        for k, v in SC["venues"].items())
+        for k, v in VENUES.items())
     vals = "".join(f'<span data-l="{l}">{" · ".join(SC["values"][l])}</span>' for l in LANGS)
     msg = "".join(f'<span data-l="{l}" class="wa-msg" hidden>{esc(U["wa_msg"][l])}</span>' for l in LANGS)
     return f'''
@@ -443,7 +451,7 @@ BR_UI = {"days": {"he": "ימי אימון", "ru": "Дни тренировок"
 def branches():
     b = C["branches"]
     v = ""
-    for i, (k, vn) in enumerate(SC["venues"].items()):
+    for i, (k, vn) in enumerate(VENUES.items()):
         q = urllib.parse.quote(vn["address"]["he"])
         ds = sorted({s["day"] for s in SC["sessions"] if s["venue"] == k})
         days = "".join(f'<span data-l="{l}">{" · ".join(DAY_SHORT[l][d] for d in ds)}</span>' for l in LANGS)
