@@ -18,3 +18,5 @@ npm run build && npm test
 ```
 
 Commit the regenerated files together with the content change. Never hand-edit `src/generated/`.
+
+Share previews (`public/og/<lang>.jpg`) use the club name and hero headline. Re-render them after changing either: `python3 scripts/landing/og.py` (needs Pillow with libraqm, and downloads Rubik on the first run).
