@@ -1,20 +1,74 @@
 [
-  {
-    "id": "BCyV2Lwp9Y4",
-    "kind": "video",
-    "date": "2020-02-01",
-    "playlist": "promo",
-    "duration": 28,
-    "title": {
-      "he": "ג׳ודו בהילוך איטי: קידה, גלגלונים ובלימות נפילה",
-      "ru": "Дзюдо в замедленной съёмке: поклон, колесо, страховка",
-      "en": "Judo in slow motion: bow, cartwheels, breakfalls"
-    },
-    "description": {
-      "he": "צילומים בהילוך איטי מיום צילום של המועדון, פברואר 2020: קידה, גלגלונים ובלימות נפילה על המזרן. מועדון הג׳ודו יוניפייט חיפה, חיפה, קריות ונשר. ליצירת קשר: unifight-haifa.github.io/unifight · וואטסאפ 054-566-4663",
-      "ru": "Замедленная съёмка со съёмочного дня клуба, февраль 2020: поклон, колесо и страховка на татами. Клуб дзюдо «Юнифайт Хайфа», Хайфа, Крайот и Нешер. Связь: unifight-haifa.github.io/unifight · WhatsApp 054-566-4663",
-      "en": "Slow-motion footage from a club film shoot, February 2020: a bow, cartwheels and breakfalls on the mat. Unifight Haifa judo club, Haifa, Krayot and Nesher. Contact: unifight-haifa.github.io/unifight · WhatsApp 054-566-4663"
-    },
-    "thumb": "BCyV2Lwp9Y4.jpg"
-  }
+ {
+  "id": "BCyV2Lwp9Y4",
+  "kind": "video",
+  "date": "2020-02-01",
+  "playlist": "promo",
+  "duration": 28,
+  "title": {
+   "he": "ג׳ודו בהילוך איטי: קידה, גלגלונים ובלימות נפילה",
+   "ru": "Дзюдо в замедленной съёмке: поклон, колесо, страховка",
+   "en": "Judo in slow motion: bow, cartwheels, breakfalls"
+  },
+  "description": {
+   "he": "צילומים בהילוך איטי מיום צילום של המועדון, פברואר 2020: קידה, גלגלונים ובלימות נפילה על המזרן. מועדון הג׳ודו יוניפייט חיפה, חיפה, קריות ונשר. ליצירת קשר: unifight-haifa.github.io/unifight · וואטסאפ 054-566-4663",
+   "ru": "Замедленная съёмка со съёмочного дня клуба, февраль 2020: поклон, колесо и страховка на татами. Клуб дзюдо «Юнифайт Хайфа», Хайфа, Крайот и Нешер. Связь: unifight-haifa.github.io/unifight · WhatsApp 054-566-4663",
+   "en": "Slow-motion footage from a club film shoot, February 2020: a bow, cartwheels and breakfalls on the mat. Unifight Haifa judo club, Haifa, Krayot and Nesher. Contact: unifight-haifa.github.io/unifight · WhatsApp 054-566-4663"
+  },
+  "thumb": "BCyV2Lwp9Y4.jpg"
+ },
+ {
+  "id": "p17xO306r7A",
+  "kind": "video",
+  "date": "2023-05-13",
+  "playlist": "competitions",
+  "duration": 741,
+  "title": {
+   "he": "קרבות ג׳ודו, ארפורט 2023",
+   "ru": "Схватки по дзюдо, Эрфурт 2023",
+   "en": "Judo fights, Erfurt 2023"
+  },
+  "description": {
+   "he": "הקרבות של הספורטאים שלנו בתחרות הג׳ודו לנוער בארפורט, גרמניה, מאי 2023. מועדון הג׳ודו יוניפייט חיפה. unifight-haifa.github.io/unifight",
+   "ru": "Схватки наших спортсменов на юношеском турнире по дзюдо в Эрфурте, Германия, май 2023. Клуб дзюдо «Юнифайт Хайфа». unifight-haifa.github.io/unifight",
+   "en": "Our athletes' bouts at the youth judo tournament in Erfurt, Germany, May 2023. Unifight Haifa judo club. unifight-haifa.github.io/unifight"
+  },
+  "thumb": "p17xO306r7A.jpg"
+ },
+ {
+  "id": "T_ezN8xeSiY",
+  "kind": "short",
+  "date": "2023-05-13",
+  "playlist": "competitions",
+  "duration": 12,
+  "title": {
+   "he": "עם מדליה ודגל, ארפורט 2023",
+   "ru": "С медалью и флагом, Эрфурт 2023",
+   "en": "With a medal and the flag, Erfurt 2023"
+  },
+  "description": {
+   "he": "רגע המדליה בתחרות הג׳ודו לנוער בארפורט, גרמניה, מאי 2023. מועדון הג׳ודו יוניפייט חיפה.",
+   "ru": "Момент с медалью на юношеском турнире по дзюдо в Эрфурте, Германия, май 2023. Клуб дзюдо «Юнифайт Хайфа».",
+   "en": "Medal moment at the youth judo tournament in Erfurt, Germany, May 2023. Unifight Haifa judo club."
+  },
+  "thumb": "T_ezN8xeSiY.jpg"
+ },
+ {
+  "id": "gdHNo87Mrx4",
+  "kind": "short",
+  "date": "2024-02-24",
+  "playlist": "camps",
+  "duration": 10,
+  "title": {
+   "he": "מחנה אימונים בגיאורגיה 2024: ספרינטים בטביליסי",
+   "ru": "Сборы в Грузии 2024: спринты в Тбилиси",
+   "en": "Georgia training camp 2024: sprint drills in Tbilisi"
+  },
+  "description": {
+   "he": "אימון כושר בחוץ במחנה האימונים של המועדון בגיאורגיה, פברואר 2024. מועדון הג׳ודו יוניפייט חיפה.",
+   "ru": "Тренировка на улице на сборах клуба в Грузии, февраль 2024. Клуб дзюдо «Юнифайт Хайфа».",
+   "en": "Outdoor conditioning at the club's training camp in Georgia, February 2024. Unifight Haifa judo club."
+  },
+  "thumb": "gdHNo87Mrx4.jpg"
+ }
 ]
