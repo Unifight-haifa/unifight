@@ -24,6 +24,7 @@ export const ui = {
     consentAccept: 'אישור',
     consentDecline: 'דחייה',
     cookieSettings: 'הגדרות עוגיות',
+    accessibilityStatement: 'הצהרת נגישות',
     privacyPolicy: 'מדיניות פרטיות',
   },
   ru: {
@@ -44,6 +45,7 @@ export const ui = {
     consentAccept: 'Принять',
     consentDecline: 'Отклонить',
     cookieSettings: 'Настройки cookie',
+    accessibilityStatement: 'Заявление о доступности',
     privacyPolicy: 'Политика конфиденциальности',
   },
   en: {
@@ -64,6 +66,7 @@ export const ui = {
     consentAccept: 'Accept',
     consentDecline: 'Decline',
     cookieSettings: 'Cookie settings',
+    accessibilityStatement: 'Accessibility statement',
     privacyPolicy: 'Privacy policy',
   },
 };
