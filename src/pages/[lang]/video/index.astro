@@ -97,7 +97,7 @@ const ld = {
     </div>
     {groups.map((g, i) => g.length > 0 && (
       <section class="video-sec" aria-labelledby={i ? 'shorts' : undefined}>
-        {i === 1 && <h2 class="h3 video-sec-h" id="shorts">Shorts</h2>}
+        {i === 1 && <h2 class="h3 video-sec-h" id="shorts" lang="en">Shorts</h2>}
         <ul class:list={['video-list', { shorts: i === 1 }]}>
           {g.map((v) => (
             <li class="video-card" data-playlist={v.playlist}>

@@ -1,6 +1,6 @@
 :root{color-scheme:dark;
   --ink:#0a0908;--ink-2:#13110f;--ink-3:#1c1915;--paper:#f3ead8;--paper-2:#d9cfbd;--mute:#a99f8d;
-  --gold:#d4a84b;--gold-2:#f1d38a;--red:#c2232e;--red-2:#8e1219;--red-3:#e0414a;--line:rgba(212,168,75,.2);
+  --gold:#d4a84b;--gold-2:#f1d38a;--red:#c2232e;--red-2:#8e1219;--red-3:#e44f57;--line:rgba(212,168,75,.2);
   --disp:"Oswald","Secular One",Impact,sans-serif;--body:"Rubik",system-ui,sans-serif;
   --kanji:"Shippori Mincho B1","Hiragino Mincho ProN","Yu Mincho",serif;
   /* symmetric so the gutter clears a side system bar in both LTR and RTL */
@@ -12,6 +12,7 @@ html{background:var(--ink);scroll-behavior:smooth}
 body{margin:0;background:var(--ink);color:var(--paper);font:400 17px/1.65 var(--body);-webkit-font-smoothing:antialiased;overflow-x:clip}
 img{display:block;max-width:100%;height:auto}
 a{color:inherit}
+:focus-visible{outline:3px solid var(--gold-2);outline-offset:2px}
 [id]{scroll-margin-top:84px}
 html:not([lang=ru]) [data-l=ru],html:not([lang=en]) [data-l=en],html[lang=ru] [data-l=he],html[lang=en] [data-l=he]{display:none!important}
 
@@ -64,25 +65,31 @@ a:hover .arrow{translate:4px}
 .plate{flex:none;inline-size:48px;block-size:48px;border-radius:50%;background:#fff;display:grid;place-items:center;box-shadow:0 0 0 2px var(--ink),0 0 0 3px var(--gold),0 8px 24px rgba(0,0,0,.55)}
 .plate{overflow:hidden}
 .plate img{inline-size:100%;block-size:100%;object-fit:contain;border-radius:50%}
-.brand-t{display:none;font:600 17px/1 var(--disp);letter-spacing:.06em;text-transform:uppercase;white-space:nowrap}
+.brand-t{position:absolute;clip-path:inset(50%);inline-size:1px;block-size:1px;overflow:hidden;font:600 17px/1 var(--disp);letter-spacing:.06em;text-transform:uppercase;white-space:nowrap}
 .hd-nav{display:none}
 .hd-r{display:flex;align-items:center;gap:6px}
 .lang{display:flex;border:1px solid rgba(243,234,216,.28);border-radius:2px}
-.lang :is(button,a){display:inline-grid;place-items:center;text-decoration:none;min-inline-size:30px;min-block-size:40px;padding:0 6px;background:transparent;color:var(--paper-2);border:0;font:600 12.5px/1 var(--body);letter-spacing:.06em;cursor:pointer}
+.lang :is(button,a){display:inline-grid;place-items:center;text-decoration:none;min-inline-size:30px;min-block-size:44px;padding:0 6px;background:transparent;color:var(--paper-2);border:0;font:600 12.5px/1 var(--body);letter-spacing:.06em;cursor:pointer}
 .lang :is(button[aria-pressed=true],a[aria-current]){background:var(--gold);color:var(--ink)}
 .lang :is(button,a):hover:not([aria-pressed=true],[aria-current]){color:var(--gold-2)}
-.btn-join{min-block-size:40px;padding:.5em .8em;font-size:13.5px;white-space:nowrap}
+.btn-join{min-block-size:44px;padding:.5em .8em;font-size:13.5px;white-space:nowrap}
 .t-long{display:none}
 html[lang=ru] .btn-join{font-size:12.5px;padding-inline:.6em}
 bdi[dir=ltr]{white-space:nowrap}
-.menu summary{list-style:none;display:grid;place-items:center;inline-size:40px;block-size:40px;border:1px solid rgba(243,234,216,.28);cursor:pointer;color:var(--paper)}
+.menu summary{list-style:none;display:grid;place-items:center;inline-size:44px;block-size:44px;border:1px solid rgba(243,234,216,.28);cursor:pointer;color:var(--paper)}
 .menu summary::-webkit-details-marker{display:none}
 .menu summary svg{inline-size:20px;stroke:currentColor;stroke-width:2;fill:none}
 .menu[open] summary{border-color:var(--gold);color:var(--gold-2)}
 .menu-p{position:fixed;inset-inline:0;top:calc(env(safe-area-inset-top,0px) + 64px);background:rgba(10,9,8,.97);border-block:1px solid var(--line);padding:12px var(--gut) 20px;display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:2px 16px;max-block-size:calc(100svh - 64px);overflow:auto}
 .menu-p a{font:500 19px/1.2 var(--disp);text-transform:uppercase;text-decoration:none;padding:12px 0;border-block-end:1px solid var(--line)}
 .menu-p a:hover{color:var(--gold-2)}
-@media (min-width:420px){.brand-t{display:block}}
+.brand .plate{flex-shrink:1;min-inline-size:36px;block-size:auto;aspect-ratio:1}
+@media (max-width:419px){.hd-in{gap:6px}.hd-r{gap:4px}}
+/* at 400% zoom the Russian join label and the logo can't share 320px; the hero CTA is right below */
+@media (max-width:359px){html[lang=ru] .btn-join{display:none}}
+/* the Russian name is longer and would run under the header controls */
+@media (min-width:420px){html:not([lang=ru]) .brand-t{position:static;clip-path:none;inline-size:auto;block-size:auto;overflow:visible}}
+@media (min-width:580px){html[lang=ru] .brand-t{position:static;clip-path:none;inline-size:auto;block-size:auto;overflow:visible}}
 @media (min-width:760px){.t-long{display:inline}.btn-join{font-size:14.5px;padding:.55em 1.1em}.lang :is(button,a){min-inline-size:40px}}
 @media (min-width:1320px){
   .hd-nav{display:flex;gap:2px 16px;flex-wrap:wrap;justify-content:center;font:500 13px/1 var(--body);letter-spacing:.06em;text-transform:uppercase}
@@ -111,6 +118,7 @@ html[lang=ru] .h1{font-size:clamp(38px,9.2vw,112px);max-inline-size:15ch}
 html[lang=he] .h1{line-height:1.08}
 .h1 .g{display:block;color:transparent;background:linear-gradient(90deg,var(--gold-2),var(--gold) 55%,#b07a26);-webkit-background-clip:text;background-clip:text}
 .hero-p{color:#e6dcc8;font-size:clamp(17px,1.7vw,21px);max-inline-size:44ch;text-shadow:0 2px 20px rgba(0,0,0,.85)}
+.hero .kicker{color:var(--gold-2)}
 .hero .cta-row{margin-block-start:28px}
 .hero .cta-row .btn{flex:1 1 220px;max-inline-size:340px}
 .hero-disc{display:flex;align-items:center;gap:.7em;margin-block-start:28px;color:var(--mute);font-size:14px;letter-spacing:.14em;text-transform:uppercase}
@@ -122,12 +130,17 @@ html[lang=he] .h1{line-height:1.08}
 }
 
 /* ticker */
-.ticker{overflow:hidden;border-block:1px solid var(--line);background:var(--ink);padding-block:16px}
+.ticker{position:relative;overflow:hidden;border-block:1px solid var(--line);background:var(--ink);padding-block:16px}
 .ticker-track{display:flex;align-items:center;inline-size:max-content;animation:tick 48s linear infinite}
 [dir=rtl] .ticker-track{animation-name:tick-rtl}
 .tk-t{font:600 clamp(20px,2.8vw,32px)/1 var(--disp);text-transform:uppercase;letter-spacing:.05em;padding-inline:26px;white-space:nowrap}
 html[lang=he] .tk-t{font-weight:400}
 .tk-k{color:var(--red-3);font-size:clamp(20px,2.6vw,30px);white-space:nowrap}
+.tk-pause{position:absolute;inset-block:0;inset-inline-end:0;inline-size:44px;border:0;border-inline-start:1px solid var(--line);background:var(--ink);color:var(--gold-2);font:600 16px/1 var(--body);cursor:pointer}
+.tk-pause:focus-visible{outline-offset:-3px}
+.tk-pause::before{content:"❚❚"}
+.tk-pause[aria-pressed=true]::before{content:"▶\fe0e"}
+.still :is(.ticker-track,.scroll,.st-fall),.still body::after{animation-play-state:paused!important}
 @keyframes tick{to{transform:translateX(-50%)}}
 @keyframes tick-rtl{to{transform:translateX(50%)}}
 
@@ -158,6 +171,8 @@ html[lang=he] .tk-t{font-weight:400}
 .st-intro{display:flex;gap:14px;align-items:flex-start;max-inline-size:62ch;margin-block-end:24px;font-size:clamp(18px,1.9vw,22px);color:var(--paper)}
 .st-intro .kj{font-size:42px;line-height:1;color:var(--red-3)}
 .success-triangle{border:1px solid var(--line)}
+/* the embed joins the chain with no spaces; let it wrap at the arrows on narrow screens */
+.st-chain [data-l]{display:inline-flex;flex-wrap:wrap;justify-content:center}
 .success-triangle .st-center img{background:#fff;border-radius:50%;padding:3%}
 
 /* coaches */
@@ -327,7 +342,7 @@ html[lang=he] .r-day{font-weight:400}
 html[lang=he] .ft-name{font-weight:400}
 .ft-brand p:not(.ft-name){color:var(--mute);font-size:14.5px}
 .ft-meta{display:grid;gap:8px;color:var(--mute);font-size:14px}
-.copy{color:#7b7262;font-size:13px}
+.copy{color:#8a806f;font-size:13px}
 
 /* reveal: content is fully visible at rest; this only adds a short settle */
 .rv.in{animation:settle .9s cubic-bezier(.2,.7,.2,1)}
@@ -361,6 +376,7 @@ html[lang=he] .ft-name{font-weight:400}
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
   .hero-media img{transform:none}
+  .tk-pause{display:none}
 }
 
 /* coaches: team photo, portraits, roster */
@@ -386,6 +402,8 @@ html[lang=he] .ft-name{font-weight:400}
 .sc-coach .grp{margin:2px 0 4px}
 .sc-slogan{color:var(--paper-2);font-size:15px}
 .sc-filters{display:grid;gap:14px;margin-block-end:18px}
+/* grid items default to min-content; without this the nowrap chip row widens the page instead of scrolling */
+.fl{min-inline-size:0}
 .fl-q{font-size:14px;color:var(--mute);margin-block-end:8px}
 .chips{display:flex;flex-wrap:wrap;gap:8px}
 .chip{display:inline-flex;align-items:center;gap:8px;min-block-size:44px;min-inline-size:44px;padding:0 14px;border:1px solid var(--line);background:rgba(19,17,15,.9);color:var(--paper);font:500 15px/1 var(--body);cursor:pointer;border-radius:22px}
@@ -406,7 +424,7 @@ html[lang=he] .day-h{font-weight:400}
 .ses-kind{justify-self:start;font-size:12.5px;font-weight:600;padding:.25em .6em;border:1px solid var(--line);color:var(--paper-2)}
 .ses-kind.k-nivheret{border-color:var(--red-3);color:#fff;background:rgba(194,35,46,.35)}
 .ses-note{font-size:13px;color:var(--mute)}
-.ses-wa{justify-self:start;display:inline-flex;align-items:center;gap:6px;min-block-size:40px;margin-block-start:4px;color:#7fe0a0;font-size:14px;font-weight:600;text-decoration:none}
+.ses-wa{justify-self:start;display:inline-flex;align-items:center;gap:6px;min-block-size:44px;margin-block-start:4px;color:#7fe0a0;font-size:14px;font-weight:600;text-decoration:none}
 .ses-wa svg{inline-size:18px;block-size:18px}
 .day-none{display:none;color:var(--mute);font-size:14px}
 .day.empty .day-none{display:block}

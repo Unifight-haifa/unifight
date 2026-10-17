@@ -6,6 +6,13 @@
   addEventListener('scroll', solid, { passive: true });
   solid();
   document.querySelectorAll('.menu a').forEach(a => a.addEventListener('click', () => { a.closest('details').open = false; }));
+  addEventListener('keydown', e => {
+    const m = document.querySelector('.menu[open]');
+    if (e.key === 'Escape' && m) { m.open = false; m.querySelector('summary').focus(); }
+  });
+  document.querySelector('.tk-pause')?.addEventListener('click', e => {
+    e.currentTarget.setAttribute('aria-pressed', H.classList.toggle('still'));
+  });
 
   if (!matchMedia('(prefers-reduced-motion: reduce)').matches && 'IntersectionObserver' in window) {
     const io = new IntersectionObserver(es => es.forEach(e => {
@@ -42,6 +49,7 @@
     press('[data-grade]', b => +b.dataset.grade === grade);
     press('[data-venue]', b => b.dataset.venue === venue);
     sec.querySelector('.sc-none').classList.toggle('on', !total);
+    sec.querySelector('.sc-count b').textContent = total;
   };
   days[today]?.classList.add('is-today'); tabs[today]?.classList.add('is-today');
   sec.addEventListener('click', e => {
@@ -72,7 +80,8 @@
     const b = e.target.closest('button');
     if (!b) return;
     if (b.dataset.dir) {
-      rail.scrollBy({ left: +b.dataset.dir * rail.clientWidth * 0.8, behavior: 'smooth' });
+      const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
+      rail.scrollBy({ left: +b.dataset.dir * rail.clientWidth * 0.8, behavior: calm ? 'auto' : 'smooth' });
       return;
     }
     const g = b.dataset.grp;

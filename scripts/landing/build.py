@@ -66,6 +66,13 @@ def ltr(s):
     return f'<bdi dir="ltr">{esc(s)}</bdi>'
 
 
+def attr(name, o):
+    """A per-language attribute: pages/[lang]/index.astro keeps the page language's <name>-<l>."""
+    if SITE:
+        return " ".join(f'{name}-{l}="{html.escape(o[l])}"' for l in LANGS)
+    return f'{name}="{html.escape(o["en"])}"'
+
+
 def img(name, cls="", eager=False, alt=None):
     """alt: {he, ru, en}, or "" for decorative; photos default to content's photos.alt."""
     p = name if "/" in name else f"img-night/{name}"
@@ -74,12 +81,7 @@ def img(name, cls="", eager=False, alt=None):
     w, h = Image.open(PUB / p).size
     load = 'fetchpriority="high"' if eager else 'loading="lazy"'
     a = PHOTO_ALT.get(name, "") if alt is None else alt
-    if isinstance(a, str):
-        a = f'alt="{html.escape(a)}"'
-    elif SITE:  # alt is one attribute: pages/[lang]/index.astro keeps the page language's alt-<l>
-        a = " ".join(f'alt-{l}="{html.escape(a[l])}"' for l in LANGS)
-    else:
-        a = f'alt="{html.escape(a["en"])}"'
+    a = f'alt="{html.escape(a)}"' if isinstance(a, str) else attr("alt", a)
     return f'<img class="{cls}" src="{PFX}{p}" width="{w}" height="{h}" {a} {load} decoding="async">'
 
 
@@ -122,6 +124,15 @@ LOGO = "brand/logo.png"
 USED.append(LOGO)
 
 
+A11Y = {
+    "menu": {"he": "תפריט", "ru": "Меню", "en": "Menu"},
+    "sections": {"he": "חלקי העמוד", "ru": "Разделы", "en": "Sections"},
+    "language": {"he": "שפה", "ru": "Язык", "en": "Language"},
+    "gallery": {"he": "גלריית תמונות", "ru": "Фотогалерея", "en": "Photo gallery"},
+    "pause": {"he": "עצירת אנימציות", "ru": "Остановить анимацию", "en": "Pause animations"},
+}
+
+
 def header():
     langs = "".join(
         f'<button type="button" data-set-lang="{l}" aria-pressed="{str(l=="he").lower()}" title="{C["language_switch"][l]}">{lab}</button>'
@@ -140,12 +151,12 @@ def header():
  <div class="hd-in">
   <a class="brand" href="#top"><span class="plate"><img src="{PFX}{LOGO}" width="256" height="256" alt=""></span>
    <span class="brand-t">{t(club["name"])}</span></a>
-  <nav class="hd-nav" aria-label="Sections">{links}</nav>
+  <nav class="hd-nav" {attr("aria-label", A11Y["sections"])}>{links}</nav>
   <div class="hd-r">
-   <div class="lang" role="group" aria-label="Language">{langs}</div>
+   <div class="lang" role="group" {attr("aria-label", A11Y["language"])}>{langs}</div>
    <a class="btn btn-wa btn-join" href="{cta["href"]}">{join}</a>
-   <details class="menu"><summary aria-label="Menu"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"/></svg></summary>
-    <nav class="menu-p" aria-label="Sections">{links}</nav></details>
+   <details class="menu"><summary {attr("aria-label", A11Y["menu"])}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"/></svg></summary>
+    <nav class="menu-p" {attr("aria-label", A11Y["sections"])}>{links}</nav></details>
   </div>
  </div>
 </header>'''
@@ -179,7 +190,9 @@ def hero_sec():
 def ticker():
     ks = ["七転八起", "柔道", "礼"]
     items = "".join(f'<span class="tk-t">{t(tl)}</span><span class="tk-k kj">{k}</span>' for tl, k in zip(C["taglines"], ks))
-    return f'<div class="ticker" aria-hidden="true"><div class="ticker-track">{items}{items}{items}{items}</div></div>'
+    # WCAG 2.2.2: endless motion needs a pause; the same button stills the grain and petals
+    return (f'<div class="ticker"><div class="ticker-track" aria-hidden="true">{items}{items}{items}{items}</div>'
+            f'<button type="button" class="tk-pause" aria-pressed="false" {attr("aria-label", A11Y["pause"])}></button></div>')
 
 
 ICON_K = {"bow": "礼", "belt": "帯", "fall": "受", "balance": "体", "handshake": "友", "rise": "起"}
@@ -273,10 +286,10 @@ def coaches():
   <p class="founded rv"><span class="kj" aria-hidden="true">創</span>{t(co["founded_note"])}</p>
   <div class="c-grid">{cards}</div>
   <div class="rail-wrap" id="team-rail">
-   <div class="rail-top"><h3 class="h3 grp">{t(RAIL_UI["title"])}</h3>
-    <div class="rail-nav"><button type="button" class="rail-btn" data-dir="-1" aria-label="{RAIL_UI["prev"]["en"]}">‹</button><button type="button" class="rail-btn" data-dir="1" aria-label="{RAIL_UI["next"]["en"]}">›</button></div></div>
-   <div class="chips" role="group">{chips}</div>
-   <ul class="rail" tabindex="0">{rail}</ul>
+   <div class="rail-top"><h3 class="h3 grp" id="rail-t">{t(RAIL_UI["title"])}</h3>
+    <div class="rail-nav"><button type="button" class="rail-btn" data-dir="-1" {attr("aria-label", RAIL_UI["prev"])}>‹</button><button type="button" class="rail-btn" data-dir="1" {attr("aria-label", RAIL_UI["next"])}>›</button></div></div>
+   <div class="chips" role="group" aria-labelledby="rail-t">{chips}</div>
+   <ul class="rail" tabindex="0" aria-labelledby="rail-t">{rail}</ul>
   </div>
  </div>
 </section>'''
@@ -327,7 +340,7 @@ def history():
    <ol class="tl">{items}</ol>
   </div>
  </div>
- <div class="strip" tabindex="0" role="region" aria-label="Gallery">{strip}</div>
+ <div class="strip" tabindex="0" role="region" {attr("aria-label", A11Y["gallery"])}>{strip}</div>
 </section>'''
 
 
@@ -389,6 +402,8 @@ SCHED_UI = {
     "none_all": {"he": "לא מצאנו קבוצה מתאימה — כתבו לנו ונמצא פתרון.", "ru": "Подходящей группы не нашлось — напишите нам, подберём.", "en": "No matching group — message us and we'll sort it out."},
     "others": {"he": "לוחות האימונים של שאר המאמנים יעלו בקרוב.", "ru": "Расписание групп других тренеров скоро появится.", "en": "Other coaches' schedules are coming soon."},
     "join": {"he": "הרשמה לקבוצה", "ru": "Записаться", "en": "Join"},
+    "days": {"he": "ימי השבוע", "ru": "Дни недели", "en": "Days of the week"},
+    "count": {"he": "אימונים מתאימים: ", "ru": "Подходящих тренировок: ", "en": "Matching classes: "},
     "wa_msg": {"he": "שלום! אשמח להצטרף לאימון: ", "ru": "Здравствуйте! Хотим записаться на тренировку: ", "en": "Hi! We'd like to join this class: "},
 }
 DAY_SHORT = {"he": ["א׳", "ב׳", "ג׳", "ד׳", "ה׳", "ו׳"], "ru": ["Вс", "Пн", "Вт", "Ср", "Чт", "Пт"], "en": ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri"]}
@@ -445,10 +460,11 @@ def schedule():
    <div><p class="sc-season">{t(U["season"])}</p><h3 class="h3 grp">{t(U["heading"])}</h3>
    <p class="sc-slogan">{t(SC["slogan"])}</p></div></div>
   <div class="sc-filters">
-   <div class="fl"><p class="fl-q">{t(U["grade_q"])}</p><div class="chips" role="group">{gchips}</div></div>
-   <div class="fl"><p class="fl-q">{t(U["venue_q"])}</p><div class="chips" role="group">{vchips}</div></div>
+   <div class="fl"><p class="fl-q" id="fl-grade">{t(U["grade_q"])}</p><div class="chips" role="group" aria-labelledby="fl-grade">{gchips}</div></div>
+   <div class="fl"><p class="fl-q" id="fl-venue">{t(U["venue_q"])}</p><div class="chips" role="group" aria-labelledby="fl-venue">{vchips}</div></div>
   </div>
-  <div class="tabs" role="group">{tabs}</div>
+  <p class="sc-count vh" aria-live="polite">{t(U["count"])}<b></b></p>
+  <div class="tabs" role="group" {attr("aria-label", U["days"])}>{tabs}</div>
   <div class="week" id="week">{days}</div>
   <div class="sc-none">{t(U["none_all"])}{wa(C["kids"]["first_class"]["cta"], "schedule_none")}</div>
   <p class="niv"><span class="kj" aria-hidden="true">選</span>{t(sc["nivheret_note"])}</p>
@@ -539,7 +555,7 @@ src = (HERE / "success-triangle.html").read_text()
 st_css = src[src.index("/* ---------- embeddable section ---------- */"):src.index("/* social-image renders")]
 st_sec = src[src.index('<section class="success-triangle"'):src.index("</section>", src.index('<section class="success-triangle"')) + len("</section>")]
 st_sec = st_sec.replace('<section class="success-triangle"',
-                        '<section class="success-triangle rv" data-theme="night" style="--st-paper:#13110f;--st-ink:#f3ead8;--st-text:#cfc5b2;--st-accent:#e0414a;--st-blossom:#e9a0a8;--st-card:#1c1915"', 1)
+                        '<section class="success-triangle rv" data-theme="night" style="--st-paper:#13110f;--st-ink:#f3ead8;--st-text:#cfc5b2;--st-accent:#e44f57;--st-blossom:#e9a0a8;--st-card:#1c1915"', 1)
 TRIANGLE = st_sec
 st_fonts = re.findall(r'<link rel="stylesheet" href="(https://fonts.googleapis.com/[^"]+)">', src)
 
@@ -551,7 +567,7 @@ JS = (HERE / "night.js").read_text()
 def render(site):
     global SITE, PFX
     SITE, PFX = site, ("%BASE%" if site else "")  # the site build swaps in its base path
-    return header() + "\n<main>" + hero_sec() + ticker() + parents() + coaches() + achievements() + history() + tournaments() + camps() + schedule() + branches() + contact() + "\n</main>" + footer()
+    return header() + '\n<main id="main">' + hero_sec() + ticker() + parents() + coaches() + achievements() + history() + tournaments() + camps() + schedule() + branches() + contact() + "\n</main>" + footer()
 
 
 body = render(True)

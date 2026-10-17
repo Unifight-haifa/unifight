@@ -1,6 +1,7 @@
 ---
 import LangPick from '../components/LangPick.astro';
-import { LANGS, NAMES, t } from '../i18n/ui';
+import site from '../../content/site.json';
+import { LANGS, NAMES, dir, t } from '../i18n/ui';
 
 const base = import.meta.env.BASE_URL;
 // Search Console checks the property's home page, which is this picker
@@ -14,16 +15,23 @@ const gsc = import.meta.env.PUBLIC_GSC_VERIFICATION;
     <meta name="robots" content="noindex" />
     {gsc && <meta name="google-site-verification" content={gsc} />}
     <title>{t('he', 'siteName')}</title>
+    <meta name="description" content={site.hero.subline.he} />
     <link rel="icon" href={`${base}favicon.ico`} sizes="48x48" />
     <link rel="icon" type="image/png" href={`${base}favicon-32.png`} sizes="32x32" />
     <link rel="apple-touch-icon" href={`${base}apple-touch-icon.png`} />
     <LangPick mode="redirect" />
   </head>
   <body>
-    <ul>
-      {LANGS.map((l) => (
-        <li><a href={base + l + '/'} lang={l}>{NAMES[l]}</a></li>
-      ))}
-    </ul>
+    <main>
+      <h1>{t('he', 'siteName')}</h1>
+      <ul>
+        {LANGS.map((l) => (
+          <li><a href={base + l + '/'} lang={l}>{NAMES[l]}</a></li>
+        ))}
+      </ul>
+    </main>
+    <footer>
+      {LANGS.map((l) => <p><a href={base + l + '/accessibility/'} lang={l} dir={dir(l)}>{t(l, 'accessibilityStatement')}</a></p>)}
+    </footer>
   </body>
 </html>

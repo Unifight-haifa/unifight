@@ -52,6 +52,10 @@ document.addEventListener('click', function (e) {
   for (var k in el.dataset) if (k.length > 2 && k.indexOf('ga') === 0) p[k.charAt(2).toLowerCase() + k.slice(3)] = el.dataset[k];
   gtag('event', el.dataset.ga, p);
 });
+// Esc dismisses for this page only; no choice is stored, so nothing loads
+document.addEventListener('keydown', function (e) {
+  if (e.key === 'Escape' && !box.hidden) box.hidden = true;
+});
 })();`;
 ---
 {GA_ID && (
