@@ -742,7 +742,11 @@
      {
       "he": "אורי קשת הלוי",
       "ru": "Ори Кешет-Галеви",
-      "en": "Ori Keshet Halevi"
+      "en": "Ori Keshet Halevi",
+      "photo": {
+       "src": "coaches/ori.jpg",
+       "source": "owner 2026-10-17"
+      }
      },
      {
       "he": "גל קלודה",
