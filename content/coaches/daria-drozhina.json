@@ -1,0 +1,17 @@
+{
+ "id": "daria-drozhina",
+ "order": 18,
+ "group": "young",
+ "name": {
+  "he": "דריה דרוז'ינה",
+  "ru": "Дарья Дрожина",
+  "en": "Daria Drozhina"
+ },
+ "photo": {
+  "src": "coaches/daria.jpg",
+  "source": "owner 2026-10-18"
+ },
+ "sources": [
+  "Lazar Kaplun article (young coaches); owner sent photo 2026-10-18 with Hebrew name דריה דרוז'ינה, restoring her to the roster"
+ ]
+}
