@@ -718,8 +718,12 @@
      },
      {
       "he": "ודים גושין",
-      "ru": "Вадим Гущин",
-      "en": "Vadim Gushchin"
+      "ru": "Вадим Гушин",
+      "en": "Vadim Gushin",
+      "photo": {
+       "src": "coaches/vadim.jpg",
+       "source": "owner 2026-10-17"
+      }
      },
      {
       "he": "איגור ביטולייב",
