@@ -1,15 +1,31 @@
 ---
+import landing from '../../generated/landing.html?raw';
+import js from '../../generated/landing.js?raw';
+import fonts from '../../generated/fonts.json';
 import { i18n } from 'astro:config/client';
+import { getRelativeLocaleUrl } from 'astro:i18n';
 import Base from '../../layouts/Base.astro';
-import { t, type Lang } from '../../i18n/ui';
+import { LANGS, type Lang } from '../../i18n/ui';
+import '../../styles/landing.css';
 
 export function getStaticPaths() {
   return i18n!.locales.map((lang) => ({ params: { lang } }));
 }
 
 const lang = Astro.params.lang as Lang;
+// landing.* are produced by the content generator; regenerate rather than hand-edit
+let body = landing.replaceAll('%BASE%', import.meta.env.BASE_URL);
+for (const l of LANGS) {
+  body = body
+    .replaceAll(`data-l-link="${l}" href="%LANG_${l}%"`, `${l === lang ? 'aria-current="page"' : `data-set-lang="${l}"`} href="${getRelativeLocaleUrl(l)}"`);
+}
 ---
-<Base lang={lang}>
-  <h1>{t(lang, 'homeTitle')}</h1>
-  <p>{t(lang, 'homeLead')}</p>
+<Base lang={lang} bare>
+  <Fragment slot="head">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    {(fonts as string[]).map((href) => <link rel="stylesheet" href={href} />)}
+  </Fragment>
+  <Fragment set:html={body} />
+  <script is:inline set:html={js} />
 </Base>

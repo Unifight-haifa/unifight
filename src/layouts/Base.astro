@@ -8,23 +8,27 @@ interface Props {
   lang: Lang;
   title?: string;
   noindex?: boolean;
+  /** page brings its own header/main/footer */
+  bare?: boolean;
 }
 
-const { lang, title, noindex } = Astro.props;
+const { lang, title, noindex, bare } = Astro.props;
 const subset = { he: 'hebrew', ru: 'cyrillic', en: 'latin' }[lang];
 // path after /<base>/<lang>/; slugs are identical across locales
 const rest = Astro.url.pathname.slice(import.meta.env.BASE_URL.length).split('/').slice(1).join('/');
 ---
 <!doctype html>
-<html lang={lang} dir={dir(lang)}>
+<html lang={lang} dir={dir(lang)} data-site>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title ?? t(lang, 'siteName')}</title>
     {noindex && <meta name="robots" content="noindex" />}
     <Font cssVariable="--font-body" preload={[{ subset }]} />
+    <slot name="head" />
   </head>
   <body>
+    {bare ? <slot /> : <Fragment>
     <header class="site-header">
       <a class="site-name" href={getRelativeLocaleUrl(lang)}>{t(lang, 'siteName')}</a>
       <nav aria-label={t(lang, 'langLabel')}>
@@ -34,6 +38,7 @@ const rest = Astro.url.pathname.slice(import.meta.env.BASE_URL.length).split('/'
       </nav>
     </header>
     <main><slot /></main>
+    </Fragment>}
     <script is:inline>
       // only an explicit switch counts as a choice; page views never write
       document.addEventListener('click', function (e) {
