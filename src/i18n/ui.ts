@@ -13,6 +13,12 @@ export const ui = {
     langLabel: 'שפה',
     notFoundTitle: 'הדף לא נמצא',
     notFoundHome: 'לדף הבית',
+    newsTitle: 'חדשות',
+    newsBy: 'מאת',
+    newsShare: 'שיתוף',
+    newsCopy: 'העתקת קישור',
+    newsCopied: 'הקישור הועתק',
+    newsAll: 'כל החדשות',
   },
   ru: {
     siteName: 'Юнифайт Хайфа',
@@ -21,6 +27,12 @@ export const ui = {
     langLabel: 'Язык',
     notFoundTitle: 'Страница не найдена',
     notFoundHome: 'На главную',
+    newsTitle: 'Новости',
+    newsBy: 'Автор:',
+    newsShare: 'Поделиться',
+    newsCopy: 'Скопировать ссылку',
+    newsCopied: 'Ссылка скопирована',
+    newsAll: 'Все новости',
   },
   en: {
     siteName: 'Unifight Haifa',
@@ -29,6 +41,12 @@ export const ui = {
     langLabel: 'Language',
     notFoundTitle: 'Page not found',
     notFoundHome: 'Go to home page',
+    newsTitle: 'News',
+    newsBy: 'By',
+    newsShare: 'Share',
+    newsCopy: 'Copy link',
+    newsCopied: 'Link copied',
+    newsAll: 'All news',
   },
 };
 

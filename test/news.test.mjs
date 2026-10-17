@@ -1,0 +1,94 @@
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import { cpSync, existsSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { pathToFileURL } from 'node:url';
+import { checkNews } from '../src/lib/news-check.mjs';
+
+const dist = new URL('../dist/', import.meta.url);
+const src = new URL('../src/content/news/', import.meta.url);
+const base = (process.env.BASE_PATH || '/unifight').replace(/\/?$/, '/');
+const LANGS = { he: 'rtl', ru: 'ltr', en: 'ltr' };
+const meta = (html, prop) => html.match(new RegExp(`<meta (?:property|name)="${prop}" content="([^"]*)"`))?.[1];
+
+const posts = readdirSync(src).map((dir) => ({
+  dir,
+  slug: dir.slice(11),
+  draft: /^draft:\s*true\s*$/m.test(readFileSync(new URL(`${dir}/index.he.md`, src), 'utf8')),
+}));
+const published = posts.filter((p) => !p.draft);
+const drafts = posts.filter((p) => p.draft);
+const page = (l, slug) => readFileSync(new URL(`${l}/news/${slug}/index.html`, dist), 'utf8');
+const feed = () => JSON.parse(readFileSync(new URL('news.json', dist), 'utf8'));
+
+test('fixtures cover both a published and a draft post', () => {
+  assert.ok(published.length > 0 && drafts.length > 0);
+});
+
+for (const { slug } of published) {
+  for (const [l, d] of Object.entries(LANGS)) {
+    test(`${l}/news/${slug}/ exists with lang="${l}" dir="${d}" and is listed`, () => {
+      assert.ok(page(l, slug).includes(`<html lang="${l}" dir="${d}"`));
+      const list = readFileSync(new URL(`${l}/news/index.html`, dist), 'utf8');
+      assert.ok(list.includes(`href="${base}${l}/news/${slug}/"`));
+    });
+
+    test(`${l}/news/${slug}/ has article og tags and hreflang`, () => {
+      const html = page(l, slug);
+      assert.equal(meta(html, 'og:type'), 'article');
+      for (const p of ['og:title', 'og:description', 'og:url']) assert.ok(meta(html, p), p);
+      const img = new URL(meta(html, 'og:image'));
+      assert.ok(img.pathname.endsWith('.jpeg') || img.pathname.endsWith('.jpg'), img.href);
+      assert.ok(statSync(new URL(img.pathname.slice(base.length), dist)).size < 600_000);
+      const alt = [...html.matchAll(/<link rel="alternate" hreflang="([^"]+)" href="([^"]+)"/g)].map((m) => m[1]);
+      assert.deepEqual(alt.sort(), Object.keys(LANGS).sort());
+    });
+
+    test(`${l}/news/${slug}/ share links carry the encoded post URL`, () => {
+      const html = page(l, slug);
+      const url = meta(html, 'og:url');
+      const enc = encodeURIComponent(url);
+      for (const host of ['https://wa.me/?text=', 'https://www.facebook.com/sharer/sharer.php?u=', 'https://t.me/share/url?url=']) {
+        const href = html.match(new RegExp(`href="(${host.replace(/[?.]/g, '\\$&')}[^"]*)"`))?.[1];
+        assert.ok(href?.includes(enc), host);
+      }
+      assert.match(html, new RegExp(`<a [^>]*href="${url}" data-copy`));
+    });
+  }
+}
+
+test('news.json is valid and lists every published post in all languages', () => {
+  const items = feed();
+  assert.deepEqual(items.map((p) => p.slug).sort(), published.map((p) => p.slug).sort());
+  for (const p of items) {
+    for (const l of Object.keys(LANGS)) {
+      assert.equal(new URL(p.url[l]).pathname, `${base}${l}/news/${p.slug}/`);
+      assert.ok(p.title[l] && p.summary[l].length <= 160);
+    }
+    assert.match(p.date, /^\d{4}-\d{2}-\d{2}$/);
+    assert.ok(existsSync(new URL(new URL(p.cover).pathname.slice(base.length), dist)), p.cover);
+  }
+});
+
+test('draft posts are absent from dist', () => {
+  for (const { slug } of drafts) {
+    for (const l of Object.keys(LANGS)) assert.ok(!existsSync(new URL(`${l}/news/${slug}/`, dist)), `${l}/${slug}`);
+    assert.ok(!feed().some((p) => p.slug === slug));
+  }
+});
+
+function rejects(file, re) {
+  const root = mkdtempSync(join(tmpdir(), 'news-'));
+  try {
+    cpSync(new URL(published[0].dir, src), join(root, published[0].dir), { recursive: true });
+    rmSync(join(root, published[0].dir, file));
+    assert.throws(() => checkNews(pathToFileURL(`${root}/`)), re);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+}
+
+test('content check accepts the real posts', () => assert.doesNotThrow(() => checkNews(src)));
+test('content check rejects a post missing a language', () => rejects('index.ru.md', /index\.ru\.md is missing/));
+test('content check rejects a post whose cover is missing', () => rejects('cover.jpg', /cover cover\.jpg not found/));

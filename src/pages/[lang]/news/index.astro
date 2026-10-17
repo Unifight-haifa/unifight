@@ -1,0 +1,46 @@
+---
+import { Image } from 'astro:assets';
+import { i18n } from 'astro:config/client';
+import { getRelativeLocaleUrl } from 'astro:i18n';
+import fonts from '../../../generated/fonts.json';
+import Base from '../../../layouts/Base.astro';
+import { LANGS, t, type Lang } from '../../../i18n/ui';
+import { fmtDate, getPosts, postPath } from '../../../lib/news';
+import '../../../styles/landing.css';
+import '../../../styles/news.css';
+
+export function getStaticPaths() {
+  return i18n!.locales.map((lang) => ({ params: { lang } }));
+}
+
+const lang = Astro.params.lang as Lang;
+const posts = await getPosts();
+const abs = (path: string) => new URL(path, Astro.site).href;
+const title = `${t(lang, 'newsTitle')} · ${t(lang, 'siteName')}`;
+---
+<Base lang={lang} title={title}>
+  <Fragment slot="head">
+    <link rel="canonical" href={abs(getRelativeLocaleUrl(lang, 'news/'))} />
+    {LANGS.map((l) => <link rel="alternate" hreflang={l} href={abs(getRelativeLocaleUrl(l, 'news/'))} />)}
+    <link rel="alternate" type="application/rss+xml" title={title} href={getRelativeLocaleUrl(lang, 'news/rss.xml')} />
+    {(fonts as string[]).map((href) => <link rel="stylesheet" href={href} />)}
+  </Fragment>
+  <div class="news">
+    <h1 class="h2">{t(lang, 'newsTitle')}</h1>
+    <ul class="news-list">
+      {posts.map((p) => {
+        const d = p.lang[lang].data;
+        return (
+          <li class="news-card">
+            <a href={postPath(lang, p.slug)}>
+              <Image src={d.cover} alt={d.cover_alt ?? ''} widths={[400, 800]} sizes="(min-width: 900px) 400px, 100vw" />
+              <time datetime={d.date.toISOString().slice(0, 10)}>{fmtDate(d.date, lang)}</time>
+              <h2 class="h3">{d.title}</h2>
+              <p>{d.summary}</p>
+            </a>
+          </li>
+        );
+      })}
+    </ul>
+  </div>
+</Base>

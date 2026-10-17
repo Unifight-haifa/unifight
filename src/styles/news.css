@@ -1,0 +1,23 @@
+/* palette and type come from landing.css; this file only lays out the news pages */
+.site-header a { color: var(--gold-2); text-decoration: none; }
+.site-header .site-name { font: 600 20px/1.2 var(--disp); text-transform: uppercase; color: var(--paper); }
+
+.news { padding-block: 1rem 4rem; }
+.news .h2 { font-size: clamp(30px, 6vw, 56px); }
+.news time, .news-meta { color: var(--mute); font-size: 15px; }
+
+.news-list { list-style: none; padding: 0; display: grid; gap: 28px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr)); }
+.news-card a { display: grid; gap: 10px; text-decoration: none; background: var(--ink-2); border: 1px solid var(--line); border-radius: 2px; padding-block-end: 18px; transition: border-color .2s; }
+.news-card a:hover { border-color: var(--gold); }
+.news-card a > :not(img) { margin-inline: 18px; }
+.news-card img { inline-size: 100%; aspect-ratio: 16 / 10; object-fit: cover; }
+.news-card .h3 { color: var(--paper); }
+.news-card p { color: var(--paper-2); font-size: 16px; }
+
+.news-back { color: var(--gold); font-size: 15px; text-decoration: none; }
+.news-cover { inline-size: 100%; margin-block: 20px 28px; border-radius: 2px; }
+.news-body { max-inline-size: 68ch; font-size: 18px; color: var(--paper-2); }
+.news-body :where(p, ul, ol) { margin-block-end: 1em; }
+.news-body a { color: var(--gold-2); }
+.news-share { display: flex; flex-wrap: wrap; gap: 10px; margin-block-start: 36px; padding-block-start: 24px; border-block-start: 1px solid var(--line); }
+.news-share .btn { min-block-size: 44px; font-size: 15px; padding: .6em 1.1em; }

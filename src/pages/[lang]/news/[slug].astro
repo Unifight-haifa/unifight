@@ -1,0 +1,80 @@
+---
+import { Image } from 'astro:assets';
+import { render } from 'astro:content';
+import { getRelativeLocaleUrl } from 'astro:i18n';
+import fonts from '../../../generated/fonts.json';
+import Base from '../../../layouts/Base.astro';
+import { LANGS, t, type Lang } from '../../../i18n/ui';
+import { authorName, fmtDate, getPosts, ogCover, postPath, type Post } from '../../../lib/news';
+import '../../../styles/landing.css';
+import '../../../styles/news.css';
+
+export async function getStaticPaths() {
+  const posts = await getPosts();
+  return LANGS.flatMap((lang) => posts.map((post) => ({ params: { lang, slug: post.slug }, props: { post } })));
+}
+
+const lang = Astro.params.lang as Lang;
+const { post } = Astro.props as { post: Post };
+const entry = post.lang[lang];
+const d = entry.data;
+const { Content } = await render(entry);
+const abs = (path: string) => new URL(path, Astro.site).href;
+const url = abs(postPath(lang, post.slug));
+const og = await ogCover(entry);
+const LOCALE = { he: 'he_IL', ru: 'ru_RU', en: 'en_US' };
+const e = encodeURIComponent;
+const share = [
+  ['WhatsApp', `https://wa.me/?text=${e(`${d.title} ${url}`)}`],
+  // sharer.php is undocumented by Facebook but stable and widely used
+  ['Facebook', `https://www.facebook.com/sharer/sharer.php?u=${e(url)}`],
+  ['Telegram', `https://t.me/share/url?url=${e(url)}&text=${e(d.title)}`],
+];
+---
+<Base lang={lang} title={`${d.title} · ${t(lang, 'siteName')}`}>
+  <Fragment slot="head">
+    <meta name="description" content={d.summary} />
+    <link rel="canonical" href={url} />
+    {LANGS.map((l) => <link rel="alternate" hreflang={l} href={abs(postPath(l, post.slug))} />)}
+    <meta property="og:type" content="article" />
+    <meta property="og:site_name" content={t(lang, 'siteName')} />
+    <meta property="og:title" content={d.title} />
+    <meta property="og:description" content={d.summary} />
+    <meta property="og:url" content={url} />
+    <meta property="og:image" content={abs(og.src)} />
+    <meta property="og:image:width" content={String(og.attributes.width)} />
+    <meta property="og:image:height" content={String(og.attributes.height)} />
+    {d.cover_alt && <meta property="og:image:alt" content={d.cover_alt} />}
+    <meta property="og:locale" content={LOCALE[lang]} />
+    {LANGS.filter((l) => l !== lang).map((l) => <meta property="og:locale:alternate" content={LOCALE[l]} />)}
+    <meta property="article:published_time" content={d.date.toISOString()} />
+    <meta name="twitter:card" content="summary_large_image" />
+    {(fonts as string[]).map((href) => <link rel="stylesheet" href={href} />)}
+  </Fragment>
+  <article class="news post">
+    <a class="news-back" href={getRelativeLocaleUrl(lang, 'news/')}>{t(lang, 'newsAll')}</a>
+    <h1 class="h2">{d.title}</h1>
+    <p class="news-meta">
+      <time datetime={d.date.toISOString().slice(0, 10)}>{fmtDate(d.date, lang)}</time>
+      · {t(lang, 'newsBy')} <bdi>{authorName(d.author, lang)}</bdi>
+    </p>
+    <Image class="news-cover" src={d.cover} alt={d.cover_alt ?? ''} widths={[600, 1200]} sizes="(min-width: 800px) 760px, 100vw" />
+    <div class="news-body"><Content /></div>
+    <nav class="news-share" aria-label={t(lang, 'newsShare')}>
+      {share.map(([name, href]) => <a class="btn btn-ghost" href={href} target="_blank" rel="noopener">{name}</a>)}
+      <a class="btn btn-ghost" href={url} data-copy data-done={t(lang, 'newsCopied')}>{t(lang, 'newsCopy')}</a>
+    </nav>
+  </article>
+  <script is:inline>
+    document.addEventListener('click', function (e) {
+      var a = e.target.closest && e.target.closest('[data-copy]');
+      if (!a) return;
+      e.preventDefault();
+      var done = function () { a.textContent = a.dataset.done; };
+      // clipboard API needs a secure context; prompt lets the user copy by hand
+      var manual = function () { window.prompt('', a.href); };
+      if (navigator.clipboard) navigator.clipboard.writeText(a.href).then(done, manual);
+      else manual();
+    });
+  </script>
+</Base>
