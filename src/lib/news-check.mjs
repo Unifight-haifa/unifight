@@ -44,6 +44,9 @@ const URL_ATTRS = new Set(['href', 'src', 'srcset', 'action', 'formaction', 'xli
 const SAFE_URL = /^(https?:\/\/|mailto:|\/(?!\/)|#)/i;
 
 export function checkRenderedBody(html) {
+  // fail closed: every "<letter" must be a tag the pattern fully understands, and no forbidden tag anywhere
+  if (/<(script|iframe|object|embed|style|form|base|meta|link|svg|math)[\s/>]/i.test(html)) throw new Error('rendered post contains a forbidden tag');
+  if ((html.match(/<[a-z]/gi) ?? []).length !== [...html.matchAll(TAG)].length) throw new Error('rendered post contains a tag that cannot be checked');
   // text is entity-escaped by the renderer, so only real tags are inspected; prose mentioning "onerror=" is fine
   for (const [tag] of html.matchAll(TAG)) {
     if (BAD_TAG.test(tag)) throw new Error('rendered post contains a forbidden tag');

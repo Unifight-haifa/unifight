@@ -143,6 +143,9 @@ test('rendered-body gate rejects unsafe output', () => {
     '<p><img src=x onerror=alert(1)></p>',
     '<script>alert(1)</script>',
     '<p><iframe src="https://e.example"></iframe></p>',
+    '<p><img/src=x/onerror=alert(1)></p>',
+    '<p><svg/onload=alert(1)></p>',
+    '<p><a href="https://ok.example" x="y"z onclick=alert(1)>x</a></p>',
   ]) assert.throws(() => checkRenderedBody(bad), undefined, bad);
   assert.throws(() => checkRenderedBody('<p><img alt="a>b" onerror=alert(1) src="/x.jpg"></p>'), /event handler/);
   assert.doesNotThrow(() => checkRenderedBody('<p>Hi &lt;img src=x onerror=alert(1)&gt; and src=x onclick=y in prose</p>'));
