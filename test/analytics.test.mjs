@@ -1,9 +1,10 @@
 import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
-import { execFileSync } from 'node:child_process';
-import { mkdtempSync, readdirSync, readFileSync, rmSync } from 'node:fs';
+import { execFile, execFileSync, spawnSync } from 'node:child_process';
+import { existsSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { createServer } from 'node:http';
+import { extname, join } from 'node:path';
 import vm from 'node:vm';
 
 const htmlFiles = (dir) => readdirSync(dir, { recursive: true }).filter((f) => f.endsWith('.html')).map((f) => join(dir, f));
@@ -16,12 +17,13 @@ test('without PUBLIC_GA_ID nothing analytics-related is rendered', { skip: !!pro
   }
 });
 
-// one extra build with a fake ID; the consent code path is what's under test
+// one extra build with the club's real ID; the consent code path is what's under test
+const ID = 'G-3XKDLN1MLL';
 let ga;
 before(() => {
   ga = mkdtempSync(join(tmpdir(), 'unifight-ga-'));
   execFileSync('npx', ['astro', 'build', '--outDir', ga], {
-    env: { ...process.env, PUBLIC_GA_ID: 'G-TEST123', PUBLIC_GSC_VERIFICATION: 'gsc-test-token' },
+    env: { ...process.env, PUBLIC_GA_ID: ID, PUBLIC_GSC_VERIFICATION: 'gsc-test-token' },
     stdio: 'pipe',
   });
 });
@@ -79,7 +81,7 @@ test('first visit: banner shows, nothing loads until Accept', () => {
   assert.equal(r.box.hidden, true);
   assert.equal(r.store.get('consent'), 'granted');
   assert.equal(r.added.length, 1);
-  assert.equal(r.added[0].src, 'https://www.googletagmanager.com/gtag/js?id=G-TEST123');
+  assert.equal(r.added[0].src, `https://www.googletagmanager.com/gtag/js?id=${ID}`);
   r.click({ ga: 'whatsapp_click', gaPlacement: 'contact', gaVenue: 'dror-school' });
   const ev = r.ctx.dataLayer.filter((a) => a[0] === 'event');
   assert.deepEqual(JSON.parse(JSON.stringify(ev)), [{ 0: 'event', 1: 'whatsapp_click', 2: { language: 'he', placement: 'contact', venue: 'dror-school' } }]);
@@ -115,4 +117,29 @@ test('each page language gets its own banner, and the tracked elements are tagge
     assert.ok(read(`${l}/privacy/index.html`).includes('data-consent-open'), `${l} privacy footer link`);
   }
   assert.ok(read('index.html').includes('<meta name="google-site-verification" content="gsc-test-token">'));
+});
+
+const hasPlaywright = spawnSync('python3', ['-c', 'import playwright'], { stdio: 'ignore' }).status === 0;
+const TYPES = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.woff2': 'font/woff2' };
+
+test('in a real browser gtag.js is requested only after Accept', { skip: !hasPlaywright && 'needs Python Playwright' }, async () => {
+  // astro preview is a single-instance daemon in Astro 7, so serve the build directly
+  const base = (process.env.BASE_PATH || '/unifight').replace(/\/?$/, '/');
+  const srv = createServer((req, res) => {
+    const path = decodeURIComponent(new URL(req.url, 'http://x').pathname);
+    let file = join(ga, path.slice(base.length));
+    if (!path.startsWith(base) || !existsSync(file)) return res.writeHead(404).end();
+    if (statSync(file).isDirectory()) file = join(file, 'index.html');
+    res.writeHead(200, { 'Content-Type': TYPES[extname(file)] ?? 'application/octet-stream' }).end(readFileSync(file));
+  });
+  await new Promise((ok) => srv.listen(0, '127.0.0.1', ok));
+  try {
+    const url = `http://127.0.0.1:${srv.address().port}${base}`;
+    const out = await new Promise((ok, fail) =>
+      execFile('python3', [new URL('consent_browser.py', import.meta.url).pathname, url, ID], (err, stdout, stderr) => (err ? fail(new Error(stderr)) : ok(stdout))),
+    );
+    assert.equal(out.trim(), 'ok');
+  } finally {
+    srv.close();
+  }
 });
