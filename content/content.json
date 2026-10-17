@@ -56,7 +56,7 @@
   {
    "id": "coaches",
    "he": "המאמנים",
-   "ru": "Тренеры",
+   "ru": "Тренера",
    "en": "Coaches"
   },
   {
@@ -368,12 +368,12 @@
  "coaches": {
   "title": {
    "he": "המאמנים שלנו",
-   "ru": "Наши тренеры",
+   "ru": "Наши тренера",
    "en": "Our coaches"
   },
   "intro": {
    "he": "מאמנים שהיו בעצמם על הפודיום — ויודעים איך להביא לשם גם אחרים.",
-   "ru": "Тренеры, которые сами стояли на пьедестале — и знают, как привести туда других.",
+   "ru": "Тренера, которые сами стояли на пьедестале — и знают, как привести туда других.",
    "en": "Coaches who have stood on the podium themselves — and know how to get others there."
   },
   "items": [
@@ -587,7 +587,7 @@
   "more_coaches": {
    "placeholder": true,
    "he": "[מאמנים נוספים — רשימה מלאה מהבעלים]",
-   "ru": "[Другие тренеры — полный список от владельца]",
+   "ru": "[Другие тренера — полный список от владельца]",
    "en": "[Other coaches — full roster from owner]"
   },
   "team_photo": {
@@ -614,7 +614,7 @@
    {
     "name": {
      "he": "טומי ארשנסקי",
-     "ru": "Артем Аршанский",
+     "ru": "Томи Аршански",
      "en": "Tommy (Artem) Arshansky"
     },
     "bio": {
@@ -622,7 +622,16 @@
      "ru": "Участник Олимпийских игр в Лондоне, неоднократный призёр чемпионатов Европы и мира, тренер юниорской сборной Израиля по дзюдо. Сегодня тренирует в Крайот.",
      "en": "London Olympian, multiple European and World championship medallist, coach of Israel's junior judo team. Coaches in the Krayot today."
     },
-    "source": "Lazar Kaplun, Facebook post, text supplied by owner 2026-10-17; he/en spellings are transliterations, unverified"
+    "source": "Lazar Kaplun, Facebook post, text supplied by owner 2026-10-17; he/en spellings are transliterations, unverified",
+    "photo": {
+     "src": "coaches/tommy.jpg",
+     "source": "owner 2026-10-17",
+     "alt": {
+      "he": "טומי ארשנסקי",
+      "ru": "Томи Аршански",
+      "en": "Tommy Arshansky"
+     }
+    }
    },
    {
     "name": {
@@ -677,7 +686,7 @@
    {
     "title": {
      "he": "מאמנים ותיקים",
-     "ru": "Тренеры клуба",
+     "ru": "Тренера клуба",
      "en": "Club coaches"
     },
     "text": {
@@ -721,12 +730,12 @@
    {
     "title": {
      "he": "הדור הצעיר",
-     "ru": "Молодые тренеры",
+     "ru": "Молодые тренера",
      "en": "Young coaches"
     },
     "text": {
      "he": "אחרי השירות בצה״ל — מאמנים, ועדיין מתחרים ברמה בינלאומית.",
-     "ru": "После службы в ЦАХАЛе — тренеры и действующие спортсмены международного уровня.",
+     "ru": "После службы в ЦАХАЛе — тренера и действующие спортсмены международного уровня.",
      "en": "Back from IDF service: coaching, and still competing internationally."
     },
     "names": [
@@ -1275,7 +1284,7 @@
     },
     "text": {
      "he": "המועדון פועל תחת השם ״אולימפיקס״, בהדרכת אלכסנדר קרטיש ופאבל ארשנסקי. באותה שנה יוצא לדרך מחנה הספורט הבינלאומי J-Sport לבני נוער.",
-     "ru": "Клуб выступает под именем «Олимпикс», тренеры — Александр Кратыш и Павел Аршанский. В том же году стартует международный молодёжный спортивный лагерь J-Sport.",
+     "ru": "Клуб выступает под именем «Олимпикс», тренера — Александр Кратыш и Павел Аршанский. В том же году стартует международный молодёжный спортивный лагерь J-Sport.",
      "en": "The club trains under the name \"Olimpix\", coached by Alexander Kratysh and Pavel Arshansky. The same year the international youth sports camp J-Sport gets going."
     },
     "sources": [
