@@ -1,0 +1,9 @@
+---
+interface Props {
+  e164: string;
+  display: string;
+}
+
+const { e164, display } = Astro.props;
+---
+<a href={`tel:${e164}`} dir="ltr">{display}</a>

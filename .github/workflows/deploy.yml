@@ -1,0 +1,56 @@
+---
+name: Deploy to GitHub Pages
+
+"on":
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+env:
+  # Custom domain: set repo Variables, see docs/domain-switch.md
+  SITE_URL: >-
+    ${{ vars.SITE_URL
+    || format('https://{0}.github.io', github.repository_owner) }}
+  BASE_PATH: >-
+    ${{ vars.BASE_PATH || format('/{0}', github.event.repository.name) }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: withastro/action@v6
+        with:
+          build-cmd: npm run build && npm test
+      - run: npm run build:linkcheck
+      - uses: lycheeverse/lychee-action@v2
+        with:
+          args: >-
+            --offline --no-progress --index-files index.html
+            --root-dir ${{ github.workspace }}/.linkcheck/project
+            .linkcheck/project
+      - uses: lycheeverse/lychee-action@v2
+        with:
+          args: >-
+            --offline --no-progress --index-files index.html
+            --root-dir ${{ github.workspace }}/.linkcheck/domain
+            .linkcheck/domain
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5

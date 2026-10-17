@@ -1,0 +1,34 @@
+---
+interface Props {
+  mode: 'redirect' | 'reveal';
+}
+
+const { mode } = Astro.props;
+const base = JSON.stringify(import.meta.env.BASE_URL);
+
+// ES5: runs before anything else on old phones. Only the 404 trusts the URL's locale segment.
+const pick = `
+var base = ${base}, L = ['he', 'ru', 'en'], pick = null;
+${mode === 'reveal' ? `var seg = location.pathname.indexOf(base) === 0 ? location.pathname.slice(base.length).split('/')[0] : '';
+if (L.indexOf(seg) >= 0) pick = seg;` : ''}
+if (!pick) try { var s = localStorage.getItem('lang'); if (L.indexOf(s) >= 0) pick = s; } catch (e) {}
+if (!pick) {
+  var prefs = navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language || ''];
+  for (var i = 0; i < prefs.length && !pick; i++) {
+    var p = String(prefs[i]).toLowerCase().split('-')[0];
+    if (p === 'iw') p = 'he';
+    if (L.indexOf(p) >= 0) pick = p;
+  }
+}
+pick = pick || 'he';`;
+
+const tail =
+  mode === 'redirect'
+    ? `location.replace(base + pick + '/' + location.search + location.hash);`
+    : `document.querySelectorAll('[data-404]').forEach(function (el) { el.hidden = el.getAttribute('data-404') !== pick; });
+document.documentElement.lang = pick;
+document.documentElement.dir = pick === 'he' ? 'rtl' : 'ltr';`;
+
+const code = `(function () {${pick}\n${tail}\n})();`;
+---
+<script is:inline set:html={code} />

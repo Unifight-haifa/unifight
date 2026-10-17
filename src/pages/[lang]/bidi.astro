@@ -1,0 +1,87 @@
+---
+import { i18n } from 'astro:config/client';
+import Base from '../../layouts/Base.astro';
+import Ltr from '../../components/Ltr.astro';
+import Phone from '../../components/Phone.astro';
+import type { Lang } from '../../i18n/ui';
+
+export function getStaticPaths() {
+  return i18n!.locales.map((lang) => ({ params: { lang } }));
+}
+
+const lang = Astro.params.lang as Lang;
+
+// Fixture text only; tokens and names are dummies.
+const s = {
+  he: {
+    weight: ['ספורטאים בקטגוריית', 'מתחרים היום.'],
+    time: ['האימון מתקיים בשעות', 'בימי שני.'],
+    date: ['הטורניר ייערך בתאריך', 'בחיפה.'],
+    score: ['הקרב הסתיים בתוצאה', 'לטובת הכחול.'],
+    phone: ['התקשרו אלינו:', 'בכל יום.'],
+    name: ['המאמן', 'מוביל את האימון.'],
+    abbr: 'משקל מרבי: 60 ק״ג.',
+    wrong: 'שגוי (ללא בידוד):',
+  },
+  ru: {
+    weight: ['Спортсмены в категории', 'выступают сегодня.'],
+    time: ['Тренировка проходит', 'по понедельникам.'],
+    date: ['Турнир пройдёт', 'в Хайфе.'],
+    score: ['Схватка закончилась со счётом', 'в пользу синего.'],
+    phone: ['Звоните:', 'каждый день.'],
+    name: ['Тренер', 'ведёт тренировку.'],
+    abbr: 'Максимальный вес: 60 кг.',
+    wrong: 'Неверно (без изоляции):',
+  },
+  en: {
+    weight: ['Athletes in the', 'category compete today.'],
+    time: ['Training runs', 'on Mondays.'],
+    date: ['The tournament is on', 'in Haifa.'],
+    score: ['The bout ended', 'for blue.'],
+    phone: ['Call us:', 'any day.'],
+    name: ['Coach', 'leads the session.'],
+    abbr: 'Maximum weight: 60 kg.',
+    wrong: 'Wrong (no isolation):',
+  },
+}[lang];
+---
+<Base lang={lang} title="Bidi fixture" noindex>
+  <h1>Bidi fixture</h1>
+  <ul>
+    <li>
+      {s.weight[0]}
+      <Ltr>−60 kg</Ltr>
+      {s.weight[1]}
+    </li>
+    <li>
+      {s.time[0]}
+      <Ltr>17:30–19:00</Ltr>
+      {s.time[1]}
+    </li>
+    <li>
+      {s.date[0]}
+      <Ltr>17.10.2026</Ltr>
+      {s.date[1]}
+    </li>
+    <li>
+      {s.score[0]}
+      <Ltr>10–0</Ltr>
+      {s.score[1]}
+    </li>
+    <li>
+      {s.phone[0]}
+      <Phone e164="+97241234567" display="+972 4-123-4567" />
+      {s.phone[1]}
+    </li>
+    <li>
+      {s.name[0]}
+      <bdi>David Cohen</bdi>
+      {s.name[1]}
+    </li>
+    <li>{s.abbr}</li>
+  </ul>
+  <p>
+    <strong>{s.wrong}</strong>
+    {s.weight[0]} −60 kg {s.weight[1]}
+  </p>
+</Base>

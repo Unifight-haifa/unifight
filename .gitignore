@@ -1,0 +1,9 @@
+# owner originals (large, not for git)
+*.zip
+assets/source/
+node_modules/
+dist/
+.astro/
+.linkcheck/
+.gstack/
+.claude/

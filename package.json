@@ -1,0 +1,19 @@
+{
+  "name": "unifight",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.22.0"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "test": "node --test",
+    "build:linkcheck": "rm -rf .linkcheck && BASE_PATH=/unifight astro build --outDir .linkcheck/project/unifight && BASE_PATH=/ astro build --outDir .linkcheck/domain",
+    "check:links": "npm run build:linkcheck && lychee --offline --no-progress --index-files index.html --root-dir \"$PWD/.linkcheck/project\" .linkcheck/project && lychee --offline --no-progress --index-files index.html --root-dir \"$PWD/.linkcheck/domain\" .linkcheck/domain"
+  },
+  "dependencies": {
+    "astro": "7.4.0"
+  }
+}

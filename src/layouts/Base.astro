@@ -1,0 +1,45 @@
+---
+import { Font } from 'astro:assets';
+import { getRelativeLocaleUrl } from 'astro:i18n';
+import { LANGS, NAMES, dir, t, type Lang } from '../i18n/ui';
+import '../styles/global.css';
+
+interface Props {
+  lang: Lang;
+  title?: string;
+  noindex?: boolean;
+}
+
+const { lang, title, noindex } = Astro.props;
+const subset = { he: 'hebrew', ru: 'cyrillic', en: 'latin' }[lang];
+// path after /<base>/<lang>/; slugs are identical across locales
+const rest = Astro.url.pathname.slice(import.meta.env.BASE_URL.length).split('/').slice(1).join('/');
+---
+<!doctype html>
+<html lang={lang} dir={dir(lang)}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title ?? t(lang, 'siteName')}</title>
+    {noindex && <meta name="robots" content="noindex" />}
+    <Font cssVariable="--font-body" preload={[{ subset }]} />
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="site-name" href={getRelativeLocaleUrl(lang)}>{t(lang, 'siteName')}</a>
+      <nav aria-label={t(lang, 'langLabel')}>
+        {LANGS.filter((l) => l !== lang).map((l) => (
+          <a href={getRelativeLocaleUrl(l, rest)} hreflang={l} lang={l} data-set-lang={l}>{NAMES[l]}</a>
+        ))}
+      </nav>
+    </header>
+    <main><slot /></main>
+    <script is:inline>
+      // only an explicit switch counts as a choice; page views never write
+      document.addEventListener('click', function (e) {
+        var a = e.target && e.target.closest && e.target.closest('[data-set-lang]');
+        if (a) try { localStorage.setItem('lang', a.dataset.setLang); } catch (err) {}
+      });
+    </script>
+  </body>
+</html>
