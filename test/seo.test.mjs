@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { readdirSync, readFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
 
 const dist = new URL('../dist/', import.meta.url);
 const base = (process.env.BASE_PATH || '/unifight').replace(/\/?$/, '/');
@@ -96,4 +96,10 @@ test('news posts carry NewsArticle JSON-LD', () => {
     assert.ok(a.headline && a.datePublished && a.author.name && a.image.length, path);
     assert.equal(new URL(a.url).pathname, path);
   }
+});
+
+test('every page links the club favicon', () => {
+  const pages = readdirSync(new URL('../dist/', import.meta.url), { recursive: true }).filter((f) => f.endsWith('.html'));
+  for (const f of pages) assert.match(readFileSync(new URL(`../dist/${f}`, import.meta.url), 'utf8'), /rel="icon"[^>]*favicon/, f);
+  for (const f of ['favicon.ico', 'favicon-32.png', 'apple-touch-icon.png']) assert.ok(existsSync(new URL(`../dist/${f}`, import.meta.url)), f);
 });

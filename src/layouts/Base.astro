@@ -26,6 +26,9 @@ const rest = Astro.url.pathname.slice(import.meta.env.BASE_URL.length).split('/'
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title ?? t(lang, 'siteName')}</title>
+    <link rel="icon" href={`${import.meta.env.BASE_URL}favicon.ico`} sizes="48x48" />
+    <link rel="icon" type="image/png" href={`${import.meta.env.BASE_URL}favicon-32.png`} sizes="32x32" />
+    <link rel="apple-touch-icon" href={`${import.meta.env.BASE_URL}apple-touch-icon.png`} />
     {description && <meta name="description" content={description} />}
     {noindex && <meta name="robots" content="noindex" />}
     <Font cssVariable="--font-body" preload={[{ subset }]} />
