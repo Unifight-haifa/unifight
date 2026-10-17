@@ -732,7 +732,11 @@
      {
       "he": "סרגיי פוטומקה",
       "ru": "Сергей Потомака",
-      "en": "Sergey Potomaka"
+      "en": "Sergey Potomaka",
+      "photo": {
+       "src": "coaches/sergey.jpg",
+       "source": "owner 2026-10-17"
+      }
      },
      {
       "he": "ודים גושין",
