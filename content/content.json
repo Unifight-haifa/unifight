@@ -390,9 +390,9 @@
      "en": "Club chair and head coach"
     },
     "bio": {
-     "he": "גדלה על המזרן שלנו: התחילה ג׳ודו בגיל חמש אצל אביה, אלכסנדר. בהמשך עברה להיאבקות, זכתה בארבע מדליות כסף באליפויות אירופה (2013–2016) וייצגה את ישראל באולימפיאדת ריו 2016. ב־2023 זכתה בכסף באליפות אירופה בסומו — המדליה הראשונה אי פעם של ישראל בענף, וב־2026 במדליית זהב בהיאבקות חופים במכביה. היום היא עומדת בראש המועדון ומאמנת ג׳ודו והיאבקות.",
-     "ru": "Выросла на нашем татами: начала заниматься дзюдо в пять лет у отца, Александра Кратыша. Потом перешла в борьбу — четыре серебряные медали чемпионатов Европы (2013–2016) и Олимпиада в Рио-2016. В 2023 году взяла серебро чемпионата Европы по сумо — первую в истории медаль Израиля в этом виде, а в 2026-м — золото Маккабиады по пляжной борьбе. Сегодня возглавляет клуб и тренирует дзюдоистов и борцов.",
-     "en": "She grew up on our mat: started judo at five with her father, Alexander. She later moved to wrestling, won four European silver medals (2013–2016) and represented Israel at the Rio 2016 Olympics. In 2023 she took silver at the European Sumo Championships — Israel's first-ever medal in the sport — and in 2026 Maccabiah gold in beach wrestling. Today she chairs the club and coaches judo and wrestling."
+     "he": "גדלה על המזרן שלנו: התחילה ג׳ודו בגיל חמש. בהמשך עברה להיאבקות, זכתה בארבע מדליות כסף באליפויות אירופה (2013–2016) וייצגה את ישראל באולימפיאדת ריו 2016. ב־2023 זכתה בכסף באליפות אירופה בסומו — המדליה הראשונה אי פעם של ישראל בענף, וב־2026 במדליית זהב בהיאבקות חופים במכביה. היום היא עומדת בראש המועדון ומאמנת ג׳ודו והיאבקות.",
+     "ru": "Выросла на нашем татами: начала заниматься дзюдо в пять лет. Потом перешла в борьбу — четыре серебряные медали чемпионатов Европы (2013–2016) и Олимпиада в Рио-2016. В 2023 году взяла серебро чемпионата Европы по сумо — первую в истории медаль Израиля в этом виде, а в 2026-м — золото Маккабиады по пляжной борьбе. Сегодня возглавляет клуб и тренирует дзюдоистов и борцов.",
+     "en": "She grew up on our mat: started judo at five. She later moved to wrestling, won four European silver medals (2013–2016) and represented Israel at the Rio 2016 Olympics. In 2023 she took silver at the European Sumo Championships — Israel's first-ever medal in the sport — and in 2026 Maccabiah gold in beach wrestling. Today she chairs the club and coaches judo and wrestling."
     },
     "facts": [
      {
@@ -458,9 +458,9 @@
      "en": "Senior coach, head of the judo school"
     },
     "bio": {
-     "he": "סגן אלוף ברית המועצות בג׳ודו לשעבר, שמאמן ג׳ודו בחיפה כבר יותר משני עשורים. מבית הספר שלו יצאו האולימפיים טומי ארשנסקי (לונדון 2012) ואילנה קרטיש (ריו 2016). היום הוא מלווה, בין השאר, את גל קלודה, מדליסט אליפות אירופה לנוער.",
-     "ru": "Бывший вице-чемпион СССР по дзюдо, тренирует в Хайфе больше двадцати лет. Среди воспитанников его школы — олимпийцы Томми (Артём) Аршанский (Лондон-2012) и Илана Кратыш (Рио-2016). Среди его нынешних учеников — Галь Клода, призёр юниорского чемпионата Европы.",
-     "en": "A former USSR judo vice-champion who has been coaching in Haifa for more than two decades. His school produced Olympians Tommy Arshansky (London 2012) and Ilana Kratysh (Rio 2016). Today he coaches, among others, Gal Kloda, a Junior European Championships medallist."
+     "ru": "Мастер спорта и старший тренер, бывший вице-чемпион СССР по дзюдо. Более 30 лет назад основал клуб и до сих пор тренирует в нём. Его школа воспитала олимпийцев и призёров чемпионатов Европы и мира.",
+     "he": "מאסטר ספורט ומאמן בכיר, סגן אלוף ברית המועצות בג׳ודו לשעבר. לפני יותר מ־30 שנה הקים את המועדון, והוא מאמן בו עד היום. מבית הספר שלו יצאו אולימפיים ומדליסטים באליפויות אירופה והעולם.",
+     "en": "Master of Sport and senior coach, a former USSR judo vice-champion. He founded the club over 30 years ago and still coaches here today. His school has produced Olympians and European and World championship medallists."
     },
     "facts": [
      {
@@ -508,7 +508,8 @@
       "ru": "Александр Кратыш в синем кимоно с чёрным поясом",
       "en": "Alexander Kratysh in a blue judogi with a black belt"
      }
-    }
+    },
+    "bio_source": "Kaplun article (owner-supplied 2026-10-17) + earlier CLUB-FACTS; owner rule: a coach's text is only about that coach"
    },
    {
     "id": "natanel-zhurovel",
