@@ -62,3 +62,22 @@
   });
   apply();
 })();
+
+(() => {
+  const w = document.getElementById('team-rail');
+  if (!w) return;
+  document.documentElement.classList.add('js');
+  const rail = w.querySelector('.rail');
+  w.addEventListener('click', e => {
+    const b = e.target.closest('button');
+    if (!b) return;
+    if (b.dataset.dir) {
+      rail.scrollBy({ left: +b.dataset.dir * rail.clientWidth * 0.8, behavior: 'smooth' });
+      return;
+    }
+    const g = b.dataset.grp;
+    w.querySelectorAll('[data-grp]').forEach(c => c.tagName === 'BUTTON'
+      ? c.setAttribute('aria-pressed', c.dataset.grp === g) : (c.hidden = !!g && c.dataset.grp !== g));
+    rail.scrollTo({ left: 0 });
+  });
+})();

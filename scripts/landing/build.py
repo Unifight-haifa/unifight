@@ -198,9 +198,27 @@ def parents():
 </section>'''
 
 
-def name_chip(n):
-    ava = img(n["photo"]["src"], "ava", alt="") if n.get("photo") else ""
-    return f'<li{" class=has-ava" if ava else ""}>{ava}{t({l: n[l] for l in LANGS})}</li>'
+RAIL_UI = {
+    "all": {"he": "כולם", "ru": "Все", "en": "All"},
+    "lead": {"he": "מאמנים בכירים", "ru": "Ведущие", "en": "Senior"},
+    "title": {"he": "צוות המאמנים", "ru": "Команда тренеров", "en": "The coaching team"},
+    "prev": {"he": "הקודם", "ru": "Назад", "en": "Previous"},
+    "next": {"he": "הבא", "ru": "Дальше", "en": "Next"},
+}
+
+
+def initials(n):
+    return {l: "".join(w[0] for w in n[l].replace("(", "").split()[:2]) for l in LANGS}
+
+
+def rail_card(n, grp, grp_label):
+    ph = n.get("photo")
+    face = (img(ph["src"], "portrait", alt="") if ph else
+            f'<span class="mono" aria-hidden="true">{t(initials(n["name"] if "name" in n else n))}</span>')
+    name = n["name"] if "name" in n else {l: n[l] for l in LANGS}
+    bio = f'<p class="rc-bio">{t(n["bio"])}</p>' if n.get("bio") else ""
+    return (f'<li class="rc" data-grp="{grp}"><div class="rc-ph{" has-img" if ph else ""}">{face}</div>'
+            f'<span class="rc-tag">{t(grp_label)}</span><h4 class="rc-n">{t(name)}</h4>{bio}</li>')
 
 
 def coaches():
@@ -218,14 +236,11 @@ def coaches():
     <div class="coach-b"><h3 class="h3 coach-n">{t(c["name"])}</h3><p class="role">{t(c["role"])}</p>
     <p class="bio">{t(c["bio"])}</p><p class="dan">{t(c["dan_rank"])}</p></div></article>'''
                     for c, k in zip(co["items"], ks))
-    lead = "".join(
-        f'<article class="lc rv{" has-ph" if m.get("photo") else ""}">'
-        + (f'<div class="lc-ph">{img(m["photo"]["src"], "portrait", alt=esc(m["photo"]["alt"]["en"]))}</div>' if m.get("photo") else "")
-        + f'<div><h3 class="h4 lc-n">{t(m["name"])}</h3><p>{t(m["bio"])}</p></div></article>' for m in co["lead_more"])
-    roster = "".join(
-        f'<div class="ros rv"><h3 class="h4">{t(r["title"])}</h3><p class="ros-t">{t(r["text"])}</p>'
-        f'<ul class="names">{"".join(name_chip(n) for n in r["names"])}</ul></div>'
-        for r in co["roster"])
+    groups = [("lead", RAIL_UI["lead"], co["lead_more"])] + [
+        (k, r["title"], r["names"]) for k, r in zip(("club", "young"), co["roster"])]
+    rail = "".join(rail_card(n, k, lab) for k, lab, ns in groups for n in ns)
+    chips = (f'<button type="button" class="chip" data-grp="" aria-pressed="true">{t(RAIL_UI["all"])}</button>'
+             + "".join(f'<button type="button" class="chip" data-grp="{k}" aria-pressed="false">{t(lab)}</button>' for k, lab, _ in groups))
     tp = co["team_photo"]
     return f'''
 <section class="sec" id="coaches">
@@ -234,8 +249,12 @@ def coaches():
   <figure class="team rv">{img(tp["src"], "team-img", alt=esc(tp["alt"]["en"]))}</figure>
   <p class="founded rv"><span class="kj" aria-hidden="true">創</span>{t(co["founded_note"])}</p>
   <div class="c-grid">{cards}</div>
-  <div class="lc-grid">{lead}</div>
-  <div class="ros-grid">{roster}</div>
+  <div class="rail-wrap" id="team-rail">
+   <div class="rail-top"><h3 class="h3 grp">{t(RAIL_UI["title"])}</h3>
+    <div class="rail-nav"><button type="button" class="rail-btn" data-dir="-1" aria-label="{RAIL_UI["prev"]["en"]}">‹</button><button type="button" class="rail-btn" data-dir="1" aria-label="{RAIL_UI["next"]["en"]}">›</button></div></div>
+   <div class="chips" role="group">{chips}</div>
+   <ul class="rail" tabindex="0">{rail}</ul>
+  </div>
  </div>
 </section>'''
 

@@ -437,6 +437,31 @@ html[lang=he] .day-h{font-weight:400}
 .names li.has-ava{display:inline-flex;align-items:center;gap:10px;padding-inline-start:4px}
 .names .ava{inline-size:44px;block-size:44px;border-radius:50%;object-fit:cover;object-position:50% 12%;background:#efe9de}
 
+/* coaching team rail: native scroll-snap, swipe on phones, arrows on desktop */
+.rail-wrap{margin-block-start:44px}
+.rail-top{display:flex;align-items:end;justify-content:space-between;gap:12px;margin-block-end:12px}
+.rail-top .grp{margin:0}
+.rail-nav{display:none;gap:8px}
+.js .rail-nav{display:flex}
+.rail-btn{inline-size:48px;block-size:48px;border:1px solid var(--line);background:var(--ink-3);color:var(--gold-2);font:400 28px/1 var(--body);cursor:pointer}
+.rail-btn:hover{border-color:var(--gold)}
+/* arrows are physical: the left one always moves the strip left, in any language */
+.rail-nav{direction:ltr}
+.rail{list-style:none;padding:4px 0 14px;margin:14px 0 0;display:grid;grid-auto-flow:column;grid-auto-columns:minmax(200px,62%);gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:thin;scrollbar-color:var(--red) transparent;overscroll-behavior-x:contain}
+.rc{scroll-snap-align:start;display:grid;align-content:start;gap:8px;padding:10px 10px 16px;background:linear-gradient(180deg,var(--ink-3),var(--ink-2));border:1px solid var(--line);transition:border-color .3s}
+.rc:hover{border-color:var(--gold)}
+.rc[hidden]{display:none}
+.rc-ph{aspect-ratio:4/5;overflow:hidden;display:grid;place-items:center;background:var(--ink-2);background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:40px 40px}
+.rc-ph.has-img{background:linear-gradient(180deg,#f6f1e7,#e4dccd)}
+.mono{font:600 clamp(44px,9vw,64px)/1 var(--disp);color:var(--gold);letter-spacing:.04em;text-shadow:0 0 30px rgba(212,168,75,.35)}
+.rc-tag{justify-self:start;font-size:11.5px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--red-3)}
+.rc-n{font:600 19px/1.15 var(--disp);text-transform:uppercase;margin:0}
+html[lang=he] .rc-n{font-weight:400}
+.rc-bio{color:var(--paper-2);font-size:14px;line-height:1.5}
+@media (min-width:600px){.rail{grid-auto-columns:minmax(200px,40%)}}
+@media (min-width:900px){.rail{grid-auto-columns:calc((100% - 36px)/4)}}
+@media (min-width:1200px){.rail{grid-auto-columns:calc((100% - 48px)/5)}}
+
 /* ---------- embeddable section ---------- */
 .success-triangle{
   --st-ink:#17110e; --st-accent:#d9222b; --st-paper:#f6f0e4; --st-text:#3b312b;
