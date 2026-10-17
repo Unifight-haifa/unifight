@@ -1,0 +1,30 @@
+{
+ "ein-hayam": {
+  "lat": 32.8222174,
+  "lng": 34.958604,
+  "source": "https://nominatim.openstreetmap.org/search?q=יציאת אירופה 17, חיפה",
+  "osm_display_name": "עין הים, 17, יציאת אירופה, קריית שפרינצק, רובע מערב חיפה, חיפה, נפת חיפה, מחוז חיפה, 3559134, ישראל",
+  "date": "2026-10-17"
+ },
+ "ironi-alef": {
+  "lat": 32.8255551,
+  "lng": 34.9853178,
+  "source": "https://nominatim.openstreetmap.org/search?amenity=school (bounded box around תל אביב, חיפה)",
+  "osm_display_name": "בית ספר עירוני א, תל אביב, קריית אליהו, רובע מערב חיפה, חיפה, נפת חיפה, מחוז חיפה, 3541633, ישראל",
+  "date": "2026-10-17"
+ },
+ "leo-baeck-hadar": {
+  "lat": 32.8103414,
+  "lng": 34.9900853,
+  "source": "https://nominatim.openstreetmap.org/search?q=ליאו בק, חיפה",
+  "osm_display_name": "ליאו בק, שדרות אליהו גולומב, רמת הדר, רובע הדר, חיפה, נפת חיפה, מחוז חיפה, 3339108, ישראל",
+  "date": "2026-10-17"
+ },
+ "dror-school": {
+  "lat": 32.8226584,
+  "lng": 34.9827287,
+  "source": "https://nominatim.openstreetmap.org/search?amenity=school (bounded box around דרור, חיפה)",
+  "osm_display_name": "דרור, החותרים, קריית אליעזר, רובע מערב חיפה, חיפה, נפת חיפה, מחוז חיפה, 3551319, ישראל",
+  "date": "2026-10-17"
+ }
+}

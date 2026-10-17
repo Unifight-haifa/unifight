@@ -1,0 +1,17 @@
+---
+import { i18n } from 'astro:config/client';
+import Base from '../../layouts/Base.astro';
+import VenueMap from '../../components/VenueMap.astro';
+import type { Lang } from '../../i18n/ui';
+
+export function getStaticPaths() {
+  return i18n!.locales.map((lang) => ({ params: { lang } }));
+}
+
+const lang = Astro.params.lang as Lang;
+const title = { he: 'מקומות האימון', ru: 'Места тренировок', en: 'Training venues' }[lang];
+---
+<Base lang={lang} title={title} noindex>
+  <h1>{title}</h1>
+  <VenueMap lang={lang} />
+</Base>

@@ -1,0 +1,150 @@
+---
+import geo from '../../content/venues-geo.json';
+import venuesText from '../../content/venues.json';
+import type { Lang } from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const s = {
+  he: {
+    show: 'הצגת המפה',
+    note: 'המפה נטענת מ־OpenStreetMap רק אחרי לחיצה.',
+    label: 'מפת מקומות האימון',
+    links: ['Google Maps', 'Waze', 'תחבורה ציבורית'],
+  },
+  ru: {
+    show: 'Показать карту',
+    note: 'Карта загружается с OpenStreetMap только после нажатия.',
+    label: 'Карта мест тренировок',
+    links: ['Google Maps', 'Waze', 'Общественный транспорт'],
+  },
+  en: {
+    show: 'Show map',
+    note: 'The map loads from OpenStreetMap only after you click.',
+    label: 'Map of training venues',
+    links: ['Google Maps', 'Waze', 'Public transport'],
+  },
+}[lang];
+
+const venues = Object.entries(geo).map(([id, g]) => {
+  const v = venuesText[id as keyof typeof venuesText];
+  const q = encodeURIComponent(v.address.he);
+  return {
+    id,
+    lat: g.lat,
+    lng: g.lng,
+    name: v[lang],
+    address: v.address[lang],
+    links: [
+      `https://www.google.com/maps/search/?api=1&query=${q}`,
+      `https://waze.com/ul?q=${q}&navigate=yes`,
+      `https://www.google.com/maps/dir/?api=1&destination=${q}&travelmode=transit`,
+    ],
+  };
+});
+const base = import.meta.env.BASE_URL;
+---
+<div class="venue-map" data-venue-map data-base={base} data-label={s.label}
+  data-points={JSON.stringify(venues.map(({ id, lat, lng }) => ({ id, lat, lng })))}>
+  <div class="venue-map-rest">
+    <button type="button">{s.show}</button>
+    <p>{s.note}</p>
+  </div>
+  {venues.map((v) => (
+    <template data-popup={v.id}>
+      <div class="venue-map-popup" lang={lang} dir={lang === 'he' ? 'rtl' : 'ltr'}>
+        <strong>{v.name}</strong>
+        <div>{v.address}</div>
+        <ul>
+          {v.links.map((href, i) => <li><a href={href} target="_blank" rel="noopener">{s.links[i]}</a></li>)}
+        </ul>
+      </div>
+    </template>
+  ))}
+</div>
+
+<script is:inline>
+  // nothing third-party is fetched until the visitor asks for the map
+  document.querySelectorAll('[data-venue-map]').forEach(function (box) {
+    box.querySelector('button').addEventListener('click', function () {
+      var vendor = box.dataset.base + 'vendor/leaflet/';
+      var css = document.createElement('link');
+      css.rel = 'stylesheet';
+      css.href = vendor + 'leaflet.css';
+      document.head.appendChild(css);
+      var js = document.createElement('script');
+      js.src = vendor + 'leaflet.js';
+      js.onload = function () {
+        var el = document.createElement('div');
+        el.className = 'venue-map-canvas';
+        // Leaflet positions controls physically; keep its own box LTR
+        el.dir = 'ltr';
+        el.tabIndex = 0;
+        el.setAttribute('aria-label', box.dataset.label);
+        box.replaceChild(el, box.querySelector('.venue-map-rest'));
+        var map = L.map(el);
+        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          maxZoom: 19,
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        }).addTo(map);
+        var pts = JSON.parse(box.dataset.points);
+        pts.forEach(function (p) {
+          var tpl = box.querySelector('template[data-popup="' + p.id + '"]');
+          L.marker([p.lat, p.lng]).addTo(map).bindPopup(tpl.content.firstElementChild.cloneNode(true));
+        });
+        map.fitBounds(pts.map(function (p) { return [p.lat, p.lng]; }), { padding: [30, 30] });
+        el.focus();
+      };
+      document.head.appendChild(js);
+    }, { once: true });
+  });
+</script>
+
+<style>
+  .venue-map {
+    inline-size: 100%;
+  }
+  .venue-map-rest,
+  .venue-map :global(.venue-map-canvas) {
+    block-size: 24rem;
+    max-block-size: 70vh;
+    border-radius: 0.5rem;
+  }
+  .venue-map-rest {
+    display: grid;
+    place-content: center;
+    justify-items: center;
+    gap: 0.5rem;
+    padding: 1rem;
+    text-align: center;
+    background: repeating-linear-gradient(45deg, #eef1f4 0 12px, #e4e8ec 12px 24px);
+    border: 1px solid #c9d0d6;
+  }
+  .venue-map-rest p {
+    margin: 0;
+    font-size: 0.875rem;
+    color: #3d4650;
+  }
+  .venue-map-rest button {
+    font: inherit;
+    font-weight: 600;
+    padding-block: 0.6rem;
+    padding-inline: 1.4rem;
+    border: 0;
+    border-radius: 999px;
+    color: #fff;
+    background: #1c4f8a;
+    cursor: pointer;
+  }
+  .venue-map-rest button:focus-visible {
+    outline: 3px solid #f2a900;
+    outline-offset: 2px;
+  }
+  .venue-map-popup ul {
+    margin: 0.25rem 0 0;
+    padding-inline-start: 1rem;
+  }
+</style>
