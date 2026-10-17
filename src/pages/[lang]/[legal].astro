@@ -1,9 +1,10 @@
 ---
 import { i18n } from 'astro:config/client';
+import { getRelativeLocaleUrl } from 'astro:i18n';
 import Base from '../../layouts/Base.astro';
-import type { Lang } from '../../i18n/ui';
+import { LANGS, t, type Lang } from '../../i18n/ui';
 
-const docs = import.meta.glob<{ frontmatter: { title: string }; Content: any }>('../../../content/legal/*.md', { eager: true });
+const docs = import.meta.glob<{ frontmatter: { title: string; description: string }; Content: any }>('../../../content/legal/*.md', { eager: true });
 
 export function getStaticPaths() {
   return i18n!.locales.flatMap((lang) => ['privacy', 'accessibility'].map((legal) => ({ params: { lang, legal } })));
@@ -11,8 +12,13 @@ export function getStaticPaths() {
 
 const { lang, legal } = Astro.params as { lang: Lang; legal: string };
 const { frontmatter, Content } = docs[`../../../content/legal/${legal}.${lang}.md`];
+const abs = (path: string) => new URL(path, Astro.site).href;
 ---
-<Base lang={lang} title={frontmatter.title}>
+<Base lang={lang} title={`${frontmatter.title} · ${t(lang, 'siteName')}`} description={frontmatter.description}>
+  <Fragment slot="head">
+    <link rel="canonical" href={abs(getRelativeLocaleUrl(lang, `${legal}/`))} />
+    {LANGS.map((l) => <link rel="alternate" hreflang={l} href={abs(getRelativeLocaleUrl(l, `${legal}/`))} />)}
+  </Fragment>
   <h1>{frontmatter.title}</h1>
   <Content />
 </Base>

@@ -18,7 +18,7 @@ const posts = await getPosts();
 const abs = (path: string) => new URL(path, Astro.site).href;
 const title = `${t(lang, 'newsTitle')} · ${t(lang, 'siteName')}`;
 ---
-<Base lang={lang} title={title}>
+<Base lang={lang} title={title} description={t(lang, 'newsDesc')}>
   <Fragment slot="head">
     <link rel="canonical" href={abs(getRelativeLocaleUrl(lang, 'news/'))} />
     {LANGS.map((l) => <link rel="alternate" hreflang={l} href={abs(getRelativeLocaleUrl(l, 'news/'))} />)}

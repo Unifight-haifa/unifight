@@ -19,6 +19,7 @@ export const ui = {
     newsCopy: 'העתקת קישור',
     newsCopied: 'הקישור הועתק',
     newsAll: 'כל החדשות',
+    newsDesc: 'חדשות מועדון הג׳ודו יוניפייט חיפה: תחרויות, מחנות אימונים וחיי המועדון.',
   },
   ru: {
     siteName: 'Юнифайт Хайфа',
@@ -33,6 +34,7 @@ export const ui = {
     newsCopy: 'Скопировать ссылку',
     newsCopied: 'Ссылка скопирована',
     newsAll: 'Все новости',
+    newsDesc: 'Новости клуба дзюдо «Юнифайт Хайфа»: турниры, сборы и жизнь клуба.',
   },
   en: {
     siteName: 'Unifight Haifa',
@@ -47,6 +49,7 @@ export const ui = {
     newsCopy: 'Copy link',
     newsCopied: 'Link copied',
     newsAll: 'All news',
+    newsDesc: 'News from the Unifight Haifa judo club: tournaments, training camps and club life.',
   },
 };
 

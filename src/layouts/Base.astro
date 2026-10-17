@@ -7,12 +7,13 @@ import '../styles/global.css';
 interface Props {
   lang: Lang;
   title?: string;
+  description?: string;
   noindex?: boolean;
   /** page brings its own header/main/footer */
   bare?: boolean;
 }
 
-const { lang, title, noindex, bare } = Astro.props;
+const { lang, title, description, noindex, bare } = Astro.props;
 const subset = { he: 'hebrew', ru: 'cyrillic', en: 'latin' }[lang];
 // path after /<base>/<lang>/; slugs are identical across locales
 const rest = Astro.url.pathname.slice(import.meta.env.BASE_URL.length).split('/').slice(1).join('/');
@@ -23,6 +24,7 @@ const rest = Astro.url.pathname.slice(import.meta.env.BASE_URL.length).split('/'
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title ?? t(lang, 'siteName')}</title>
+    {description && <meta name="description" content={description} />}
     {noindex && <meta name="robots" content="noindex" />}
     <Font cssVariable="--font-body" preload={[{ subset }]} />
     <slot name="head" />

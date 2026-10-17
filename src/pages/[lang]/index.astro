@@ -3,10 +3,13 @@ import landing from '../../generated/landing.html?raw';
 import js from '../../generated/landing.js?raw';
 import fonts from '../../generated/fonts.json';
 import site from '../../../content/site.json';
+import venues from '../../../content/venues.json';
+import geo from '../../../content/venues-geo.json';
 import { i18n } from 'astro:config/client';
 import { getRelativeLocaleUrl } from 'astro:i18n';
 import Base from '../../layouts/Base.astro';
 import VenueMap from '../../components/VenueMap.astro';
+import JsonLd from '../../components/JsonLd.astro';
 import { LANGS, type Lang } from '../../i18n/ui';
 import '../../styles/landing.css';
 
@@ -29,6 +32,30 @@ const LOCALE = { he: 'he_IL', ru: 'ru_RU', en: 'en_US' };
 const [beforeMap, afterMap] = body.split('<!--VENUE_MAP-->');
 const title = `${site.club.name[lang]} · ${site.hero.headline[lang]}`;
 const desc = site.hero.subline[lang];
+// SportsClub alone has no `sport`; that comes from SportsOrganization
+const club = {
+  '@context': 'https://schema.org',
+  '@type': ['SportsClub', 'SportsOrganization'],
+  '@id': abs(`${import.meta.env.BASE_URL}#club`),
+  name: site.club.name[lang],
+  description: desc,
+  url: abs(getRelativeLocaleUrl(lang)),
+  logo: abs(`${import.meta.env.BASE_URL}${site.club.logo}`),
+  sameAs: site.contact.social.filter((s) => s.confidence === 'confirmed').map((s) => s.url),
+  telephone: '+972-54-566-4663',
+  email: site.contact.email.value,
+  sport: 'Judo',
+  location: Object.entries(venues).map(([id, v]) => {
+    const [streetAddress, addressLocality] = v.address[lang].split(/, (?=[^,]+$)/);
+    const g = geo[id as keyof typeof geo];
+    return {
+      '@type': 'Place',
+      name: v[lang],
+      address: { '@type': 'PostalAddress', streetAddress, addressLocality, addressCountry: 'IL' },
+      geo: { '@type': 'GeoCoordinates', latitude: g.lat, longitude: g.lng },
+    };
+  }),
+};
 ---
 <Base lang={lang} bare>
   <Fragment slot="head">
@@ -48,6 +75,7 @@ const desc = site.hero.subline[lang];
     <meta property="og:locale" content={LOCALE[lang]} />
     {LANGS.filter((l) => l !== lang).map((l) => <meta property="og:locale:alternate" content={LOCALE[l]} />)}
     <meta name="twitter:card" content="summary_large_image" />
+    <JsonLd data={club} />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     {(fonts as string[]).map((href) => <link rel="stylesheet" href={href} />)}

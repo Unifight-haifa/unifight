@@ -1,5 +1,6 @@
 ---
 title: Accessibility statement
+description: How accessible the Unifight Haifa website is, the known gaps, and how to contact us.
 ---
 
 Last updated: 18 October 2026

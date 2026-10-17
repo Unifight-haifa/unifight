@@ -1,5 +1,6 @@
 ---
 title: Privacy policy
+description: What information the Unifight Haifa website handles, why, and what your rights are.
 ---
 
 Last updated: 17 October 2026

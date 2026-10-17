@@ -10,8 +10,13 @@ export function getStaticPaths() {
 
 const lang = Astro.params.lang as Lang;
 const title = { he: 'מקומות האימון', ru: 'Места тренировок', en: 'Training venues' }[lang];
+const description = {
+  he: 'כתובות ומפה של מקומות האימון של יוניפייט חיפה.',
+  ru: 'Адреса и карта мест тренировок «Юнифайт Хайфа».',
+  en: 'Addresses and a map of Unifight Haifa training venues.',
+}[lang];
 ---
-<Base lang={lang} title={title} noindex>
+<Base lang={lang} title={title} description={description} noindex>
   <h1>{title}</h1>
   <VenueMap lang={lang} />
 </Base>
