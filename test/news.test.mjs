@@ -4,7 +4,7 @@ import { cpSync, existsSync, mkdtempSync, readdirSync, readFileSync, rmSync, sta
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { checkNews } from '../src/lib/news-check.mjs';
+import { checkNews, checkRenderedBody } from '../src/lib/news-check.mjs';
 
 const dist = new URL('../dist/', import.meta.url);
 const src = new URL('../src/content/news/', import.meta.url);
@@ -118,4 +118,31 @@ test('content check rejects raw HTML in a post', () => {
   } finally {
     rmSync(root, { recursive: true, force: true });
   }
+});
+
+test('rendered post bodies contain only safe tags and links', () => {
+  for (const l of ['he', 'ru', 'en']) {
+    for (const d of readdirSync(new URL(`${l}/news/`, dist), { withFileTypes: true })) {
+      if (!d.isDirectory()) continue;
+      const html = readFileSync(new URL(`${l}/news/${d.name}/index.html`, dist), 'utf8');
+      const body = html.split('class="news-body">')[1]?.split('</article>')[0];
+      assert.ok(body, `${l}/${d.name} has a body`);
+      assert.doesNotThrow(() => checkRenderedBody(body), `${l}/${d.name}`);
+    }
+  }
+});
+
+test('rendered-body gate rejects unsafe output', () => {
+  for (const bad of [
+    '<p><a href="javascript:alert(1)">x</a></p>',
+    '<p><a href="JaVaScRiPt:alert(1)">x</a></p>',
+    '<p><a href="&#106;avascript:alert(1)">x</a></p>',
+    '<p><a href=javascript:alert(1)>x</a></p>',
+    '<p><img src="data:image/svg+xml,x"></p>',
+    '<p><a href="//evil.example">x</a></p>',
+    '<p><img src=x onerror=alert(1)></p>',
+    '<script>alert(1)</script>',
+    '<p><iframe src="https://e.example"></iframe></p>',
+  ]) assert.throws(() => checkRenderedBody(bad), undefined, bad);
+  assert.doesNotThrow(() => checkRenderedBody('<p><a href="https://example.org">a</a> <img src="/unifight/_astro/c.jpg" srcset="/unifight/_astro/c.jpg 1x, /unifight/_astro/d.jpg 2x"> <a href="#t">t</a></p>'));
 });

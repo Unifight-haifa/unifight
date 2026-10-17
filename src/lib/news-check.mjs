@@ -33,3 +33,21 @@ export function checkNews(root) {
     }
   }
 }
+
+// Final gate on the rendered post body: whatever Markdown syntax slipped past the source check,
+// this sees exactly what the browser will get. CI runs it before deploy.
+const BAD_TAG = /<(script|iframe|object|embed|style|form|base|meta|link|svg|math)\b/i;
+const ON_ATTR = /\son[a-z]+\s*=/i;
+const URL_ATTR = /\s(?:href|src|srcset|action|formaction|xlink:href|poster)\s*=\s*("[^"]*"|'[^']*'|[^\s>]+)/gi;
+const SAFE_URL = /^(https?:\/\/|mailto:|\/(?!\/)|#)/i;
+
+export function checkRenderedBody(html) {
+  if (BAD_TAG.test(html)) throw new Error('rendered post contains a forbidden tag');
+  if (ON_ATTR.test(html)) throw new Error('rendered post contains an event handler');
+  for (const m of html.matchAll(URL_ATTR)) {
+    const raw = m[1].replace(/^["']|["']$/g, '').replace(/&#?\w+;/g, '?');
+    for (const u of raw.split(',').map((s) => s.trim().split(/\s+/)[0]).filter(Boolean)) {
+      if (!SAFE_URL.test(u)) throw new Error(`rendered post links to "${u}"`);
+    }
+  }
+}
