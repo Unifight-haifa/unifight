@@ -434,6 +434,8 @@ html[lang=he] .day-h{font-weight:400}
 .lc.has-ph{display:grid;grid-template-columns:96px 1fr;gap:14px;align-items:start}
 .lc-ph{aspect-ratio:4/5;overflow:hidden;background:linear-gradient(180deg,#f6f1e7,#e4dccd)}
 .v-addr{color:var(--paper-2);font-size:15px}
+.names li.has-ava{display:inline-flex;align-items:center;gap:10px;padding-inline-start:4px}
+.names .ava{inline-size:44px;block-size:44px;border-radius:50%;object-fit:cover;object-position:50% 12%;background:#efe9de}
 
 /* ---------- embeddable section ---------- */
 .success-triangle{

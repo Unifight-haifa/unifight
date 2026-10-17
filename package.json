@@ -6,6 +6,7 @@
     "node": ">=22.22.0"
   },
   "scripts": {
+    "gen": "python3 scripts/landing/build.py",
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",

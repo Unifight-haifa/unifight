@@ -1,0 +1,395 @@
+{
+ "season": "2026/27",
+ "coach": "natanel",
+ "source": "owner image 2026-10-17 (schedule-natanel-2026-27-source.png); Tue nivheret + Fri ne-waza labels from owner message 2026-10-17; owner 2026-10-17: Wed competitive group = nivheret (same squad); school-hours access question 'not important'",
+ "confidence": "confirmed",
+ "title_source_he": "מערכת אימונים 2026/27",
+ "slogan": {
+  "he": "ג׳ודו – יחד מתקדמים, יחד מנצחים!",
+  "ru": "Дзюдо — вместе растём, вместе побеждаем!",
+  "en": "Judo — growing together, winning together!"
+ },
+ "values": {
+  "he": [
+   "משמעת",
+   "כבוד",
+   "חברות",
+   "התמדה",
+   "מצוינות"
+  ],
+  "ru": [
+   "Дисциплина",
+   "Уважение",
+   "Дружба",
+   "Упорство",
+   "Мастерство"
+  ],
+  "en": [
+   "Discipline",
+   "Respect",
+   "Friendship",
+   "Perseverance",
+   "Excellence"
+  ]
+ },
+ "days": {
+  "he": [
+   "ראשון",
+   "שני",
+   "שלישי",
+   "רביעי",
+   "חמישי",
+   "שישי"
+  ],
+  "ru": [
+   "Воскресенье",
+   "Понедельник",
+   "Вторник",
+   "Среда",
+   "Четверг",
+   "Пятница"
+  ],
+  "en": [
+   "Sunday",
+   "Monday",
+   "Tuesday",
+   "Wednesday",
+   "Thursday",
+   "Friday"
+  ]
+ },
+ "venues": {
+  "leo-baeck-hadar": {
+   "he": "ליאו בק הדר",
+   "ru": "Лео Бек (Адар)",
+   "en": "Leo Baeck (Hadar)",
+   "icon": "pin-blue",
+   "address": {
+    "he": "שדרות אליהו גולומב 4, חיפה",
+    "ru": "бульв. Элияху Голомб, 4, Хайфа",
+    "en": "4 Eliyahu Golomb Blvd, Haifa"
+   },
+   "address_source": "https://www.d.co.il/6967160/8240/",
+   "address_note": "Leo Baeck elementary, Hadar (d.co.il + school FB page); madlan says no. 10",
+   "address_checked": "2026-10-17"
+  },
+  "dror-school": {
+   "he": "בית ספר דרור",
+   "ru": "Школа «Дрор»",
+   "en": "Dror School",
+   "icon": "school",
+   "address": {
+    "he": "דרור 19, חיפה",
+    "ru": "ул. Дрор, 19, Хайфа",
+    "en": "19 Dror St, Haifa"
+   },
+   "address_source": "https://dror.edu-haifa.org.il/",
+   "address_note": "Dror school (school site contact page)",
+   "address_checked": "2026-10-17"
+  },
+  "ein-hayam": {
+   "he": "עין הים",
+   "ru": "Эйн-ха-Ям",
+   "en": "Ein HaYam",
+   "icon": "waves",
+   "address": {
+    "he": "יציאת אירופה 17, חיפה",
+    "ru": "ул. Йециат Эйропа, 17, Хайфа",
+    "en": "17 Yetziat Eropa St, Haifa"
+   },
+   "address_source": "https://einhayam.edu-haifa.org.il/",
+   "address_note": "Ein HaYam school (site: contact page)",
+   "address_checked": "2026-10-17"
+  },
+  "ironi-alef": {
+   "he": "עירוני א׳",
+   "ru": "Ирони Алеф",
+   "en": "Ironi Alef",
+   "icon": "pin-red",
+   "address": {
+    "he": "תל אביב 27, חיפה",
+    "ru": "ул. Тель-Авив, 27, Хайфа",
+    "en": "27 Tel Aviv St, Haifa"
+   },
+   "address_source": "https://www.d.co.il/6933580/8780/",
+   "address_note": "Ironi Alef school (directories d.co.il, allschool)",
+   "address_checked": "2026-10-17"
+  }
+ },
+ "kinds": {
+  "regular": {
+   "he": "",
+   "ru": "",
+   "en": ""
+  },
+  "school-project": {
+   "he": "פרויקט בית ספרי",
+   "ru": "Школьный проект",
+   "en": "School project"
+  },
+  "nivheret": {
+   "he": "נבחרת המועדון (קבוצה תחרותית)",
+   "ru": "Сборная клуба (соревновательная группа)",
+   "en": "Selected team (competitive group)"
+  },
+  "newaza": {
+   "he": "אימון קרקע (נה־וואזה)",
+   "ru": "Борьба в партере (нэ-вадза)",
+   "en": "Groundwork (ne-waza)"
+  }
+ },
+ "grade_letters_he": [
+  "גן",
+  "א׳",
+  "ב׳",
+  "ג׳",
+  "ד׳",
+  "ה׳",
+  "ו׳",
+  "ז׳",
+  "ח׳"
+ ],
+ "sessions": [
+  {
+   "day": 0,
+   "venue": "leo-baeck-hadar",
+   "start": "12:00",
+   "end": "12:45",
+   "grades": [
+    1,
+    6
+   ],
+   "kind": "school-project",
+   "subgroup": 1
+  },
+  {
+   "day": 0,
+   "venue": "leo-baeck-hadar",
+   "start": "12:45",
+   "end": "13:30",
+   "grades": [
+    1,
+    6
+   ],
+   "kind": "school-project",
+   "subgroup": 2
+  },
+  {
+   "day": 0,
+   "venue": "ein-hayam",
+   "start": "14:00",
+   "end": "15:00",
+   "grades": [
+    1,
+    6
+   ],
+   "kind": "regular"
+  },
+  {
+   "day": 0,
+   "venue": "ironi-alef",
+   "start": "17:30",
+   "end": "18:15",
+   "grades": [
+    0,
+    0
+   ],
+   "kind": "regular"
+  },
+  {
+   "day": 0,
+   "venue": "ironi-alef",
+   "start": "18:15",
+   "end": "19:15",
+   "grades": [
+    1,
+    3
+   ],
+   "kind": "regular"
+  },
+  {
+   "day": 1,
+   "venue": "ein-hayam",
+   "start": "17:00",
+   "end": "18:00",
+   "grades": [
+    1,
+    3
+   ],
+   "kind": "regular"
+  },
+  {
+   "day": 1,
+   "venue": "ein-hayam",
+   "start": "18:00",
+   "end": "19:30",
+   "grades": [
+    3,
+    7
+   ],
+   "kind": "regular"
+  },
+  {
+   "day": 1,
+   "venue": "ein-hayam",
+   "start": "19:30",
+   "end": "21:00",
+   "grades": [
+    8,
+    null
+   ],
+   "kind": "regular"
+  },
+  {
+   "day": 2,
+   "venue": "ironi-alef",
+   "start": "17:30",
+   "end": "19:00",
+   "grades": [
+    4,
+    8
+   ],
+   "kind": "regular"
+  },
+  {
+   "day": 2,
+   "venue": "ironi-alef",
+   "start": "19:00",
+   "end": "20:30",
+   "grades": [
+    8,
+    null
+   ],
+   "kind": "nivheret"
+  },
+  {
+   "day": 3,
+   "venue": "leo-baeck-hadar",
+   "start": "13:40",
+   "end": "14:30",
+   "grades": [
+    5,
+    6
+   ],
+   "kind": "regular"
+  },
+  {
+   "day": 3,
+   "venue": "leo-baeck-hadar",
+   "start": "14:30",
+   "end": "15:20",
+   "grades": [
+    1,
+    2
+   ],
+   "kind": "regular"
+  },
+  {
+   "day": 3,
+   "venue": "leo-baeck-hadar",
+   "start": "15:20",
+   "end": "16:10",
+   "grades": [
+    3,
+    4
+   ],
+   "kind": "regular"
+  },
+  {
+   "day": 3,
+   "venue": "ironi-alef",
+   "start": "18:00",
+   "end": "19:00",
+   "grades": [
+    1,
+    3
+   ],
+   "kind": "regular"
+  },
+  {
+   "day": 3,
+   "venue": "ironi-alef",
+   "start": "19:00",
+   "end": "20:30",
+   "grades": [
+    6,
+    null
+   ],
+   "kind": "nivheret"
+  },
+  {
+   "day": 4,
+   "venue": "dror-school",
+   "start": "13:40",
+   "end": "14:30",
+   "grades": [
+    1,
+    6
+   ],
+   "kind": "regular"
+  },
+  {
+   "day": 4,
+   "venue": "ein-hayam",
+   "start": "17:00",
+   "end": "18:00",
+   "grades": [
+    1,
+    3
+   ],
+   "kind": "regular"
+  },
+  {
+   "day": 4,
+   "venue": "ein-hayam",
+   "start": "18:00",
+   "end": "19:30",
+   "grades": [
+    3,
+    7
+   ],
+   "kind": "regular"
+  },
+  {
+   "day": 4,
+   "venue": "ein-hayam",
+   "start": "19:30",
+   "end": "21:00",
+   "grades": [
+    8,
+    null
+   ],
+   "kind": "regular"
+  },
+  {
+   "day": 5,
+   "venue": "ironi-alef",
+   "start": "13:30",
+   "end": "15:00",
+   "grades": [
+    4,
+    8
+   ],
+   "kind": "regular"
+  },
+  {
+   "day": 5,
+   "venue": "ironi-alef",
+   "start": "15:00",
+   "end": "16:30",
+   "grades": [
+    8,
+    null
+   ],
+   "kind": "newaza",
+   "note": {
+    "he": "ייתכנו שינויים",
+    "ru": "время может измениться",
+    "en": "may change"
+   }
+  }
+ ],
+ "open_questions": [
+  "Ilana's and Alexander's groups: schedule to come."
+ ]
+}

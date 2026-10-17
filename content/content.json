@@ -1,0 +1,2355 @@
+{
+ "meta": {
+  "version": "2026-10-17",
+  "languages": [
+   "he",
+   "ru",
+   "en"
+  ],
+  "default_language": "he",
+  "rules": [
+   "Use text exactly as written; do not add facts, numbers, dates or names.",
+   "Objects with \"placeholder\": true are open questions for the owner: render them visibly as placeholders (e.g. dashed box / muted text), never fill them in.",
+   "Times, weights, phone numbers and years are plain strings; wrap them in <bdi dir=\"ltr\"> on Hebrew (RTL) pages.",
+   "Athletes who were minors at the time are never named; keep it that way in captions and alt text.",
+   "Never link to unifight.info or olimpix.info. Only URLs found in this file may be linked.",
+   "Nivheret = the club's selected team, never Israel's national team."
+  ],
+  "confidence_legend": {
+   "confirmed": "independent primary or news source (federation/JudoInside/news/municipality), or owner-provided",
+   "likely": "club's own channel only (Facebook, Instagram, archived club site, club photo archive); phrased modestly; owner should confirm before going live"
+  },
+  "sources_files": [
+   ".planning/research/CLUB-FACTS.md",
+   ".planning/research/EVENTS.md",
+   "design-options/content/SCHEDULE.md",
+   "design-options/img/PHOTOS.md"
+  ]
+ },
+ "club": {
+  "name": {
+   "he": "יוניפייט חיפה",
+   "ru": "Юнифайт Хайфа",
+   "en": "Unifight Haifa"
+  },
+  "descriptor": {
+   "he": "בית ספר לג׳ודו בחיפה והסביבה",
+   "ru": "Школа дзюдо в Хайфе и окрестностях",
+   "en": "Judo school in Haifa and the area"
+  },
+  "disciplines": {
+   "he": "ג׳ודו, היאבקות, סמבו",
+   "ru": "дзюдо, борьба, самбо",
+   "en": "judo, wrestling, sambo"
+  },
+  "disciplines_source": "https://www.davar1.co.il/452598/",
+  "disciplines_confidence": "confirmed",
+  "logo": "brand/logo.png"
+ },
+ "nav": [
+  {
+   "id": "parents",
+   "he": "להורים",
+   "ru": "Родителям",
+   "en": "For parents"
+  },
+  {
+   "id": "coaches",
+   "he": "המאמנים",
+   "ru": "Тренеры",
+   "en": "Coaches"
+  },
+  {
+   "id": "achievements",
+   "he": "הישגים",
+   "ru": "Достижения",
+   "en": "Achievements"
+  },
+  {
+   "id": "history",
+   "he": "הסיפור שלנו",
+   "ru": "История",
+   "en": "Our story"
+  },
+  {
+   "id": "tournaments",
+   "he": "תחרויות",
+   "ru": "Турниры",
+   "en": "Tournaments"
+  },
+  {
+   "id": "camps",
+   "he": "מחנות אימונים",
+   "ru": "Лагеря и сборы",
+   "en": "Camps"
+  },
+  {
+   "id": "schedule",
+   "he": "לוח אימונים",
+   "ru": "Расписание",
+   "en": "Schedule"
+  },
+  {
+   "id": "branches",
+   "he": "איפה מתאמנים",
+   "ru": "Где тренируемся",
+   "en": "Locations"
+  },
+  {
+   "id": "contact",
+   "he": "צרו קשר",
+   "ru": "Контакты",
+   "en": "Contact"
+  }
+ ],
+ "language_switch": {
+  "he": "עברית",
+  "ru": "Русский",
+  "en": "English"
+ },
+ "hero": {
+  "eyebrow": {
+   "he": "בית ספר לג׳ודו · חיפה",
+   "ru": "Школа дзюдо · Хайфа",
+   "en": "Judo school · Haifa"
+  },
+  "headline": {
+   "he": "חזקים על המזרן. חזקים בחיים.",
+   "ru": "Сильные на татами. Сильные в жизни.",
+   "en": "Strong on the mat. Strong in life."
+  },
+  "subline": {
+   "he": "ג׳ודו לילדים, לנוער ולמבוגרים בחיפה והסביבה. מהנפילה הראשונה ועד הפודיום הבינלאומי — עם מאמנים שעברו את הדרך הזאת בעצמם.",
+   "ru": "Дзюдо для детей, подростков и взрослых в Хайфе и окрестностях. От первого падения до международного пьедестала — с тренерами, которые сами прошли этот путь.",
+   "en": "Judo for kids, teens and adults in Haifa and the area. From the very first fall to international podiums — with coaches who have walked that road themselves."
+  },
+  "cta_primary": {
+   "he": "הצטרפו ליוניפייט",
+   "ru": "Присоединяйтесь к Юнифайт",
+   "en": "Join Unifight",
+   "href": "#contact"
+  },
+  "cta_secondary": {
+   "he": "ללוח האימונים",
+   "ru": "Расписание тренировок",
+   "en": "See the schedule",
+   "href": "#schedule"
+  }
+ },
+ "taglines": [
+  {
+   "he": "אצלנו ג׳ודו זה הרבה יותר מחוג.",
+   "ru": "У нас дзюдо — это больше, чем кружок.",
+   "en": "Here, judo is much more than an after-school class.",
+   "note": "HE adapted from the club's Instagram bio"
+  },
+  {
+   "he": "נופלים. קמים. גדלים.",
+   "ru": "Упасть. Подняться. Вырасти.",
+   "en": "Fall. Get up. Grow."
+  },
+  {
+   "he": "מהחגורה הראשונה ועד הבמה הגדולה.",
+   "ru": "От первого пояса — до большой сцены.",
+   "en": "From the first belt to the big stage."
+  }
+ ],
+ "kids": {
+  "title": {
+   "he": "למה ג׳ודו זו בחירה חכמה לילד שלכם",
+   "ru": "Почему дзюдо — умный выбор для вашего ребёнка",
+   "en": "Why judo is a smart choice for your child"
+  },
+  "intro": {
+   "he": "ג׳ודו זה לא רק הטלות. זה בית ספר לאופי — והילדים פשוט אוהבים להגיע.",
+   "ru": "Дзюдо — это не только броски. Это школа характера, и дети идут на тренировку с удовольствием.",
+   "en": "Judo isn't only about throws. It's a school of character — and kids genuinely love coming."
+  },
+  "benefits": [
+   {
+    "id": "discipline",
+    "icon_hint": "bow",
+    "title": {
+     "he": "משמעת שנשארת",
+     "ru": "Дисциплина, которая остаётся",
+     "en": "Discipline that sticks"
+    },
+    "text": {
+     "he": "קידה בכניסה למזרן, הקשבה למאמן, סבלנות עד שמגיע התור — ולסיים את מה שהתחלנו. ההרגלים האלה עוברים איתם הביתה ולבית הספר.",
+     "ru": "Поклон при входе на татами, внимание к тренеру, умение дождаться своей очереди и довести начатое до конца. Эти привычки дети уносят домой и в школу.",
+     "en": "Bowing onto the mat, listening to the coach, waiting for your turn, finishing what you started. These habits follow kids home and into the classroom."
+    }
+   },
+   {
+    "id": "confidence",
+    "icon_hint": "belt",
+    "title": {
+     "he": "ביטחון עצמי אמיתי",
+     "ru": "Уверенность, заработанная честно",
+     "en": "Confidence they earned"
+    },
+    "text": {
+     "he": "כל טכניקה חדשה וכל חגורה חדשה הן הישג שהילד השיג בעצמו. ביטחון כזה נבנה מעבודה, לא ממחמאות.",
+     "ru": "Каждый новый приём и каждый новый пояс ребёнок заработал сам. Такая уверенность строится на труде, а не на похвале.",
+     "en": "Every new technique and every new belt is something your child achieved on their own. That kind of confidence is built on effort, not on praise."
+    }
+   },
+   {
+    "id": "ukemi",
+    "icon_hint": "fall",
+    "title": {
+     "he": "ללמוד ליפול נכון",
+     "ru": "Умение правильно падать",
+     "en": "Learning to fall safely"
+    },
+    "text": {
+     "he": "אוקמי — אמנות הנפילה — היא מהדברים הראשונים שלומדים אצלנו. לדעת ליפול בלי להיפגע זו מיומנות שימושית גם בחצר, גם על האופניים וגם בכל מקום אחר.",
+     "ru": "Укеми — искусство безопасного падения — мы разучиваем одним из первых. Умение упасть и не ушибиться пригодится и во дворе, и на велосипеде, и в жизни.",
+     "en": "Ukemi — the art of falling — is one of the first things we teach. Knowing how to land without getting hurt is useful in the playground, on a bike and everywhere else."
+    }
+   },
+   {
+    "id": "fitness",
+    "icon_hint": "balance",
+    "title": {
+     "he": "כוח, שיווי משקל וקואורדינציה",
+     "ru": "Сила, ловкость, координация",
+     "en": "Strength, balance, coordination"
+    },
+    "text": {
+     "he": "ג׳ודו מפעיל את כל הגוף: ריצה, גלגולים, אחיזות ושיווי משקל. הילדים מתחזקים ונעשים זריזים יותר — תוך כדי משחק.",
+     "ru": "Дзюдо задействует всё тело: бег, кувырки, захваты, равновесие. Дети становятся сильнее и ловчее — играя.",
+     "en": "Judo works the whole body: running, rolling, gripping, balancing. Kids get stronger and more agile while they play."
+    }
+   },
+   {
+    "id": "respect",
+    "icon_hint": "handshake",
+    "title": {
+     "he": "כבוד וחברויות אמיתיות",
+     "ru": "Уважение и настоящая дружба",
+     "en": "Respect and real friendships"
+    },
+    "text": {
+     "he": "על המזרן מתאמנים עם שותף, לא נגד אויב. לומדים לכבד את היריב, את המאמן ואת עצמנו — ומוצאים חברים לשנים.",
+     "ru": "На татами тренируются с партнёром, а не против врага. Дети учатся уважать соперника, тренера и самих себя — и находят друзей на годы.",
+     "en": "On the mat you train with a partner, not against an enemy. Kids learn to respect opponents, coaches and themselves — and make friends for years."
+    }
+   },
+   {
+    "id": "resilience",
+    "icon_hint": "rise",
+    "title": {
+     "he": "חוסן וביטחון שקט",
+     "ru": "Стойкость и спокойная уверенность",
+     "en": "Resilience and quiet confidence"
+    },
+    "text": {
+     "he": "להפסיד בקרב, לקום ולנסות שוב — ככה בונים חוסן. ילד שמרגיש יציב על הרגליים גם מתנהל אחרת: רגוע, זקוף ובטוח בעצמו.",
+     "ru": "Проиграть схватку, подняться и попробовать снова — так закаляется характер. Ребёнок, который твёрдо стоит на ногах, и держится иначе: спокойно, прямо, уверенно.",
+     "en": "Losing a bout, getting up and trying again — that's how resilience is built. A child who feels steady on their feet carries themselves differently: calm, upright, sure of themselves."
+    }
+   }
+  ],
+  "first_class": {
+   "title": {
+    "he": "האימון הראשון",
+    "ru": "Первая тренировка",
+    "en": "Your first class"
+   },
+   "bring_title": {
+    "he": "מה להביא",
+    "ru": "Что взять с собой",
+    "en": "What to bring"
+   },
+   "bring": [
+    {
+     "he": "בגדי ספורט נוחים (בלי רוכסנים וכפתורים)",
+     "ru": "Удобную спортивную одежду (без молний и пуговиц)",
+     "en": "Comfortable sports clothes (no zips or buttons)"
+    },
+    {
+     "he": "בקבוק מים",
+     "ru": "Бутылку воды",
+     "en": "A water bottle"
+    },
+    {
+     "he": "שיער ארוך אסוף, בלי תכשיטים",
+     "ru": "Длинные волосы собрать, украшения снять",
+     "en": "Long hair tied back, no jewellery"
+    }
+   ],
+   "expect_title": {
+    "he": "למה לצפות",
+    "ru": "Что вас ждёт",
+    "en": "What to expect"
+   },
+   "expect": [
+    {
+     "he": "חימום משחקי שמכניס לאווירה",
+     "ru": "Разминка в игровой форме",
+     "en": "A playful warm-up"
+    },
+    {
+     "he": "צעדים ראשונים בנפילות בטוחות",
+     "ru": "Первые шаги в безопасных падениях",
+     "en": "First steps in safe falling"
+    },
+    {
+     "he": "טכניקות פשוטות עם שותף, תחת עין המאמן",
+     "ru": "Простые приёмы с партнёром под присмотром тренера",
+     "en": "Simple techniques with a partner, under the coach's eye"
+    },
+    {
+     "he": "זמן לשאול את המאמן כל שאלה בסוף האימון",
+     "ru": "Время задать тренеру любые вопросы после занятия",
+     "en": "Time to ask the coach anything after class"
+    }
+   ],
+   "open_questions": [
+    {
+     "placeholder": true,
+     "id": "trial_class",
+     "he": "[אימון ניסיון: בתשלום / ללא תשלום — לאישור הבעלים]",
+     "ru": "[Пробное занятие: платно / бесплатно — уточнить у владельца]",
+     "en": "[Trial class: free or paid — owner to confirm]"
+    },
+    {
+     "placeholder": true,
+     "id": "judogi",
+     "he": "[חליפת ג׳ודו (ג׳ודוגי): השאלה / רכישה דרך המועדון — לאישור הבעלים]",
+     "ru": "[Кимоно (дзюдоги): выдаётся / покупается через клуб — уточнить у владельца]",
+     "en": "[Judo suit (judogi): loaned or bought through the club — owner to confirm]"
+    },
+    {
+     "placeholder": true,
+     "id": "min_age",
+     "he": "[מאיזה גיל מקבלים — לאישור הבעלים]",
+     "ru": "[С какого возраста принимают — уточнить у владельца]",
+     "en": "[Youngest age we accept — owner to confirm]"
+    },
+    {
+     "placeholder": true,
+     "id": "fees",
+     "he": "[מחירים ותשלום — לאישור הבעלים]",
+     "ru": "[Стоимость и оплата — уточнить у владельца]",
+     "en": "[Fees and payment — owner to confirm]"
+    },
+    {
+     "placeholder": true,
+     "id": "parents_watch",
+     "he": "[האם הורים יכולים לצפות באימון — לאישור הבעלים]",
+     "ru": "[Могут ли родители смотреть тренировку — уточнить у владельца]",
+     "en": "[Can parents watch the class — owner to confirm]"
+    }
+   ],
+   "cta": {
+    "he": "קבעו אימון ראשון בוואטסאפ",
+    "ru": "Записаться на первую тренировку в WhatsApp",
+    "en": "Book a first class on WhatsApp",
+    "href": "#contact"
+   }
+  }
+ },
+ "success_triangle": {
+  "title_note": "The infographic carries its own title and card texts (coach, athlete, parent). Add only this intro line above it.",
+  "intro": {
+   "he": "הצלחה בג׳ודו נבנית משלושה צדדים: המאמן, הספורטאי וההורה. כשכל אחד עושה את שלו — המשולש עומד יציב.",
+   "ru": "Успех в дзюдо держится на трёх сторонах: тренер, спортсмен и родитель. Когда каждый делает своё — треугольник стоит прочно.",
+   "en": "Success in judo rests on three sides: coach, athlete and parent. When each does their part, the triangle stands firm."
+  },
+  "embed": "infographic/success-triangle.html (see infographic/EMBED.md)",
+  "static_images": {
+   "he": "infographic/success-triangle-he.png",
+   "ru": "infographic/success-triangle-ru.png",
+   "en": "infographic/success-triangle-en.png"
+  }
+ },
+ "coaches": {
+  "title": {
+   "he": "המאמנים שלנו",
+   "ru": "Наши тренеры",
+   "en": "Our coaches"
+  },
+  "intro": {
+   "he": "מאמנים שהיו בעצמם על הפודיום — ויודעים איך להביא לשם גם אחרים.",
+   "ru": "Тренеры, которые сами стояли на пьедестале — и знают, как привести туда других.",
+   "en": "Coaches who have stood on the podium themselves — and know how to get others there."
+  },
+  "items": [
+   {
+    "id": "ilana-kratysh",
+    "name": {
+     "he": "אילנה קרטיש",
+     "ru": "Илана Кратыш",
+     "en": "Ilana Kratysh"
+    },
+    "role": {
+     "he": "יו״ר העמותה ומאמנת ראשית",
+     "ru": "Председатель амуты и главный тренер",
+     "en": "Club chair and head coach"
+    },
+    "bio": {
+     "he": "גדלה על המזרן שלנו: התחילה ג׳ודו בגיל חמש אצל אביה, אלכסנדר. בהמשך עברה להיאבקות, זכתה בארבע מדליות כסף באליפויות אירופה (2013–2016) וייצגה את ישראל באולימפיאדת ריו 2016. ב־2023 זכתה בכסף באליפות אירופה בסומו — המדליה הראשונה אי פעם של ישראל בענף, וב־2026 במדליית זהב בהיאבקות חופים במכביה. היום היא עומדת בראש המועדון ומאמנת ג׳ודו והיאבקות.",
+     "ru": "Выросла на нашем татами: начала заниматься дзюдо в пять лет у отца, Александра Кратыша. Потом перешла в борьбу — четыре серебряные медали чемпионатов Европы (2013–2016) и Олимпиада в Рио-2016. В 2023 году взяла серебро чемпионата Европы по сумо — первую в истории медаль Израиля в этом виде, а в 2026-м — золото Маккабиады по пляжной борьбе. Сегодня возглавляет клуб и тренирует дзюдоистов и борцов.",
+     "en": "She grew up on our mat: started judo at five with her father, Alexander. She later moved to wrestling, won four European silver medals (2013–2016) and represented Israel at the Rio 2016 Olympics. In 2023 she took silver at the European Sumo Championships — Israel's first-ever medal in the sport — and in 2026 Maccabiah gold in beach wrestling. Today she chairs the club and coaches judo and wrestling."
+    },
+    "facts": [
+     {
+      "fact": "chair of the amuta, head coach",
+      "source": "https://1075.fm/item/207044/",
+      "confidence": "confirmed"
+     },
+     {
+      "fact": "started judo at 5 with her father; trained at the club",
+      "source": "https://www.davar1.co.il/452598/",
+      "confidence": "confirmed"
+     },
+     {
+      "fact": "four European wrestling silvers 2013–2016",
+      "source": "https://www.davar1.co.il/452598/",
+      "also": "https://en.wikipedia.org/wiki/Ilana_Kratysh",
+      "confidence": "confirmed"
+     },
+     {
+      "fact": "Rio 2016 Olympian (wrestling)",
+      "source": "https://haipo.co.il/item/116382",
+      "confidence": "confirmed"
+     },
+     {
+      "fact": "European sumo silver 2023 (Krotoszyn, Poland), Israel's first",
+      "source": "https://www.davar1.co.il/451513/",
+      "confidence": "confirmed"
+     },
+     {
+      "fact": "Maccabiah 2026 beach wrestling gold",
+      "source": "https://nws.report/sport/150802/",
+      "confidence": "confirmed"
+     }
+    ],
+    "dan_rank": {
+     "placeholder": true,
+     "he": "[דרגת דאן — לאישור]",
+     "ru": "[Дан — уточнить]",
+     "en": "[Dan rank — to confirm]"
+    },
+    "photo": {
+     "src": "coaches/ilana.jpg",
+     "w": 800,
+     "h": 1200,
+     "source": "owner 2026-10-17",
+     "alt": {
+      "he": "אילנה קרטיש בחליפת ג׳ודו וחגורה שחורה",
+      "ru": "Илана Кратыш в кимоно с чёрным поясом",
+      "en": "Ilana Kratysh in a judogi with a black belt"
+     }
+    }
+   },
+   {
+    "id": "alexander-kratysh",
+    "name": {
+     "he": "אלכסנדר קרטיש",
+     "ru": "Александр Кратыш",
+     "en": "Alexander Kratysh"
+    },
+    "role": {
+     "he": "מאמן בכיר, ראש בית הספר לג׳ודו",
+     "ru": "Старший тренер, руководитель школы дзюдо",
+     "en": "Senior coach, head of the judo school"
+    },
+    "bio": {
+     "he": "סגן אלוף ברית המועצות בג׳ודו לשעבר, שמאמן ג׳ודו בחיפה כבר יותר משני עשורים. מבית הספר שלו יצאו האולימפיים טומי ארשנסקי (לונדון 2012) ואילנה קרטיש (ריו 2016). היום הוא מלווה, בין השאר, את גל קלודה, מדליסט אליפות אירופה לנוער.",
+     "ru": "Бывший вице-чемпион СССР по дзюдо, тренирует в Хайфе больше двадцати лет. Среди воспитанников его школы — олимпийцы Томми (Артём) Аршанский (Лондон-2012) и Илана Кратыш (Рио-2016). Среди его нынешних учеников — Галь Клода, призёр юниорского чемпионата Европы.",
+     "en": "A former USSR judo vice-champion who has been coaching in Haifa for more than two decades. His school produced Olympians Tommy Arshansky (London 2012) and Ilana Kratysh (Rio 2016). Today he coaches, among others, Gal Kloda, a Junior European Championships medallist."
+    },
+    "facts": [
+     {
+      "fact": "USSR judo vice-champion",
+      "source": "https://www.davar1.co.il/452598/",
+      "confidence": "confirmed",
+      "note": "single news source; owner to confirm wording"
+     },
+     {
+      "fact": "coaching in Haifa since at least 2001",
+      "source": "https://web.archive.org/web/2019/http://unifight.info/?p=118",
+      "confidence": "confirmed",
+      "note": "Haifa municipality press release, Jun 2001, reproduced on archived club site"
+     },
+     {
+      "fact": "club coach",
+      "source": "https://haipo.co.il/item/122821",
+      "confidence": "confirmed"
+     },
+     {
+      "fact": "Olympians Arshansky and Kratysh trained at the club",
+      "source": "https://haipo.co.il/item/116382",
+      "confidence": "confirmed"
+     },
+     {
+      "fact": "personal coach of Gal Kloda",
+      "source": "https://www.facebook.com/unifightjudoclub/",
+      "confidence": "likely",
+      "note": "club FB post 15 Dec 2025"
+     }
+    ],
+    "dan_rank": {
+     "placeholder": true,
+     "he": "[דרגת דאן — לאישור]",
+     "ru": "[Дан — уточнить]",
+     "en": "[Dan rank — to confirm]"
+    },
+    "photo": {
+     "src": "coaches/alexander.jpg",
+     "w": 800,
+     "h": 1200,
+     "source": "owner 2026-10-17",
+     "alt": {
+      "he": "אלכסנדר קרטיש בחליפת ג׳ודו כחולה וחגורה שחורה",
+      "ru": "Александр Кратыш в синем кимоно с чёрным поясом",
+      "en": "Alexander Kratysh in a blue judogi with a black belt"
+     }
+    }
+   },
+   {
+    "id": "natanel-zhurovel",
+    "name": {
+     "he": "נתנאל ז׳ורובל",
+     "ru": "Натанель Журовель",
+     "en": "Natanel Zhurovel"
+    },
+    "role": {
+     "he": "מאמן",
+     "ru": "Тренер",
+     "en": "Coach"
+    },
+    "bio": {
+     "he": "בוגר המועדון: כבר כנער היה מהבולטים בקבוצה שלנו באליפויות ישראל לקבוצות. אלוף ישראל עד גיל 23 שלוש פעמים (2019, 2021, 2022), פעמיים כסף בגביע אירופה (2022), והתחרה בסבב הגרנד פרי. היום הוא מאמן במועדון, ויחד עם אלכסנדר קרטיש מלווה את גל קלודה.",
+     "ru": "Воспитанник клуба: ещё подростком выделялся в нашей команде на командных чемпионатах Израиля. Трёхкратный чемпион Израиля до 23 лет (2019, 2021, 2022), дважды серебряный призёр Кубка Европы (2022), выступал на этапах Гран-при. Сейчас тренирует в клубе. Галь Клода, призёр юниорского чемпионата Европы, — их общий с Александром Кратышем ученик.",
+     "en": "Raised in the club: as a teenager he was already one of our standouts at Israel's team championships. Three-time Israeli U23 champion (2019, 2021, 2022), two-time European Cup silver medallist (2022), he went on to compete on the Grand Prix circuit. Now a club coach, he works with Gal Kloda together with Alexander Kratysh."
+    },
+    "facts": [
+     {
+      "fact": "club judo coach (own Instagram bio)",
+      "source": "https://www.instagram.com/natanel_z/",
+      "confidence": "confirmed"
+     },
+     {
+      "fact": "named in the club's coach list, Nov 2025",
+      "source": "https://1075.fm/item/207044/",
+      "confidence": "confirmed"
+     },
+     {
+      "fact": "club standout 2013 U15 / 2015 U17 team championships",
+      "source": "https://haifainfo.com/?p=51439",
+      "confidence": "likely"
+     },
+     {
+      "fact": "Israeli U23 champion 2019, 2021, 2022",
+      "source": "https://www.judoinside.com/judoka/113150/Natanel_Zhurovel/judo-results",
+      "confidence": "confirmed"
+     },
+     {
+      "fact": "European Cup silver Sarajevo and Riga 2022",
+      "source": "https://www.judoinside.com/judoka/113150/Natanel_Zhurovel/judo-results",
+      "confidence": "confirmed"
+     },
+     {
+      "fact": "Grand Prix Linz and Zagreb 2023",
+      "source": "https://sports.walla.co.il/item/3602721",
+      "confidence": "confirmed"
+     },
+     {
+      "fact": "personal coach of Gal Kloda with Alexander Kratysh",
+      "source": "https://www.facebook.com/unifightjudoclub/",
+      "confidence": "likely",
+      "note": "club FB post 15 Dec 2025"
+     }
+    ],
+    "dan_rank": {
+     "placeholder": true,
+     "he": "[דרגת דאן — לאישור]",
+     "ru": "[Дан — уточнить]",
+     "en": "[Dan rank — to confirm]"
+    },
+    "photo": {
+     "src": "coaches/natanel.jpg",
+     "w": 800,
+     "h": 1102,
+     "source": "owner 2026-10-17 (studio portrait, replaces camp photo)",
+     "alt": {
+      "he": "נתנאל ז׳ורובל בחליפת ג׳ודו לבנה וחגורה שחורה",
+      "ru": "Натанель Журовель в белом кимоно с чёрным поясом",
+      "en": "Natanel Zhurovel in a white judogi with a black belt"
+     }
+    }
+   }
+  ],
+  "more_coaches": {
+   "placeholder": true,
+   "he": "[מאמנים נוספים — רשימה מלאה מהבעלים]",
+   "ru": "[Другие тренеры — полный список от владельца]",
+   "en": "[Other coaches — full roster from owner]"
+  },
+  "team_photo": {
+   "src": "coaches/team.jpg",
+   "w": 1600,
+   "h": 884,
+   "source": "owner 2026-10-17 ('all the club's coaches')",
+   "people_left_to_right": [
+    "?",
+    "?",
+    "?",
+    "alexander-kratysh",
+    "?",
+    "ilana-kratysh"
+   ],
+   "alt": {
+    "he": "צוות המאמנים של יוניפייט חיפה",
+    "ru": "Тренерский состав «Юнифайт Хайфа»",
+    "en": "The Unifight Haifa coaching team"
+   }
+  },
+  "team_count": 6,
+  "lead_more": [
+   {
+    "name": {
+     "he": "טומי ארשנסקי",
+     "ru": "Артем Аршанский",
+     "en": "Tommy (Artem) Arshansky"
+    },
+    "bio": {
+     "he": "משתתף אולימפיאדת לונדון, מדליסט באליפויות אירופה והעולם, מאמן נבחרת ישראל לנוער. מאמן היום בקריות.",
+     "ru": "Участник Олимпийских игр в Лондоне, неоднократный призёр чемпионатов Европы и мира, тренер юниорской сборной Израиля по дзюдо. Сегодня тренирует в Крайот.",
+     "en": "London Olympian, multiple European and World championship medallist, coach of Israel's junior judo team. Coaches in the Krayot today."
+    },
+    "source": "Lazar Kaplun, Facebook post, text supplied by owner 2026-10-17; he/en spellings are transliterations, unverified"
+   },
+   {
+    "name": {
+     "he": "דניס ספרטק",
+     "ru": "Денис Спартак",
+     "en": "Denis Spartak"
+    },
+    "bio": {
+     "he": "זוכה ומדליסט בטורנירים בינלאומיים ובגביעי אירופה, מדליסט באליפויות אירופה.",
+     "ru": "Победитель и призёр международных турниров и кубков Европы, призёр чемпионатов Европы.",
+     "en": "Winner and medallist at international tournaments and European Cups, European championship medallist."
+    },
+    "source": "Lazar Kaplun, Facebook post, text supplied by owner 2026-10-17; he/en spellings are transliterations, unverified"
+   },
+   {
+    "name": {
+     "he": "מקסים גושין",
+     "ru": "Максим Гущин",
+     "en": "Maxim Gushchin"
+    },
+    "bio": {
+     "he": "ספורטאי ומאמן ותיק, שופט בינלאומי מוביל בישראל.",
+     "ru": "Спортсмен и тренер с опытом, ведущий судья Израиля международной категории.",
+     "en": "Experienced athlete and coach, one of Israel's leading international-category referees."
+    },
+    "source": "Lazar Kaplun, Facebook post, text supplied by owner 2026-10-17; he/en spellings are transliterations, unverified"
+   },
+   {
+    "name": {
+     "he": "אירנה ליוהקי",
+     "ru": "Ирина Лёгкая",
+     "en": "Irina Legkaya"
+    },
+    "bio": {
+     "he": "מאמנת ותיקה, מדליסטית באליפויות אירופה והעולם.",
+     "ru": "Опытный тренер, неоднократный призёр чемпионатов Европы и мира.",
+     "en": "Experienced coach, multiple European and World championship medallist."
+    },
+    "source": "Lazar Kaplun, Facebook post, text supplied by owner 2026-10-17; he/en spellings are transliterations, unverified",
+    "photo": {
+     "src": "coaches/irina.jpg",
+     "source": "owner 2026-10-17",
+     "alt": {
+      "he": "אירנה ליוהקי בחליפת ג׳ודו כחולה וחגורה שחורה",
+      "ru": "Ирина Лёгкая в синем кимоно с чёрным поясом",
+      "en": "Irina Legkaya in a blue judogi with a black belt"
+     }
+    }
+   }
+  ],
+  "roster": [
+   {
+    "title": {
+     "he": "מאמנים ותיקים",
+     "ru": "Тренеры клуба",
+     "en": "Club coaches"
+    },
+    "text": {
+     "he": "שנים רבות על המזרן, כל יום.",
+     "ru": "Много лет каждый день на татами.",
+     "en": "On the tatami every day, for many years."
+    },
+    "names": [
+     {
+      "he": "מיכאל גורן",
+      "ru": "Михаэль Горэн",
+      "en": "Michael Goren"
+     },
+     {
+      "he": "פבל ארשנסקי",
+      "ru": "Павел Аршанский",
+      "en": "Pavel Arshansky"
+     },
+     {
+      "he": "אנטון קרוגליאק",
+      "ru": "Антон Кругляк",
+      "en": "Anton Kruglyak"
+     },
+     {
+      "he": "סרגיי פוטומקה",
+      "ru": "Сергей Потомака",
+      "en": "Sergey Potomaka"
+     },
+     {
+      "he": "ודים גושין",
+      "ru": "Вадим Гущин",
+      "en": "Vadim Gushchin"
+     },
+     {
+      "he": "איגור ביטולייב",
+      "ru": "Игорь Битуляев",
+      "en": "Igor Bitulyaev"
+     }
+    ]
+   },
+   {
+    "title": {
+     "he": "הדור הצעיר",
+     "ru": "Молодые тренеры",
+     "en": "Young coaches"
+    },
+    "text": {
+     "he": "אחרי השירות בצה״ל — מאמנים, ועדיין מתחרים ברמה בינלאומית.",
+     "ru": "После службы в ЦАХАЛе — тренеры и действующие спортсмены международного уровня.",
+     "en": "Back from IDF service: coaching, and still competing internationally."
+    },
+    "names": [
+     {
+      "he": "אורי קשת הלוי",
+      "ru": "Ори Кешет-Галеви",
+      "en": "Ori Keshet Halevi"
+     },
+     {
+      "he": "גל קלודה",
+      "ru": "Галь Клода",
+      "en": "Gal Kloda"
+     },
+     {
+      "he": "מייקל וולוביק",
+      "ru": "Майкл Воловик",
+      "en": "Michael Volovik",
+      "photo": {
+       "src": "coaches/michael.jpg",
+       "source": "owner 2026-10-17"
+      }
+     },
+     {
+      "he": "אלכס קגן",
+      "ru": "Алекс Каган",
+      "en": "Alex Kagan"
+     }
+    ]
+   }
+  ],
+  "roster_source": "Lazar Kaplun, Facebook post, text supplied by owner 2026-10-17; he/en spellings are transliterations, unverified; he names = owner's official list 2026-10-17 (Kozlov, Drozhina not on it, removed); owner 2026-10-17: Irina = אירנה ליוהקי, Igor (not Egor) Bitulyaev, Ori Keshet-Halevi confirmed",
+  "founded_note": {
+   "he": "לפני יותר מ־30 שנה הקים את המועדון אלכסנדר קרטיש, מאסטר ספורט ומאמן בכיר — והוא מאמן בו עד היום.",
+   "ru": "Более 30 лет назад мастер спорта и старший тренер Александр Кратыш создал клуб — и до сих пор тренирует в нём.",
+   "en": "Over 30 years ago Alexander Kratysh, Master of Sport and senior coach, founded the club, and he still coaches here today.",
+   "source": "Lazar Kaplun, Facebook post, text supplied by owner 2026-10-17; he/en spellings are transliterations, unverified"
+  }
+ },
+ "achievements": {
+  "title": {
+   "he": "הישגים",
+   "ru": "Достижения",
+   "en": "Achievements"
+  },
+  "intro": {
+   "he": "מהמזרן בחיפה לאולימפיאדה, לגראנד סלאם ולאליפויות אירופה.",
+   "ru": "С хайфского татами — на Олимпиаду, турниры Большого шлема и чемпионаты Европы.",
+   "en": "From a Haifa mat to the Olympics, the Grand Slam and the European Championships."
+  },
+  "highlights": [
+   {
+    "id": "arshansky-olympics",
+    "year": "2012",
+    "person": "Tommy Arshansky",
+    "kind": "olympic",
+    "title": {
+     "he": "טומי ארשנסקי — אולימפיאדת לונדון 2012",
+     "ru": "Томми (Артём) Аршанский — Олимпиада в Лондоне 2012",
+     "en": "Tommy Arshansky — London 2012 Olympics"
+    },
+    "detail": {
+     "he": "בוגר המועדון; ב־2013 גם ארד באליפות אירופה.",
+     "ru": "Воспитанник клуба; в 2013 году — бронза чемпионата Европы.",
+     "en": "A club graduate; European Championships bronze in 2013."
+    },
+    "sources": [
+     "https://haipo.co.il/item/116382",
+     "https://en.wikipedia.org/wiki/Tommy_Arshansky"
+    ],
+    "confidence": "confirmed"
+   },
+   {
+    "id": "kratysh-olympics",
+    "year": "2016",
+    "person": "Ilana Kratysh",
+    "kind": "olympic",
+    "title": {
+     "he": "אילנה קרטיש — אולימפיאדת ריו 2016",
+     "ru": "Илана Кратыш — Олимпиада в Рио 2016",
+     "en": "Ilana Kratysh — Rio 2016 Olympics"
+    },
+    "detail": {
+     "he": "התחילה בג׳ודו במועדון; היאבקות, ארבע מדליות כסף באליפויות אירופה (2013–2016).",
+     "ru": "Начинала с дзюдо в клубе; борьба, четыре серебра чемпионатов Европы (2013–2016).",
+     "en": "Started in judo at the club; wrestling, four European silver medals (2013–2016)."
+    },
+    "sources": [
+     "https://haipo.co.il/item/116382",
+     "https://en.wikipedia.org/wiki/Ilana_Kratysh"
+    ],
+    "confidence": "confirmed"
+   },
+   {
+    "id": "novitzki-gs-tbilisi",
+    "year": "2025",
+    "person": "Adelina Novitzki",
+    "kind": "international",
+    "title": {
+     "he": "עדלינה נוביצקי — ארד בגראנד סלאם טביליסי",
+     "ru": "Аделина Новицки — бронза турнира Большого шлема в Тбилиси",
+     "en": "Adelina Novitzki — Grand Slam Tbilisi bronze"
+    },
+    "detail": {
+     "he": "מרץ 2025, -70 ק״ג.",
+     "ru": "Март 2025, -70 кг.",
+     "en": "March 2025, -70 kg."
+    },
+    "weight": "-70 kg",
+    "sources": [
+     "https://www.judoinside.com/judoka/120363/Adelina_Novitzki"
+    ],
+    "confidence": "confirmed"
+   },
+   {
+    "id": "novitzki-junior-euro",
+    "year": "2022–2023",
+    "person": "Adelina Novitzki",
+    "kind": "international",
+    "title": {
+     "he": "עדלינה נוביצקי — פעמיים סגנית אלופת אירופה לנוער",
+     "ru": "Аделина Новицки — дважды серебряный призёр юниорского чемпионата Европы",
+     "en": "Adelina Novitzki — two Junior European silvers"
+    },
+    "detail": {
+     "he": "פראג 2022 ו־האג 2023; מקום 5 באליפות העולם לנוער 2023.",
+     "ru": "Прага-2022 и Гаага-2023; 5-е место на юниорском чемпионате мира 2023.",
+     "en": "Prague 2022 and The Hague 2023; 5th at the 2023 Junior World Championships."
+    },
+    "sources": [
+     "https://www.judoinside.com/judoka/120363/Adelina_Novitzki/judo-results"
+    ],
+    "confidence": "confirmed"
+   },
+   {
+    "id": "novitzki-senior-champion",
+    "year": "2025",
+    "person": "Adelina Novitzki",
+    "kind": "national",
+    "title": {
+     "he": "עדלינה נוביצקי — אלופת ישראל לבוגרות",
+     "ru": "Аделина Новицки — чемпионка Израиля среди взрослых",
+     "en": "Adelina Novitzki — Israeli senior champion"
+    },
+    "detail": {
+     "he": "-70 ק״ג, זהב באליפויות ינואר ודצמבר 2025.",
+     "ru": "-70 кг, золото чемпионатов в январе и декабре 2025.",
+     "en": "-70 kg, gold at both the January and December 2025 championships."
+    },
+    "weight": "-70 kg",
+    "sources": [
+     "https://www.judoinside.com/judoka/120363/Adelina_Novitzki/judo-results",
+     "https://www.davar1.co.il/645451/"
+    ],
+    "confidence": "confirmed"
+   },
+   {
+    "id": "kloda-poznan",
+    "year": "2024",
+    "person": "Gal Kloda",
+    "kind": "international",
+    "title": {
+     "he": "גל קלודה — זהב בגביע אירופה לנוער (U21), פוזנן",
+     "ru": "Галь Клода — золото юниорского Кубка Европы (U21), Познань",
+     "en": "Gal Kloda — Junior European Cup (U21) gold, Poznań"
+    },
+    "detail": {
+     "he": "אפריל 2024, -66 ק״ג; 49 מתחרים בקטגוריה.",
+     "ru": "Апрель 2024, -66 кг; 49 участников в категории.",
+     "en": "April 2024, -66 kg; 49 in the category."
+    },
+    "weight": "-66 kg",
+    "sources": [
+     "https://carmelist.co.il/item/87701",
+     "https://www.judoinside.com/judoka/153673/Gal_Kloda/judo-results"
+    ],
+    "confidence": "confirmed"
+   },
+   {
+    "id": "kloda-junior-euro",
+    "year": "2024",
+    "person": "Gal Kloda",
+    "kind": "international",
+    "title": {
+     "he": "גל קלודה — ארד באליפות אירופה לנוער, טאלין",
+     "ru": "Галь Клода — бронза юниорского чемпионата Европы, Таллин",
+     "en": "Gal Kloda — Junior European Championships bronze, Tallinn"
+    },
+    "detail": {
+     "he": "ספטמבר 2024, -66 ק״ג. ב־2026 — זהב באליפות ארה״ב הפתוחה (U21).",
+     "ru": "Сентябрь 2024, -66 кг. В 2026-м — золото US Open (U21).",
+     "en": "September 2024, -66 kg. In 2026 — US Open (U21) gold."
+    },
+    "weight": "-66 kg",
+    "sources": [
+     "https://www.judoinside.com/judoka/153673/Gal_Kloda/judo-results"
+    ],
+    "confidence": "confirmed"
+   },
+   {
+    "id": "cadet-euro-bronze",
+    "year": "2024",
+    "person": null,
+    "minor": true,
+    "kind": "international",
+    "title": {
+     "he": "הקדט שלנו — ארד באליפות אירופה לקדטים",
+     "ru": "Наш кадет — бронза первенства Европы среди кадетов",
+     "en": "Our cadet — European Cadet Championships bronze"
+    },
+    "detail": {
+     "he": "סופיה, יוני 2024, -50 ק״ג.",
+     "ru": "София, июнь 2024, -50 кг.",
+     "en": "Sofia, June 2024, -50 kg."
+    },
+    "weight": "-50 kg",
+    "sources": [
+     "https://en.wikipedia.org/wiki/2024_European_Cadet_Judo_Championships"
+    ],
+    "confidence": "confirmed",
+    "note": "athlete was a minor — do not name"
+   },
+   {
+    "id": "kratysh-sumo",
+    "year": "2023",
+    "person": "Ilana Kratysh",
+    "kind": "international",
+    "title": {
+     "he": "אילנה קרטיש — כסף באליפות אירופה בסומו",
+     "ru": "Илана Кратыш — серебро чемпионата Европы по сумо",
+     "en": "Ilana Kratysh — European Sumo Championships silver"
+    },
+    "detail": {
+     "he": "קרוטושין, פולין, ספטמבר 2023 — המדליה הראשונה של ישראל בענף.",
+     "ru": "Кротошин, Польша, сентябрь 2023 — первая медаль Израиля в этом виде.",
+     "en": "Krotoszyn, Poland, September 2023 — Israel's first medal in the sport."
+    },
+    "sources": [
+     "https://carmelist.co.il/item/76590",
+     "https://www.davar1.co.il/451513/"
+    ],
+    "confidence": "confirmed"
+   },
+   {
+    "id": "zhurovel-u23",
+    "year": "2019–2022",
+    "person": "Natanel Zhurovel",
+    "kind": "national",
+    "title": {
+     "he": "נתנאל ז׳ורובל — 3 פעמים אלוף ישראל עד גיל 23",
+     "ru": "Натанель Журовель — трёхкратный чемпион Израиля до 23 лет",
+     "en": "Natanel Zhurovel — three-time Israeli U23 champion"
+    },
+    "detail": {
+     "he": "2019, 2021, 2022; פעמיים כסף בגביע אירופה ב־2022.",
+     "ru": "2019, 2021, 2022; дважды серебро Кубка Европы в 2022-м.",
+     "en": "2019, 2021, 2022; two European Cup silvers in 2022."
+    },
+    "sources": [
+     "https://www.judoinside.com/judoka/113150/Natanel_Zhurovel/judo-results",
+     "https://haipo.co.il/item/403860"
+    ],
+    "confidence": "confirmed"
+   },
+   {
+    "id": "cadets-2025-first",
+    "year": "2025",
+    "person": null,
+    "kind": "team",
+    "title": {
+     "he": "מקום ראשון בארץ באליפות ישראל לקדטים",
+     "ru": "Первое место в стране на чемпионате Израиля среди кадетов",
+     "en": "No. 1 club at the Israeli Cadet Championship"
+    },
+    "detail": {
+     "he": "נובמבר 2025: 12 מדליות — 4 זהב, 3 כסף, 5 ארד; יותר מ־600 ספורטאים וכ־50 מועדונים.",
+     "ru": "Ноябрь 2025: 12 медалей — 4 золота, 3 серебра, 5 бронз; более 600 спортсменов и около 50 клубов.",
+     "en": "November 2025: 12 medals — 4 gold, 3 silver, 5 bronze; 600+ athletes from about 50 clubs."
+    },
+    "sources": [
+     "https://1075.fm/item/207044/",
+     "https://haipo.co.il/item/602077"
+    ],
+    "confidence": "confirmed"
+   },
+   {
+    "id": "u15-team-2015",
+    "year": "2015",
+    "person": null,
+    "kind": "team",
+    "title": {
+     "he": "אלופי ישראל לקבוצות עד גיל 15",
+     "ru": "Чемпионы Израиля в командном первенстве до 15 лет",
+     "en": "Israeli U15 team champions"
+    },
+    "detail": {
+     "he": "אילת, ינואר 2015; קבוצת עד גיל 17 — מקום שני.",
+     "ru": "Эйлат, январь 2015; команда до 17 лет — второе место.",
+     "en": "Eilat, January 2015; our U17 team took silver."
+    },
+    "sources": [
+     "https://haifainfo.com/?p=51439"
+    ],
+    "confidence": "confirmed"
+   }
+  ],
+  "more_results": [
+   {
+    "id": "youth-2026",
+    "year": "2026",
+    "text": {
+     "he": "אליפות ישראל לנוער 2026: 14 מדליות (2 זהב, 4 כסף, 8 ארד).",
+     "ru": "Чемпионат Израиля среди юношей 2026: 14 медалей (2 золота, 4 серебра, 8 бронз).",
+     "en": "Israeli Youth Championship 2026: 14 medals (2 gold, 4 silver, 8 bronze)."
+    },
+    "sources": [
+     "https://haipo.co.il/en/haipo-news-02-06-26-10-56-57"
+    ],
+    "confidence": "confirmed"
+   },
+   {
+    "id": "boys-children-2026",
+    "year": "2026",
+    "text": {
+     "he": "אליפות ישראל לילדים 2026: כ־60 בנים מהמועדון, 18 זהב, 11 כסף, 24 ארד — מקום שלישי בדירוג המועדונים.",
+     "ru": "Детский чемпионат Израиля 2026: около 60 мальчиков из клуба, 18 золотых, 11 серебряных и 24 бронзовые медали — третье место среди клубов.",
+     "en": "Israeli Children's Championship 2026: about 60 of our boys, 18 gold, 11 silver, 24 bronze — 3rd in the club ranking."
+    },
+    "sources": [
+     "https://1075.fm/item/220812"
+    ],
+    "confidence": "confirmed"
+   },
+   {
+    "id": "girls-2026",
+    "year": "2026",
+    "text": {
+     "he": "אליפות ישראל לבנות 2026: 39 ספורטאיות מהמועדון — מקום ראשון בטבלת המדליות הקבוצתית (לפי המועדון).",
+     "ru": "Чемпионат Израиля среди девочек 2026: 39 спортсменок клуба — первое место в командном медальном зачёте (по данным клуба).",
+     "en": "Israeli Girls' Championship 2026: 39 of our girls — 1st in the team medal table (club report)."
+    },
+    "sources": [
+     "https://www.facebook.com/unifightjudoclub/posts/pfbid02iwR9KSuYxAgrTahAQKMUZhxtSkecTKsUeEbAzKLh9yUyAncU8rrcAtw9BoYxVnVJl"
+    ],
+    "confidence": "likely"
+   },
+   {
+    "id": "maccabiah-2026",
+    "year": "2026",
+    "text": {
+     "he": "מכביה 2026: בג׳ודו 2 זהב, 3 כסף ו־2 ארד; בהיאבקות חופים — זהב לאילנה קרטיש.",
+     "ru": "Маккабиада 2026: в дзюдо 2 золота, 3 серебра и 2 бронзы; в пляжной борьбе — золото Иланы Кратыш.",
+     "en": "Maccabiah 2026: judo 2 gold, 3 silver, 2 bronze; beach wrestling gold for Ilana Kratysh."
+    },
+    "sources": [
+     "https://1075.fm/item/220812",
+     "https://nws.report/sport/150802/"
+    ],
+    "confidence": "confirmed"
+   },
+   {
+    "id": "u23-2022",
+    "year": "2022",
+    "text": {
+     "he": "אליפות ישראל עד גיל 23: מקום שני בין המועדונים, ומספר המדליות הגדול ביותר מכל מועדוני הג׳ודו.",
+     "ru": "Чемпионат Израиля до 23 лет: второе место среди клубов и больше всех медалей среди дзюдо-клубов.",
+     "en": "Israeli U23 Championship: 2nd among clubs, with more medals than any other judo club."
+    },
+    "sources": [
+     "https://haipo.co.il/item/403860"
+    ],
+    "confidence": "confirmed"
+   },
+   {
+    "id": "sambo-2025",
+    "year": "2025",
+    "text": {
+     "he": "גביע ישראל בסמבו 2025: זהב, כסף וארד.",
+     "ru": "Кубок Израиля по самбо 2025: золото, серебро и бронза.",
+     "en": "Israel Sambo Cup 2025: one gold, one silver, one bronze."
+    },
+    "sources": [
+     "https://smoothcomp.com/en/club/58191"
+    ],
+    "confidence": "confirmed"
+   },
+   {
+    "id": "wrestling-2025",
+    "year": "2025",
+    "text": {
+     "he": "אליפות ישראל בהיאבקות חופשית: 26 משתתפים מהמועדון, 12 מדליות.",
+     "ru": "Чемпионат Израиля по вольной борьбе: 26 спортсменов клуба, 12 медалей.",
+     "en": "Israeli freestyle wrestling championship: 26 club athletes, 12 medals."
+    },
+    "sources": [
+     "https://haipo.co.il/item/559969"
+    ],
+    "confidence": "confirmed"
+   }
+  ],
+  "stats": [
+   {
+    "id": "olympians",
+    "value": "2",
+    "label": {
+     "he": "אולימפיים שהתאמנו במועדון",
+     "ru": "олимпийца — воспитанники клуба",
+     "en": "Olympians who trained at the club"
+    },
+    "sources": [
+     "https://haipo.co.il/item/116382"
+    ],
+    "confidence": "confirmed"
+   },
+   {
+    "id": "cadet-medals-2025",
+    "value": "12",
+    "label": {
+     "he": "מדליות ומקום ראשון בארץ — אליפות ישראל לקדטים 2025",
+     "ru": "медалей и первое место в стране — чемпионат Израиля среди кадетов 2025",
+     "en": "medals and No. 1 club — Israeli Cadet Championship 2025"
+    },
+    "sources": [
+     "https://1075.fm/item/207044/"
+    ],
+    "confidence": "confirmed"
+   },
+   {
+    "id": "north-2025-competitors",
+    "value": "1,000+",
+    "label": {
+     "he": "מתחרים באליפות הצפון שאירחנו ב־2025",
+     "ru": "участников на чемпионате Севера, который мы провели в 2025 году",
+     "en": "competitors at the Northern Championship we hosted in 2025"
+    },
+    "sources": [
+     "https://www.facebook.com/unifightjudoclub/posts/pfbid02BZ6xAcdAj2ADbe4p86Dc4nrqKSvtH4CRdSns7FkpWNAffXaWq41XqcE4W7Z5Joj5l"
+    ],
+    "confidence": "likely"
+   },
+   {
+    "id": "jsport-kids",
+    "value": "500+",
+    "label": {
+     "he": "ילדים ממדינות שונות במחנות J-Sport של העמותה (2011–2014)",
+     "ru": "детей из разных стран прошли лагеря J-Sport нашей амуты (2011–2014)",
+     "en": "kids from several countries at our association's J-Sport camps (2011–2014)"
+    },
+    "sources": [
+     "https://haifainfo.com/?p=43105"
+    ],
+    "confidence": "confirmed"
+   },
+   {
+    "id": "youth-medals-2026",
+    "value": "14",
+    "label": {
+     "he": "מדליות באליפות ישראל לנוער 2026",
+     "ru": "медалей на чемпионате Израиля среди юношей 2026",
+     "en": "medals at the Israeli Youth Championship 2026"
+    },
+    "sources": [
+     "https://haipo.co.il/en/haipo-news-02-06-26-10-56-57"
+    ],
+    "confidence": "confirmed"
+   },
+   {
+    "id": "north-2019-medals",
+    "value": "50+",
+    "label": {
+     "he": "מדליות לספורטאי המועדון באליפות הצפון 2019",
+     "ru": "медалей у спортсменов клуба на чемпионате Севера 2019",
+     "en": "medals for club athletes at the 2019 Northern Championship"
+    },
+    "sources": [
+     "https://haipo.co.il/item/116382"
+    ],
+    "confidence": "confirmed"
+   }
+  ]
+ },
+ "history": {
+  "title": {
+   "he": "הסיפור שלנו",
+   "ru": "Наша история",
+   "en": "Our story"
+  },
+  "intro": {
+   "he": "יותר משני עשורים של ג׳ודו בחיפה — מקבוצת נוער שכונתית ועד אולימפיאדות.",
+   "ru": "Больше двадцати лет дзюдо в Хайфе — от юношеской команды до Олимпийских игр.",
+   "en": "More than two decades of judo in Haifa — from a youth team to the Olympic Games."
+  },
+  "lineage_note": {
+   "placeholder": true,
+   "he": "[רצף השמות ״ספורט לצפון״ → ״אולימפיקס״ → ״יוניפייט״ ושנת הקמת בית הספר לג׳ודו — לאישור הבעלים]",
+   "ru": "[Преемственность «Спорт ле-Цафон» → «Олимпикс» → «Юнифайт» и год основания школы дзюдо — уточнить у владельца]",
+   "en": "[Lineage Sport LeTzafon → Olimpix → Unifight and the judo school's founding year — owner to confirm]"
+  },
+  "items": [
+   {
+    "year": "2001",
+    "title": {
+     "he": "29 מדליות באליפות ישראל",
+     "ru": "29 медалей на чемпионате Израиля",
+     "en": "29 medals at the Israeli championship"
+    },
+    "text": {
+     "he": "קבוצת הנוער של עמותת ״ספורט לצפון״, בהדרכת לזר קפלון, אלכסנדר קרטיש ואולג בריק, זוכה ב־29 מדליות, 6 מהן זהב. ראש העירייה עמרם מצנע מקבל את הספורטאים לכבוד ההישג.",
+     "ru": "Юношеская команда амуты «Спорт ле-Цафон» под руководством Лазаря Каплуна, Александра Кратыша и Олега Брика завоёвывает 29 медалей, из них 6 золотых. Мэр Хайфы Амрам Мицна принимает спортсменов в мэрии.",
+     "en": "The youth team of the Sport LeTzafon association, coached by Lazar Kaplun, Alexander Kratysh and Oleg Brik, wins 29 medals, 6 of them gold. Haifa mayor Amram Mitzna hosts the athletes."
+    },
+    "source": "https://web.archive.org/web/2019/http://unifight.info/?p=118",
+    "confidence": "confirmed",
+    "note": "Haifa municipality press release (Jun 2001) reproduced on the archived club site"
+   },
+   {
+    "year": "2007",
+    "title": {
+     "he": "הקמת עמותת יוניפייט חיפה",
+     "ru": "Основана амута «Юнифайт Хайфа»",
+     "en": "Unifight Haifa association founded"
+    },
+    "text": {
+     "he": "העמותה הוקמה כדי לפתח ספורט בקרב בני נוער, בשיתוף עם עיריית חיפה.",
+     "ru": "Амута создана для развития спорта среди молодёжи и работает в сотрудничестве с муниципалитетом Хайфы.",
+     "en": "The association was set up to develop youth sport, working together with the Haifa municipality."
+    },
+    "source": "https://web.archive.org/web/20180112092101/http://unifight.info:80/?",
+    "confidence": "likely"
+   },
+   {
+    "year": "2011",
+    "title": {
+     "he": "״אולימפיקס״ ומחנות J-Sport",
+     "ru": "«Олимпикс» и лагеря J-Sport",
+     "en": "\"Olimpix\" and the J-Sport camps"
+    },
+    "text": {
+     "he": "המועדון פועל תחת השם ״אולימפיקס״, בהדרכת אלכסנדר קרטיש ופאבל ארשנסקי. באותה שנה יוצא לדרך מחנה הספורט הבינלאומי J-Sport לבני נוער.",
+     "ru": "Клуб выступает под именем «Олимпикс», тренеры — Александр Кратыш и Павел Аршанский. В том же году стартует международный молодёжный спортивный лагерь J-Sport.",
+     "en": "The club trains under the name \"Olimpix\", coached by Alexander Kratysh and Pavel Arshansky. The same year the international youth sports camp J-Sport gets going."
+    },
+    "sources": [
+     "https://web.archive.org/web/20190123033944/http://olimpix.info/",
+     "https://haifainfo.com/?p=43105"
+    ],
+    "confidence": "likely"
+   },
+   {
+    "year": "2012",
+    "title": {
+     "he": "בוגר המועדון באולימפיאדה",
+     "ru": "Воспитанник клуба — на Олимпиаде",
+     "en": "A club graduate at the Olympics"
+    },
+    "text": {
+     "he": "טומי ארשנסקי מייצג את ישראל בג׳ודו באולימפיאדת לונדון; שנה אחר כך הוא זוכה בארד באליפות אירופה.",
+     "ru": "Томми (Артём) Аршанский выступает за Израиль на Олимпиаде в Лондоне, а через год берёт бронзу чемпионата Европы.",
+     "en": "Tommy Arshansky represents Israel in judo at the London Olympics; a year later he wins European Championships bronze."
+    },
+    "sources": [
+     "https://haipo.co.il/item/116382",
+     "https://en.wikipedia.org/wiki/Tommy_Arshansky"
+    ],
+    "confidence": "confirmed"
+   },
+   {
+    "year": "2012",
+    "title": {
+     "he": "מחנה סולידריות לילדי הדרום",
+     "ru": "Лагерь солидарности для детей юга",
+     "en": "Solidarity camp for kids from the south"
+    },
+    "text": {
+     "he": "בנובמבר, בזמן הלחימה בעזה, העמותה מארחת 85 ג׳ודוקאים בני 4–15 מאשדוד ומאשקלון לשלושה ימים של אימונים, טורניר וטיולים.",
+     "ru": "В ноябре, во время боёв в Газе, амута принимает 85 юных дзюдоистов 4–15 лет из Ашдода и Ашкелона: три дня тренировок, турнир и экскурсии.",
+     "en": "In November, during the fighting in Gaza, the association hosts 85 young judoka aged 4–15 from Ashdod and Ashkelon for three days of training, a tournament and trips."
+    },
+    "source": "https://web.archive.org/web/2019/http://unifight.info/?p=21",
+    "confidence": "confirmed"
+   },
+   {
+    "year": "2013",
+    "title": {
+     "he": "גביעים באליפות ישראל לקבוצות",
+     "ru": "Кубки командного чемпионата Израиля",
+     "en": "Cups at the Israeli team championship"
+    },
+    "text": {
+     "he": "באליפות ישראל לקבוצות עד גיל 15 בתל אביב המועדון זוכה בשני גביעים — זהב וארד — והוא הקבוצה היחידה מהצפון.",
+     "ru": "На командном чемпионате Израиля до 15 лет в Тель-Авиве клуб завоёвывает два кубка — «золото» и «бронзу» — и оказывается единственной командой с севера.",
+     "en": "At the Israeli U15 team championship in Tel Aviv the club wins two cups — gold and bronze — as the only team from the north."
+    },
+    "source": "https://haifainfo.com/?p=34416",
+    "confidence": "confirmed"
+   },
+   {
+    "year": "2015",
+    "title": {
+     "he": "אלופי ישראל לקבוצות",
+     "ru": "Чемпионы Израиля в командном зачёте",
+     "en": "Israeli team champions"
+    },
+    "text": {
+     "he": "בפסטיבל 50 שנה לאיגוד הג׳ודו באילת: קבוצת עד גיל 15 של יוניפייט — אלופת ישראל, וקבוצת עד גיל 17 — מקום שני.",
+     "ru": "На фестивале к 50-летию федерации дзюдо в Эйлате команда «Юнифайт» до 15 лет становится чемпионом Израиля, а команда до 17 лет — серебряным призёром.",
+     "en": "At the Israel Judo Association's 50th-anniversary festival in Eilat, Unifight's U15 team become Israeli champions and the U17 team take silver."
+    },
+    "source": "https://haifainfo.com/?p=51439",
+    "confidence": "confirmed"
+   },
+   {
+    "year": "2016",
+    "title": {
+     "he": "אילנה קרטיש בריו",
+     "ru": "Илана Кратыш в Рио",
+     "en": "Ilana Kratysh at Rio"
+    },
+    "text": {
+     "he": "בוגרת המועדון, שהתחילה ג׳ודו בגיל חמש אצל אביה, מייצגת את ישראל בהיאבקות באולימפיאדת ריו.",
+     "ru": "Воспитанница клуба, начавшая заниматься дзюдо в пять лет у отца, представляет Израиль в борьбе на Олимпиаде в Рио.",
+     "en": "A club graduate who started judo at five with her father represents Israel in wrestling at the Rio Olympics."
+    },
+    "sources": [
+     "https://www.davar1.co.il/452598/",
+     "https://en.wikipedia.org/wiki/Ilana_Kratysh"
+    ],
+    "confidence": "confirmed"
+   },
+   {
+    "year": "2022",
+    "title": {
+     "he": "אליפות הצפון בנשר",
+     "ru": "Чемпионат Севера в Нешере",
+     "en": "Northern Championship in Nesher"
+    },
+    "text": {
+     "he": "כ־450 משתתפים מגיל 4 ועד בוגרים, באולם הספורט בנשר. באותה שנה — מקום שני ומספר המדליות הגדול ביותר באליפות ישראל עד גיל 23.",
+     "ru": "Около 450 участников от 4 лет до взрослых в спортзале Нешера. В том же году — второе место и больше всех медалей на чемпионате Израиля до 23 лет.",
+     "en": "About 450 competitors, from age 4 to adults, at the Nesher sports hall. The same year: 2nd place and the most medals at the Israeli U23 Championship."
+    },
+    "sources": [
+     "https://haipo.co.il/item/346254",
+     "https://haipo.co.il/item/403860"
+    ],
+    "confidence": "confirmed"
+   },
+   {
+    "year": "2024",
+    "title": {
+     "he": "מדליות באליפויות אירופה",
+     "ru": "Медали чемпионатов Европы",
+     "en": "European Championship medals"
+    },
+    "text": {
+     "he": "ארד לקדט שלנו באליפות אירופה לקדטים בסופיה, וארד לגל קלודה באליפות אירופה לנוער בטאלין.",
+     "ru": "Наш кадет — бронза первенства Европы в Софии, Галь Клода — бронза юниорского чемпионата Европы в Таллине.",
+     "en": "Bronze for our cadet at the European Cadet Championships in Sofia, and bronze for Gal Kloda at the Junior European Championships in Tallinn."
+    },
+    "sources": [
+     "https://en.wikipedia.org/wiki/2024_European_Cadet_Judo_Championships",
+     "https://www.judoinside.com/judoka/153673/Gal_Kloda/judo-results"
+    ],
+    "confidence": "confirmed"
+   },
+   {
+    "year": "2025",
+    "title": {
+     "he": "גראנד סלאם ומקום ראשון בארץ",
+     "ru": "Большой шлем и первое место в стране",
+     "en": "A Grand Slam medal and No. 1 in Israel"
+    },
+    "text": {
+     "he": "עדלינה נוביצקי זוכה בארד בגראנד סלאם טביליסי, והמועדון מסיים ראשון באליפות ישראל לקדטים עם 12 מדליות.",
+     "ru": "Аделина Новицки берёт бронзу турнира Большого шлема в Тбилиси, а клуб занимает первое место на чемпионате Израиля среди кадетов с 12 медалями.",
+     "en": "Adelina Novitzki wins bronze at Grand Slam Tbilisi, and the club finishes first at the Israeli Cadet Championship with 12 medals."
+    },
+    "sources": [
+     "https://www.judoinside.com/judoka/120363/Adelina_Novitzki",
+     "https://1075.fm/item/207044/"
+    ],
+    "confidence": "confirmed"
+   },
+   {
+    "year": "2026",
+    "title": {
+     "he": "היום",
+     "ru": "Сегодня",
+     "en": "Today"
+    },
+    "text": {
+     "he": "מדליות במכביה, עשרות ילדים ונערים על הפודיום באליפויות ישראל — והדרך נמשכת.",
+     "ru": "Медали Маккабиады, десятки детей и подростков на пьедесталах чемпионатов Израиля — и путь продолжается.",
+     "en": "Maccabiah medals, dozens of kids and teens on national podiums — and the road goes on."
+    },
+    "sources": [
+     "https://1075.fm/item/220812"
+    ],
+    "confidence": "confirmed",
+    "note": "medal counts in achievements.more_results (2026)"
+   }
+  ]
+ },
+ "tournaments": {
+  "title": {
+   "he": "תחרויות שארגנו",
+   "ru": "Турниры, которые мы проводим",
+   "en": "Tournaments we run"
+  },
+  "intro": {
+   "he": "אנחנו לא רק מתחרים — אנחנו גם מארחים. אליפות הצפון בג׳ודו מביאה לנשר מועדונים מכל הארץ.",
+   "ru": "Мы не только выступаем, но и принимаем гостей. Чемпионат Севера по дзюдо собирает в Нешере клубы со всей страны.",
+   "en": "We don't just compete — we host. The Northern Judo Championship brings clubs from all over Israel to Nesher."
+  },
+  "organized": [
+   {
+    "id": "north-2025",
+    "year": "2025",
+    "name": {
+     "he": "אליפות הצפון בג׳ודו",
+     "ru": "Чемпионат Севера по дзюдо",
+     "en": "Northern Judo Championship"
+    },
+    "place": {
+     "he": "נשר",
+     "ru": "Нешер",
+     "en": "Nesher"
+    },
+    "participants": "1,000+",
+    "text": {
+     "he": "יומיים של תחרות: ביום שישי כ־250 ילדים מהגן ועד כיתה ב׳, ובשבת — מכיתה ג׳ ועד נוער ובוגרים. יותר מ־20 אגודות, מאשקלון ועד קריית שמונה. התחרות הגדולה ביותר שאירחנו עד היום.",
+     "ru": "Два дня соревнований: в пятницу около 250 малышей от детского сада до второго класса, в субботу — от третьего класса до юношей и взрослых. Более 20 клубов, от Ашкелона до Кирьят-Шмоны. Самый большой турнир, который мы когда-либо проводили.",
+     "en": "Two days of competition: on Friday about 250 kids from kindergarten to 2nd grade, on Saturday from 3rd grade up to youth and adults. More than 20 clubs, from Ashkelon to Kiryat Shmona. The biggest event we've ever hosted."
+    },
+    "source": "https://www.facebook.com/unifightjudoclub/posts/pfbid02BZ6xAcdAj2ADbe4p86Dc4nrqKSvtH4CRdSns7FkpWNAffXaWq41XqcE4W7Z5Joj5l",
+    "confidence": "likely",
+    "note": "exact dates not confirmed (post ~3 Nov 2025); show year only"
+   },
+   {
+    "id": "north-2022",
+    "year": "2022",
+    "name": {
+     "he": "אליפות הג׳ודו בצפון 2022",
+     "ru": "Чемпионат Севера по дзюдо 2022",
+     "en": "Northern Judo Championship 2022"
+    },
+    "place": {
+     "he": "אולם הספורט בנשר",
+     "ru": "Спортзал Нешера",
+     "en": "Nesher sports hall"
+    },
+    "participants": "~450",
+    "text": {
+     "he": "26 בפברואר 2022: כ־450 משתתפים מכל הגילים, החל מגיל 4. את התחרות מארגנת אילנה קרטיש, יו״ר העמותה.",
+     "ru": "26 февраля 2022: около 450 участников всех возрастов, начиная с 4 лет. Организатор — председатель амуты Илана Кратыш.",
+     "en": "26 February 2022: about 450 competitors of all ages, from 4 years old. Organized by club chair Ilana Kratysh."
+    },
+    "source": "https://haipo.co.il/item/346254",
+    "confidence": "confirmed"
+   },
+   {
+    "id": "fight-sim-2026",
+    "year": "2026",
+    "name": {
+     "he": "סימולציית קרבות",
+     "ru": "День соревновательной практики",
+     "en": "Competition simulation day"
+    },
+    "place": {
+     "placeholder": true,
+     "he": "[מקום — לאישור]",
+     "ru": "[Место — уточнить]",
+     "en": "[Venue — to confirm]"
+    },
+    "participants": null,
+    "text": {
+     "he": "יחד עם מכבי חיפה ובהשתתפות מאמנים ומועדונים מכל הצפון: שקילה, הגרלות ושופטים רשמיים — בדיוק כמו בתחרות אמיתית.",
+     "ru": "Совместно с «Маккаби Хайфа», при участии тренеров и клубов со всего севера: взвешивание, жеребьёвка, официальные судьи — всё как на настоящих соревнованиях.",
+     "en": "Together with Maccabi Haifa and coaches and clubs from across the north: weigh-ins, draws and official referees — just like the real thing."
+    },
+    "source": "https://www.facebook.com/unifightjudoclub/videos/3431478037054453/",
+    "confidence": "likely"
+   }
+  ],
+  "earlier_editions": {
+   "placeholder": true,
+   "he": "[מהדורות קודמות של אליפות הצפון (2018–2021, 2023–2024) — שנים, מקום ומספר משתתפים מהבעלים]",
+   "ru": "[Прошлые чемпионаты Севера (2018–2021, 2023–2024): годы, места и число участников — от владельца]",
+   "en": "[Earlier Northern Championship editions (2018–2021, 2023–2024): years, venues, numbers — from owner]"
+  },
+  "sumo": {
+   "title": {
+    "he": "גם סומו",
+    "ru": "И даже сумо",
+    "en": "Sumo, too"
+   },
+   "text": {
+    "he": "אילנה קרטיש זכתה ב־2023 במדליה הראשונה של ישראל באליפות אירופה בסומו (כסף, קרוטושין, פולין). באפריל 2024 ניהלה את אליפות ישראל בסומו במרכז הספורט ליאו באק בחיפה — כ־200 ספורטאים, התחרות הראשונה בארץ מזה כ־15 שנה. ב־2025 שפטה באליפות ישראל בסומו בנשר.",
+    "ru": "В 2023 году Илана Кратыш завоевала первую для Израиля медаль чемпионата Европы по сумо (серебро, Кротошин, Польша). В апреле 2024-го она была директором чемпионата Израиля по сумо в спорткомплексе «Лео Бек» в Хайфе — около 200 спортсменов, первый такой турнир в стране примерно за 15 лет. В 2025 году судила чемпионат Израиля по сумо в Нешере.",
+    "en": "In 2023 Ilana Kratysh won Israel's first-ever medal at the European Sumo Championships (silver, Krotoszyn, Poland). In April 2024 she directed the Israeli Sumo Championship at the Leo Baeck sports center in Haifa — about 200 athletes, the first such event in Israel in some 15 years. In 2025 she refereed the Israeli Sumo Championship in Nesher."
+   },
+   "sources": [
+    "https://www.davar1.co.il/451513/",
+    "https://haipo.co.il/item/513833",
+    "https://carmelist.co.il/item/88156",
+    "https://nws.report/nesher-news/133553/"
+   ],
+   "confidence": "confirmed",
+   "note": "Sources name the Israeli sumo association as organizer, not Unifight. Do not write 'Unifight organized'."
+  }
+ },
+ "camps": {
+  "title": {
+   "he": "מחנות אימונים",
+   "ru": "Лагеря и сборы",
+   "en": "Camps"
+  },
+  "intro": {
+   "he": "אימונים, טיולים וחברים מכל העולם — מחנות שהילדים זוכרים שנים.",
+   "ru": "Тренировки, путешествия и друзья со всего мира — лагеря, которые дети вспоминают годами.",
+   "en": "Training, trips and friends from around the world — camps kids remember for years."
+  },
+  "recent": [
+   {
+    "id": "germany-2023",
+    "when": {
+     "he": "מאי 2023",
+     "ru": "Май 2023",
+     "en": "May 2023"
+    },
+    "title": {
+     "he": "מסע לגרמניה",
+     "ru": "Поездка в Германию",
+     "en": "Trip to Germany"
+    },
+    "text": {
+     "he": "טורניר באֶרפורט, אימונים, טיולים ופארק חבלים.",
+     "ru": "Турнир в Эрфурте, тренировки, экскурсии и верёвочный парк.",
+     "en": "A tournament in Erfurt, training, sightseeing and a rope park."
+    },
+    "source": "owner photo archive: drive-003/UNIFIGHT/ג׳ודו/2022-2023/גרמניה (EXIF 12–16 May 2023)",
+    "confidence": "likely",
+    "photos": [
+     "camp-erfurt-flag.jpg",
+     "camp-erfurt-square.jpg",
+     "camp-ropepark.jpg"
+    ]
+   },
+   {
+    "id": "sukkot-2023",
+    "when": {
+     "he": "סוכות 2023",
+     "ru": "Суккот 2023",
+     "en": "Sukkot 2023"
+    },
+    "title": {
+     "he": "מחנה אימונים בסוכות",
+     "ru": "Сборы на Суккот",
+     "en": "Sukkot training camp"
+    },
+    "text": {
+     "he": "כמה ימים של אימונים אינטנסיביים על המזרן, יחד.",
+     "ru": "Несколько дней интенсивных тренировок на татами — всей командой.",
+     "en": "A few days of intensive training on the mat, all together."
+    },
+    "source": "owner photo archive: drive-003/UNIFIGHT/ג׳ודו/2023-2024/מחנה אימונים סוכות (EXIF 1–5 Oct 2023)",
+    "confidence": "likely",
+    "photos": [
+     "camp-sukkot-mass.jpg",
+     "camp-festival.jpg",
+     "camp-group.jpg",
+     "train-sukkot-randori.jpg"
+    ]
+   },
+   {
+    "id": "georgia-2024",
+    "when": {
+     "he": "פברואר 2024",
+     "ru": "Февраль 2024",
+     "en": "February 2024"
+    },
+    "title": {
+     "he": "מחנה אימונים בגאורגיה",
+     "ru": "Сборы в Грузии",
+     "en": "Training camp in Georgia"
+    },
+    "text": {
+     "he": "אימונים במזרן ובחוץ, ויום בשלג בגודאורי.",
+     "ru": "Тренировки в зале и на улице, и день в снегах Гудаури.",
+     "en": "Training on the mat and outdoors, and a day in the snow at Gudauri."
+    },
+    "source": "owner photo archive: drive-003/UNIFIGHT/ג׳ודו/2023-2024/מחנה אימונים גיאורגיה 2-24 (EXIF 22–25 Feb 2024)",
+    "confidence": "likely",
+    "photos": [
+     "georgia-dojo.jpg",
+     "train-georgia-outdoor.jpg",
+     "camp-snow-wide.jpg",
+     "snow-flag.jpg",
+     "camp-gudauri.jpg"
+    ]
+   }
+  ],
+  "history_title": {
+   "he": "מחנות J-Sport (2011–2015)",
+   "ru": "Лагеря J-Sport (2011–2015)",
+   "en": "J-Sport camps (2011–2015)"
+  },
+  "history_intro": {
+   "he": "במשך כמה שנים הפעילה העמותה את J-Sport — מחנה ספורט בינלאומי לבני נוער מישראל, אוקראינה ורוסיה. את הג׳ודו במחנות הדריך אלכסנדר קרטיש.",
+   "ru": "Несколько лет амута проводила J-Sport — международный спортивный лагерь для подростков из Израиля, Украины и России. Дзюдо в лагерях вёл Александр Кратыш.",
+   "en": "For several years the association ran J-Sport, an international sports camp for teens from Israel, Ukraine and Russia. Judo at the camps was coached by Alexander Kratysh."
+  },
+  "history_intro_sources": [
+   "https://haifainfo.com/?p=43105",
+   "https://web.archive.org/web/2019/http://unifight.info/?p=19"
+  ],
+  "history": [
+   {
+    "year": "2011",
+    "when": {
+     "he": "אוגוסט–ספטמבר 2011",
+     "ru": "Август–сентябрь 2011",
+     "en": "Aug–Sep 2011"
+    },
+    "place": {
+     "he": "אודסה, אוקראינה",
+     "ru": "Одесса, Украина",
+     "en": "Odessa, Ukraine"
+    },
+    "text": {
+     "he": "מחנה המועדון — יותר מ־50 ספורטאים.",
+     "ru": "Сборы клуба — более 50 спортсменов.",
+     "en": "Club camp — more than 50 athletes."
+    },
+    "source": "https://web.archive.org/web/2019/http://olimpix.info/2011/08/derzhim-put-v-odessu/",
+    "confidence": "likely"
+   },
+   {
+    "year": "2012",
+    "when": {
+     "he": "יולי 2012",
+     "ru": "Июль 2012",
+     "en": "July 2012"
+    },
+    "place": {
+     "he": "כפר הנוער נחלת יהודה",
+     "ru": "Молодёжная деревня Нахалат-Иехуда",
+     "en": "Nahalat Yehuda youth village"
+    },
+    "text": {
+     "he": "כמאה ילדים בני 9–16; טומי ארשנסקי ביקר במחנה לפני לונדון 2012.",
+     "ru": "Почти сто детей 9–16 лет; Томми Аршанский заехал в лагерь перед Лондоном-2012.",
+     "en": "Nearly a hundred kids aged 9–16; Tommy Arshansky visited before London 2012."
+    },
+    "source": "https://web.archive.org/web/2019/http://unifight.info/?p=19",
+    "confidence": "confirmed"
+   },
+   {
+    "year": "2012",
+    "when": {
+     "he": "אוגוסט 2012",
+     "ru": "Август 2012",
+     "en": "August 2012"
+    },
+    "place": {
+     "he": "אודסה, אוקראינה",
+     "ru": "Одесса, Украина",
+     "en": "Odessa, Ukraine"
+    },
+    "text": {
+     "he": "12 ימים: 70 ילדים מרוסיה ומאוקראינה ו־25 מישראל.",
+     "ru": "12 дней: 70 ребят из России и Украины и 25 из Израиля.",
+     "en": "12 days: 70 kids from Russia and Ukraine and 25 from Israel."
+    },
+    "source": "https://web.archive.org/web/2019/http://unifight.info/?p=3205",
+    "confidence": "confirmed"
+   },
+   {
+    "year": "2012",
+    "when": {
+     "he": "נובמבר 2012",
+     "ru": "Ноябрь 2012",
+     "en": "November 2012"
+    },
+    "place": {
+     "he": "חיפה והסביבה",
+     "ru": "Хайфа и окрестности",
+     "en": "Haifa area"
+    },
+    "text": {
+     "he": "מחנה סולידריות: 85 ג׳ודוקאים צעירים מאשדוד ומאשקלון, בזמן הלחימה בעזה.",
+     "ru": "Лагерь солидарности: 85 юных дзюдоистов из Ашдода и Ашкелона во время боёв в Газе.",
+     "en": "Solidarity camp: 85 young judoka from Ashdod and Ashkelon during the Gaza fighting."
+    },
+    "source": "https://web.archive.org/web/2019/http://unifight.info/?p=21",
+    "confidence": "confirmed"
+   },
+   {
+    "year": "2013",
+    "when": {
+     "he": "יולי 2013",
+     "ru": "Июль 2013",
+     "en": "July 2013"
+    },
+    "place": {
+     "he": "הרי הקרפטים, אוקראינה",
+     "ru": "Карпаты, Украина",
+     "en": "Carpathians, Ukraine"
+    },
+    "text": {
+     "he": "J-Sport Extreme.",
+     "ru": "J-Sport Extreme.",
+     "en": "J-Sport Extreme."
+    },
+    "source": "https://haifainfo.com/?p=36818",
+    "confidence": "likely"
+   },
+   {
+    "year": "2014",
+    "when": {
+     "he": "אוגוסט 2014",
+     "ru": "Август 2014",
+     "en": "August 2014"
+    },
+    "place": {
+     "he": "כפר הנוער כפר גלים",
+     "ru": "Молодёжная деревня Кфар-Галим",
+     "en": "Kfar Galim youth village"
+    },
+    "text": {
+     "he": "כמאה ילדים מישראל, מאוקראינה ומרוסיה, 12 ימים של ג׳ודו והיאבקות.",
+     "ru": "Около ста детей из Израиля, Украины и России, 12 дней дзюдо и вольной борьбы.",
+     "en": "About a hundred kids from Israel, Ukraine and Russia; 12 days of judo and wrestling."
+    },
+    "source": "https://haifainfo.com/?p=43105",
+    "confidence": "confirmed"
+   },
+   {
+    "year": "2014",
+    "when": {
+     "he": "חנוכה 2014",
+     "ru": "Ханука 2014",
+     "en": "Hanukkah 2014"
+    },
+    "place": {
+     "he": "מודיעין",
+     "ru": "Модиин",
+     "en": "Modiin"
+    },
+    "text": {
+     "he": "מחנה חורף בן שישה ימים.",
+     "ru": "Шестидневный зимний лагерь.",
+     "en": "A six-day winter camp."
+    },
+    "source": "https://haifainfo.com/?p=46569",
+    "confidence": "likely"
+   },
+   {
+    "year": "2015",
+    "when": {
+     "he": "אוגוסט 2015",
+     "ru": "Август 2015",
+     "en": "August 2015"
+    },
+    "place": {
+     "he": "כפר גלים",
+     "ru": "Кфар-Галим",
+     "en": "Kfar Galim"
+    },
+    "text": {
+     "he": "בני 10–16, עם שיעור אמן של אילנה קרטיש.",
+     "ru": "Ребята 10–16 лет, мастер-класс Иланы Кратыш.",
+     "en": "Ages 10–16, with a masterclass by Ilana Kratysh."
+    },
+    "source": "https://web.archive.org/web/2019/http://unifight.info/?p=2842",
+    "confidence": "likely"
+   }
+  ],
+  "upcoming": {
+   "placeholder": true,
+   "he": "[המחנה הבא — תאריכים ופרטים מהבעלים]",
+   "ru": "[Ближайшие сборы — даты и детали от владельца]",
+   "en": "[Next camp — dates and details from owner]"
+  }
+ },
+ "schedule": {
+  "title": {
+   "he": "לוח אימונים",
+   "ru": "Расписание тренировок",
+   "en": "Training schedule"
+  },
+  "source": "owner message 2026-10-17 (SCHEDULE.md)",
+  "confidence": "confirmed",
+  "groups": [
+   {
+    "id": "older",
+    "label": {
+     "he": "קבוצת הבוגרים",
+     "ru": "Старшая группа",
+     "en": "Older group"
+    },
+    "rows": [
+     {
+      "day": {
+       "he": "יום שני",
+       "ru": "Понедельник",
+       "en": "Monday"
+      },
+      "training": {
+       "he": "אימון ג׳ודו",
+       "ru": "Тренировка по дзюдо",
+       "en": "Judo training"
+      },
+      "place": {
+       "he": "עין הים",
+       "ru": "Эйн-ха-Ям",
+       "en": "Ein HaYam"
+      },
+      "time": "19:30–21:00"
+     },
+     {
+      "day": {
+       "he": "יום שלישי",
+       "ru": "Вторник",
+       "en": "Tuesday"
+      },
+      "training": {
+       "he": "אימון נבחרת המועדון",
+       "ru": "Тренировка сборной клуба (нивхерет)",
+       "en": "Selected team (nivheret)"
+      },
+      "place": {
+       "he": "עירוני א׳",
+       "ru": "Ирони Алеф",
+       "en": "Ironi Alef"
+      },
+      "time": "19:00–20:30",
+      "highlight": true
+     },
+     {
+      "day": {
+       "he": "יום רביעי",
+       "ru": "Среда",
+       "en": "Wednesday"
+      },
+      "training": {
+       "he": "אימון ג׳ודו",
+       "ru": "Тренировка по дзюдо",
+       "en": "Judo training"
+      },
+      "place": {
+       "he": "עירוני א׳",
+       "ru": "Ирони Алеф",
+       "en": "Ironi Alef"
+      },
+      "time": "19:00–20:30"
+     },
+     {
+      "day": {
+       "he": "יום חמישי",
+       "ru": "Четверг",
+       "en": "Thursday"
+      },
+      "training": {
+       "he": "אימון ג׳ודו",
+       "ru": "Тренировка по дзюдо",
+       "en": "Judo training"
+      },
+      "place": {
+       "he": "עין הים",
+       "ru": "Эйн-ха-Ям",
+       "en": "Ein HaYam"
+      },
+      "time": "19:30–21:00"
+     },
+     {
+      "day": {
+       "he": "יום שישי",
+       "ru": "Пятница",
+       "en": "Friday"
+      },
+      "training": {
+       "he": "אימון קרקע (נה־וואזה)",
+       "ru": "Борьба в партере (нэ-вадза)",
+       "en": "Groundwork (ne-waza)"
+      },
+      "place": {
+       "he": "עירוני א׳",
+       "ru": "Ирони Алеф",
+       "en": "Ironi Alef"
+      },
+      "time": "15:00–16:30",
+      "note": {
+       "he": "ייתכנו שינויים",
+       "ru": "время может измениться",
+       "en": "may change"
+      }
+     }
+    ]
+   },
+   {
+    "id": "kids",
+    "label": {
+     "he": "קבוצות הילדים",
+     "ru": "Детские группы",
+     "en": "Kids' groups"
+    },
+    "placeholder": true,
+    "message": {
+     "he": "לוח האימונים של קבוצות הילדים יעלה בקרוב. בינתיים — כתבו לנו בוואטסאפ ונמצא קבוצה מתאימה לגיל ולשכונה.",
+     "ru": "Расписание детских групп скоро появится. А пока напишите нам в WhatsApp — подберём группу по возрасту и району.",
+     "en": "The kids' schedule is coming soon. Meanwhile, message us on WhatsApp and we'll find a group that fits your child's age and neighbourhood."
+    },
+    "cta": {
+     "he": "כתבו לנו בוואטסאפ",
+     "ru": "Написать в WhatsApp",
+     "en": "Message us on WhatsApp",
+     "href": "#contact"
+    }
+   }
+  ],
+  "nivheret_note": {
+   "he": "נבחרת המועדון — קבוצה תחרותית לספורטאים שמתכוננים לאליפויות.",
+   "ru": "Сборная клуба (нивхерет) — соревновательная группа для спортсменов, которые готовятся к турнирам.",
+   "en": "The selected team (nivheret) is the club's competitive squad for athletes preparing for championships."
+  },
+  "nivheret_details": {
+   "placeholder": true,
+   "he": "[מי יכול להצטרף לנבחרת, ספורטאים ממועדונים אחרים — פרטים מהבעלים]",
+   "ru": "[Кто может попасть в сборную клуба, в том числе спортсмены других клубов — от владельца]",
+   "en": "[Who can join the selected team, incl. athletes from other clubs — from owner]"
+  }
+ },
+ "branches": {
+  "title": {
+   "he": "איפה מתאמנים",
+   "ru": "Где мы тренируемся",
+   "en": "Where we train"
+  },
+  "intro": {
+   "he": "קבוצות בשכונות שונות בחיפה, וגם בנשר ובעתלית.",
+   "ru": "Группы в разных районах Хайфы, а также в Нешере и Атлите.",
+   "en": "Groups across Haifa's neighbourhoods, plus Nesher and Atlit."
+  },
+  "venues": [
+   {
+    "id": "ein-hayam",
+    "name": {
+     "he": "עין הים",
+     "ru": "Эйн-ха-Ям",
+     "en": "Ein HaYam"
+    },
+    "note": {
+     "he": "קבוצת הבוגרים",
+     "ru": "старшая группа",
+     "en": "older group"
+    },
+    "address": {
+     "placeholder": true,
+     "he": "[כתובת — מהבעלים]",
+     "ru": "[Адрес — от владельца]",
+     "en": "[Address — from owner]"
+    },
+    "source": "SCHEDULE.md (owner)",
+    "confidence": "confirmed"
+   },
+   {
+    "id": "ironi-alef",
+    "name": {
+     "he": "עירוני א׳",
+     "ru": "Ирони Алеф",
+     "en": "Ironi Alef"
+    },
+    "note": {
+     "he": "קבוצת הבוגרים והנבחרת",
+     "ru": "старшая группа и сборная клуба",
+     "en": "older group and selected team"
+    },
+    "address": {
+     "placeholder": true,
+     "he": "[כתובת — מהבעלים]",
+     "ru": "[Адрес — от владельца]",
+     "en": "[Address — from owner]"
+    },
+    "source": "SCHEDULE.md (owner)",
+    "confidence": "confirmed"
+   }
+  ],
+  "neighbourhoods": [
+   {
+    "id": "kiryat-eliezer",
+    "name": {
+     "he": "קריית אליעזר",
+     "ru": "Кирьят-Элиэзер",
+     "en": "Kiryat Eliezer"
+    },
+    "sources": [
+     "https://haipo.co.il/item/122821"
+    ],
+    "confidence": "confirmed"
+   },
+   {
+    "id": "hadar",
+    "name": {
+     "he": "הדר",
+     "ru": "Адар",
+     "en": "Hadar"
+    },
+    "sources": [
+     "https://haipo.co.il/item/122821"
+    ],
+    "confidence": "confirmed"
+   },
+   {
+    "id": "neve-shaanan",
+    "name": {
+     "he": "נווה שאנן",
+     "ru": "Неве-Шаанан",
+     "en": "Neve Sha'anan"
+    },
+    "sources": [
+     "https://haipo.co.il/item/122821"
+    ],
+    "confidence": "confirmed"
+   },
+   {
+    "id": "shprinzak",
+    "name": {
+     "he": "שפרינצק",
+     "ru": "Шпринцак",
+     "en": "Shprinzak"
+    },
+    "sources": [
+     "https://haipo.co.il/item/122821"
+    ],
+    "confidence": "confirmed"
+   },
+   {
+    "id": "nesher",
+    "name": {
+     "he": "נשר",
+     "ru": "Нешер",
+     "en": "Nesher"
+    },
+    "sources": [
+     "https://haipo.co.il/item/122821"
+    ],
+    "confidence": "confirmed"
+   },
+   {
+    "id": "carmel-tzarfati",
+    "name": {
+     "he": "כרמל צרפתי",
+     "ru": "Французский Кармель",
+     "en": "French Carmel"
+    },
+    "sources": [
+     "https://www.facebook.com/unifighthaifa/posts/pfbid07PRTVLJ5g3rAM49fh1D8hayRqMJkAtYRwap9jiRr3XMiPdPeNqj7o3stpCEfiskel"
+    ],
+    "confidence": "likely"
+   },
+   {
+    "id": "merkaz-hacarmel",
+    "name": {
+     "he": "מרכז הכרמל",
+     "ru": "Мерказ ха-Кармель",
+     "en": "Merkaz HaCarmel"
+    },
+    "sources": [
+     "https://www.facebook.com/unifighthaifa/posts/pfbid07PRTVLJ5g3rAM49fh1D8hayRqMJkAtYRwap9jiRr3XMiPdPeNqj7o3stpCEfiskel"
+    ],
+    "confidence": "likely"
+   },
+   {
+    "id": "atlit",
+    "name": {
+     "he": "עתלית",
+     "ru": "Атлит",
+     "en": "Atlit"
+    },
+    "sources": [
+     "https://www.facebook.com/unifighthaifa/posts/pfbid07PRTVLJ5g3rAM49fh1D8hayRqMJkAtYRwap9jiRr3XMiPdPeNqj7o3stpCEfiskel"
+    ],
+    "confidence": "likely"
+   }
+  ],
+  "full_list": {
+   "placeholder": true,
+   "he": "[רשימת סניפים מלאה: שם האולם, כתובת, גילאים ומאמן לכל סניף — מהבעלים]",
+   "ru": "[Полный список филиалов: зал, адрес, возраст и тренер — от владельца]",
+   "en": "[Full branch list: hall, address, ages and coach per branch — from owner]"
+  },
+  "map": {
+   "placeholder": true,
+   "he": "[מפה — אחרי אישור הכתובות]",
+   "ru": "[Карта — после подтверждения адресов]",
+   "en": "[Map — once addresses are confirmed]"
+  }
+ },
+ "contact": {
+  "title": {
+   "he": "בואו להתאמן איתנו",
+   "ru": "Приходите тренироваться",
+   "en": "Come train with us"
+  },
+  "text": {
+   "he": "שאלה על קבוצה, גיל או סניף? כתבו לנו או התקשרו — נשמח לעזור.",
+   "ru": "Вопрос о группе, возрасте или филиале? Напишите или позвоните — с радостью поможем.",
+   "en": "Questions about a group, age or location? Message or call us — we're happy to help."
+  },
+  "whatsapp_cta": {
+   "label": {
+    "he": "כתבו לנו בוואטסאפ",
+    "ru": "Написать в WhatsApp",
+    "en": "Message us on WhatsApp"
+   },
+   "number": {
+    "placeholder": true,
+    "he": "[איזה מספר מקבל את פניות האתר — לבחירת הבעלים]",
+    "ru": "[Какой номер получает заявки с сайта — выбор владельца]",
+    "en": "[Which number receives site enquiries — owner to choose]"
+   },
+   "mockup_default": "054-566-4663",
+   "mockup_default_note": "Ilana's public number (confirmed). Use for mockups only; real WhatsApp link pending owner choice."
+  },
+  "phones": [
+   {
+    "name": {
+     "he": "אילנה",
+     "ru": "Илана",
+     "en": "Ilana"
+    },
+    "phone": "054-763-2054",
+    "tel": "+972547632054",
+    "source": "https://www.israeldojo.co.il/מורה-אומנויות-לחימה/unifight/",
+    "confidence": "confirmed"
+   },
+   {
+    "name": {
+     "he": "נתנאל",
+     "ru": "Натанель",
+     "en": "Natanel"
+    },
+    "phone": "054-566-4663",
+    "tel": "+972545664663",
+    "source": "https://smoothcomp.com/en/club/58191/contact",
+    "confidence": "confirmed"
+   },
+   {
+    "name": {
+     "he": "אלכסנדר",
+     "ru": "Александр",
+     "en": "Alexander"
+    },
+    "phone": "052-237-7054",
+    "tel": "+972522377054",
+    "source": "https://www.facebook.com/unifighthaifa/posts/pfbid07PRTVLJ5g3rAM49fh1D8hayRqMJkAtYRwap9jiRr3XMiPdPeNqj7o3stpCEfiskel ; old club flyer from owner 2026-10-17 (content/old-flyer-alexander-source.png)",
+    "confidence": "confirmed"
+   }
+  ],
+  "email": {
+   "value": "unifight.haifa@outlook.com",
+   "source": "https://www.facebook.com/unifightjudoclub/",
+   "confidence": "likely",
+   "note": "owner to confirm which email is current"
+  },
+  "social": [
+   {
+    "id": "facebook",
+    "label": "Facebook",
+    "url": "https://www.facebook.com/unifightjudoclub/",
+    "confidence": "confirmed"
+   },
+   {
+    "id": "instagram",
+    "label": "Instagram",
+    "handle": "@unifight_haifa",
+    "url": "https://www.instagram.com/unifight_haifa/",
+    "confidence": "likely",
+    "note": "linked from coach's bio; owner to confirm it's official"
+   },
+   {
+    "id": "tiktok",
+    "label": "TikTok",
+    "placeholder": true,
+    "he": "[טיקטוק — כתובת מהבעלים]",
+    "ru": "[TikTok — ссылка от владельца]",
+    "en": "[TikTok — handle from owner]"
+   }
+  ]
+ },
+ "footer": {
+  "tagline": {
+   "he": "יוניפייט חיפה — בית ספר לג׳ודו בחיפה והסביבה",
+   "ru": "Юнифайт Хайфа — школа дзюдо в Хайфе и окрестностях",
+   "en": "Unifight Haifa — judo school in Haifa and the area"
+  },
+  "legal": {
+   "he": "יוניפייט חיפה (ע״ר)",
+   "ru": "Амута «Юнифайт Хайфа»",
+   "en": "Unifight Haifa (registered non-profit)"
+  },
+  "legal_source": "https://www.guidestar.org.il/he/organization/580472751",
+  "amuta_number": {
+   "placeholder": true,
+   "he": "[מספר עמותה — לאישור]",
+   "ru": "[Номер амуты — уточнить]",
+   "en": "[Non-profit number — to confirm]"
+  },
+  "copyright": {
+   "he": "© 2026 יוניפייט חיפה. כל הזכויות שמורות.",
+   "ru": "© 2026 Юнифайт Хайфа. Все права защищены.",
+   "en": "© 2026 Unifight Haifa. All rights reserved."
+  },
+  "accessibility_link": {
+   "placeholder": true,
+   "he": "[הצהרת נגישות]",
+   "ru": "[Заявление о доступности]",
+   "en": "[Accessibility statement]"
+  }
+ },
+ "photos": {
+  "base_path": "img/",
+  "rules": [
+   "Do not use: kids-tournament-smiles, result-erfurt-girls-flag, kids-video-trio, kids-video-stance, kids-sukkot-pair, kids-belt-play (identifiable minors in close-up; consent pending).",
+   "Avoid as main image (other clubs' / federation / sponsor branding): tour-erfurt-hall, result-hadera-podium, result-districts-team, result-erfurt-coaches, result-nerush-podium, result-sambo-team, result-erfurt-flag-podium, train-georgia-bow, dojo-lineup (gallery strip only).",
+   "train-georgia-ground shows a surname back patch — skip or crop it out.",
+   "No coach is identified by name in any photo: never caption a photo with a coach's name.",
+   "Tournament photos (tour-*, result-jfp-*) don't prove the club organized those events: caption as 'our athletes at…', not 'our tournament'."
+  ],
+  "hero": {
+   "light": [
+    "tour-north-hall.jpg",
+    "camp-sukkot-mass.jpg"
+   ],
+   "dark": [
+    "groundwork.jpg",
+    "camp-snow-wide.jpg",
+    "train-sukkot-randori.jpg"
+   ],
+   "bright": [
+    "belts-air.jpg",
+    "kids-belts-throw.jpg",
+    "kids-belt-cheer.jpg"
+   ]
+  },
+  "kids": [
+   "kids-coach.jpg",
+   "rope-climb.jpg",
+   "belt-class.jpg",
+   "kids-belt-cheer.jpg",
+   "result-kids-certificates.jpg",
+   "result-jfp-mascot.jpg"
+  ],
+  "first_class": [
+   "belt-class.jpg",
+   "kids-coach.jpg"
+  ],
+  "success_triangle": [
+   "coach-belt-ceremony.jpg"
+  ],
+  "coaches": [
+   "coach-belt-ceremony.jpg",
+   "coach-georgia-athlete.jpg",
+   "train-wingate-talk.jpg"
+  ],
+  "achievements": [
+   "medals-team.jpg",
+   "medals-kids.jpg",
+   "intl-medals.jpg",
+   "result-cadets-trio.jpg",
+   "hadera-team.jpg"
+  ],
+  "history": [
+   "camp-group.jpg",
+   "tour-north-hall.jpg"
+  ],
+  "tournaments": [
+   "tour-north-hall.jpg",
+   "tour-kids-bout.jpg",
+   "tour-kids-referee.jpg",
+   "tour-kids-warmup.jpg",
+   "result-jfp-haifa.jpg",
+   "tour-hadera-arena.jpg"
+  ],
+  "camps": [
+   "camp-sukkot-mass.jpg",
+   "camp-festival.jpg",
+   "camp-erfurt-flag.jpg",
+   "camp-erfurt-square.jpg",
+   "camp-ropepark.jpg",
+   "georgia-dojo.jpg",
+   "train-georgia-outdoor.jpg",
+   "train-georgia-stairs.jpg",
+   "camp-snow-wide.jpg",
+   "snow-flag.jpg",
+   "camp-gudauri.jpg"
+  ],
+  "schedule": [
+   "groundwork.jpg",
+   "train-hadera-randori.jpg",
+   "train-georgia-randori.jpg",
+   "train-sukkot-randori.jpg"
+  ],
+  "nivheret": [
+   "train-wingate-talk.jpg",
+   "train-video-randori.jpg"
+  ],
+  "branches": [
+   "kids-white-night.jpg",
+   "belt-class.jpg"
+  ],
+  "contact": [
+   "kids-belts-throw.jpg",
+   "belts-air.jpg"
+  ],
+  "gallery_strip": [
+   "groundwork.jpg",
+   "rope-climb.jpg",
+   "intl-medals.jpg",
+   "camp-festival.jpg",
+   "snow-flag.jpg",
+   "train-georgia-cooldown.jpg",
+   "dojo-lineup.jpg"
+  ]
+ }
+}
