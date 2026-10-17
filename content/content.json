@@ -738,7 +738,17 @@
      {
       "he": "גל קלודה",
       "ru": "Галь Клода",
-      "en": "Gal Kloda"
+      "en": "Gal Kloda",
+      "photo": {
+       "src": "coaches/gal.jpg",
+       "source": "owner 2026-10-17"
+      },
+      "bio": {
+       "he": "ארד באליפות אירופה לנוער (טאלין, 2024), זהב בגביע אירופה לנוער U21 (פוזנן, 2024), זהב באליפות ארה״ב הפתוחה U21 (2026).",
+       "ru": "Бронза юниорского чемпионата Европы (Таллин, 2024), золото юниорского Кубка Европы U21 (Познань, 2024), золото US Open U21 (2026).",
+       "en": "Junior European Championships bronze (Tallinn, 2024), Junior European Cup U21 gold (Poznań, 2024), US Open U21 gold (2026)."
+      },
+      "bio_source": "content.achievements.highlights (Gal Kloda rows)"
      },
      {
       "he": "מייקל וולוביק",
