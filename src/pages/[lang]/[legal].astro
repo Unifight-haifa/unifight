@@ -1,0 +1,28 @@
+---
+import { i18n } from 'astro:config/client';
+import Base from '../../layouts/Base.astro';
+import type { Lang } from '../../i18n/ui';
+
+// TODO(owner): add the contact email and amuta number (ע״ר) to the copy once confirmed.
+// Candidates to verify: unifight.haifa@outlook.com, guidestar.org.il/he/organization/580472751.
+const docs = import.meta.glob<{ frontmatter: { title: string }; Content: any }>('../../../content/legal/*.md', { eager: true });
+
+export function getStaticPaths() {
+  return i18n!.locales.flatMap((lang) => ['privacy', 'accessibility'].map((legal) => ({ params: { lang, legal } })));
+}
+
+const { lang, legal } = Astro.params as { lang: Lang; legal: string };
+const { frontmatter, Content } = docs[`../../../content/legal/${legal}.${lang}.md`];
+---
+<Base lang={lang} title={frontmatter.title}>
+  <h1>{frontmatter.title}</h1>
+  <Content />
+</Base>
+
+<style>
+  /* long Russian words overflow a 360px viewport */
+  h1 {
+    hyphens: auto;
+    overflow-wrap: break-word;
+  }
+</style>
