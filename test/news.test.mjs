@@ -99,8 +99,21 @@ test('content check rejects raw HTML in a post', () => {
     const dir = join(root, published[0].dir);
     cpSync(new URL(published[0].dir, src), dir, { recursive: true });
     const f = join(dir, 'index.ru.md');
-    writeFileSync(f, readFileSync(f, 'utf8') + '\n<img src=x onerror=alert(1)>\n');
-    assert.throws(() => checkNews(pathToFileURL(`${root}/`)), /raw HTML/);
+    const orig = readFileSync(f, 'utf8');
+    for (const [bad, re] of [
+      ['<img src=x onerror=alert(1)>', /raw HTML/],
+      ['`a` <script>alert(1)</script> `b`', /raw HTML/],
+      ['<javascript:alert(1)>', /raw HTML/],
+      ['[x](javascript:alert(1))', /link target/],
+      ['[x]( JaVaScRiPt:alert(1))', /link target/],
+      ['[x](&#106;avascript:alert(1))', /link target/],
+      ['[r]: data:text/html,hi', /link target/],
+    ]) {
+      writeFileSync(f, `${orig}\n${bad}\n`);
+      assert.throws(() => checkNews(pathToFileURL(`${root}/`)), re, bad);
+    }
+    writeFileSync(f, `${orig}\n[site](https://example.org/x) ![p](photo-2.jpg) [a](/unifight/ru/)\n`);
+    assert.doesNotThrow(() => checkNews(pathToFileURL(`${root}/`)));
   } finally {
     rmSync(root, { recursive: true, force: true });
   }
