@@ -1,0 +1,1188 @@
+{
+  "name": "news-telegram-intake",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "id": "27052074-7c60-51db-80ba-6acee7567ed7",
+      "name": "Telegram Trigger",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        300
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "REPLACE_ME",
+          "name": "Unifight News Bot"
+        }
+      },
+      "webhookId": "REPLACE_ME"
+    },
+    {
+      "parameters": {
+        "resource": "row",
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "",
+          "cachedResultName": "publishers"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "telegram_id",
+              "condition": "eq",
+              "keyValue": "={{ String($json.message.from.id) }}"
+            }
+          ]
+        },
+        "limit": 1
+      },
+      "id": "9dd38fb8-b278-55f0-b017-231c13925b39",
+      "name": "Find Publisher",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        220,
+        300
+      ],
+      "alwaysOutputData": true,
+      "_note": "Data Table node params (filters/columns/operation names) written from docs operation list, not from an export; re-select the table after import. https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.datatable/"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "cd7b8d3f-a15a-403a-b21e-33ec89ea6ce7",
+              "leftValue": "={{ !!$json.coach_id && $json.active === true && $('Telegram Trigger').first().json.message.chat.type === 'private' }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "4cf9d8c0-dee1-5f76-83bd-6b1229b00c2d",
+      "name": "Is Allowed",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        440,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').first().json.message.chat.id }}",
+        "text": "={{ 'Нет доступа к публикации новостей. Ваш Telegram ID: ' + $('Telegram Trigger').first().json.message.from.id + '. Перешлите его администратору клуба.' }}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "disable_web_page_preview": true
+        }
+      },
+      "id": "80ac27df-1f91-57c7-8d77-9fa128945d17",
+      "name": "Reply Denied",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        660,
+        520
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "REPLACE_ME",
+          "name": "Unifight News Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "row",
+        "operation": "insert",
+        "dataTableId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "",
+          "cachedResultName": "audit_log"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "ts": "={{ $now.toISO() }}",
+            "actor_id": "={{ 'tg:' + $('Telegram Trigger').first().json.message.from.id }}",
+            "channel": "telegram",
+            "action": "denied",
+            "target": "",
+            "result": "denied",
+            "detail": "={{ ($('Telegram Trigger').first().json.message.text || '').slice(0, 100) }}",
+            "execution_id": "={{ $execution.id }}"
+          },
+          "matchingColumns": [],
+          "schema": []
+        }
+      },
+      "id": "7b58a590-1c1d-56af-b692-61d6e764193f",
+      "name": "Log Denied",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        880,
+        520
+      ],
+      "_note": "Data Table node params (filters/columns/operation names) written from docs operation list, not from an export; re-select the table after import. https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.datatable/"
+    },
+    {
+      "parameters": {
+        "jsCode": "\n// One update = one command or one piece of content for the open draft.\nconst m = $('Telegram Trigger').first().json.message;\nconst p = $input.first().json;\nconst raw = (m.text || m.caption || '').trim();\nconst c = raw.match(/^\\/(\\w+)(?:@\\w+)?\\s*([\\s\\S]*)$/);\nlet photo = '';\nif (m.photo && m.photo.length) photo = m.photo[m.photo.length - 1].file_id;\nelse if (m.document && (m.document.mime_type || '').startsWith('image/')) photo = m.document.file_id;\nreturn [{ json: {\n  cmd: c ? c[1].toLowerCase() : 'content',\n  arg: c ? c[2].trim() : '',\n  text: c ? '' : raw,\n  photo,\n  video: !!(m.video || m.video_note),\n  chat_id: String(m.chat.id),\n  telegram_id: String(m.from.id),\n  coach_id: p.coach_id, name: p.name || '', role: p.role, lang: p.lang || '',\n} }];\n"
+      },
+      "id": "476f763f-eaba-5aa5-884f-ffb5753d3bc1",
+      "name": "Parse Command",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        660,
+        280
+      ]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "4c8a60fd-9c3e-4c9e-83b4-f7cfd9fcbe41",
+                    "leftValue": "={{ $json.cmd }}",
+                    "rightValue": "new",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "new"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "2853360d-29a1-4b39-8899-d78412b3ce6a",
+                    "leftValue": "={{ $json.cmd }}",
+                    "rightValue": "content",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "content"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "0ed7220b-f663-4b90-8ab0-132cb52c610a",
+                    "leftValue": "={{ $json.cmd }}",
+                    "rightValue": "done",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "done"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "95a6d62d-56fb-4b6d-8245-927849222952",
+                    "leftValue": "={{ $json.cmd }}",
+                    "rightValue": "cancel",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "cancel"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "42a48dd7-3f39-4ba6-b721-883943bb919d",
+                    "leftValue": "={{ $json.cmd }}",
+                    "rightValue": "unpublish",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "unpublish"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra",
+          "renameFallbackOutput": "help"
+        }
+      },
+      "id": "c8abaf1c-83b3-5692-ac5f-971567155594",
+      "name": "Route",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        880,
+        280
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "row",
+        "operation": "upsert",
+        "dataTableId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "",
+          "cachedResultName": "tg_collect"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "telegram_id",
+              "condition": "eq",
+              "keyValue": "={{ $json.telegram_id }}"
+            }
+          ]
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "telegram_id": "={{ $json.telegram_id }}",
+            "text": "",
+            "photo_ids": "[]",
+            "src_lang": "={{ ['he','ru','en'].includes($json.arg) ? $json.arg : '' }}",
+            "started_at": "={{ $now.toISO() }}"
+          },
+          "matchingColumns": [],
+          "schema": []
+        }
+      },
+      "id": "d93facdf-d340-58ae-af24-7ede6cd4e829",
+      "name": "Open Draft",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        1100,
+        0
+      ],
+      "_note": "Data Table node params (filters/columns/operation names) written from docs operation list, not from an export; re-select the table after import. https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.datatable/"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Parse Command').first().json.chat_id }}",
+        "text": "Новая новость. Пришлите текст: первая строка — заголовок, дальше — сама новость. Затем от 1 до 6 фото, первое станет обложкой. Когда всё готово — /done, отменить — /cancel.",
+        "additionalFields": {
+          "appendAttribution": false,
+          "disable_web_page_preview": true
+        }
+      },
+      "id": "da2e73b7-2d8d-5a5a-a2a5-9b08a6c25a6f",
+      "name": "Reply New",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1320,
+        0
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "REPLACE_ME",
+          "name": "Unifight News Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "row",
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "",
+          "cachedResultName": "tg_collect"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "telegram_id",
+              "condition": "eq",
+              "keyValue": "={{ $json.telegram_id }}"
+            }
+          ]
+        },
+        "limit": 1
+      },
+      "id": "bc206d7b-058d-5feb-8abb-de391fb08c95",
+      "name": "Get Draft",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        1100,
+        180
+      ],
+      "alwaysOutputData": true,
+      "_note": "Data Table node params (filters/columns/operation names) written from docs operation list, not from an export; re-select the table after import. https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.datatable/"
+    },
+    {
+      "parameters": {
+        "jsCode": "\nconst cur = $input.first().json;\nconst p = $('Parse Command').first().json;\nif (!cur.telegram_id) return [{ json: { save: false, reply: 'Сначала отправьте /new.' } }];\nconst photos = JSON.parse(cur.photo_ids || '[]');\nlet note = '';\nif (p.video) note = 'Видео пока не публикуется автоматически, загрузите его на YouTube вручную. ';\nif (p.photo) {\n  if (photos.length >= 6) note += 'Больше 6 фото нельзя, это фото не добавлено. ';\n  else photos.push(p.photo);\n}\nconst text = p.text ? (cur.text ? cur.text + '\\n\\n' + p.text : p.text) : (cur.text || '');\nreturn [{ json: {\n  save: true, telegram_id: cur.telegram_id, text, photo_ids: JSON.stringify(photos),\n  reply: `${note}Принято: текст ${text.length} симв., фото ${photos.length}. Готово — /done.`,\n} }];\n"
+      },
+      "id": "aab3640c-3a21-54f8-a2c5-ff5de4942e30",
+      "name": "Append To Draft",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1320,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "645967e5-b3ba-4265-9aa4-a4f19e35bb51",
+              "leftValue": "={{ $json.save }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "be2a140e-448c-5215-9af0-172a23162861",
+      "name": "Save Draft?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1540,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "row",
+        "operation": "update",
+        "dataTableId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "",
+          "cachedResultName": "tg_collect"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "telegram_id",
+              "condition": "eq",
+              "keyValue": "={{ $('Append To Draft').first().json.telegram_id }}"
+            }
+          ]
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "text": "={{ $('Append To Draft').first().json.text }}",
+            "photo_ids": "={{ $('Append To Draft').first().json.photo_ids }}"
+          },
+          "matchingColumns": [],
+          "schema": []
+        }
+      },
+      "id": "125c8989-0d6d-5846-822e-99c6fb18cc05",
+      "name": "Save Draft",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        1760,
+        120
+      ],
+      "_note": "Data Table node params (filters/columns/operation names) written from docs operation list, not from an export; re-select the table after import. https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.datatable/"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Parse Command').first().json.chat_id }}",
+        "text": "={{ $('Append To Draft').first().json.reply }}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "disable_web_page_preview": true
+        }
+      },
+      "id": "36f3a7ec-3d9a-5d6f-8c33-daab48d5bd79",
+      "name": "Reply Content",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1980,
+        180
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "REPLACE_ME",
+          "name": "Unifight News Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "row",
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "",
+          "cachedResultName": "tg_collect"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "telegram_id",
+              "condition": "eq",
+              "keyValue": "={{ $json.telegram_id }}"
+            }
+          ]
+        },
+        "limit": 1
+      },
+      "id": "8f9be3b7-77f8-565c-9d70-d46c123054cf",
+      "name": "Get Draft For Done",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        1100,
+        380
+      ],
+      "alwaysOutputData": true,
+      "_note": "Data Table node params (filters/columns/operation names) written from docs operation list, not from an export; re-select the table after import. https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.datatable/"
+    },
+    {
+      "parameters": {
+        "jsCode": "\nconst r = $input.first().json;\nconst p = $('Parse Command').first().json;\nconst photos = JSON.parse(r.photo_ids || '[]');\nconst lines = (r.text || '').trim().split('\\n');\nconst title = (lines.shift() || '').trim();\nconst body = lines.join('\\n').trim();\nif (!r.telegram_id || title.length < 3 || body.length < 20 || !photos.length) {\n  return [{ json: { ok: false } }];\n}\nconst detect = (s) => /[֐-׿]/.test(s) ? 'he' : /[Ѐ-ӿ]/.test(s) ? 'ru' : 'en';\nconst meta = {\n  channel: 'telegram', chat_id: p.chat_id, email: '',\n  author_id: p.coach_id, author_name: p.name,\n  src_lang: r.src_lang || detect(title + ' ' + body),\n  title, body, cover_alt: '', tags: [],\n  draft_id: `tg-${p.telegram_id}-${Date.now()}`,\n};\nreturn photos.map((file_id, index) => ({ json: { ok: true, file_id, index, meta } }));\n"
+      },
+      "id": "ee1673ac-4ef1-5b9c-82d4-494d9f3edb28",
+      "name": "Check Draft",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1320,
+        380
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "9432878a-6269-42b6-911f-6f87849d28c6",
+              "leftValue": "={{ $json.ok }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "219d7a0e-ba73-52cb-83fa-439c4a3d1ccd",
+      "name": "Draft Ready?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1540,
+        380
+      ]
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Parse Command').first().json.chat_id }}",
+        "text": "Не хватает данных: нужен заголовок (первая строка), текст новости и хотя бы одно фото. Начать заново — /new.",
+        "additionalFields": {
+          "appendAttribution": false,
+          "disable_web_page_preview": true
+        }
+      },
+      "id": "8e356a06-17af-5778-a3bf-f5aac681106c",
+      "name": "Reply Not Ready",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1760,
+        480
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "REPLACE_ME",
+          "name": "Unifight News Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $json.file_id }}",
+        "download": true
+      },
+      "id": "46099ad1-cab0-587d-b579-53062543e303",
+      "name": "Download Photo",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1760,
+        340
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "REPLACE_ME",
+          "name": "Unifight News Bot"
+        }
+      },
+      "_note": "File > Get with download; Bot API getFile is limited to 20 MB per file. https://core.telegram.org/bots/api#file"
+    },
+    {
+      "parameters": {
+        "jsCode": "\n// Publish input: one item per image (binary \"data\"), cover first, same meta on each.\nreturn $input.all().map((it, i) => ({\n  json: { ...$('Check Draft').all()[i].json.meta, index: i },\n  binary: { data: it.binary.data },\n}));\n"
+      },
+      "id": "f2b9fc9e-c0c0-59ce-ba1e-dcfa82af8b15",
+      "name": "To Publish Items",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1980,
+        340
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "REPLACE_WITH_news-publish_ID",
+          "cachedResultName": "news-publish"
+        },
+        "mode": "once",
+        "options": {
+          "waitForSubWorkflow": false
+        }
+      },
+      "id": "2a7eee33-a0ec-57a5-a418-5f7c81dd3179",
+      "name": "Start Publish",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        2200,
+        340
+      ],
+      "_note": "Sub-workflow runs once with all items so binaries arrive together; confirm binary data passes to the sub-workflow. https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.executeworkflowtrigger/"
+    },
+    {
+      "parameters": {
+        "resource": "row",
+        "operation": "deleteRows",
+        "dataTableId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "",
+          "cachedResultName": "tg_collect"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "telegram_id",
+              "condition": "eq",
+              "keyValue": "={{ $('Parse Command').first().json.telegram_id }}"
+            }
+          ]
+        }
+      },
+      "id": "083bb313-50f4-5260-ba28-fdd129bbd240",
+      "name": "Clear Draft",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        2420,
+        340
+      ],
+      "executeOnce": true,
+      "alwaysOutputData": true,
+      "_note": "Data Table node params (filters/columns/operation names) written from docs operation list, not from an export; re-select the table after import. https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.datatable/"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Parse Command').first().json.chat_id }}",
+        "text": "Готовлю перевод на три языка. Через минуту пришлю предпросмотр.",
+        "additionalFields": {
+          "appendAttribution": false,
+          "disable_web_page_preview": true
+        }
+      },
+      "id": "10bc69fb-723d-5df5-b7bd-0038dde0d22c",
+      "name": "Reply Done",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2640,
+        340
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "REPLACE_ME",
+          "name": "Unifight News Bot"
+        }
+      },
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "resource": "row",
+        "operation": "deleteRows",
+        "dataTableId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "",
+          "cachedResultName": "tg_collect"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "telegram_id",
+              "condition": "eq",
+              "keyValue": "={{ $json.telegram_id }}"
+            }
+          ]
+        }
+      },
+      "id": "dc1c4e02-e45d-565d-85f8-98d27580c982",
+      "name": "Drop Draft",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        1100,
+        600
+      ],
+      "alwaysOutputData": true,
+      "_note": "Data Table node params (filters/columns/operation names) written from docs operation list, not from an export; re-select the table after import. https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.datatable/"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Parse Command').first().json.chat_id }}",
+        "text": "Черновик удалён.",
+        "additionalFields": {
+          "appendAttribution": false,
+          "disable_web_page_preview": true
+        }
+      },
+      "id": "56c4c059-905b-5b28-843b-f57f5f3f1ca4",
+      "name": "Reply Cancelled",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1320,
+        600
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "REPLACE_ME",
+          "name": "Unifight News Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "63be3610-ce04-4146-a314-6359380213a7",
+              "leftValue": "={{ $json.role === 'admin' }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "c9bb5761-4879-5d15-8acf-d44f6de744ca",
+      "name": "Is Admin",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1100,
+        780
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "REPLACE_WITH_news-unpublish_ID",
+          "cachedResultName": "news-unpublish"
+        },
+        "mode": "once",
+        "options": {
+          "waitForSubWorkflow": false
+        }
+      },
+      "id": "db0afd8e-f388-5a8d-98eb-e6cb891c33bb",
+      "name": "Start Unpublish",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        1320,
+        740
+      ]
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.chat_id }}",
+        "text": "Снимать новости с сайта могут только администраторы.",
+        "additionalFields": {
+          "appendAttribution": false,
+          "disable_web_page_preview": true
+        }
+      },
+      "id": "68bdb55c-af93-5090-b670-b7707018547f",
+      "name": "Reply Not Admin",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1320,
+        900
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "REPLACE_ME",
+          "name": "Unifight News Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.chat_id }}",
+        "text": "Команды:\n/new — новая новость (можно /new ru, если язык текста не определился)\n/done — отправить на перевод и предпросмотр\n/cancel — удалить черновик\n/unpublish <адрес или slug> — снять новость (только админы)",
+        "additionalFields": {
+          "appendAttribution": false,
+          "disable_web_page_preview": true
+        }
+      },
+      "id": "b1a76ff8-a88e-5325-81b5-37608a56f899",
+      "name": "Reply Help",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1100,
+        960
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "REPLACE_ME",
+          "name": "Unifight News Bot"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Find Publisher",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find Publisher": {
+      "main": [
+        [
+          {
+            "node": "Is Allowed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Allowed": {
+      "main": [
+        [
+          {
+            "node": "Parse Command",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Reply Denied",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Command": {
+      "main": [
+        [
+          {
+            "node": "Route",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reply Denied": {
+      "main": [
+        [
+          {
+            "node": "Log Denied",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route": {
+      "main": [
+        [
+          {
+            "node": "Open Draft",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get Draft",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get Draft For Done",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Drop Draft",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Is Admin",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Reply Help",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Open Draft": {
+      "main": [
+        [
+          {
+            "node": "Reply New",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Draft": {
+      "main": [
+        [
+          {
+            "node": "Append To Draft",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append To Draft": {
+      "main": [
+        [
+          {
+            "node": "Save Draft?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save Draft?": {
+      "main": [
+        [
+          {
+            "node": "Save Draft",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Reply Content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save Draft": {
+      "main": [
+        [
+          {
+            "node": "Reply Content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Draft For Done": {
+      "main": [
+        [
+          {
+            "node": "Check Draft",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Draft": {
+      "main": [
+        [
+          {
+            "node": "Draft Ready?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Draft Ready?": {
+      "main": [
+        [
+          {
+            "node": "Download Photo",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Reply Not Ready",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download Photo": {
+      "main": [
+        [
+          {
+            "node": "To Publish Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "To Publish Items": {
+      "main": [
+        [
+          {
+            "node": "Start Publish",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start Publish": {
+      "main": [
+        [
+          {
+            "node": "Clear Draft",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Clear Draft": {
+      "main": [
+        [
+          {
+            "node": "Reply Done",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Drop Draft": {
+      "main": [
+        [
+          {
+            "node": "Reply Cancelled",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Admin": {
+      "main": [
+        [
+          {
+            "node": "Start Unpublish",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Reply Not Admin",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "errorWorkflow": "REPLACE_WITH_news-error_WORKFLOW_ID"
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": false
+  },
+  "tags": []
+}

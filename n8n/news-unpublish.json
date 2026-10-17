@@ -1,0 +1,1254 @@
+{
+  "name": "news-unpublish",
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "id": "c4bd9358-67ad-513f-a5af-cd785cc92694",
+      "name": "From Telegram",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "sendAndWait",
+        "chatId": "={{ $json.chat_id }}",
+        "message": "={{ 'Снять с сайта новость ' + $json.arg + '? Пост в Facebook тоже будет удалён.' }}",
+        "responseType": "approval",
+        "approvalOptions": {
+          "values": {
+            "approvalType": "double",
+            "approveLabel": "Удалить",
+            "disapproveLabel": "Отмена"
+          }
+        },
+        "options": {
+          "limitWaitTime": {
+            "values": {
+              "limitType": "afterTimeInterval",
+              "resumeAmount": 1,
+              "resumeUnit": "hours"
+            }
+          },
+          "appendAttribution": false
+        }
+      },
+      "id": "786425ad-fe55-53bf-96ec-43d649051a7e",
+      "name": "Confirm Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        220,
+        200
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "REPLACE_ME",
+          "name": "Unifight News Bot"
+        }
+      },
+      "_note": "Send and Wait for Response: operation/field names inferred; docs confirm Response Type Custom Form + Limit Wait Time. https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-base.telegram/message-operations/"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "6346f70c-8dbb-4c18-b9d4-8ab917ff9ac9",
+              "leftValue": "={{ $json.data?.approved === true }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "3e93501f-b1eb-5cae-8fcc-f650e854359c",
+      "name": "Confirmed?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        440,
+        200
+      ],
+      "_note": "Approval output path data.approved assumed from n8n send-and-wait output; check on first run."
+    },
+    {
+      "parameters": {
+        "authentication": "n8nUserAuth",
+        "formTitle": "Снять новость с сайта",
+        "formDescription": "Только для администраторов. Вставьте адрес новости или её slug — часть адреса после /news/, например tournament-results.",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Адрес новости или slug",
+              "fieldName": "folder",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Подтверждение",
+              "fieldName": "confirm",
+              "fieldType": "checkbox",
+              "requiredField": true,
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Да, снять новость и удалить пост в Facebook"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "responseMode": "lastNode",
+        "options": {
+          "path": "unifight-news-unpublish",
+          "appendAttribution": false
+        }
+      },
+      "id": "3b809fde-e17f-5f72-a583-f776fa9bd4ca",
+      "name": "Admin Form",
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        0,
+        520
+      ],
+      "webhookId": "REPLACE_ME",
+      "_note": "Same n8n User Auth notes as news-form-intake."
+    },
+    {
+      "parameters": {
+        "resource": "row",
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "",
+          "cachedResultName": "publishers"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "email",
+              "condition": "eq",
+              "keyValue": "={{ String($json.user?.email || '').toLowerCase() }}"
+            }
+          ]
+        },
+        "limit": 1
+      },
+      "id": "fbc3ce03-1827-5cf5-a5fe-d700ba1d06f0",
+      "name": "Find Admin",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        220,
+        520
+      ],
+      "alwaysOutputData": true,
+      "_note": "Data Table node params (filters/columns/operation names) written from docs operation list, not from an export; re-select the table after import. https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.datatable/"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "6b7af840-fbbb-4c3f-8b35-c7bdd70b70c4",
+              "leftValue": "={{ !!$('Admin Form').first().json.user?.email && String($json.email || '').toLowerCase() === String($('Admin Form').first().json.user.email).toLowerCase() && $json.role === 'admin' && $json.active === true }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "8f71d17a-da50-505c-8ca3-e4fc0ba146d7",
+      "name": "Is Admin",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        440,
+        520
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "completion",
+        "completionTitle": "Нет прав",
+        "completionMessage": "Снимать новости могут только администраторы клуба.",
+        "options": {}
+      },
+      "id": "e63c678d-ceee-5e95-8c75-67c973f1d27e",
+      "name": "Denied Page",
+      "type": "n8n-nodes-base.form",
+      "typeVersion": 1,
+      "position": [
+        660,
+        680
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "completion",
+        "completionTitle": "Принято",
+        "completionMessage": "Результат придёт на почту в течение пары минут.",
+        "options": {}
+      },
+      "id": "b5cfb455-d35e-51a8-98ad-5b67ad6189e8",
+      "name": "Accepted Page",
+      "type": "n8n-nodes-base.form",
+      "typeVersion": 1,
+      "position": [
+        660,
+        440
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "\n// Same shape from both entry points.\nconst cfg = { repo: 'Unifight-haifa/unifight', branch: 'main', news_dir: 'src/content/news' };\nlet s;\ntry {\n  const t = $('From Telegram').first().json;\n  s = { folder: t.arg, actor_id: t.coach_id, channel: 'telegram', chat_id: t.chat_id, email: '' };\n} catch (e) {\n  const f = $('Admin Form').first().json, a = $('Find Admin').first().json;\n  s = { folder: f.folder, actor_id: a.coach_id, channel: 'email', chat_id: '', email: a.email };\n}\n// Accept a folder name, a slug or a post URL (/<lang>/news/<slug>/).\ns.ref = String(s.folder || '').trim().replace(/\\/+$/, '').split('/').pop();\ns.valid = /^[a-z0-9-]+$/.test(s.ref);\nreturn [{ json: { ...s, cfg } }];\n"
+      },
+      "id": "c89d5177-9091-5122-9f46-be33de087126",
+      "name": "Normalize",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        880,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "=https://api.github.com/repos/{{ $('Normalize').first().json.cfg.repo }}/contents/{{ $json.cfg.news_dir }}?ref={{ $json.cfg.branch }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "githubApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/vnd.github+json"
+            },
+            {
+              "name": "X-GitHub-Api-Version",
+              "value": "2026-03-10"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true,
+              "fullResponse": true
+            }
+          }
+        }
+      },
+      "id": "af6ce9fc-d1dd-599a-8af0-609cb0d04eb8",
+      "name": "List News",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        990,
+        460
+      ],
+      "credentials": {
+        "githubApi": {
+          "id": "REPLACE_ME",
+          "name": "GitHub unifight contents"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "\n// Map slug or folder to the real folder; the URL slug is the folder name minus its date.\nconst s = $('Normalize').first().json;\nconst res = $input.first().json;\nconst dirs = (Array.isArray(res.body) ? res.body : []).filter(x => x.type === 'dir').map(x => x.name);\nconst folder = s.valid ? (dirs.find(d => d === s.ref || d.replace(/^\\d{4}-\\d{2}-\\d{2}-/, '') === s.ref) || '') : '';\nreturn [{ json: { ...s, folder, valid: !!folder } }];\n"
+      },
+      "id": "4a2dd60e-6c76-56c6-b061-ace9e48c441b",
+      "name": "Resolve",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1050,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "row",
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "",
+          "cachedResultName": "news_drafts"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "folder",
+              "condition": "eq",
+              "keyValue": "={{ $json.folder }}"
+            }
+          ]
+        },
+        "limit": 1
+      },
+      "id": "a2ea791d-3857-5587-b7f7-0eb10c72dbcf",
+      "name": "Find Draft",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        1100,
+        300
+      ],
+      "alwaysOutputData": true,
+      "_note": "Data Table node params (filters/columns/operation names) written from docs operation list, not from an export; re-select the table after import. https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.datatable/"
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "=https://api.github.com/repos/{{ $('Normalize').first().json.cfg.repo }}/contents/{{ $('Normalize').first().json.cfg.news_dir }}/{{ $('Resolve').first().json.folder }}?ref={{ $('Normalize').first().json.cfg.branch }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "githubApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/vnd.github+json"
+            },
+            {
+              "name": "X-GitHub-Api-Version",
+              "value": "2026-03-10"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true,
+              "fullResponse": true
+            }
+          }
+        }
+      },
+      "id": "0823ffb0-ded2-589c-b6fc-60f96881c7c5",
+      "name": "List Folder",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1320,
+        300
+      ],
+      "credentials": {
+        "githubApi": {
+          "id": "REPLACE_ME",
+          "name": "GitHub unifight contents"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "\nconst s = $('Resolve').first().json;\nconst draft = $('Find Draft').first().json || {};\nconst res = $input.first().json;\nconst files = Array.isArray(res.body) ? res.body.filter(x => x.type === 'file') : [];\nconst base = { channel: s.channel, chat_id: s.chat_id, email: s.email };\nif (!s.valid || res.statusCode !== 200 || !files.length) {\n  return [{ json: { ...base, found: false,\n    notify: `Новость «${s.ref}» не найдена на сайте. Пришлите адрес новости или её slug (часть адреса после /news/).`,\n    audit: { actor_id: s.actor_id, action: 'unpublish', target: s.folder, result: 'not_found', detail: String(res.statusCode) } } }];\n}\nreturn [{ json: { ...base, found: true, fb_post_id: draft.fb_post_id || '', ig_media_id: draft.ig_media_id || '',\n  draft_id: draft.draft_id || '', tree: files.map(x => ({ path: x.path, mode: '100644', type: 'blob', sha: null })) } }];\n"
+      },
+      "id": "cabc7d73-3122-5e7d-8158-c5e9f461cae5",
+      "name": "Plan Delete",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1540,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "f57f6a82-85f2-4cb4-8cfa-f61369083f59",
+              "leftValue": "={{ $json.found }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "15318ba5-367e-5dd9-83db-1134013c027a",
+      "name": "Found?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1760,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "=https://api.github.com/repos/{{ $('Normalize').first().json.cfg.repo }}/git/ref/heads/{{ $('Normalize').first().json.cfg.branch }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "githubApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/vnd.github+json"
+            },
+            {
+              "name": "X-GitHub-Api-Version",
+              "value": "2026-03-10"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "e5c5f882-77fe-5323-8033-e8dec1df5486",
+      "name": "Get Ref",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1980,
+        200
+      ],
+      "credentials": {
+        "githubApi": {
+          "id": "REPLACE_ME",
+          "name": "GitHub unifight contents"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "=https://api.github.com/repos/{{ $('Normalize').first().json.cfg.repo }}/git/commits/{{ $json.object.sha }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "githubApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/vnd.github+json"
+            },
+            {
+              "name": "X-GitHub-Api-Version",
+              "value": "2026-03-10"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "8c066831-5047-5c42-af5d-2acccacbde88",
+      "name": "Get Head Commit",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2200,
+        200
+      ],
+      "credentials": {
+        "githubApi": {
+          "id": "REPLACE_ME",
+          "name": "GitHub unifight contents"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://api.github.com/repos/{{ $('Normalize').first().json.cfg.repo }}/git/trees",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "githubApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/vnd.github+json"
+            },
+            {
+              "name": "X-GitHub-Api-Version",
+              "value": "2026-03-10"
+            }
+          ]
+        },
+        "options": {},
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ base_tree: $json.tree.sha, tree: $('Plan Delete').first().json.tree }) }}"
+      },
+      "id": "548b82c3-b166-55f7-8967-595ab1b38358",
+      "name": "Create Tree",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2420,
+        200
+      ],
+      "credentials": {
+        "githubApi": {
+          "id": "REPLACE_ME",
+          "name": "GitHub unifight contents"
+        }
+      },
+      "_note": "Tree entries with sha:null delete files. https://docs.github.com/en/rest/git/trees"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://api.github.com/repos/{{ $('Normalize').first().json.cfg.repo }}/git/commits",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "githubApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/vnd.github+json"
+            },
+            {
+              "name": "X-GitHub-Api-Version",
+              "value": "2026-03-10"
+            }
+          ]
+        },
+        "options": {},
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ message: 'News: unpublish ' + $('Resolve').first().json.folder + '\\n\\nRequested by ' + $('Normalize').first().json.actor_id, tree: $json.sha, parents: [$('Get Ref').first().json.object.sha] }) }}"
+      },
+      "id": "728314e6-3e77-5c1f-90b5-489c071e12f5",
+      "name": "Create Commit",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2640,
+        200
+      ],
+      "credentials": {
+        "githubApi": {
+          "id": "REPLACE_ME",
+          "name": "GitHub unifight contents"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "=https://api.github.com/repos/{{ $('Normalize').first().json.cfg.repo }}/git/refs/heads/{{ $('Normalize').first().json.cfg.branch }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "githubApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/vnd.github+json"
+            },
+            {
+              "name": "X-GitHub-Api-Version",
+              "value": "2026-03-10"
+            }
+          ]
+        },
+        "options": {},
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ sha: $json.sha, force: false }) }}"
+      },
+      "id": "ffb1bc40-e139-5298-9f3f-9ada610bf26e",
+      "name": "Update Ref",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2860,
+        200
+      ],
+      "credentials": {
+        "githubApi": {
+          "id": "REPLACE_ME",
+          "name": "GitHub unifight contents"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "298fa68d-3055-4c63-bba5-d8595f8a2108",
+              "leftValue": "={{ !!$('Plan Delete').first().json.fb_post_id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "d05ff1f6-c0a7-5403-aee1-2b30a4a1af80",
+      "name": "Has FB Post?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        3080,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "hostUrl": "graph.facebook.com",
+        "httpRequestMethod": "DELETE",
+        "graphApiVersion": "v25.0",
+        "node": "={{ $('Plan Delete').first().json.fb_post_id }}",
+        "edge": "",
+        "options": {}
+      },
+      "id": "d8fb81b2-40d8-52de-bd34-bc6adb87c0cb",
+      "name": "Delete FB Post",
+      "type": "n8n-nodes-base.facebookGraphApi",
+      "typeVersion": 1,
+      "position": [
+        3300,
+        120
+      ],
+      "credentials": {
+        "facebookGraphApi": {
+          "id": "REPLACE_ME",
+          "name": "Facebook Page Unifight"
+        }
+      },
+      "onError": "continueRegularOutput",
+      "_note": "Facebook Graph API node: queryParameters structure and graphApiVersion value unverified; docs list Host URL/Method/Version/Node/Edge. https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-base.facebookgraphapi/"
+    },
+    {
+      "parameters": {
+        "jsCode": "\nconst s = $('Resolve').first().json;\nconst p = $('Plan Delete').first().json;\nlet fb = 'не было';\nif (p.fb_post_id) {\n  const r = $('Delete FB Post').first().json;\n  fb = r.success ? 'удалён' : 'не удалось удалить: ' + (r.error?.message || r.error || '?');\n}\nconst ig = p.ig_media_id ? `Instagram: удалите пост вручную в приложении (id ${p.ig_media_id}).` : '';\nreturn [{ json: {\n  channel: s.channel, chat_id: s.chat_id, email: s.email, notify_admin: s.channel !== 'telegram' || !!ig,\n  notify: [`Новость ${s.folder} снята с сайта (обновится через 1–2 минуты).`, `Facebook: пост ${fb}.`, ig].filter(Boolean).join('\\n'),\n  draft: { draft_id: p.draft_id || `unknown-${s.folder}`, folder: s.folder, author_id: '', channel: s.channel,\n           status: 'unpublished', title_en: '', commit_sha: $('Create Commit').first().json.sha,\n           fb_post_id: p.fb_post_id, ig_media_id: p.ig_media_id, error: '' },\n  audit: { actor_id: s.actor_id, action: 'unpublish', target: s.folder, result: 'ok', detail: `fb=${fb}` },\n} }];\n"
+      },
+      "id": "1e731bd4-74e7-5426-9081-608f1926a535",
+      "name": "Report",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3520,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "row",
+        "operation": "insert",
+        "dataTableId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "",
+          "cachedResultName": "audit_log"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "ts": "={{ $now.toISO() }}",
+            "actor_id": "={{ $json.audit.actor_id }}",
+            "channel": "={{ $json.channel }}",
+            "action": "={{ $json.audit.action }}",
+            "target": "={{ $json.audit.target }}",
+            "result": "={{ $json.audit.result }}",
+            "detail": "={{ $json.audit.detail }}",
+            "execution_id": "={{ $execution.id }}"
+          },
+          "matchingColumns": [],
+          "schema": []
+        }
+      },
+      "id": "24a14840-b81f-5389-b95b-2cca09053fdd",
+      "name": "Audit",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        3760,
+        300
+      ],
+      "_note": "Data Table node params (filters/columns/operation names) written from docs operation list, not from an export; re-select the table after import. https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.datatable/"
+    },
+    {
+      "parameters": {
+        "resource": "row",
+        "operation": "upsert",
+        "dataTableId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "",
+          "cachedResultName": "news_drafts"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "draft_id",
+              "condition": "eq",
+              "keyValue": "={{ $json.draft.draft_id }}"
+            }
+          ]
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "draft_id": "={{ $json.draft.draft_id }}",
+            "folder": "={{ $json.draft.folder }}",
+            "author_id": "={{ $json.draft.author_id }}",
+            "channel": "={{ $json.draft.channel }}",
+            "status": "={{ $json.draft.status }}",
+            "title_en": "={{ $json.draft.title_en }}",
+            "commit_sha": "={{ $json.draft.commit_sha }}",
+            "fb_post_id": "={{ $json.draft.fb_post_id }}",
+            "ig_media_id": "={{ $json.draft.ig_media_id }}",
+            "error": "={{ $json.draft.error }}",
+            "updated_at": "={{ $now.toISO() }}"
+          },
+          "matchingColumns": [],
+          "schema": []
+        }
+      },
+      "id": "d93f07e8-d90f-563c-96bd-6b9a2dc47ef8",
+      "name": "Update Draft",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        3760,
+        480
+      ],
+      "_note": "Data Table node params (filters/columns/operation names) written from docs operation list, not from an export; re-select the table after import. https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.datatable/"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "bf27ef26-1182-4ef0-9a9d-66bcc56ed034",
+                    "leftValue": "={{ $json.channel === 'telegram' }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "true",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "telegram"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "cb824175-44c3-42f4-a0cf-bac64ceacca8",
+                    "leftValue": "={{ $json.channel === 'email' }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "true",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "email"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "caec3d8f-f0f7-41e0-8fe7-5b5053b6bc26",
+                    "leftValue": "={{ $json.notify_admin === true }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "true",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "admin"
+            }
+          ]
+        },
+        "options": {
+          "allMatchingOutputs": true
+        }
+      },
+      "id": "2fb2e25e-2de8-579c-b914-726f9728fc63",
+      "name": "Notify",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        3760,
+        660
+      ]
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.chat_id }}",
+        "text": "={{ $json.notify.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;') }}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "disable_web_page_preview": true,
+          "parse_mode": "HTML"
+        }
+      },
+      "id": "21a3bc75-0b74-574d-8eeb-7475e320de65",
+      "name": "Notify Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        4000,
+        560
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "REPLACE_ME",
+          "name": "Unifight News Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "REPLACE_news@club-domain",
+        "toEmail": "={{ $json.email }}",
+        "subject": "Unifight: новости",
+        "emailFormat": "text",
+        "text": "={{ $json.notify }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "ce397e50-aefb-5c28-b202-d97650f3f8d0",
+      "name": "Notify Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        4000,
+        720
+      ],
+      "credentials": {
+        "smtp": {
+          "id": "REPLACE_ME",
+          "name": "Club SMTP"
+        }
+      },
+      "_note": "Send Email type name emailSend and param names (fromEmail/toEmail/emailFormat/text) from memory of v2.1; docs confirm the fields. https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.sendemail/"
+    },
+    {
+      "parameters": {
+        "chatId": "REPLACE_ADMIN_CHAT_ID",
+        "text": "={{ ('[admin] ' + $json.notify).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;') }}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "disable_web_page_preview": true,
+          "parse_mode": "HTML"
+        }
+      },
+      "id": "95aaa3df-3f15-5874-9d7a-012c1ad83c3a",
+      "name": "Notify Admin",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        4000,
+        880
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "REPLACE_ME",
+          "name": "Unifight News Bot"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Notify": {
+      "main": [
+        [
+          {
+            "node": "Notify Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Notify Email",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Notify Admin",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "From Telegram": {
+      "main": [
+        [
+          {
+            "node": "Confirm Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Confirm Telegram": {
+      "main": [
+        [
+          {
+            "node": "Confirmed?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Confirmed?": {
+      "main": [
+        [
+          {
+            "node": "Normalize",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Admin Form": {
+      "main": [
+        [
+          {
+            "node": "Find Admin",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find Admin": {
+      "main": [
+        [
+          {
+            "node": "Is Admin",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Admin": {
+      "main": [
+        [
+          {
+            "node": "Accepted Page",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Normalize",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Denied Page",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize": {
+      "main": [
+        [
+          {
+            "node": "List News",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "List News": {
+      "main": [
+        [
+          {
+            "node": "Resolve",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Resolve": {
+      "main": [
+        [
+          {
+            "node": "Find Draft",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find Draft": {
+      "main": [
+        [
+          {
+            "node": "List Folder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "List Folder": {
+      "main": [
+        [
+          {
+            "node": "Plan Delete",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Plan Delete": {
+      "main": [
+        [
+          {
+            "node": "Found?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Found?": {
+      "main": [
+        [
+          {
+            "node": "Get Ref",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Notify",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Audit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Ref": {
+      "main": [
+        [
+          {
+            "node": "Get Head Commit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Head Commit": {
+      "main": [
+        [
+          {
+            "node": "Create Tree",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Tree": {
+      "main": [
+        [
+          {
+            "node": "Create Commit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Commit": {
+      "main": [
+        [
+          {
+            "node": "Update Ref",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Ref": {
+      "main": [
+        [
+          {
+            "node": "Has FB Post?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has FB Post?": {
+      "main": [
+        [
+          {
+            "node": "Delete FB Post",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete FB Post": {
+      "main": [
+        [
+          {
+            "node": "Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Report": {
+      "main": [
+        [
+          {
+            "node": "Audit",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Update Draft",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Notify",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "errorWorkflow": "REPLACE_WITH_news-error_WORKFLOW_ID"
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": false
+  },
+  "tags": []
+}

@@ -1,0 +1,89 @@
+{
+  "name": "news-error",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "dd2cc16a-95d4-5c8f-86c7-49e299a6071c",
+      "name": "Error Trigger",
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "_note": "Set as Error workflow in each news workflow settings. https://docs.n8n.io/flow-logic/error-handling/"
+    },
+    {
+      "parameters": {
+        "jsCode": "\nconst x = $input.first().json;\nconst msg = [\n  `Сбой: ${x.workflow?.name || '?'}`,\n  `Шаг: ${x.execution?.lastNodeExecuted || '?'}`,\n  `Ошибка: ${String(x.execution?.error?.message || '?').slice(0, 500)}`,\n  x.execution?.url || '',\n].filter(Boolean).join('\\n');\nreturn [{ json: { msg } }];\n"
+      },
+      "id": "de2754c7-ccec-5f7a-bca0-ca448d5a17e0",
+      "name": "Format Error",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        220,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "chatId": "REPLACE_ADMIN_CHAT_ID",
+        "text": "={{ $json.msg.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;') }}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "disable_web_page_preview": true,
+          "parse_mode": "HTML"
+        }
+      },
+      "id": "53da3183-1e44-57fe-802f-e4d6e45041ce",
+      "name": "Alert Admin",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        440,
+        0
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "REPLACE_ME",
+          "name": "Unifight News Bot"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "Format Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Error": {
+      "main": [
+        [
+          {
+            "node": "Alert Admin",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": false
+  },
+  "tags": []
+}

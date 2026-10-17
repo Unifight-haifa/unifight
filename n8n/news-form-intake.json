@@ -1,0 +1,343 @@
+{
+  "name": "news-form-intake",
+  "nodes": [
+    {
+      "parameters": {
+        "authentication": "n8nUserAuth",
+        "formTitle": "Новость для сайта Unifight",
+        "formDescription": "Напишите новость на одном языке. Перевод на два других и предпросмотр придут вам на почту, публикация только после вашего подтверждения.",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Язык текста",
+              "fieldName": "lang",
+              "fieldType": "dropdown",
+              "requiredField": true,
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Иврит (he)"
+                  },
+                  {
+                    "option": "Русский (ru)"
+                  },
+                  {
+                    "option": "English (en)"
+                  }
+                ]
+              }
+            },
+            {
+              "fieldLabel": "Заголовок",
+              "fieldName": "title",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Текст новости",
+              "fieldName": "body",
+              "fieldType": "textarea",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Обложка (JPEG или PNG)",
+              "fieldName": "cover",
+              "fieldType": "file",
+              "multipleFiles": false,
+              "acceptFileTypes": ".jpg,.jpeg,.png",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Ещё фото, до 5 (необязательно)",
+              "fieldName": "photos",
+              "fieldType": "file",
+              "multipleFiles": true,
+              "acceptFileTypes": ".jpg,.jpeg,.png"
+            },
+            {
+              "fieldLabel": "Что на обложке (одной фразой, без имён детей)",
+              "fieldName": "cover_alt"
+            },
+            {
+              "fieldLabel": "Теги через запятую (необязательно)",
+              "fieldName": "tags"
+            }
+          ]
+        },
+        "responseMode": "lastNode",
+        "options": {
+          "path": "unifight-news",
+          "appendAttribution": false,
+          "ignoreBots": true
+        }
+      },
+      "id": "f09b35a8-ebc6-5679-92f4-ca80fbad09a9",
+      "name": "News Form",
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        0,
+        300
+      ],
+      "webhookId": "REPLACE_ME",
+      "_note": "Authentication \"n8n User Auth\" is documented (only logged-in instance users; output adds user id/email/name); the internal value \"n8nUserAuth\", the user output path and field keys (fieldName/multipleFiles/acceptFileTypes) are unverified. https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.formtrigger/"
+    },
+    {
+      "parameters": {
+        "resource": "row",
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "",
+          "cachedResultName": "publishers"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "email",
+              "condition": "eq",
+              "keyValue": "={{ String($json.user?.email || '').toLowerCase() }}"
+            }
+          ]
+        },
+        "limit": 1
+      },
+      "id": "5d570fd5-768a-5eeb-accf-5d80bfb8e11a",
+      "name": "Find Publisher",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        220,
+        300
+      ],
+      "alwaysOutputData": true,
+      "_note": "Data Table node params (filters/columns/operation names) written from docs operation list, not from an export; re-select the table after import. https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.datatable/"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "d031dc93-06af-4b63-a253-999ea73bf89d",
+              "leftValue": "={{ !!$('News Form').first().json.user?.email && String($json.email || '').toLowerCase() === String($('News Form').first().json.user.email).toLowerCase() && !!$json.coach_id && $json.active === true }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "06eefeec-ccb5-5ac9-9e7f-b6d0448a0ff6",
+      "name": "Is Allowed",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        440,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "row",
+        "operation": "insert",
+        "dataTableId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "",
+          "cachedResultName": "audit_log"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "ts": "={{ $now.toISO() }}",
+            "actor_id": "={{ 'email:' + ($('News Form').first().json.user?.email || '?') }}",
+            "channel": "email",
+            "action": "denied",
+            "target": "",
+            "result": "denied",
+            "detail": "={{ ($('News Form').first().json.title || '').slice(0, 100) }}",
+            "execution_id": "={{ $execution.id }}"
+          },
+          "matchingColumns": [],
+          "schema": []
+        }
+      },
+      "id": "b6bc8913-8ac4-53f5-9f17-0fed9655ae8b",
+      "name": "Log Denied",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        660,
+        480
+      ],
+      "_note": "Data Table node params (filters/columns/operation names) written from docs operation list, not from an export; re-select the table after import. https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.datatable/"
+    },
+    {
+      "parameters": {
+        "operation": "completion",
+        "completionTitle": "Нет прав на публикацию",
+        "completionMessage": "Ваш адрес не в списке авторов новостей. Обратитесь к администратору клуба.",
+        "options": {}
+      },
+      "id": "0abc0892-d5a3-5344-b0d6-6d7b28870a26",
+      "name": "Denied Page",
+      "type": "n8n-nodes-base.form",
+      "typeVersion": 1,
+      "position": [
+        880,
+        480
+      ],
+      "_note": "Form node, Page Type Form Ending (completion). https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.form/"
+    },
+    {
+      "parameters": {
+        "jsCode": "\n// Publish input: one item per image (binary \"data\"), cover first, max 6.\nconst f = $('News Form').first();\nconst p = $input.first().json;\nconst v = f.json;\nconst keys = Object.keys(f.binary || {});\nconst order = [...keys.filter(k => k.startsWith('cover')), ...keys.filter(k => !k.startsWith('cover'))].slice(0, 6);\nif (!order.length) throw new Error('Form submitted without a cover image');\nconst lang = (String(v.lang || '').match(/\\((he|ru|en)\\)/) || [])[1] || p.lang || 'he';\nconst meta = {\n  channel: 'email', chat_id: '', email: p.email,\n  author_id: p.coach_id, author_name: p.name || '',\n  src_lang: lang,\n  title: String(v.title || '').trim(), body: String(v.body || '').trim(),\n  cover_alt: String(v.cover_alt || '').trim(),\n  tags: String(v.tags || '').split(',').map(t => t.trim()).filter(Boolean).slice(0, 8),\n  draft_id: `form-${p.coach_id}-${Date.now()}`,\n};\nreturn order.map((k, index) => ({ json: { ...meta, index }, binary: { data: f.binary[k] } }));\n"
+      },
+      "id": "7becbdb3-42c1-55e7-bdd1-cadf703945bf",
+      "name": "Prepare Items",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        660,
+        220
+      ],
+      "_note": "Binary keys for multi-file fields assumed to start with the field name (cover, photos_0...)."
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "REPLACE_WITH_news-publish_ID",
+          "cachedResultName": "news-publish"
+        },
+        "mode": "once",
+        "options": {
+          "waitForSubWorkflow": false
+        }
+      },
+      "id": "827249ba-8c75-5be5-9106-c05b951846a7",
+      "name": "Start Publish",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        880,
+        220
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "completion",
+        "completionTitle": "Новость принята",
+        "completionMessage": "Через пару минут на вашу почту придёт предпросмотр на трёх языках с кнопкой «Опубликовать / Исправить / Отменить».",
+        "options": {}
+      },
+      "id": "a8e4adcf-7e8a-5a80-bfbe-7f3a8f05aad6",
+      "name": "Accepted Page",
+      "type": "n8n-nodes-base.form",
+      "typeVersion": 1,
+      "position": [
+        1100,
+        220
+      ],
+      "executeOnce": true
+    }
+  ],
+  "connections": {
+    "News Form": {
+      "main": [
+        [
+          {
+            "node": "Find Publisher",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find Publisher": {
+      "main": [
+        [
+          {
+            "node": "Is Allowed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Allowed": {
+      "main": [
+        [
+          {
+            "node": "Prepare Items",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Log Denied",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Items": {
+      "main": [
+        [
+          {
+            "node": "Start Publish",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start Publish": {
+      "main": [
+        [
+          {
+            "node": "Accepted Page",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Denied": {
+      "main": [
+        [
+          {
+            "node": "Denied Page",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "errorWorkflow": "REPLACE_WITH_news-error_WORKFLOW_ID"
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": false
+  },
+  "tags": []
+}
