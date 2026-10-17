@@ -107,6 +107,13 @@
    "he": "חדשות",
    "ru": "Новости",
    "en": "News"
+  },
+  {
+   "id": "video",
+   "href": "video/",
+   "he": "וידאו",
+   "ru": "Видео",
+   "en": "Video"
   }
  ],
  "language_switch": {

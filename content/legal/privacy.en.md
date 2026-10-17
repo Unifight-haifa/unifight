@@ -32,6 +32,7 @@ When your browser loads a page, the services below receive technical data such a
 - **GitHub Pages** hosts the site.
 - **Google Fonts** supplies some of the fonts on the home page.
 - **OpenStreetMap** supplies the map of our training venues. The map is loaded only after you press the button to show it.
+- **YouTube** hosts the club videos. The player loads only after you press play on a video; from then on YouTube's own privacy policy applies.
 - **Google Analytics** measures how the site is used, but only if you accept analytics (see below).
 
 Each of these services handles that data under its own privacy policy.
@@ -44,7 +45,7 @@ The site links to WhatsApp, Facebook, Instagram, Google Maps and Waze. Nothing i
 
 The site asks whether you agree to analytics. Until you press "Accept", nothing is loaded from Google Analytics and no analytics cookies are set. If you press "Decline", nothing is loaded either.
 
-If you accept, the site loads Google Analytics 4. Google then sets cookies whose names start with `_ga` and receives information about your visit: the pages you open, the site language, your device and browser type, your approximate location (country or city, worked out from your IP address), and clicks on WhatsApp, phone and social network links, schedule filters, the map and navigation links, the language switcher and the news sharing buttons. For a click we record only which button it was, for example the training venue or the place on the page, never what you write or say. Google Analytics 4 does not store IP addresses. Advertising features stay off.
+If you accept, the site loads Google Analytics 4. Google then sets cookies whose names start with `_ga` and receives information about your visit: the pages you open, the site language, your device and browser type, your approximate location (country or city, worked out from your IP address), and clicks on WhatsApp, phone and social network links, schedule filters, the map and navigation links, the language switcher, the news sharing buttons and video plays. For a click we record only which button it was, for example the training venue or the place on the page, never what you write or say. Google Analytics 4 does not store IP addresses. Advertising features stay off.
 
 We use this only to understand how the site is used and to improve it. Google processes the data, possibly outside Israel, under its own [privacy policy](https://policies.google.com/privacy), and keeps it for the period set in our account, at most 14 months.
 

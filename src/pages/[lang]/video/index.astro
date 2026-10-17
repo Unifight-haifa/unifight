@@ -1,0 +1,171 @@
+---
+import { i18n } from 'astro:config/client';
+import { getRelativeLocaleUrl } from 'astro:i18n';
+import videos from '../../../../content/videos.json';
+import fonts from '../../../generated/fonts.json';
+import Base from '../../../layouts/Base.astro';
+import JsonLd from '../../../components/JsonLd.astro';
+import { LANGS, t, type Lang } from '../../../i18n/ui';
+import { fmtDate } from '../../../lib/news';
+import { PLAYLISTS } from '../../../lib/videos-check.mjs';
+import '../../../styles/landing.css';
+import '../../../styles/news.css';
+import '../../../styles/video.css';
+
+export function getStaticPaths() {
+  return i18n!.locales.map((lang) => ({ params: { lang } }));
+}
+
+const lang = Astro.params.lang as Lang;
+const s = {
+  he: {
+    title: 'וידאו',
+    desc: 'סרטונים של מועדון הג׳ודו יוניפייט חיפה: אימונים, תחרויות ומחנות אימונים.',
+    all: 'הכול',
+    filter: 'סינון לפי נושא',
+    close: 'סגירה',
+    note: 'הסרטון מתנגן מ־YouTube.',
+    playlists: { promo: 'צילומי המועדון', competitions: 'תחרויות', camps: 'מחנות אימונים', training: 'אימונים', events: 'אירועים' },
+  },
+  ru: {
+    title: 'Видео',
+    desc: 'Видео клуба дзюдо «Юнифайт Хайфа»: тренировки, турниры и сборы.',
+    all: 'Все',
+    filter: 'Фильтр по теме',
+    close: 'Закрыть',
+    note: 'Видео воспроизводится с YouTube.',
+    playlists: { promo: 'Промо-съёмки клуба', competitions: 'Соревнования', camps: 'Сборы', training: 'Тренировки', events: 'События' },
+  },
+  en: {
+    title: 'Video',
+    desc: 'Videos from the Unifight Haifa judo club: training, competitions and camps.',
+    all: 'All',
+    filter: 'Filter by topic',
+    close: 'Close',
+    note: 'The video plays from YouTube.',
+    playlists: { promo: 'Club promo footage', competitions: 'Competitions', camps: 'Training camps', training: 'Training', events: 'Events' },
+  },
+}[lang];
+
+type Video = (typeof videos)[number] & { duration?: number };
+const base = import.meta.env.BASE_URL;
+const abs = (path: string) => new URL(path, Astro.site).href;
+const url = abs(getRelativeLocaleUrl(lang, 'video/'));
+const title = `${s.title} · ${t(lang, 'siteName')}`;
+const LOCALE = { he: 'he_IL', ru: 'ru_RU', en: 'en_US' };
+const list = ([...videos] as Video[]).sort((a, b) => b.date.localeCompare(a.date) || a.id.localeCompare(b.id));
+const groups = [list.filter((v) => v.kind !== 'short'), list.filter((v) => v.kind === 'short')];
+const present = PLAYLISTS.filter((p) => list.some((v) => v.playlist === p)) as (keyof typeof s.playlists)[];
+const thumb = (v: Video) => `${base}videos/${v.thumb}`;
+const dur = (sec: number) => `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, '0')}`;
+const ld = {
+  '@context': 'https://schema.org',
+  '@graph': list.map((v) => ({
+    '@type': 'VideoObject',
+    name: v.title[lang],
+    description: v.description[lang],
+    thumbnailUrl: [abs(thumb(v))],
+    uploadDate: v.date,
+    embedUrl: `https://www.youtube-nocookie.com/embed/${v.id}`,
+    ...(v.duration && { duration: `PT${v.duration}S` }),
+  })),
+};
+---
+<Base lang={lang} title={title} description={s.desc}>
+  <Fragment slot="head">
+    <link rel="canonical" href={url} />
+    {LANGS.map((l) => <link rel="alternate" hreflang={l} href={abs(getRelativeLocaleUrl(l, 'video/'))} />)}
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={t(lang, 'siteName')} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={s.desc} />
+    <meta property="og:url" content={url} />
+    <meta property="og:image" content={abs(`${base}og/${lang}.jpg`)} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:locale" content={LOCALE[lang]} />
+    {LANGS.filter((l) => l !== lang).map((l) => <meta property="og:locale:alternate" content={LOCALE[l]} />)}
+    <meta name="twitter:card" content="summary_large_image" />
+    <JsonLd data={ld} />
+    {(fonts as string[]).map((href) => <link rel="stylesheet" href={href} />)}
+  </Fragment>
+  <div class="news">
+    <h1 class="h2">{s.title}</h1>
+    <div class="chips video-filter" role="group" aria-label={s.filter} data-video-filter hidden>
+      <button type="button" class="chip" data-filter="" aria-pressed="true">{s.all}</button>
+      {present.map((p) => <button type="button" class="chip" data-filter={p} aria-pressed="false">{s.playlists[p]}</button>)}
+    </div>
+    {groups.map((g, i) => g.length > 0 && (
+      <section class="video-sec" aria-labelledby={i ? 'shorts' : undefined}>
+        {i === 1 && <h2 class="h3 video-sec-h" id="shorts">Shorts</h2>}
+        <ul class:list={['video-list', { shorts: i === 1 }]}>
+          {g.map((v) => (
+            <li class="video-card" data-playlist={v.playlist}>
+              {/* plain link without JS; the script swaps it for the in-page player */}
+              <a href={`https://youtu.be/${v.id}`} data-video={v.id} data-kind={v.kind} data-ga="video_play" data-ga-video_id={v.id} data-ga-playlist={v.playlist}>
+                <span class="video-thumb">
+                  <img src={thumb(v)} alt="" loading="lazy" decoding="async" />
+                  <span class="video-play" aria-hidden="true"></span>
+                  {v.duration && <span class="video-dur" dir="ltr">{dur(v.duration)}</span>}
+                </span>
+                <time datetime={v.date}>{fmtDate(new Date(v.date), lang)}</time>
+                {i === 1 ? <h3 class="video-title">{v.title[lang]}</h3> : <h2 class="video-title">{v.title[lang]}</h2>}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </section>
+    ))}
+  </div>
+  <dialog class="video-modal" aria-modal="true" aria-labelledby="video-modal-title" data-video-modal>
+    <div class="video-modal-bar">
+      <p class="video-modal-title" id="video-modal-title"></p>
+      <button type="button" class="video-close" data-video-close aria-label={s.close}>×</button>
+    </div>
+    <div class="video-frame"></div>
+    <p class="video-note">{s.note}</p>
+  </dialog>
+  <script is:inline>
+    (function () {
+      var dlg = document.querySelector('[data-video-modal]'), frame = dlg.querySelector('.video-frame'), opener;
+      var bar = document.querySelector('[data-video-filter]');
+      bar.hidden = false;
+      bar.addEventListener('click', function (e) {
+        var b = e.target.closest('[data-filter]');
+        if (!b) return;
+        var f = b.dataset.filter;
+        bar.querySelectorAll('[data-filter]').forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); });
+        document.querySelectorAll('.video-card').forEach(function (li) { li.hidden = !!f && li.dataset.playlist !== f; });
+        document.querySelectorAll('.video-sec').forEach(function (sec) { sec.hidden = !sec.querySelector('.video-card:not([hidden])'); });
+      });
+      document.addEventListener('click', function (e) {
+        var a = e.target.closest && e.target.closest('a[data-video]');
+        // let modified clicks open youtu.be in a new tab as usual
+        if (!a || e.ctrlKey || e.metaKey || e.shiftKey || e.altKey || e.button) return;
+        e.preventDefault();
+        opener = a;
+        var f = document.createElement('iframe');
+        f.src = 'https://www.youtube-nocookie.com/embed/' + encodeURIComponent(a.dataset.video) + '?autoplay=1&rel=0&modestbranding=1&playsinline=1';
+        f.title = a.querySelector('.video-title').textContent;
+        f.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
+        f.allowFullscreen = true;
+        // YouTube refuses embeds that arrive without a referrer
+        f.referrerPolicy = 'strict-origin-when-cross-origin';
+        frame.textContent = '';
+        frame.appendChild(f);
+        dlg.querySelector('#video-modal-title').textContent = f.title;
+        dlg.classList.toggle('is-short', a.dataset.kind === 'short');
+        dlg.showModal();
+        dlg.querySelector('[data-video-close]').focus();
+      });
+      dlg.addEventListener('click', function (e) {
+        if (e.target === dlg || e.target.closest('[data-video-close]')) dlg.close();
+      });
+      // Esc closes natively; dropping the iframe stops playback
+      dlg.addEventListener('close', function () {
+        frame.textContent = '';
+        if (opener) opener.focus();
+      });
+    })();
+  </script>
+</Base>

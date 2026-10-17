@@ -1,0 +1,38 @@
+/* video page; palette, .chip and .news layout come from landing.css and news.css */
+.video-filter { margin-block: 8px 28px; }
+.video-filter[hidden], .video-card[hidden], .video-sec[hidden] { display: none; }
+.video-sec + .video-sec { margin-block-start: 48px; }
+.video-sec-h { color: var(--paper); margin-block-end: 16px; }
+
+.video-list { list-style: none; padding: 0; display: grid; gap: 28px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr)); }
+.video-list.shorts { gap: 16px; grid-template-columns: repeat(auto-fill, minmax(min(45%, 200px), 1fr)); }
+.video-card a { display: grid; align-content: start; gap: 10px; block-size: 100%; text-decoration: none; background: var(--ink-2); border: 1px solid var(--line); border-radius: 2px; padding-block-end: 18px; transition: border-color .2s; }
+.video-card a:hover { border-color: var(--gold); }
+.video-card a:focus-visible { outline: 3px solid var(--gold-2); outline-offset: 2px; }
+.video-card a > :not(.video-thumb) { margin-inline: 18px; }
+.shorts .video-card a > :not(.video-thumb) { margin-inline: 12px; }
+.video-card time { color: var(--mute); font-size: 15px; }
+.video-title { color: var(--paper); font-size: clamp(18px, 2vw, 22px); line-height: 1.25; }
+.shorts .video-title { font-size: 16px; }
+
+.video-thumb { position: relative; display: block; }
+.video-thumb img { inline-size: 100%; aspect-ratio: 16 / 9; object-fit: cover; }
+.shorts .video-thumb img { aspect-ratio: 9 / 16; }
+.video-play { position: absolute; inset: 0; margin: auto; inline-size: 56px; block-size: 56px; border-radius: 50%; background: rgb(10 9 8 / .7); border: 2px solid var(--gold); transition: background .2s; }
+/* media controls point the same way in RTL */
+.video-play::after { content: ""; position: absolute; inset: 0; margin: auto; inline-size: 18px; block-size: 20px; translate: 2px 0; background: var(--paper); clip-path: polygon(0 0, 100% 50%, 0 100%); }
+.video-card a:hover .video-play { background: var(--red); }
+.video-dur { position: absolute; inset-block-end: 8px; inset-inline-end: 8px; padding: 1px 6px; border-radius: 2px; background: rgb(0 0 0 / .8); color: #fff; font-size: 13px; line-height: 1.5; }
+
+/* sized so the player plus its bar and note fit any viewport */
+.video-modal { --chrome: 8.5rem; inline-size: min(94vw, (100dvh - var(--chrome)) * 16 / 9); max-inline-size: none; max-block-size: none; padding: 0; border: 1px solid var(--line); background: var(--ink-2); color: var(--paper); }
+.video-modal.is-short { inline-size: min(94vw, (100dvh - var(--chrome)) * 9 / 16); }
+.video-modal::backdrop { background: rgb(0 0 0 / .85); }
+.video-modal-bar { display: flex; align-items: center; gap: 8px; padding-block: 4px; padding-inline: 16px 4px; }
+.video-modal-title { flex: 1; min-inline-size: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 500; }
+.video-close { flex: none; inline-size: 44px; block-size: 44px; border: 0; background: none; color: var(--paper); font: 400 30px/1 var(--body); cursor: pointer; }
+.video-close:focus-visible { outline: 3px solid var(--gold-2); outline-offset: -3px; }
+.video-frame { aspect-ratio: 16 / 9; background: #000; }
+.is-short .video-frame { aspect-ratio: 9 / 16; }
+.video-frame iframe { display: block; inline-size: 100%; block-size: 100%; border: 0; }
+.video-note { padding-block: 6px 8px; padding-inline: 16px; color: var(--mute); font-size: 14px; }

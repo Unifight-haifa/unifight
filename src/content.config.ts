@@ -1,9 +1,12 @@
 import { defineCollection } from 'astro:content';
 import { glob } from 'astro/loaders';
 import { z } from 'astro/zod';
+import videos from '../content/videos.json';
 import { checkNews } from './lib/news-check.mjs';
+import { checkVideos } from './lib/videos-check.mjs';
 
 checkNews(new URL('./content/news/', import.meta.url));
+checkVideos(videos, new URL('../public/videos/', import.meta.url));
 
 const news = defineCollection({
   loader: glob({
