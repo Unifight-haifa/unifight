@@ -119,7 +119,8 @@ def header():
     join = "".join(
         f'<span data-l="{l}">{one(l, cta[l].split(" ", 1)[0])}<span class="t-long"> {one(l, cta[l].split(" ", 1)[1])}</span></span>'
         for l in LANGS)
-    links = "".join(f'<a href="#{n["id"]}">{t(n)}</a>' for n in C["nav"])
+    # "news" is a separate page; relative href keeps the visitor's language
+    links = "".join(f'<a href="{n.get("href", "#" + n["id"])}">{t(n)}</a>' for n in C["nav"])
     return f'''
 <header class="hd" id="hd">
  <div class="hd-in">

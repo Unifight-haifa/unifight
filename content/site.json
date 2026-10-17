@@ -100,6 +100,13 @@
    "he": "צרו קשר",
    "ru": "Контакты",
    "en": "Contact"
+  },
+  {
+   "id": "news",
+   "href": "news/",
+   "he": "חדשות",
+   "ru": "Новости",
+   "en": "News"
   }
  ],
  "language_switch": {
