@@ -461,3 +461,4 @@ html[lang=he] .rc-n{font-weight:400}
 @media (min-width:600px){.rail{grid-auto-columns:minmax(200px,40%)}}
 @media (min-width:900px){.rail{grid-auto-columns:calc((100% - 36px)/4)}}
 @media (min-width:1200px){.rail{grid-auto-columns:calc((100% - 48px)/5)}}
+.ft-legal a{color:inherit}

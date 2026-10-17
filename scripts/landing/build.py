@@ -466,6 +466,7 @@ def branches():
  <div class="wrap">
   {head("branches", "道場", b["title"], b["intro"])}
   <div class="venues v4">{v}</div>
+  <!--VENUE_MAP-->
   <ul class="hoods rv">{nb}</ul>
  </div>
 </section>'''
@@ -500,6 +501,12 @@ def contact():
 </section>'''
 
 
+LEGAL_LINKS = "".join(
+    f'<span data-l="{l}"><a href="%BASE%{l}/accessibility/">{a}</a> · <a href="%BASE%{l}/privacy/">{p}</a></span>'
+    for l, a, p in (("he", "הצהרת נגישות", "מדיניות פרטיות"), ("ru", "Заявление о доступности", "Политика конфиденциальности"),
+                    ("en", "Accessibility statement", "Privacy policy")))
+
+
 def footer():
     f = C["footer"]
     return f'''
@@ -507,7 +514,7 @@ def footer():
  <div class="wrap ft-in">
   <div class="ft-brand"><span class="plate plate-lg"><img src="{PFX}{LOGO}" width="256" height="256" alt="" loading="lazy"></span>
    <div><p class="ft-name">{t(club["name"])}</p><p>{t(f["tagline"])}</p></div></div>
-  <div class="ft-meta"><p>{t(f["legal"])} {t(f["amuta_number"])}</p><p>{t(f["accessibility_link"])}</p><p class="copy">{t(f["copyright"])}</p></div>
+  <div class="ft-meta"><p>{t(f["legal"])} {t(f["amuta_number"])}</p><p class="ft-legal">{LEGAL_LINKS}</p><p class="copy">{t(f["copyright"])}</p></div>
  </div>
 </footer>'''
 

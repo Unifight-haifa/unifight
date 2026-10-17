@@ -6,6 +6,7 @@ import site from '../../../content/site.json';
 import { i18n } from 'astro:config/client';
 import { getRelativeLocaleUrl } from 'astro:i18n';
 import Base from '../../layouts/Base.astro';
+import VenueMap from '../../components/VenueMap.astro';
 import { LANGS, type Lang } from '../../i18n/ui';
 import '../../styles/landing.css';
 
@@ -23,6 +24,8 @@ for (const l of LANGS) {
 // share scrapers need absolute URLs
 const abs = (path: string) => new URL(path, Astro.site).href;
 const LOCALE = { he: 'he_IL', ru: 'ru_RU', en: 'en_US' };
+// the map is an Astro component, so it is slotted into the generated HTML at a marker
+const [beforeMap, afterMap] = body.split('<!--VENUE_MAP-->');
 const title = `${site.club.name[lang]} · ${site.hero.headline[lang]}`;
 const desc = site.hero.subline[lang];
 ---
@@ -48,6 +51,8 @@ const desc = site.hero.subline[lang];
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     {(fonts as string[]).map((href) => <link rel="stylesheet" href={href} />)}
   </Fragment>
-  <Fragment set:html={body} />
+  <Fragment set:html={beforeMap} />
+  <VenueMap lang={lang} />
+  <Fragment set:html={afterMap} />
   <script is:inline set:html={js} />
 </Base>
