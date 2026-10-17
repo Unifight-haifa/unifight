@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { cpSync, existsSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync } from 'node:fs';
+import { cpSync, existsSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
@@ -92,3 +92,16 @@ function rejects(file, re) {
 test('content check accepts the real posts', () => assert.doesNotThrow(() => checkNews(src)));
 test('content check rejects a post missing a language', () => rejects('index.ru.md', /index\.ru\.md is missing/));
 test('content check rejects a post whose cover is missing', () => rejects('cover.jpg', /cover cover\.jpg not found/));
+
+test('content check rejects raw HTML in a post', () => {
+  const root = mkdtempSync(join(tmpdir(), 'news-'));
+  try {
+    const dir = join(root, published[0].dir);
+    cpSync(new URL(published[0].dir, src), dir, { recursive: true });
+    const f = join(dir, 'index.ru.md');
+    writeFileSync(f, readFileSync(f, 'utf8') + '\n<img src=x onerror=alert(1)>\n');
+    assert.throws(() => checkNews(pathToFileURL(`${root}/`)), /raw HTML/);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
