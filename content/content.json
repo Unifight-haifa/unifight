@@ -645,7 +645,16 @@
      "ru": "Победитель и призёр международных турниров и кубков Европы, призёр чемпионатов Европы.",
      "en": "Winner and medallist at international tournaments and European Cups, European championship medallist."
     },
-    "source": "Lazar Kaplun, Facebook post, text supplied by owner 2026-10-17; he/en spellings are transliterations, unverified"
+    "source": "Lazar Kaplun, Facebook post, text supplied by owner 2026-10-17; he/en spellings are transliterations, unverified",
+    "photo": {
+     "src": "coaches/denis.jpg",
+     "source": "owner 2026-10-17",
+     "alt": {
+      "he": "דניס ספרטק",
+      "ru": "Денис Спартак",
+      "en": "Denis Spartak"
+     }
+    }
    },
    {
     "name": {
