@@ -67,7 +67,7 @@
           },
           "conditions": [
             {
-              "id": "cd7b8d3f-a15a-403a-b21e-33ec89ea6ce7",
+              "id": "ceebd29e-5f14-4185-8a5f-05357f84fafb",
               "leftValue": "={{ !!$json.coach_id && $json.active === true && $('Telegram Trigger').first().json.message.chat.type === 'private' }}",
               "rightValue": "",
               "operator": {
@@ -177,7 +177,7 @@
                 },
                 "conditions": [
                   {
-                    "id": "4c8a60fd-9c3e-4c9e-83b4-f7cfd9fcbe41",
+                    "id": "bd8c8edf-4be1-49b0-b372-06d7ba56090d",
                     "leftValue": "={{ $json.cmd }}",
                     "rightValue": "new",
                     "operator": {
@@ -201,7 +201,7 @@
                 },
                 "conditions": [
                   {
-                    "id": "2853360d-29a1-4b39-8899-d78412b3ce6a",
+                    "id": "787b2437-0622-456f-8797-90be59c3ac40",
                     "leftValue": "={{ $json.cmd }}",
                     "rightValue": "content",
                     "operator": {
@@ -225,7 +225,7 @@
                 },
                 "conditions": [
                   {
-                    "id": "0ed7220b-f663-4b90-8ab0-132cb52c610a",
+                    "id": "8ab48a12-b08a-4379-be4e-5a1fa4032048",
                     "leftValue": "={{ $json.cmd }}",
                     "rightValue": "done",
                     "operator": {
@@ -249,7 +249,7 @@
                 },
                 "conditions": [
                   {
-                    "id": "95a6d62d-56fb-4b6d-8245-927849222952",
+                    "id": "945bb8a3-1bf7-49c7-a3c2-5d87f64996ac",
                     "leftValue": "={{ $json.cmd }}",
                     "rightValue": "cancel",
                     "operator": {
@@ -273,7 +273,7 @@
                 },
                 "conditions": [
                   {
-                    "id": "42a48dd7-3f39-4ba6-b721-883943bb919d",
+                    "id": "4b40c426-7954-417a-9360-23b50e698d5b",
                     "leftValue": "={{ $json.cmd }}",
                     "rightValue": "unpublish",
                     "operator": {
@@ -425,7 +425,7 @@
           },
           "conditions": [
             {
-              "id": "645967e5-b3ba-4265-9aa4-a4f19e35bb51",
+              "id": "c89b0bf9-c788-4049-b597-0c8015da75fd",
               "leftValue": "={{ $json.save }}",
               "rightValue": "",
               "operator": {
@@ -567,7 +567,7 @@
           },
           "conditions": [
             {
-              "id": "9432878a-6269-42b6-911f-6f87849d28c6",
+              "id": "cfd09f86-a11a-403b-a519-8fb0564a891e",
               "leftValue": "={{ $json.ok }}",
               "rightValue": "",
               "operator": {
@@ -795,7 +795,7 @@
           },
           "conditions": [
             {
-              "id": "63be3610-ce04-4146-a314-6359380213a7",
+              "id": "75f983b2-d3ad-4451-a3a2-f8663252b758",
               "leftValue": "={{ $json.role === 'admin' }}",
               "rightValue": "",
               "operator": {

@@ -186,7 +186,7 @@
           },
           "conditions": [
             {
-              "id": "d517c230-3f50-470e-a5f6-5121ec249bf3",
+              "id": "341c0df9-908e-4b64-802e-39d95aaca361",
               "leftValue": "={{ $json.ok }}",
               "rightValue": "",
               "operator": {
@@ -252,7 +252,7 @@
     },
     {
       "parameters": {
-        "jsCode": "\n// Validate the translation and flag what the author must check.\nlet st; try { st = $('Decision').last().json; } catch (e) { st = null; }\nif (!st || st.decision !== 'edit') st = $('Rate Check').first().json;\nconst d = $('Pack Images').first().json;\nconst r = $input.first().json;\nconst raw = typeof r.content === 'string' ? r.content\n  : (r.content?.[0]?.text ?? r.text ?? r.output ?? r.message?.content ?? JSON.stringify(r));\nconst m = String(raw).match(/\\{[\\s\\S]*\\}/);\nif (!m) throw new Error('Translation reply is not JSON');\nconst t = JSON.parse(m[0]);\nconst L = ['he', 'ru', 'en'];\nfor (const l of L) {\n  for (const k of ['title', 'summary', 'body']) {\n    if (!t[l] || typeof t[l][k] !== 'string' || !t[l][k].trim()) throw new Error(`Translation missing ${l}.${k}`);\n  }\n  if (t[l].summary.length > 160) t[l].summary = t[l].summary.slice(0, 157).replace(/\\s+\\S*$/, '') + '…';\n  t[l].cover_alt = (t[l].cover_alt || d.cover_alt || t[l].title).slice(0, 200);\n}\nif (!st.corrections) { t[d.src_lang].title = d.title; t[d.src_lang].body = d.body; }\nconst warnings = [];\nconst src = t[d.src_lang].title + ' ' + t[d.src_lang].body;\nconst nums = [...new Set(src.match(/\\d+(?:[.,:]\\d+)*/g) || [])];\nfor (const l of L) {\n  const txt = t[l].title + ' ' + t[l].body;\n  const miss = nums.filter(n => !txt.includes(n));\n  if (miss.length) warnings.push(`${l.toUpperCase()}: нет чисел ${miss.join(', ')}`);\n}\nif (/נבחרת|нивхерет|nivheret/i.test(src) && !/ישראל|Израил|Israel/i.test(src)) {\n  if (!/נבחרת/.test(t.he.body + t.he.title)) warnings.push('HE: нет слова «נבחרת»');\n  if (!/нивхерет/i.test(t.ru.body + t.ru.title)) warnings.push('RU: нет «сборная клуба (нивхерет)»');\n  if (!/nivheret/i.test(t.en.body + t.en.title)) warnings.push('EN: нет \"selected team (nivheret)\"');\n  if (/national team/i.test(t.en.body + t.en.title) || /сборн\\S* (Израиля|страны)|национальн\\S* сборн/i.test(t.ru.body + t.ru.title)) {\n    warnings.push('Нивхерет переведена как национальная сборная — исправьте');\n  }\n}\nlet slug = String(t.slug || '').toLowerCase().replace(/[^a-z0-9-]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 60);\nif (slug.length < 3) slug = 'news';\nconst date = new Date().toLocaleDateString('sv-SE', { timeZone: 'Asia/Jerusalem' });\nreturn [{ json: {\n  tr: { he: t.he, ru: t.ru, en: t.en }, slug, date, folder: `${date}-${slug}`, warnings,\n  revision: st.revision || 0, channel: d.channel, chat_id: d.chat_id, email: d.email,\n  draft: { draft_id: d.draft_id, folder: '', author_id: d.author_id, channel: d.channel, status: 'preview',\n           title_en: t.en.title, commit_sha: '', fb_post_id: '', ig_media_id: '', error: '' },\n} }];\n"
+        "jsCode": "\n// Validate the translation and flag what the author must check.\nlet st; try { st = $('Decision').last().json; } catch (e) { st = null; }\nif (!st || st.decision !== 'edit') st = $('Rate Check').first().json;\nconst d = $('Pack Images').first().json;\nconst r = $input.first().json;\nconst raw = typeof r.content === 'string' ? r.content\n  : (r.content?.[0]?.text ?? r.text ?? r.output ?? r.message?.content ?? JSON.stringify(r));\nconst m = String(raw).match(/\\{[\\s\\S]*\\}/);\nif (!m) throw new Error('Translation reply is not JSON');\nconst t = JSON.parse(m[0]);\nconst L = ['he', 'ru', 'en'];\nfor (const l of L) {\n  for (const k of ['title', 'summary', 'body']) {\n    if (!t[l] || typeof t[l][k] !== 'string' || !t[l][k].trim()) throw new Error(`Translation missing ${l}.${k}`);\n  }\n  if (t[l].summary.length > 160) t[l].summary = t[l].summary.slice(0, 157).replace(/\\s+\\S*$/, '') + '…';\n  t[l].cover_alt = (t[l].cover_alt || d.cover_alt || t[l].title).slice(0, 200);\n}\nif (!st.corrections) { t[d.src_lang].title = d.title; t[d.src_lang].body = d.body; }\n// The build rejects raw HTML (src/lib/news-check.mjs); Markdown would pass it through as stored XSS.\nconst noTags = v => String(v).replace(/</g, '&lt;').replace(/>/g, '&gt;');\nfor (const l of L) for (const k of ['title', 'summary', 'body', 'cover_alt']) t[l][k] = noTags(t[l][k]);\nconst warnings = [];\nconst src = t[d.src_lang].title + ' ' + t[d.src_lang].body;\nconst nums = [...new Set(src.match(/\\d+(?:[.,:]\\d+)*/g) || [])];\nfor (const l of L) {\n  const txt = t[l].title + ' ' + t[l].body;\n  const miss = nums.filter(n => !txt.includes(n));\n  if (miss.length) warnings.push(`${l.toUpperCase()}: нет чисел ${miss.join(', ')}`);\n}\nif (/נבחרת|нивхерет|nivheret/i.test(src) && !/ישראל|Израил|Israel/i.test(src)) {\n  if (!/נבחרת/.test(t.he.body + t.he.title)) warnings.push('HE: нет слова «נבחרת»');\n  if (!/нивхерет/i.test(t.ru.body + t.ru.title)) warnings.push('RU: нет «сборная клуба (нивхерет)»');\n  if (!/nivheret/i.test(t.en.body + t.en.title)) warnings.push('EN: нет \"selected team (nivheret)\"');\n  if (/national team/i.test(t.en.body + t.en.title) || /сборн\\S* (Израиля|страны)|национальн\\S* сборн/i.test(t.ru.body + t.ru.title)) {\n    warnings.push('Нивхерет переведена как национальная сборная — исправьте');\n  }\n}\nlet slug = String(t.slug || '').toLowerCase().replace(/[^a-z0-9-]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 60);\nif (slug.length < 3) slug = 'news';\nconst date = new Date().toLocaleDateString('sv-SE', { timeZone: 'Asia/Jerusalem' });\nreturn [{ json: {\n  tr: { he: t.he, ru: t.ru, en: t.en }, slug, date, folder: `${date}-${slug}`, warnings,\n  revision: st.revision || 0, channel: d.channel, chat_id: d.chat_id, email: d.email,\n  draft: { draft_id: d.draft_id, folder: '', author_id: d.author_id, channel: d.channel, status: 'preview',\n           title_en: t.en.title, commit_sha: '', fb_post_id: '', ig_media_id: '', error: '' },\n} }];\n"
       },
       "id": "f9cb7afc-5ec3-532d-9e9b-c2fc21d7e0d0",
       "name": "Parse Translation",
@@ -278,7 +278,7 @@
                 },
                 "conditions": [
                   {
-                    "id": "69a96aac-1108-4ac8-aa72-cd741822fbbe",
+                    "id": "4e6c9a80-2db3-4256-af9a-9bf0d858f1b2",
                     "leftValue": "={{ $json.channel }}",
                     "rightValue": "telegram",
                     "operator": {
@@ -302,7 +302,7 @@
                 },
                 "conditions": [
                   {
-                    "id": "37865b7f-d964-4a14-900e-6d72a23673d4",
+                    "id": "bc9c95a2-ce17-4a61-871b-8e5b9ebb7c5b",
                     "leftValue": "={{ $json.channel }}",
                     "rightValue": "email",
                     "operator": {
@@ -519,7 +519,7 @@
                 },
                 "conditions": [
                   {
-                    "id": "85980a2f-6995-46c9-b2da-1a9278c33c7a",
+                    "id": "93607ea5-9a63-4720-8217-6bd6cb153094",
                     "leftValue": "={{ $json.decision }}",
                     "rightValue": "publish",
                     "operator": {
@@ -543,7 +543,7 @@
                 },
                 "conditions": [
                   {
-                    "id": "17955764-3be2-4fb7-ac36-ddc9e2e975d1",
+                    "id": "9580f280-18d4-47d8-8452-6352ac363c0f",
                     "leftValue": "={{ $json.decision }}",
                     "rightValue": "edit",
                     "operator": {
@@ -632,7 +632,7 @@
     },
     {
       "parameters": {
-        "jsCode": "\n// Build the post folder: three Markdown files plus images.\nconst p = $('Parse Translation').last().json;\nconst d = $('Pack Images').first().json;\nconst cfg = $('Config').first().json.cfg;\n// URL is /<lang>/news/<slug>/, so the slug (folder minus date) must be unique across all posts.\nconst res = $input.first().json;\nif (res.statusCode !== 200 && res.statusCode !== 404) throw new Error(`Listing news folder failed: ${res.statusCode}`);\nconst taken = new Set((Array.isArray(res.body) ? res.body : []).map(x => x.name.replace(/^\\d{4}-\\d{2}-\\d{2}-/, '')));\nlet slug = p.slug;\nfor (let n = 2; taken.has(slug); n++) slug = `${p.slug}-${n}`;\nconst folder = `${p.date}-${slug}`;\nconst fm = (o) => '---\\n' + Object.entries(o)\n  .map(([k, v]) => k === 'date' ? `${k}: ${v}` : `${k}: ${JSON.stringify(v)}`).join('\\n') + '\\n---\\n\\n';\nconst extra = d.files.slice(1).map(f => `\\n\\n![${p.tr.en.title.replace(/[\\[\\]]/g, '')}](${f.path})`).join('');\nconst md = ['he', 'ru', 'en'].map(l => ({\n  path: `${cfg.news_dir}/${folder}/index.${l}.md`,\n  content: fm({\n    title: p.tr[l].title, summary: p.tr[l].summary, date: p.date, author: d.author_id,\n    cover: 'cover.jpg', cover_alt: p.tr[l].cover_alt, tags: d.tags || [], draft: false,\n  }) + p.tr[l].body.trim() + extra + '\\n',\n}));\nreturn [{ json: { folder, slug, md, tr: p.tr, tags: d.tags || [] } }];\n"
+        "jsCode": "\n// Build the post folder: three Markdown files plus images.\nconst p = $('Parse Translation').last().json;\nconst d = $('Pack Images').first().json;\nconst cfg = $('Config').first().json.cfg;\n// URL is /<lang>/news/<slug>/, so the slug (folder minus date) must be unique across all posts.\nconst res = $input.first().json;\nif (res.statusCode !== 200 && res.statusCode !== 404) throw new Error(`Listing news folder failed: ${res.statusCode}`);\nconst taken = new Set((Array.isArray(res.body) ? res.body : []).map(x => x.name.replace(/^\\d{4}-\\d{2}-\\d{2}-/, '')));\nlet slug = p.slug;\nfor (let n = 2; taken.has(slug); n++) slug = `${p.slug}-${n}`;\nconst folder = `${p.date}-${slug}`;\n// Escaped again here so no path into the repo skips it; idempotent since no < or > survives.\nconst noTags = v => String(v).replace(/</g, '&lt;').replace(/>/g, '&gt;');\nconst tr = Object.fromEntries(['he', 'ru', 'en'].map(l => [l, Object.fromEntries(\n  ['title', 'summary', 'body', 'cover_alt'].map(k => [k, noTags(p.tr[l][k])]))]));\nconst tags = (d.tags || []).map(noTags);\nconst fm = (o) => '---\\n' + Object.entries(o)\n  .map(([k, v]) => k === 'date' ? `${k}: ${v}` : `${k}: ${JSON.stringify(v)}`).join('\\n') + '\\n---\\n\\n';\nconst extra = d.files.slice(1).map(f => `\\n\\n![${tr.en.title.replace(/[\\[\\]]/g, '')}](${f.path})`).join('');\nconst md = ['he', 'ru', 'en'].map(l => ({\n  path: `${cfg.news_dir}/${folder}/index.${l}.md`,\n  content: fm({\n    title: tr[l].title, summary: tr[l].summary, date: p.date, author: d.author_id,\n    cover: 'cover.jpg', cover_alt: tr[l].cover_alt, tags, draft: false,\n  }) + tr[l].body.trim() + extra + '\\n',\n}));\nreturn [{ json: { folder, slug, md, tr, tags } }];\n"
       },
       "id": "7c4343b7-9b47-5645-8e96-7ae653f95663",
       "name": "Final Files",
@@ -1015,7 +1015,7 @@
                 },
                 "conditions": [
                   {
-                    "id": "7e3f1e8e-5e15-4b30-a7c7-5d4a1fe38a93",
+                    "id": "f416a37a-7943-4c6d-9951-3c3180b19dd7",
                     "leftValue": "={{ $json.state }}",
                     "rightValue": "live",
                     "operator": {
@@ -1039,7 +1039,7 @@
                 },
                 "conditions": [
                   {
-                    "id": "db976ce6-6179-4437-8333-30bd5f07b0d4",
+                    "id": "2a54bc97-39ec-47e1-a215-b005f08b9b4a",
                     "leftValue": "={{ $json.state }}",
                     "rightValue": "retry",
                     "operator": {
@@ -1063,7 +1063,7 @@
                 },
                 "conditions": [
                   {
-                    "id": "df899b9b-c264-4046-89b7-705cab1bd313",
+                    "id": "dacb2a97-128c-4266-80a5-5c9627e05914",
                     "leftValue": "={{ $json.state }}",
                     "rightValue": "timeout",
                     "operator": {
@@ -1358,7 +1358,7 @@
                 },
                 "conditions": [
                   {
-                    "id": "d1974718-2210-49f5-9036-ccf2287e4829",
+                    "id": "352a71b8-674c-4fc6-9d77-3c87ef6c59d7",
                     "leftValue": "={{ $json.channel === 'telegram' }}",
                     "rightValue": "",
                     "operator": {
@@ -1383,7 +1383,7 @@
                 },
                 "conditions": [
                   {
-                    "id": "9cfc4724-7761-4cf9-9e73-5262d04d7a3c",
+                    "id": "cab07d4c-aa88-4281-ac94-94cc909ace74",
                     "leftValue": "={{ $json.channel === 'email' }}",
                     "rightValue": "",
                     "operator": {
@@ -1408,7 +1408,7 @@
                 },
                 "conditions": [
                   {
-                    "id": "5f7be6de-c9fc-4d58-a0b9-2b4b61a527e9",
+                    "id": "d9b33ac0-adc0-4c71-9528-e72f88c8d1e2",
                     "leftValue": "={{ $json.notify_admin === true }}",
                     "rightValue": "",
                     "operator": {

@@ -259,6 +259,8 @@ draft: false
 ---
 ```
 
+В title, summary, body и cover_alt всех языков (и в тегах) `<` и `>` заменяются на `&lt;` и `&gt;`: сначала в `Parse Translation`, ещё раз в `Final Files`. Markdown пропускает HTML на страницу как есть, а сборка отклоняет любой тег в новости (`src/lib/news-check.mjs`), так что один неэкранированный `<` остановил бы все деплои. Если в тексте был `<`, в Facebook и Instagram он придёт как `&lt;`. Это редкость, оставлено как есть.
+
 Значения пишутся через `JSON.stringify`, это валидный YAML: кавычки, двоеточия и иврит экранировать не нужно. Дополнительные фото добавляются в конец текста как `![<заголовок>](photo-2.jpg)`.
 
 **Токен:** fine-grained PAT, владелец ресурса — организация `Unifight-haifa`, «Only select repositories» → `unifight`, Repository permissions → **Contents: Read and write**. Для всех вызовов выше этого достаточно: blobs / trees / commits / refs и contents записаны в разделе «Contents» [G4]. Добавляет ли GitHub Metadata: read-only сам, в документации не сказано; проверить в форме создания. Срок — год, с напоминанием (§11 чек-листа). Если в организации включено одобрение токенов, до одобрения токен «will only be able to read public resources» [G5].
