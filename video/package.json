@@ -1,0 +1,15 @@
+{
+  "name": "unifight-coach-videos",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "studio": "remotion studio src/index.jsx",
+    "render": "remotion render src/index.jsx"
+  },
+  "dependencies": {
+    "@remotion/cli": "4.0.532",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "remotion": "4.0.532"
+  }
+}
