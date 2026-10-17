@@ -2,7 +2,7 @@
 title: Accessibility statement
 ---
 
-Last updated: 17 October 2026
+Last updated: 18 October 2026
 
 Unifight Haifa wants everyone, including people with disabilities, to be able to use this website. We follow the Equal Rights for Persons with Disabilities (Service Accessibility Adjustments) Regulations, 5773-2013, and aim to meet Israeli Standard IS 5568, which is based on the international WCAG 2.0 guidelines, at level AA.
 
@@ -18,11 +18,12 @@ The site partially conforms to IS 5568 at level AA. We built it with level AA in
 - The layout adapts to phones and tablets, and you can zoom the text with your browser.
 - Phone numbers, dates and times are marked so that they keep the right order inside Hebrew text.
 - Animations are reduced when your device is set to reduce motion.
+- Photos on the home page that carry information have a short text description in the page language. Background photos that only decorate the page are hidden from screen readers.
 - Training venue addresses are shown as text with links to navigation apps. The map is optional and loads only when you ask for it.
 
 ## Known gaps
 
-- Many photos do not have a text description yet. We are adding descriptions to photos that carry information.
+- A news post's cover photo has a text description only if the author added one.
 - The interactive map may not be fully usable with a screen reader or keyboard. The same venue information is available as text.
 - Content on external services we link to, such as WhatsApp, Facebook, Instagram, Google Maps and Waze, is not under our control.
 

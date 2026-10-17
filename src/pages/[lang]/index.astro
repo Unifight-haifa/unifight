@@ -21,6 +21,7 @@ for (const l of LANGS) {
   body = body
     .replaceAll(`data-l-link="${l}" href="%LANG_${l}%"`, `${l === lang ? 'aria-current="page"' : `data-set-lang="${l}"`} href="${getRelativeLocaleUrl(l)}"`);
 }
+body = body.replace(/alt-he="([^"]*)" alt-ru="([^"]*)" alt-en="([^"]*)"/g, (_, he, ru, en) => `alt="${{ he, ru, en }[lang]}"`);
 // share scrapers need absolute URLs
 const abs = (path: string) => new URL(path, Astro.site).href;
 const LOCALE = { he: 'he_IL', ru: 'ru_RU', en: 'en_US' };

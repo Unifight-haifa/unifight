@@ -24,6 +24,7 @@ LANGS = ("he", "ru", "en")
 WA = "https://wa.me/972545664663"
 WA_NUM = "054-566-4663"
 USED = []  # local asset paths, in order of first use
+PHOTO_ALT = C["photos"]["alt"]
 SITE, PFX = True, "%BASE%"
 PREVIEW = Path(sys.argv[sys.argv.index("--preview") + 1]) if "--preview" in sys.argv else None
 
@@ -65,13 +66,21 @@ def ltr(s):
     return f'<bdi dir="ltr">{esc(s)}</bdi>'
 
 
-def img(name, cls="", eager=False, alt=""):
+def img(name, cls="", eager=False, alt=None):
+    """alt: {he, ru, en}, or "" for decorative; photos default to content's photos.alt."""
     p = name if "/" in name else f"img-night/{name}"
     if p not in USED:
         USED.append(p)
     w, h = Image.open(PUB / p).size
     load = 'fetchpriority="high"' if eager else 'loading="lazy"'
-    return f'<img class="{cls}" src="{PFX}{p}" width="{w}" height="{h}" alt="{alt}" {load} decoding="async">'
+    a = PHOTO_ALT.get(name, "") if alt is None else alt
+    if isinstance(a, str):
+        a = f'alt="{html.escape(a)}"'
+    elif SITE:  # alt is one attribute: pages/[lang]/index.astro keeps the page language's alt-<l>
+        a = " ".join(f'alt-{l}="{html.escape(a[l])}"' for l in LANGS)
+    else:
+        a = f'alt="{html.escape(a["en"])}"'
+    return f'<img class="{cls}" src="{PFX}{p}" width="{w}" height="{h}" {a} {load} decoding="async">'
 
 
 def nav_label(i):
@@ -124,7 +133,7 @@ def header():
     return f'''
 <header class="hd" id="hd">
  <div class="hd-in">
-  <a class="brand" href="#top"><span class="plate"><img src="{PFX}{LOGO}" width="256" height="256" alt="{esc(club["name"]["en"])}"></span>
+  <a class="brand" href="#top"><span class="plate"><img src="{PFX}{LOGO}" width="256" height="256" alt=""></span>
    <span class="brand-t">{t(club["name"])}</span></a>
   <nav class="hd-nav" aria-label="Sections">{links}</nav>
   <div class="hd-r">
@@ -221,7 +230,7 @@ def initials(n):
 
 def rail_card(n, grp, grp_label):
     ph = n.get("photo")
-    face = (img(ph["src"], "portrait", alt="") if ph else
+    face = (img(ph["src"], "portrait", alt=n["name"]) if ph else
             f'<span class="mono" aria-hidden="true">{t(initials(n["name"]))}</span>')
     bio = f'<p class="rc-bio">{t(n["bio"])}</p>' if n.get("bio") else ""
     return (f'<li class="rc" data-grp="{grp}"><div class="rc-ph{" has-img" if ph else ""}">{face}</div>'
@@ -238,7 +247,7 @@ def coaches():
     def photo(c, k):
         ph = c["photo"]
         if isinstance(ph, dict) and ph.get("src"):
-            return f'<div class="coach-ph has-img">{img(ph["src"], "portrait", alt=esc(ph["alt"]["en"]))}</div>'
+            return f'<div class="coach-ph has-img">{img(ph["src"], "portrait", alt=ph["alt"])}</div>'
         return f'<div class="coach-ph"><span class="kj" aria-hidden="true">{k}</span></div>'
     cards = "".join(f'''
    <article class="coach rv"><span class="coach-bg kj" aria-hidden="true">{k}</span>
@@ -255,7 +264,7 @@ def coaches():
 <section class="sec" id="coaches">
  <div class="wrap">
   {head("coaches", "師", co["title"], co["intro"])}
-  <figure class="team rv">{img(tp["src"], "team-img", alt=esc(tp["alt"]["en"]))}</figure>
+  <figure class="team rv">{img(tp["src"], "team-img", alt=tp["alt"])}</figure>
   <p class="founded rv"><span class="kj" aria-hidden="true">創</span>{t(co["founded_note"])}</p>
   <div class="c-grid">{cards}</div>
   <div class="rail-wrap" id="team-rail">

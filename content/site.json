@@ -1861,7 +1861,8 @@
    "Avoid as main image (other clubs' / federation / sponsor branding): tour-erfurt-hall, result-hadera-podium, result-districts-team, result-erfurt-coaches, result-nerush-podium, result-sambo-team, result-erfurt-flag-podium, train-georgia-bow, dojo-lineup (gallery strip only).",
    "train-georgia-ground shows a surname back patch — skip or crop it out.",
    "No coach is identified by name in any photo: never caption a photo with a coach's name.",
-   "Tournament photos (tour-*, result-jfp-*) don't prove the club organized those events: caption as 'our athletes at…', not 'our tournament'."
+   "Tournament photos (tour-*, result-jfp-*) don't prove the club organized those events: caption as 'our athletes at…', not 'our tournament'.",
+   "alt: a short factual description per photo in he/ru/en. Never name minors or guess who is in the picture. Background photos behind text are decorative and get no alt."
   ],
   "hero": {
    "light": [
@@ -1957,6 +1958,163 @@
    "snow-flag.jpg",
    "train-georgia-cooldown.jpg",
    "dojo-lineup.jpg"
-  ]
+  ],
+  "alt": {
+   "kids-coach.jpg": {
+    "he": "מאמן עם קבוצת ילדים בחליפות ג׳ודו לבנות וכחולות על המזרן",
+    "ru": "Тренер с группой детей в белых и синих кимоно на татами",
+    "en": "A coach with a group of children in white and blue judo suits on the mat"
+   },
+   "rope-climb.jpg": {
+    "he": "ילדים בחליפות ג׳ודו מטפסים על חבלים באולם האימונים",
+    "ru": "Дети в кимоно лазают по канатам в зале",
+    "en": "Children in judo suits climbing ropes in the training hall"
+   },
+   "belt-class.jpg": {
+    "he": "ילדים מניפים תעודות וחגורות חדשות באולם",
+    "ru": "Дети поднимают грамоты и новые пояса в зале",
+    "en": "Children holding up certificates and new belts in the dojo"
+   },
+   "kids-belt-cheer.jpg": {
+    "he": "ילדים שמחים עם תעודות וחגורות אחרי מבחן חגורה",
+    "ru": "Дети радуются грамотам и поясам после аттестации",
+    "en": "Children celebrating with certificates and belts after a belt grading"
+   },
+   "result-jfp-mascot.jpg": {
+    "he": "שלושה ילדים עם תעודות על פודיום בתחרות, לצד קמע ירוק",
+    "ru": "Трое детей с грамотами на пьедестале турнира рядом с зелёным талисманом",
+    "en": "Three children with certificates on a tournament podium, next to a green mascot"
+   },
+   "result-kids-certificates.jpg": {
+    "he": "ג׳ודוקאים צעירים עם מדליות ותעודות בתחרות, לצד מאמן",
+    "ru": "Юные дзюдоисты с медалями и грамотами на турнире вместе с тренером",
+    "en": "Young judoka with medals and certificates at a tournament, with a coach"
+   },
+   "medals-kids.jpg": {
+    "he": "ילדים מציגים מדליות באליפות ישראל בג׳ודו, לצד שני מאמנים",
+    "ru": "Дети показывают медали на чемпионате Израиля по дзюдо, рядом двое тренеров",
+    "en": "Children showing their medals at the Israel Judo Championships, with two coaches"
+   },
+   "intl-medals.jpg": {
+    "he": "ג׳ודוקאים צעירים עם מדליות ודגל ישראל בטורניר בינלאומי בארפורט",
+    "ru": "Юные дзюдоисты с медалями и флагом Израиля на международном турнире в Эрфурте",
+    "en": "Young judoka with medals and an Israeli flag at an international tournament in Erfurt"
+   },
+   "result-cadets-trio.jpg": {
+    "he": "שלושה ג׳ודוקאים צעירים עם מדליות באולם התחרויות",
+    "ru": "Трое юных дзюдоистов с медалями в зале соревнований",
+    "en": "Three young judoka with medals in a competition hall"
+   },
+   "hadera-team.jpg": {
+    "he": "בני נוער עם מדליות ושני מאמנים מול כרזת האליפות הבינלאומית בג׳ודו בחדרה",
+    "ru": "Подростки с медалями и двое тренеров у баннера международного турнира по дзюдо в Хадере",
+    "en": "Teenagers with medals and two coaches in front of the International Judo Championships banner in Hadera"
+   },
+   "camp-group.jpg": {
+    "he": "קבוצה גדולה של ג׳ודוקאים ומאמנים באולם אימונים, מתחת לכרזת ג׳ודו",
+    "ru": "Большая группа дзюдоистов и тренеров в зале под баннером дзюдо",
+    "en": "A large group of judoka and coaches in a training hall, under a judo banner"
+   },
+   "tour-north-hall.jpg": {
+    "he": "ילדים בחליפות ג׳ודו יושבים בשורות לאורך המזרנים באולם מלא צופים",
+    "ru": "Дети в кимоно сидят рядами вдоль татами в зале, полном зрителей",
+    "en": "Rows of children in judo suits sitting along the mats in a hall full of spectators"
+   },
+   "camp-festival.jpg": {
+    "he": "תמונה קבוצתית של ג׳ודוקאים ומאמנים על המזרן מול כרזת פסטיבל ג׳ודו בחיפה",
+    "ru": "Общее фото дзюдоистов и тренеров на татами у баннера фестиваля дзюдо в Хайфе",
+    "en": "Group photo of judoka and coaches on the mat in front of a Haifa judo festival banner"
+   },
+   "camp-sukkot-mass.jpg": {
+    "he": "משתתפי המחנה והמאמנים בתמונה קבוצתית על המזרן הכחול",
+    "ru": "Участники сборов и тренеры на общем фото на синем татами",
+    "en": "Camp participants and coaches in a group photo on the blue mat"
+   },
+   "snow-flag.jpg": {
+    "he": "הקבוצה עם דגל ישראל בשלג, על רקע ההרים",
+    "ru": "Группа с флагом Израиля на снегу на фоне гор",
+    "en": "The group with an Israeli flag in the snow, mountains behind them"
+   },
+   "train-georgia-cooldown.jpg": {
+    "he": "בני נוער מתמתחים ליד קיר מרופד אחרי אימון",
+    "ru": "Подростки растягиваются у мягкой стены после тренировки",
+    "en": "Teenagers stretching against a padded wall after training"
+   },
+   "dojo-lineup.jpg": {
+    "he": "ג׳ודוקאים בחליפות לבנות עומדים בשורה באולם, מתחת לשלט Erfurter Judo-Club",
+    "ru": "Дзюдоисты в белых кимоно выстроились в зале под вывеской Erfurter Judo-Club",
+    "en": "Judoka in white suits lined up in a dojo under an Erfurter Judo-Club sign"
+   },
+   "tour-kids-bout.jpg": {
+    "he": "שני ילדים בקרב ג׳ודו על המזרן בתחרות",
+    "ru": "Двое детей в схватке на татами на турнире",
+    "en": "Two children in a judo bout on the mat at a tournament"
+   },
+   "tour-kids-referee.jpg": {
+    "he": "ילד בחליפת ג׳ודו כחולה על מזרן התחרות, ולידו שופט",
+    "ru": "Ребёнок в синем кимоно на татами, рядом судья",
+    "en": "A child in a blue judo suit on the competition mat, with a referee nearby"
+   },
+   "tour-kids-warmup.jpg": {
+    "he": "ילדים מתחממים על המזרנים לפני תחרות",
+    "ru": "Дети разминаются на татами перед турниром",
+    "en": "Children warming up on the mats before a tournament"
+   },
+   "result-jfp-haifa.jpg": {
+    "he": "שלושה ילדים עם תעודות על הפודיום בטורניר Judo for Peace בחיפה",
+    "ru": "Трое детей с грамотами на пьедестале турнира Judo for Peace в Хайфе",
+    "en": "Three children with certificates on the podium at the Judo for Peace tournament in Haifa"
+   },
+   "tour-hadera-arena.jpg": {
+    "he": "זירת תחרויות גדולה עם מזרנים אדומים וכחולים ולוח תוצאות",
+    "ru": "Большой зал соревнований с красно-синими татами и табло",
+    "en": "A large competition arena with red and blue mats and a results board"
+   },
+   "camp-erfurt-flag.jpg": {
+    "he": "הקבוצה עם דגל ישראל בחוץ, במסע לגרמניה",
+    "ru": "Группа с флагом Израиля на улице во время поездки в Германию",
+    "en": "The group with an Israeli flag outdoors on the trip to Germany"
+   },
+   "camp-erfurt-square.jpg": {
+    "he": "הקבוצה בכיכר מרוצפת מול הקתדרלה של ארפורט",
+    "ru": "Группа на мощёной площади у Эрфуртского собора",
+    "en": "The group on a cobbled square in front of Erfurt Cathedral"
+   },
+   "camp-ropepark.jpg": {
+    "he": "הקבוצה בכניסה לפארק חבלים ביער",
+    "ru": "Группа у входа в верёвочный парк в лесу",
+    "en": "The group at the entrance to a rope park in a forest"
+   },
+   "train-sukkot-randori.jpg": {
+    "he": "זוגות מתאמנים ברנדורי על המזרן הכחול במחנה האימונים",
+    "ru": "Пары отрабатывают рандори на синем татами во время сборов",
+    "en": "Pairs practising randori on the blue mat at the training camp"
+   },
+   "georgia-dojo.jpg": {
+    "he": "ג׳ודוקאים ומאמנים עומדים בשורה באולם אימונים גדול בגאורגיה",
+    "ru": "Дзюдоисты и тренеры выстроились в большом зале в Грузии",
+    "en": "Judoka and coaches lined up in a large training hall in Georgia"
+   },
+   "train-georgia-outdoor.jpg": {
+    "he": "בני נוער מתאמנים בחוץ בין העצים",
+    "ru": "Подростки тренируются на улице среди деревьев",
+    "en": "Teenagers training outdoors among the trees"
+   },
+   "camp-snow-wide.jpg": {
+    "he": "הקבוצה על מדרון מושלג תחת שמיים כחולים",
+    "ru": "Группа на заснеженном склоне под синим небом",
+    "en": "The group on a snowy mountainside under a blue sky"
+   },
+   "camp-gudauri.jpg": {
+    "he": "אנשים הולכים בשלג למרגלות ההרים בגודאורי",
+    "ru": "Люди идут по снегу у подножия гор в Гудаури",
+    "en": "People walking across the snow below the mountains at Gudauri"
+   },
+   "belts-air.jpg": {
+    "he": "ילדים בחליפות ג׳ודו מרימים ידיים בשמחה באולם",
+    "ru": "Дети в кимоно радостно вскидывают руки в зале",
+    "en": "Children in judo suits throwing their arms up in celebration in the dojo"
+   }
+  }
  }
 }
