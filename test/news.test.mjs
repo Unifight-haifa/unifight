@@ -108,6 +108,7 @@ test('content check rejects raw HTML in a post', () => {
       ['[x]( JaVaScRiPt:alert(1))', /link target/],
       ['[x](&#106;avascript:alert(1))', /link target/],
       ['[r]: data:text/html,hi', /link target/],
+      ['[click][x]\n\n[x]: javascript:alert(1) "t"', /link target/],
     ]) {
       writeFileSync(f, `${orig}\n${bad}\n`);
       assert.throws(() => checkNews(pathToFileURL(`${root}/`)), re, bad);

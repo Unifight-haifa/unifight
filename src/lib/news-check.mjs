@@ -3,7 +3,7 @@ import { existsSync, readdirSync, readFileSync } from 'node:fs';
 const LANGS = ['he', 'ru', 'en'];
 const RAW_HTML = /<[a-z!/?]/i;
 // link/image targets: web links, site paths, anchors, or an image file in the post folder
-const LINK = /\]\(\s*<?([^)\s>]*)|^\s*\[[^\]]+\]:\s*<?(\S*?)>?\s*$/gim;
+const LINK = /\]\(\s*<?([^)\s>]*)|^\s{0,3}\[[^\]]+\]:\s*<?([^\s>]*)/gim;
 const SAFE_TARGET = /^(https?:\/\/|\/(?!\/)|#|(\.\/)?[\w.-]+\.(jpe?g|png|webp|gif)$)/i;
 const DIR = /^\d{4}-\d{2}-\d{2}-([a-z0-9]+(?:-[a-z0-9]+)*)$/;
 
