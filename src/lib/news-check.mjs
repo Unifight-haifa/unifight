@@ -36,18 +36,25 @@ export function checkNews(root) {
 
 // Final gate on the rendered post body: whatever Markdown syntax slipped past the source check,
 // this sees exactly what the browser will get. CI runs it before deploy.
-const BAD_TAG = /<(script|iframe|object|embed|style|form|base|meta|link|svg|math)\b/i;
-const ON_ATTR = /\son[a-z]+\s*=/i;
-const URL_ATTR = /\s(?:href|src|srcset|action|formaction|xlink:href|poster)\s*=\s*("[^"]*"|'[^']*'|[^\s>]+)/gi;
+const BAD_TAG = /^<(script|iframe|object|embed|style|form|base|meta|link|svg|math)\b/i;
+// a real start tag, quote-aware so a ">" inside an attribute value can't end it early
+const TAG = /<[a-z][^\s/>]*(?:\s+[^\s=/>]+(?:\s*=\s*(?:"[^"]*"|'[^']*'|[^\s>]+))?)*\s*\/?>/gi;
+const ATTR = /\s([^\s=/>]+)(?:\s*=\s*("[^"]*"|'[^']*'|[^\s>]+))?/g;
+const URL_ATTRS = new Set(['href', 'src', 'srcset', 'action', 'formaction', 'xlink:href', 'poster']);
 const SAFE_URL = /^(https?:\/\/|mailto:|\/(?!\/)|#)/i;
 
 export function checkRenderedBody(html) {
-  if (BAD_TAG.test(html)) throw new Error('rendered post contains a forbidden tag');
-  if (ON_ATTR.test(html)) throw new Error('rendered post contains an event handler');
-  for (const m of html.matchAll(URL_ATTR)) {
-    const raw = m[1].replace(/^["']|["']$/g, '').replace(/&#?\w+;/g, '?');
-    for (const u of raw.split(',').map((s) => s.trim().split(/\s+/)[0]).filter(Boolean)) {
-      if (!SAFE_URL.test(u)) throw new Error(`rendered post links to "${u}"`);
+  // text is entity-escaped by the renderer, so only real tags are inspected; prose mentioning "onerror=" is fine
+  for (const [tag] of html.matchAll(TAG)) {
+    if (BAD_TAG.test(tag)) throw new Error('rendered post contains a forbidden tag');
+    for (const [, name, value = ''] of tag.slice(tag.search(/\s|\/?>$/)).matchAll(ATTR)) {
+      const n = name.toLowerCase();
+      if (n.startsWith('on')) throw new Error('rendered post contains an event handler');
+      if (!URL_ATTRS.has(n)) continue;
+      const raw = value.replace(/^["']|["']$/g, '').replace(/&#?\w+;/g, '?');
+      for (const u of raw.split(',').map((x) => x.trim().split(/\s+/)[0]).filter(Boolean)) {
+        if (!SAFE_URL.test(u)) throw new Error(`rendered post links to "${u}"`);
+      }
     }
   }
 }
