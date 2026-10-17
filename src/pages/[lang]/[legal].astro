@@ -3,8 +3,6 @@ import { i18n } from 'astro:config/client';
 import Base from '../../layouts/Base.astro';
 import type { Lang } from '../../i18n/ui';
 
-// TODO(owner): add the contact email and amuta number (ע״ר) to the copy once confirmed.
-// Candidates to verify: unifight.haifa@outlook.com, guidestar.org.il/he/organization/580472751.
 const docs = import.meta.glob<{ frontmatter: { title: string }; Content: any }>('../../../content/legal/*.md', { eager: true });
 
 export function getStaticPaths() {

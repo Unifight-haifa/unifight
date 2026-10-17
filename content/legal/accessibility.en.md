@@ -32,4 +32,4 @@ Training takes place in school halls and other buildings that are not run by the
 
 ## Accessibility contact
 
-If you find a problem with accessibility on the site, or need information in another format, contact us on WhatsApp: <a href="https://wa.me/972545664663" dir="ltr">054-566-4663</a>. Please tell us which page you were on and what the problem was, and we will fix it as soon as we can.
+If you find a problem with accessibility on the site, or need information in another format, contact us on WhatsApp: <a href="https://wa.me/972545664663" dir="ltr">054-566-4663</a>, or by email: <a href="mailto:unifight.haifa@outlook.com" dir="ltr">unifight.haifa@outlook.com</a>. Please tell us which page you were on and what the problem was, and we will fix it as soon as we can.

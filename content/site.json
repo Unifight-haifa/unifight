@@ -1796,8 +1796,8 @@
   "email": {
    "value": "unifight.haifa@outlook.com",
    "source": "https://www.facebook.com/unifightjudoclub/",
-   "confidence": "likely",
-   "note": "owner to confirm which email is current"
+   "confidence": "confirmed",
+   "note": "owner confirmed 2026-10-17"
   },
   "social": [
    {
@@ -1837,10 +1837,10 @@
   },
   "legal_source": "https://www.guidestar.org.il/he/organization/580472751",
   "amuta_number": {
-   "placeholder": true,
-   "he": "[מספר עמותה — לאישור]",
-   "ru": "[Номер амуты — уточнить]",
-   "en": "[Non-profit number — to confirm]"
+   "he": "ע״ר 580472751",
+   "ru": "№ 580472751",
+   "en": "No. 580472751",
+   "source": "owner confirmed 2026-10-17"
   },
   "copyright": {
    "he": "© 2026 יוניפייט חיפה. כל הזכויות שמורות.",
