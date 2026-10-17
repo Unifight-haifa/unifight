@@ -20,6 +20,11 @@ export const ui = {
     newsCopied: 'הקישור הועתק',
     newsAll: 'כל החדשות',
     newsDesc: 'חדשות מועדון הג׳ודו יוניפייט חיפה: תחרויות, מחנות אימונים וחיי המועדון.',
+    consentText: 'נשמח להשתמש ב־Google Analytics כדי להבין איך משתמשים באתר. Google שומרת עוגיות רק אם תאשרו.',
+    consentAccept: 'אישור',
+    consentDecline: 'דחייה',
+    cookieSettings: 'הגדרות עוגיות',
+    privacyPolicy: 'מדיניות פרטיות',
   },
   ru: {
     siteName: 'Юнифайт Хайфа',
@@ -35,6 +40,11 @@ export const ui = {
     newsCopied: 'Ссылка скопирована',
     newsAll: 'Все новости',
     newsDesc: 'Новости клуба дзюдо «Юнифайт Хайфа»: турниры, сборы и жизнь клуба.',
+    consentText: 'Мы хотели бы использовать Google Analytics, чтобы понимать, как пользуются сайтом. Google сохраняет cookie, только если вы согласитесь.',
+    consentAccept: 'Принять',
+    consentDecline: 'Отклонить',
+    cookieSettings: 'Настройки cookie',
+    privacyPolicy: 'Политика конфиденциальности',
   },
   en: {
     siteName: 'Unifight Haifa',
@@ -50,6 +60,11 @@ export const ui = {
     newsCopied: 'Link copied',
     newsAll: 'All news',
     newsDesc: 'News from the Unifight Haifa judo club: tournaments, training camps and club life.',
+    consentText: "We'd like to use Google Analytics to understand how the site is used. Google sets cookies only if you accept.",
+    consentAccept: 'Accept',
+    consentDecline: 'Decline',
+    cookieSettings: 'Cookie settings',
+    privacyPolicy: 'Privacy policy',
   },
 };
 

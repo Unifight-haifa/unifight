@@ -81,8 +81,8 @@ const share = [
     <Image class="news-cover" src={d.cover} alt={d.cover_alt ?? ''} widths={[600, 1200]} sizes="(min-width: 800px) 760px, 100vw" />
     <div class="news-body"><Content /></div>
     <nav class="news-share" aria-label={t(lang, 'newsShare')}>
-      {share.map(([name, href]) => <a class="btn btn-ghost" href={href} target="_blank" rel="noopener">{name}</a>)}
-      <a class="btn btn-ghost" href={url} data-copy data-done={t(lang, 'newsCopied')}>{t(lang, 'newsCopy')}</a>
+      {share.map(([name, href]) => <a class="btn btn-ghost" href={href} target="_blank" rel="noopener" data-ga="news_share" data-ga-channel={name.toLowerCase()}>{name}</a>)}
+      <a class="btn btn-ghost" href={url} data-copy data-ga="news_share" data-ga-channel="copy" data-done={t(lang, 'newsCopied')}>{t(lang, 'newsCopy')}</a>
     </nav>
   </article>
   <script is:inline>

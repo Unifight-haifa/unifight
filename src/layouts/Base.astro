@@ -1,7 +1,9 @@
 ---
 import { Font } from 'astro:assets';
 import { getRelativeLocaleUrl } from 'astro:i18n';
+import Consent from '../components/Consent.astro';
 import { LANGS, NAMES, dir, t, type Lang } from '../i18n/ui';
+import { GA_ID } from '../lib/analytics';
 import '../styles/global.css';
 
 interface Props {
@@ -35,12 +37,14 @@ const rest = Astro.url.pathname.slice(import.meta.env.BASE_URL.length).split('/'
       <a class="site-name" href={getRelativeLocaleUrl(lang)}>{t(lang, 'siteName')}</a>
       <nav aria-label={t(lang, 'langLabel')}>
         {LANGS.filter((l) => l !== lang).map((l) => (
-          <a href={getRelativeLocaleUrl(l, rest)} hreflang={l} lang={l} data-set-lang={l}>{NAMES[l]}</a>
+          <a href={getRelativeLocaleUrl(l, rest)} hreflang={l} lang={l} data-set-lang={l} data-ga="language_switch" data-ga-to={l}>{NAMES[l]}</a>
         ))}
       </nav>
     </header>
     <main><slot /></main>
+    {GA_ID && <footer class="site-footer"><button type="button" class="consent-open" data-consent-open>{t(lang, 'cookieSettings')}</button></footer>}
     </Fragment>}
+    <Consent lang={lang} />
     <script is:inline>
       // only an explicit switch counts as a choice; page views never write
       document.addEventListener('click', function (e) {

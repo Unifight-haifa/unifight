@@ -22,6 +22,9 @@ env:
     || format('https://{0}.github.io', github.repository_owner) }}
   BASE_PATH: >-
     ${{ vars.BASE_PATH || format('/{0}', github.event.repository.name) }}
+  # unset means off; see docs/google-analytics-setup.ru.md
+  PUBLIC_GA_ID: ${{ vars.PUBLIC_GA_ID }}
+  PUBLIC_GSC_VERIFICATION: ${{ vars.PUBLIC_GSC_VERIFICATION }}
 
 jobs:
   build:

@@ -91,9 +91,14 @@ WA_SVG = ('<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path
 ARROW = '<span class="arrow" aria-hidden="true">→</span>'
 
 
-def wa(label, extra=""):
-    return (f'<div class="wa-row {extra}"><a class="btn btn-wa" href="{WA}" target="_blank" rel="noopener">{WA_SVG}{t(label)}</a>'
-            f'<a class="wa-num" href="tel:+972545664663">{ltr(WA_NUM)}</a></div>')
+def ga(event, **params):
+    """Analytics hook read by the site's one click listener (src/components/Consent.astro)."""
+    return f'data-ga="{event}"' + "".join(f' data-ga-{k}="{v}"' for k, v in params.items())
+
+
+def wa(label, placement, extra=""):
+    return (f'<div class="wa-row {extra}"><a class="btn btn-wa" href="{WA}" target="_blank" rel="noopener" {ga("whatsapp_click", placement=placement)}>{WA_SVG}{t(label)}</a>'
+            f'<a class="wa-num" href="tel:+972545664663" {ga("phone_click", placement=placement)}>{ltr(WA_NUM)}</a></div>')
 
 
 def head(nav_id, kanji, title, intro=None):
@@ -122,7 +127,7 @@ def header():
         f'<button type="button" data-set-lang="{l}" aria-pressed="{str(l=="he").lower()}" title="{C["language_switch"][l]}">{lab}</button>'
         for l, lab in (("he", "עב"), ("ru", "RU"), ("en", "EN")))
     if SITE:
-        langs = "".join(f'<a data-l-link="{l}" href="%LANG_{l}%" hreflang="{l}" lang="{l}" title="{C["language_switch"][l]}">{lab}</a>'
+        langs = "".join(f'<a data-l-link="{l}" href="%LANG_{l}%" hreflang="{l}" lang="{l}" {ga("language_switch", to=l)} title="{C["language_switch"][l]}">{lab}</a>'
                         for l, lab in (("he", "עב"), ("ru", "RU"), ("en", "EN")))
     cta = hero["cta_primary"]
     join = "".join(
@@ -205,7 +210,7 @@ def parents():
      <div><h4 class="h4">{t(fc["expect_title"])}</h4><ol class="nl">{expect}</ol></div>
     </div>
     <div class="qs">{qs}</div>
-    {wa(fc["cta"])}
+    {wa(fc["cta"], "first_class")}
    </div>
    <div class="fc-pics">{img("result-jfp-mascot.jpg", "pic")}{img("result-kids-certificates.jpg", "pic")}</div>
   </div>
@@ -418,16 +423,16 @@ def schedule():
                       f'<span class="ses-time">{ltr(s["start"] + "–" + s["end"])}</span>'
                       f'<span class="ses-grade">{t(grade_label(s["grades"]))}</span>'
                       f'<span class="ses-venue"><i aria-hidden="true"></i>{t({l: v[l] for l in LANGS})}</span>{badge}{note}'
-                      f'<a class="ses-wa" href="{WA}" target="_blank" rel="noopener">{WA_SVG}{t(U["join"])}</a></li>')
+                      f'<a class="ses-wa" href="{WA}" target="_blank" rel="noopener" {ga("whatsapp_click", placement="schedule", venue=s["venue"])}>{WA_SVG}{t(U["join"])}</a></li>')
         name = {l: SC["days"][l][d] for l in LANGS}
         days += (f'<section class="day" data-day="{d}"><h4 class="day-h">{t(name)}<span class="day-today">{t(U["today"])}</span></h4>'
                  f'<ul class="ses-list">{cards}</ul><p class="day-none">{t(U["none_day"])}</p></section>')
     tabs = "".join(f'<button type="button" class="tab" data-tab="{d}" aria-pressed="false">{t({l: DAY_SHORT[l][d] for l in LANGS})}<b class="tab-n"></b></button>' for d in range(6))
     grades = [(-1, U["all"])] + [(0, {"he": "גן", "ru": "Сад", "en": "KG"})] + [
         (g, {"he": SC["grade_letters_he"][g] + ("+" if g == 8 else ""), "ru": f"{g}{'+' if g == 8 else ''}", "en": f"{g}{'+' if g == 8 else ''}"}) for g in range(1, 9)]
-    gchips = "".join(f'<button type="button" class="chip" data-grade="{g}" aria-pressed="{str(g == -1).lower()}">{t(lab)}</button>' for g, lab in grades)
-    vchips = f'<button type="button" class="chip" data-venue="" aria-pressed="true">{t(U["all"])}</button>' + "".join(
-        f'<button type="button" class="chip" data-venue="{k}" aria-pressed="false" style="--vc:{VENUE_COLOR[k]}"><i aria-hidden="true"></i>{t({l: v[l] for l in LANGS})}</button>'
+    gchips = "".join(f'<button type="button" class="chip" data-grade="{g}" {ga("schedule_filter", grade=g)} aria-pressed="{str(g == -1).lower()}">{t(lab)}</button>' for g, lab in grades)
+    vchips = f'<button type="button" class="chip" data-venue="" {ga("schedule_filter", venue="all")} aria-pressed="true">{t(U["all"])}</button>' + "".join(
+        f'<button type="button" class="chip" data-venue="{k}" {ga("schedule_filter", venue=k)} aria-pressed="false" style="--vc:{VENUE_COLOR[k]}"><i aria-hidden="true"></i>{t({l: v[l] for l in LANGS})}</button>'
         for k, v in VENUES.items())
     vals = "".join(f'<span data-l="{l}">{" · ".join(SC["values"][l])}</span>' for l in LANGS)
     msg = "".join(f'<span data-l="{l}" class="wa-msg" hidden>{esc(U["wa_msg"][l])}</span>' for l in LANGS)
@@ -445,7 +450,7 @@ def schedule():
   </div>
   <div class="tabs" role="group">{tabs}</div>
   <div class="week" id="week">{days}</div>
-  <div class="sc-none">{t(U["none_all"])}{wa(C["kids"]["first_class"]["cta"])}</div>
+  <div class="sc-none">{t(U["none_all"])}{wa(C["kids"]["first_class"]["cta"], "schedule_none")}</div>
   <p class="niv"><span class="kj" aria-hidden="true">選</span>{t(sc["nivheret_note"])}</p>
   <p class="sc-vals">{vals}</p>
   <p class="sc-others">{t(U["others"])}</p>
@@ -467,9 +472,9 @@ def branches():
         days = "".join(f'<span data-l="{l}">{" · ".join(DAY_SHORT[l][d] for d in ds)}</span>' for l in LANGS)
         v += (f'<article class="venue rv" style="--vc:{VENUE_COLOR[k]}"><span class="v-i" aria-hidden="true">0{i+1}</span>'
               f'<h3 class="h3">{t({l: vn[l] for l in LANGS})}</h3><p class="v-addr">{t(vn["address"])}</p><p class="v-note">{t(BR_UI["days"])}: {days}</p>'
-              f'<div class="v-links"><a href="https://www.google.com/maps/search/?api=1&amp;query={q}" target="_blank" rel="noopener">Google Maps</a>'
-              f'<a href="https://waze.com/ul?q={q}&amp;navigate=yes" target="_blank" rel="noopener">Waze</a>'
-              f'<a href="https://www.google.com/maps/dir/?api=1&amp;destination={q}&amp;travelmode=transit" target="_blank" rel="noopener">{t(BR_UI["bus"])}</a></div></article>')
+              f'<div class="v-links"><a href="https://www.google.com/maps/search/?api=1&amp;query={q}" target="_blank" rel="noopener" {ga("map_open", venue=k, provider="google_maps")}>Google Maps</a>'
+              f'<a href="https://waze.com/ul?q={q}&amp;navigate=yes" target="_blank" rel="noopener" {ga("map_open", venue=k, provider="waze")}>Waze</a>'
+              f'<a href="https://www.google.com/maps/dir/?api=1&amp;destination={q}&amp;travelmode=transit" target="_blank" rel="noopener" {ga("map_open", venue=k, provider="transit")}>{t(BR_UI["bus"])}</a></div></article>')
     nb = "".join(f'<li>{t(n["name"])}</li>' for n in b["neighbourhoods"])
     return f'''
 <section class="sec tatami" id="branches">
@@ -484,14 +489,14 @@ def branches():
 
 def contact():
     co = C["contact"]
-    phones = "".join(f'<li><span>{t(p["name"])}</span><a href="tel:{p["tel"]}">{ltr(p["phone"])}</a></li>' for p in co["phones"])
+    phones = "".join(f'<li><span>{t(p["name"])}</span><a href="tel:{p["tel"]}" {ga("phone_click", placement="contact")}>{ltr(p["phone"])}</a></li>' for p in co["phones"])
     soc = ""
     for s in co["social"]:
         if s.get("placeholder"):
             soc += t(s)
         else:
             lab = esc(s["label"]) + (f' <bdi dir="ltr">{esc(s["handle"])}</bdi>' if s.get("handle") else "")
-            soc += f'<a class="soc" href="{s["url"]}" target="_blank" rel="noopener">{lab} {ARROW}</a>'
+            soc += f'<a class="soc" href="{s["url"]}" target="_blank" rel="noopener" {ga("social_click", network=s["id"])}>{lab} {ARROW}</a>'
     return f'''
 <section class="sec contact" id="contact">
  <div class="ct-bg">{img("kids-belts-throw.jpg")}</div>
@@ -500,7 +505,7 @@ def contact():
   <div class="sh rv"><span class="kicker"><span class="kj" aria-hidden="true">連絡</span>{t(nav_label("contact"))}</span><h2 class="h2 ct-h">{t(co["title"])}</h2><p class="lead">{t(co["text"])}</p></div>
   <div class="ct-grid">
    <div class="ct-card rv">
-    {wa(co["whatsapp_cta"]["label"], "wa-big")}
+    {wa(co["whatsapp_cta"]["label"], "contact", "wa-big")}
     <ul class="phones">{phones}</ul>
     <p class="mail"><a href="mailto:{co["email"]["value"]}">{ltr(co["email"]["value"])}</a></p>
     <div class="socs">{soc}</div>
@@ -524,7 +529,7 @@ def footer():
  <div class="wrap ft-in">
   <div class="ft-brand"><span class="plate plate-lg"><img src="{PFX}{LOGO}" width="256" height="256" alt="" loading="lazy"></span>
    <div><p class="ft-name">{t(club["name"])}</p><p>{t(f["tagline"])}</p></div></div>
-  <div class="ft-meta"><p>{t(f["legal"])} {t(f["amuta_number"])}</p><p class="ft-legal">{LEGAL_LINKS}</p><p class="copy">{t(f["copyright"])}</p></div>
+  <div class="ft-meta"><p>{t(f["legal"])} {t(f["amuta_number"])}</p><p class="ft-legal">{LEGAL_LINKS}<!--COOKIES--></p><p class="copy">{t(f["copyright"])}</p></div>
  </div>
 </footer>'''
 

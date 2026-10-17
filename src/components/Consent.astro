@@ -1,0 +1,131 @@
+---
+import { getRelativeLocaleUrl } from 'astro:i18n';
+import { t, type Lang } from '../i18n/ui';
+import { GA_ID } from '../lib/analytics';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+
+// ES5 like the other inline scripts. Consent Mode v2 basic: gtag doesn't exist until the visitor accepts.
+const code = `(function () {
+var ID = ${JSON.stringify(GA_ID)}, KEY = 'consent', box = document.querySelector('[data-consent]');
+var saved = function () { try { return localStorage.getItem(KEY); } catch (e) { return null; } };
+function load() {
+  window.dataLayer = window.dataLayer || [];
+  window.gtag = function () { dataLayer.push(arguments); };
+  gtag('consent', 'default', { ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied', analytics_storage: 'granted' });
+  gtag('js', new Date());
+  gtag('config', ID);
+  var s = document.createElement('script');
+  s.async = true;
+  s.src = 'https://www.googletagmanager.com/gtag/js?id=' + ID;
+  document.head.appendChild(s);
+}
+function choose(v) {
+  try { localStorage.setItem(KEY, v); } catch (e) {}
+  box.hidden = true;
+  if (v === 'granted') { if (!window.gtag) load(); return; }
+  if (!window.gtag) return;
+  // withdrawn: drop GA cookies on every parent domain they may sit on, then start clean
+  var h = location.hostname.split('.');
+  document.cookie.split('; ').forEach(function (c) {
+    var n = c.split('=')[0];
+    if (n.indexOf('_ga') !== 0) return;
+    document.cookie = n + '=; max-age=0; path=/';
+    for (var i = 0; i < h.length - 1; i++) document.cookie = n + '=; max-age=0; path=/; domain=' + h.slice(i).join('.');
+  });
+  location.reload();
+}
+if (saved() === 'granted') load();
+else if (!saved()) box.hidden = false;
+document.addEventListener('click', function (e) {
+  var el = e.target.closest && e.target.closest('[data-consent-choice], [data-consent-open], [data-ga]');
+  if (!el) return;
+  if (el.dataset.consentChoice) return choose(el.dataset.consentChoice);
+  if (el.hasAttribute('data-consent-open')) { box.hidden = false; box.querySelector('button').focus(); return; }
+  if (!window.gtag) return;
+  // data-ga names the event; data-ga-<param> attributes become its parameters
+  var p = { language: document.documentElement.lang };
+  for (var k in el.dataset) if (k.length > 2 && k.indexOf('ga') === 0) p[k.charAt(2).toLowerCase() + k.slice(3)] = el.dataset[k];
+  gtag('event', el.dataset.ga, p);
+});
+})();`;
+---
+{GA_ID && (
+  <Fragment>
+    <section class="consent" data-consent aria-label={t(lang, 'cookieSettings')} hidden>
+      <p>
+        {t(lang, 'consentText')}
+        <a href={getRelativeLocaleUrl(lang, 'privacy/')}>{t(lang, 'privacyPolicy')}</a>
+      </p>
+      <div class="consent-btns">
+        <button type="button" data-consent-choice="granted">{t(lang, 'consentAccept')}</button>
+        <button type="button" data-consent-choice="denied">{t(lang, 'consentDecline')}</button>
+      </div>
+    </section>
+    <script is:inline set:html={code} />
+    <style is:inline>
+      .consent {
+        position: fixed;
+        inset-inline: 0.75rem;
+        inset-block-end: 0.75rem;
+        z-index: 1000;
+        box-sizing: border-box;
+        max-inline-size: 36rem;
+        margin-inline: auto;
+        padding: 1rem;
+        border: 1px solid #c9a227;
+        border-radius: 0.5rem;
+        background: #13110f;
+        color: #f3ead8;
+        box-shadow: 0 0.25rem 1.5rem rgb(0 0 0 / 0.4);
+        font-size: 15px;
+        line-height: 1.5;
+      }
+      .consent[hidden] {
+        display: none;
+      }
+      .consent p {
+        margin: 0 0 0.75rem;
+      }
+      .consent a {
+        color: inherit;
+        text-decoration: underline;
+      }
+      /* equal prominence: both choices share one style */
+      .consent-btns {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.5rem;
+      }
+      .consent-btns button {
+        font: inherit;
+        font-weight: 600;
+        min-block-size: 2.75rem;
+        padding-inline: 0.75rem;
+        border: 2px solid #f3ead8;
+        border-radius: 999px;
+        background: transparent;
+        color: inherit;
+        cursor: pointer;
+      }
+      .consent button:focus-visible,
+      .consent-open:focus-visible {
+        outline: 3px solid #f2a900;
+        outline-offset: 2px;
+      }
+      .consent-open {
+        font: inherit;
+        padding: 0;
+        border: 0;
+        background: none;
+        color: inherit;
+        text-decoration: underline;
+        cursor: pointer;
+      }
+    </style>
+  </Fragment>
+)}

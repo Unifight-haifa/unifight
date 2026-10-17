@@ -10,7 +10,8 @@ import { getRelativeLocaleUrl } from 'astro:i18n';
 import Base from '../../layouts/Base.astro';
 import VenueMap from '../../components/VenueMap.astro';
 import JsonLd from '../../components/JsonLd.astro';
-import { LANGS, type Lang } from '../../i18n/ui';
+import { LANGS, t, type Lang } from '../../i18n/ui';
+import { GA_ID } from '../../lib/analytics';
 import '../../styles/landing.css';
 
 export function getStaticPaths() {
@@ -24,6 +25,7 @@ for (const l of LANGS) {
   body = body
     .replaceAll(`data-l-link="${l}" href="%LANG_${l}%"`, `${l === lang ? 'aria-current="page"' : `data-set-lang="${l}"`} href="${getRelativeLocaleUrl(l)}"`);
 }
+body = body.replace('<!--COOKIES-->', GA_ID ? ` · <button type="button" class="consent-open" data-consent-open>${t(lang, 'cookieSettings')}</button>` : '');
 body = body.replace(/alt-he="([^"]*)" alt-ru="([^"]*)" alt-en="([^"]*)"/g, (_, he, ru, en) => `alt="${{ he, ru, en }[lang]}"`);
 // share scrapers need absolute URLs
 const abs = (path: string) => new URL(path, Astro.site).href;

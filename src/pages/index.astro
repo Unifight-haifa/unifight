@@ -3,6 +3,8 @@ import LangPick from '../components/LangPick.astro';
 import { LANGS, NAMES, t } from '../i18n/ui';
 
 const base = import.meta.env.BASE_URL;
+// Search Console checks the property's home page, which is this picker
+const gsc = import.meta.env.PUBLIC_GSC_VERIFICATION;
 ---
 <!doctype html>
 <html lang="he" dir="rtl">
@@ -10,6 +12,7 @@ const base = import.meta.env.BASE_URL;
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="robots" content="noindex" />
+    {gsc && <meta name="google-site-verification" content={gsc} />}
     <title>{t('he', 'siteName')}</title>
     <LangPick mode="redirect" />
   </head>

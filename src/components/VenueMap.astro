@@ -46,11 +46,12 @@ const venues = Object.entries(geo).map(([id, g]) => {
   };
 });
 const base = import.meta.env.BASE_URL;
+const PROVIDERS = ['google_maps', 'waze', 'transit'];
 ---
 <div class="venue-map" data-venue-map data-base={base} data-label={s.label}
   data-points={JSON.stringify(venues.map(({ id, lat, lng }) => ({ id, lat, lng })))}>
   <div class="venue-map-rest">
-    <button type="button">{s.show}</button>
+    <button type="button" data-ga="map_open" data-ga-provider="osm">{s.show}</button>
     <p>{s.note}</p>
   </div>
   {venues.map((v) => (
@@ -59,7 +60,9 @@ const base = import.meta.env.BASE_URL;
         <strong>{v.name}</strong>
         <div>{v.address}</div>
         <ul>
-          {v.links.map((href, i) => <li><a href={href} target="_blank" rel="noopener">{s.links[i]}</a></li>)}
+          {v.links.map((href, i) => (
+            <li><a href={href} target="_blank" rel="noopener" data-ga="map_open" data-ga-venue={v.id} data-ga-provider={PROVIDERS[i]}>{s.links[i]}</a></li>
+          ))}
         </ul>
       </div>
     </template>

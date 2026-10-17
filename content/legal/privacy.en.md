@@ -3,7 +3,7 @@ title: Privacy policy
 description: What information the Unifight Haifa website handles, why, and what your rights are.
 ---
 
-Last updated: 17 October 2026
+Last updated: 18 October 2026
 
 This policy explains what information the Unifight Haifa website handles and why. It is written in line with the Israeli Protection of Privacy Law, 5741-1981, including Amendment 13, which came into force on 14 August 2025.
 
@@ -13,14 +13,15 @@ The site is run by Unifight Haifa, a registered non-profit association (amuta no
 
 ## What we collect
 
-Nothing that you enter. The site is static: it has no forms, no user accounts and no payments, and it does not ask for your name, phone number or any other personal details. We do not use cookies, analytics or advertising trackers.
+Nothing that you enter. The site is static: it has no forms, no user accounts and no payments, and it does not ask for your name, phone number or any other personal details. We do not use advertising trackers. Analytics runs only if you agree to it, as described below.
 
 ## What is saved in your browser
 
-To remember your choices on your next visit, the site saves two kinds of settings in your browser's local storage (localStorage):
+To remember your choices on your next visit, the site saves these settings in your browser's local storage (localStorage):
 
 - the site language you picked;
-- your schedule filters (for example, the age group or branch you selected).
+- your schedule filters (for example, the age group or branch you selected);
+- whether you accepted or declined analytics.
 
 These settings stay on your device and are never sent to us. You can delete them at any time by clearing the site data in your browser.
 
@@ -31,6 +32,7 @@ When your browser loads a page, the services below receive technical data such a
 - **GitHub Pages** hosts the site.
 - **Google Fonts** supplies some of the fonts on the home page.
 - **OpenStreetMap** supplies the map of our training venues. The map is loaded only after you press the button to show it.
+- **Google Analytics** measures how the site is used, but only if you accept analytics (see below).
 
 Each of these services handles that data under its own privacy policy.
 
@@ -38,9 +40,15 @@ Each of these services handles that data under its own privacy policy.
 
 The site links to WhatsApp, Facebook, Instagram, Google Maps and Waze. Nothing is loaded from these services until you click a link. Once you open one, that service's own privacy policy applies.
 
-## Analytics in the future
+## Analytics
 
-We do not use analytics today. If we add a tool such as Google Analytics, it will run only after you give your consent, and we will update this policy before we enable it.
+The site asks whether you agree to analytics. Until you press "Accept", nothing is loaded from Google Analytics and no analytics cookies are set. If you press "Decline", nothing is loaded either.
+
+If you accept, the site loads Google Analytics 4. Google then sets cookies whose names start with `_ga` and receives information about your visit: the pages you open, the site language, your device and browser type, your approximate location (country or city, worked out from your IP address), and clicks on WhatsApp, phone and social network links, schedule filters, the map and navigation links, the language switcher and the news sharing buttons. For a click we record only which button it was, for example the training venue or the place on the page, never what you write or say. Google Analytics 4 does not store IP addresses. Advertising features stay off.
+
+We use this only to understand how the site is used and to improve it. Google processes the data, possibly outside Israel, under its own [privacy policy](https://policies.google.com/privacy), and keeps it for the period set in our account, at most 14 months.
+
+You can change your choice at any time with the "Cookie settings" link at the bottom of the page. If you withdraw consent, the site deletes the Google Analytics cookies from your browser and stops loading it.
 
 ## Photos
 
