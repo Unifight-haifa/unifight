@@ -65,7 +65,7 @@
           },
           "conditions": [
             {
-              "id": "92d4b8be-fe52-4d29-9176-be1c9ed06fe3",
+              "id": "2de3545f-419c-5b71-ab04-9b661cf43893",
               "leftValue": "={{ $json.data?.approved === true }}",
               "rightValue": "",
               "operator": {
@@ -176,7 +176,7 @@
           },
           "conditions": [
             {
-              "id": "b8cd2884-246f-4f2c-b0e4-0cd17e7137c1",
+              "id": "5d08f2aa-7ece-5237-ba48-0b3820f81792",
               "leftValue": "={{ !!$('Admin Form').first().json.user?.email && String($json.email || '').toLowerCase() === String($('Admin Form').first().json.user.email).toLowerCase() && $json.role === 'admin' && $json.active === true }}",
               "rightValue": "",
               "operator": {
@@ -399,7 +399,7 @@
           },
           "conditions": [
             {
-              "id": "9884625c-7d54-443e-9fe9-fd3fe3b012c8",
+              "id": "d2339db0-e0b4-5b2a-937c-eca40df901d8",
               "leftValue": "={{ $json.found }}",
               "rightValue": "",
               "operator": {
@@ -623,7 +623,7 @@
           },
           "conditions": [
             {
-              "id": "18667a26-0fdf-4e3f-b19b-d9a9cb1e981b",
+              "id": "db98ca43-7ad4-5744-8f18-1557ac29bce5",
               "leftValue": "={{ !!$('Plan Delete').first().json.fb_post_id }}",
               "rightValue": "",
               "operator": {
@@ -783,7 +783,7 @@
                 },
                 "conditions": [
                   {
-                    "id": "7c542350-dedf-4e1d-81e6-aac67d14bbba",
+                    "id": "58463e33-0fff-5dcb-ac5f-d58ce500d906",
                     "leftValue": "={{ $json.channel === 'telegram' }}",
                     "rightValue": "",
                     "operator": {
@@ -808,7 +808,7 @@
                 },
                 "conditions": [
                   {
-                    "id": "027a7015-050c-4389-9dda-80ff343ffbc9",
+                    "id": "99a41d12-8c4f-54a8-b3b4-777b71f07330",
                     "leftValue": "={{ $json.channel === 'email' }}",
                     "rightValue": "",
                     "operator": {
@@ -833,7 +833,7 @@
                 },
                 "conditions": [
                   {
-                    "id": "167f1391-7a44-46bb-8d0b-3409043e3a88",
+                    "id": "776e4d08-0abd-5337-ba6b-42acfe1bbf62",
                     "leftValue": "={{ $json.notify_admin === true }}",
                     "rightValue": "",
                     "operator": {

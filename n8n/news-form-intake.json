@@ -124,7 +124,7 @@
           },
           "conditions": [
             {
-              "id": "6566a066-ca96-4544-9cbc-09cf4c0f0ba8",
+              "id": "b39a30b8-5329-5d78-a466-88ff7755f731",
               "leftValue": "={{ !!$('News Form').first().json.user?.email && String($json.email || '').toLowerCase() === String($('News Form').first().json.user.email).toLowerCase() && !!$json.coach_id && $json.active === true }}",
               "rightValue": "",
               "operator": {
