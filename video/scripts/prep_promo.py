@@ -83,8 +83,8 @@ PHOTO_SET = {
 }
 
 OGA = 'https://opengameart.org/sites/default/files/'
-# "Hero Suite A" by some-weirdo, CC0: https://opengameart.org/content/hero-suite-a
-MUSIC = OGA + 'dime_no_loop.ogg'
+# Eighties Action Kevin MacLeod (incompetech.com), CC BY 4.0 (credit in README)
+MUSIC = 'https://incompetech.com/music/royalty-free/mp3-royaltyfree/Eighties%20Action.mp3'
 # All CC0 on OpenGameArt: name -> (url, file inside the zip or None)
 SFX = {
     'whoosh': (OGA + 'qubodup-timehitwind.zip', 'qubodup-megaswosh1.wav'),  # /content/wind-hit-time-morph
@@ -139,6 +139,6 @@ if __name__ == '__main__':
     with tempfile.TemporaryDirectory() as tmp:
         for name, (url, member) in SFX.items():
             sfx(name, url, member, tmp)
-    if not os.path.exists(OUT + 'hero-suite-a.ogg'):
-        run('curl', '-sfL', '-o', OUT + 'hero-suite-a.ogg', MUSIC)
+    if not os.path.exists(OUT + 'eighties-action.mp3'):
+        run('curl', '-sfL', '-o', OUT + 'eighties-action.mp3', MUSIC)
     print('ok')

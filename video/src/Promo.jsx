@@ -6,6 +6,7 @@ import {CLUB, COPY, CUTS, PFPS} from './promoData';
 
 const F = (s) => Math.round(s * PFPS);
 const clamp = {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'};
+const XF = 3;
 // Shared grade on top of the per-source prep, so phone, WhatsApp and cinema clips read as one film.
 const GRADE = 'contrast(1.06) saturate(0.9) sepia(0.08) brightness(0.97)';
 const LOW_RES = 'saturate(0.7) contrast(1.12)';
@@ -215,14 +216,17 @@ export const Promo = ({lang, format}) => {
   return (
     <AbsoluteFill style={{background: C.ink}}>
       {cut.music.map((m, k) => {
-        const len = F(m.to - m.from);
+        // each piece starts XF frames early and crossfades in, so its downbeat lands at full level
+        const start = k ? F(m.at) - XF : 0;
+        const next = cut.music[k + 1];
+        const len = (next ? F(next.at) : total) - start;
         return (
-          <Sequence key={k} from={F(m.at)} durationInFrames={len + 1} layout="none">
+          <Sequence key={k} from={start} durationInFrames={len} layout="none">
             <Audio
-              src={staticFile('promo/hero-suite-a.ogg')}
-              trimBefore={F(m.from)}
-              // tiny fades hide clicks where the edit jumps inside the track
-              volume={(f) => Math.min(k ? interpolate(f, [0, 2], [0, 1], clamp) : 1, interpolate(f, [len - 2, len], [1, 0], clamp))}
+              src={staticFile('promo/eighties-action.mp3')}
+              // fractional trim undoes the frame rounding of `start`, keeping the splice on the beat grid
+              trimBefore={start + (m.from - m.at) * PFPS}
+              volume={(f) => Math.min(k ? interpolate(f, [0, XF], [0, 1], clamp) : 1, next ? interpolate(f, [len - XF, len], [1, 0], clamp) : 1)}
             />
           </Sequence>
         );
