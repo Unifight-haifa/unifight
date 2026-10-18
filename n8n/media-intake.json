@@ -265,7 +265,7 @@
       ],
       "parameters": {
         "method": "GET",
-        "url": "=https://www.googleapis.com/drive/v3/files/{{ $json.drive_file_id }}?fields=id,name,mimeType,size,webViewLink&supportsAllDrives=true",
+        "url": "=https://www.googleapis.com/drive/v3/files/{{ $json.drive_file_id }}?fields=id,name,mimeType,size,webViewLink,parents&supportsAllDrives=true",
         "authentication": "predefinedCredentialType",
         "nodeCredentialType": "googleDriveOAuth2Api",
         "options": {}
@@ -282,7 +282,7 @@
         752
       ],
       "parameters": {
-        "jsCode": "\nconst c = $('Classify').first().json;\nconst f = $input.first().json;\nconst mime = String(f.mimeType || '');\nif (!/^(image|video)\\//.test(mime)) {\n  return [{ json: { reject: true, chat_id: c.author_tg, text: 'По ссылке не фото и не видео, или у бота нет доступа к файлу. Загрузите файл в папку клуба и пришлите ссылку ещё раз.' } }];\n}\nconst ext = (String(f.name || '').match(/\\.([a-z0-9]{2,5})$/i)?.[1] || mime.split('/')[1]).toLowerCase();\nreturn [{ json: {\n  media_id: `${c.day}-${f.id}`, type: mime.startsWith('video/') ? 'video' : 'photo', status: 'new',\n  author_id: c.author_id, author_tg: c.author_tg, caption: '', tg_file_id: '', tg_unique_id: '', media_group_id: '',\n  drive_file_id: f.id, drive_link: f.webViewLink || `https://drive.google.com/file/d/${f.id}/view`,\n  file_name: `${c.day}_${c.author_id}_${String(f.id).slice(0, 16)}.${ext}`, mime, size_bytes: Number(f.size || 0),\n} }];\n"
+        "jsCode": "\n// The club credential can read far more than the media folder, so only files inside it (root or a month folder) are accepted.\nconst c = $('Classify').first().json;\nconst f = $('Get Drive File').first().json;\nconst parent = $input.first().json;\nconst root = c.cfg.drive_root_id;\nconst mime = String(f.mimeType || '');\nconst parents = Array.isArray(f.parents) ? f.parents : [];\nconst inRoot = parents.includes(root)\n  || (parent.id === parents[0] && parent.mimeType === 'application/vnd.google-apps.folder' && (parent.parents || []).includes(root));\nconst why = !f.id ? 'no access' : !/^(image|video)\\//.test(mime) ? `mime ${mime || '?'}` : !inRoot ? `outside media folder (parent ${parents[0] || '-'})` : '';\nif (why) {\n  return [{ json: { reject: true, reason: why, drive_file_id: c.drive_file_id, author_id: c.author_id, chat_id: c.author_tg,\n    text: `Этот файл не принят: подходят только фото и видео, загруженные в папку клуба «Unifight media» (${c.cfg.drive_root_url}). Загрузите файл туда и пришлите ссылку ещё раз.` } }];\n}\nconst ext = (String(f.name || '').match(/\\.([a-z0-9]{2,5})$/i)?.[1] || mime.split('/')[1]).toLowerCase();\nreturn [{ json: {\n  media_id: `${c.day}-${f.id}`, type: mime.startsWith('video/') ? 'video' : 'photo', status: 'new',\n  author_id: c.author_id, author_tg: c.author_tg, caption: '', tg_file_id: '', tg_unique_id: '', media_group_id: '',\n  drive_file_id: f.id, drive_link: f.webViewLink || `https://drive.google.com/file/d/${f.id}/view`,\n  file_name: `${c.day}_${c.author_id}_${String(f.id).slice(0, 16)}.${ext}`, mime, size_bytes: Number(f.size || 0),\n} }];\n"
       }
     },
     {
@@ -663,6 +663,141 @@
         "width": 384,
         "height": 288
       }
+    },
+    {
+      "id": "d3ed916b-4881-4eb2-be6d-7abb42a8952c",
+      "name": "Get Parent Folder",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        900,
+        560
+      ],
+      "parameters": {
+        "method": "GET",
+        "url": "=https://www.googleapis.com/drive/v3/files/{{ encodeURIComponent(($json.parents || [])[0] || 'none') }}?fields=id,mimeType,parents&supportsAllDrives=true",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleDriveOAuth2Api",
+        "options": {}
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "id": "2b2c3e88-11d4-49bd-ab1c-f26b2238a9ac",
+      "name": "Log Rejected Link",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        1500,
+        700
+      ],
+      "parameters": {
+        "resource": "row",
+        "operation": "insert",
+        "dataTableId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "JefIWDs5Xw3sqWY8",
+          "cachedResultName": "audit_log"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "matchingColumns": [],
+          "value": {
+            "ts": "={{ $now.toISO() }}",
+            "actor_id": "={{ $json.author_id }}",
+            "channel": "telegram",
+            "action": "media_link",
+            "target": "={{ $json.drive_file_id }}",
+            "result": "denied",
+            "detail": "={{ $json.reason }}",
+            "execution_id": "={{ $execution.id }}"
+          },
+          "schema": [
+            {
+              "id": "ts",
+              "displayName": "ts",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "actor_id",
+              "displayName": "actor_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "channel",
+              "displayName": "channel",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "action",
+              "displayName": "action",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "target",
+              "displayName": "target",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "result",
+              "displayName": "result",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "detail",
+              "displayName": "detail",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "execution_id",
+              "displayName": "execution_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ]
+        },
+        "options": {}
+      }
     }
   ],
   "connections": {
@@ -782,17 +917,6 @@
         ]
       ]
     },
-    "Get Drive File": {
-      "main": [
-        [
-          {
-            "node": "Link Row",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Link Row": {
       "main": [
         [
@@ -816,6 +940,11 @@
         [
           {
             "node": "Reply",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Log Rejected Link",
             "type": "main",
             "index": 0
           }
@@ -892,6 +1021,28 @@
         [
           {
             "node": "Reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Drive File": {
+      "main": [
+        [
+          {
+            "node": "Get Parent Folder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Parent Folder": {
+      "main": [
+        [
+          {
+            "node": "Link Row",
             "type": "main",
             "index": 0
           }
