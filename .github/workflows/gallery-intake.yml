@@ -1,0 +1,79 @@
+---
+# Bot-submitted photos live in a PRIVATE staging repo; only the cleaned
+# copies are committed here. See docs/bot-content-contracts.md
+name: Gallery intake
+
+# no push/pull_request trigger: dispatch needs a token with write access
+"on":
+  repository_dispatch:
+    types: [gallery-intake]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: gallery-intake
+  cancel-in-progress: false
+
+env:
+  INBOX_REPO: ${{ vars.MEDIA_INBOX_REPO || 'Unifight-haifa/media-inbox' }}
+
+jobs:
+  intake:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: main
+      - uses: actions/checkout@v7
+        with:
+          repository: ${{ env.INBOX_REPO }}
+          token: ${{ secrets.MEDIA_INBOX_TOKEN }}
+          path: .inbox
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+      - run: pip install pillow==12.3.0 pillow-heif==1.8.1
+      - id: run
+        run: |
+          python scripts/gallery_intake.py .inbox | tee "$RUNNER_TEMP/added.txt"
+          echo "added=$(wc -l < "$RUNNER_TEMP/added.txt")" >> "$GITHUB_OUTPUT"
+      - if: steps.run.outputs.added != '0'
+        # the same check the site build runs, before anything reaches main
+        run: >-
+          node --input-type=module -e "
+          import { checkGallery } from './src/lib/gallery-check.mjs';
+          import { readFileSync } from 'node:fs';
+          import { pathToFileURL } from 'node:url';
+          checkGallery(JSON.parse(readFileSync('content/gallery.json', 'utf8')),
+          pathToFileURL('src/assets/gallery/'));"
+      - if: steps.run.outputs.added != '0'
+        name: Commit the cleaned photos here
+        run: |
+          for r in . .inbox; do
+            git -C "$r" config user.name "github-actions[bot]"
+            git -C "$r" config user.email \
+              "41898283+github-actions[bot]@users.noreply.github.com"
+          done
+          git add src/assets/gallery content/gallery.json
+          { echo "Gallery: add bot-submitted photos"; echo
+            cat "$RUNNER_TEMP/added.txt"; } | git commit -s -F -
+          for _ in 1 2 3; do
+            git push origin HEAD:main && exit 0
+            git pull --rebase origin main
+          done
+          exit 1
+      - if: steps.run.outputs.added != '0'
+        # only after the public commit landed, so a failure loses nothing
+        name: Delete the originals from staging
+        run: |
+          git -C .inbox add -A incoming/gallery
+          git -C .inbox commit -s -q -m "Gallery intake: originals removed"
+          git -C .inbox push
+      - if: steps.run.outputs.added != '0'
+        # our own push doesn't start the deploy, so ask for it
+        run: gh workflow run deploy.yml --ref main
+        env:
+          GH_TOKEN: ${{ github.token }}

@@ -7,3 +7,6 @@ dist/
 .linkcheck/
 .gstack/
 .claude/
+# raw bot photos belong in the private staging repo, never here
+incoming/
+.inbox/
