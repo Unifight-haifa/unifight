@@ -60,3 +60,21 @@ ffmpeg, draws the dot map, tatami strip and ink map, copies the logo and cuts bo
 - Map: Natural Earth 1:110m land, public domain.
 - Fonts (SIL OFL, from google/fonts): Oswald, Rubik, Secular One, Yuji Boku (subset to the kanji used).
 - Remotion is free for non-profit organisations under its licence (the club is an amuta).
+
+## Club promo
+
+`Promo` (`src/Promo.jsx`, copy and shot lists in `src/promoData.js`) is the channel trailer:
+about 71 s in 16:9 and a 38 s 9:16 cutdown, in ru, he or en.
+
+```sh
+python3 -I scripts/prep_promo.py ../assets/source    # clips, photos, music, SFX into public/promo/ (gitignored)
+scripts/render_promo.sh ru 16x9 out/promo-ru-16x9.mp4  # also writes out/promo-ru-16x9-720p.mp4
+```
+
+The render is normalised to -14 LUFS. Only camera material is used; the WhatsApp fight copies
+are shown framed and small rather than blown up.
+
+- Music: "Hero Suite A" by some-weirdo, CC0, https://opengameart.org/content/hero-suite-a.
+  Cuts follow its ~95.7 BPM grid; the drop is beat 225.
+- SFX, all CC0 from OpenGameArt: "Wind, hit, time morph" (qubodup), "75 CC0 breaking / falling / hit sfx"
+  (rubberduck), "Heartbeat sounds" (bart), "Breathing Tired" (mikeask).
