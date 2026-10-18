@@ -49,6 +49,7 @@ const title = `${a.title[lang]} · ${t(lang, 'siteName')}`;
 const levels = LEVELS.filter((l) => achievements.some((c) => c.level === l)) as (keyof typeof s.levels)[];
 const years = [...new Set(achievements.flatMap((c) => c.years))].sort((x, y) => y - x);
 // highlights: "Name — event" titles: the name goes above the event, as on the landing cards
+const KANJI = { olympics: '五輪', world: '世界', europe: '欧州', israel: '一本' };
 const split = (x: string) => (x.includes(' — ') ? x.split(' — ', 2) : [null, x]);
 const ld = {
   '@context': 'https://schema.org',
@@ -81,8 +82,12 @@ const ld = {
         const [who, what] = 'person' in c ? split(c.title[lang]) : [null, c.title[lang]];
         return (
           <li class:list={['club-card', `lv-${c.level}`]} data-level={c.level} data-years={c.years.join(' ')}>
-            <Image src={photo(c.photo)} alt={c.alt[lang]} widths={[400, 800]} sizes="(min-width: 900px) 300px, 100vw" />
-            <p class="club-card-meta"><bdi dir="ltr">{c.year}</bdi> · {s.levels[c.level as keyof typeof s.levels]}</p>
+            {c.photo ? (
+              <Image src={photo(c.photo)} alt={c.alt![lang]} widths={[400, 800]} sizes="(min-width: 900px) 300px, 100vw" />
+            ) : (
+              <div class="club-card-type" aria-hidden="true"><span class="kj">{KANJI[c.level as keyof typeof KANJI]}</span><span class="club-card-year" dir="ltr">{c.year}</span></div>
+            )}
+            <p class="club-card-meta"><bdi dir="ltr">{c.year}</bdi> <span class="club-lv">{s.levels[c.level as keyof typeof s.levels]}</span></p>
             {who && <p class="hl-who">{who}</p>}
             <h2 class="h3" set:html={bidi(lang, what!)} />
             {c.detail && <p set:html={bidi(lang, c.detail[lang])} />}

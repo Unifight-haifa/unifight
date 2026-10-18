@@ -47,15 +47,19 @@ const all: Tournament[] = Object.entries(files).map(([p, t]) => {
 });
 export const tournaments = published(all) as Tournament[];
 
-type Card = Sourced & { id: string; level: string; years: number[]; year: string; title: T; detail?: T; photo: string; alt: T };
+type Card = Sourced & { id: string; level: string; years: number[]; year: string; title: T; detail?: T; photo?: string; alt?: T; photo_source?: string };
 const known = new Map<string, Record<string, unknown>>(
   [...site.achievements.highlights, ...site.achievements.more_results.map((m) => ({ ...m, title: m.text }))].map((h) => [h.id, h]),
 );
 const cards = achievementsData.items.map((a) => ({ ...known.get(a.id), ...a }) as unknown as Card);
-checkEntries(cards, 'achievements', ['title', 'alt']);
+checkEntries(cards, 'achievements', ['title']);
 for (const c of cards) {
   if (!LEVELS.includes(c.level)) throw new Error(`achievements ${c.id}: level must be one of ${LEVELS.join(', ')}`);
   if (!c.years?.length || !c.years.every(Number.isInteger)) throw new Error(`achievements ${c.id}: years must be whole years`);
+  // a named card with someone else's photo misleads, so every photo states why it matches
+  if (!c.photo) continue;
+  if (!c.photo_source?.trim()) throw new Error(`achievements ${c.id}: photo needs a photo_source saying why it shows this athlete or event`);
+  checkEntries([{ ...c }], `achievements ${c.id}`, ['alt']);
   photo(c.photo);
 }
 export const achievements = (published(cards) as Card[]).sort((a, b) => Math.max(...b.years) - Math.max(...a.years));

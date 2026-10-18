@@ -121,6 +121,17 @@ test('sitemap, landing nav and "more" links reach the new pages', () => {
   assert.equal(landing.match(/class="more-link"/g).length, 3);
 });
 
+test('achievement cards show a photo only when its photo_source says why it matches', () => {
+  const items = json('../content/achievements.json').items;
+  for (const it of items) if (it.photo) assert.ok(it.photo_source?.trim(), it.id);
+  const html = read('en/achievements/index.html');
+  const cards = html.match(/<li class="club-card[\s\S]*?<\/li>/g);
+  const typed = cards.filter((c) => c.includes('club-card-type'));
+  assert.ok(typed.length > 0);
+  for (const c of typed) assert.ok(!/<img\b/.test(c), c.slice(0, 120));
+  assert.equal(cards.length - typed.length, items.filter((i) => i.photo).length);
+});
+
 test('achievement filters are progressive: without JS every card shows', () => {
   for (const [l] of LANGS) {
     const html = read(`${l}/achievements/index.html`);

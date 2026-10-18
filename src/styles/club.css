@@ -20,12 +20,18 @@
 .club-filters { display: grid; gap: 10px; margin-block-end: 28px; }
 .club-cards, .club-photos { list-style: none; padding: 0; display: grid; gap: 22px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr)); }
 .club-card { display: grid; align-content: start; gap: 8px; background: var(--ink-2); border: 1px solid var(--line); border-radius: 2px; padding-block-end: 18px; }
-.club-card > :not(img) { margin-inline: 18px; }
+.club-card > :not(img, .club-card-type) { margin-inline: 18px; }
 .club-card img, .club-photos img { inline-size: 100%; block-size: auto; aspect-ratio: 4 / 3; object-fit: cover; }
-.club-card .h3 { font-size: 20px; margin: 0; }
+.club-card .h3 { font-size: 20px; margin-block: 0; }
 .club-card p:last-child { color: var(--paper-2); font-size: 15.5px; }
 .club-card-meta { color: var(--mute); font-size: 14px; }
 .lv-olympics { border-color: var(--gold); }
+/* cards without a verified photo: year and a kanji accent instead of a stand-in picture */
+.club-card-type { position: relative; overflow: hidden; display: grid; align-items: end; aspect-ratio: 4 / 3; padding: 18px; background: radial-gradient(90% 80% at 100% 0%, rgba(212,168,75,.16), transparent 60%), var(--ink-3); border-block-end: 1px solid var(--line); }
+.club-card-type .kj { position: absolute; inset-block-start: 10px; inset-inline-end: 14px; font-size: 64px; line-height: 1; color: rgba(212,168,75,.28); }
+.club-card-year { justify-self: start; font: 600 clamp(40px, 6vw, 56px)/1 "Oswald", sans-serif; color: var(--gold-2); }
+.lv-israel .club-card-year { color: var(--red-3); }
+.club-lv { display: inline-block; margin-inline-start: 6px; padding: 3px 8px; font-size: 12px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--ink); background: var(--gold); }
 
 .club-events, .club-results, .club-slots { list-style: none; padding: 0; display: grid; gap: 12px; }
 .club-events li { padding: 14px 16px; background: var(--ink-2); border: 1px solid var(--line); }
