@@ -61,21 +61,31 @@
   },
   {
    "id": "achievements",
+   "href": "achievements/",
    "he": "הישגים",
    "ru": "Достижения",
    "en": "Achievements"
   },
   {
    "id": "history",
+   "href": "history/",
    "he": "הסיפור שלנו",
    "ru": "История",
    "en": "Our story"
   },
   {
    "id": "tournaments",
+   "href": "tournaments/",
    "he": "תחרויות",
    "ru": "Турниры",
    "en": "Tournaments"
+  },
+  {
+   "id": "nivheret",
+   "href": "nivheret/",
+   "he": "נבחרת המועדון",
+   "ru": "Сборная клуба",
+   "en": "Selected team"
   },
   {
    "id": "camps",
@@ -826,7 +836,12 @@
     ],
     "confidence": "confirmed"
    }
-  ]
+  ],
+  "more": {
+   "he": "כל ההישגים",
+   "ru": "Все достижения",
+   "en": "All achievements"
+  }
  },
  "history": {
   "title": {
@@ -1048,7 +1063,12 @@
     "confidence": "confirmed",
     "note": "medal counts in achievements.more_results (2026)"
    }
-  ]
+  ],
+  "more": {
+   "he": "הסיפור המלא",
+   "ru": "Вся история",
+   "en": "Full story"
+  }
  },
  "tournaments": {
   "title": {
@@ -1156,6 +1176,11 @@
    ],
    "confidence": "confirmed",
    "note": "Sources name the Israeli sumo association as organizer, not Unifight. Do not write 'Unifight organized'."
+  },
+  "more": {
+   "he": "כל התחרויות",
+   "ru": "Все турниры",
+   "en": "All tournaments"
   }
  },
  "camps": {

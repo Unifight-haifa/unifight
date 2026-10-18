@@ -38,6 +38,7 @@ html[lang=he] :is(.h1,.h2,.h3,.h4){font-weight:400;letter-spacing:0}
 .sh{margin-block-end:clamp(32px,5vw,56px)}
 .ph{display:inline-block;color:var(--gold-2);background:rgba(212,168,75,.08);border:1px dashed rgba(241,211,138,.6);padding:.12em .55em;border-radius:3px;font-size:.88em;line-height:1.45}
 .more-ph{margin-block-start:22px}
+.more-link{margin-block-start:32px}
 .pic{inline-size:100%;block-size:100%;object-fit:cover;filter:grayscale(.35) sepia(.18) contrast(1.08) brightness(.86);transition:filter .6s,transform .8s}
 :is(figure,.band,.ach-pics,.t-pics,.camp-mo,.fc-pics,.soon-pics,.hist-pics,.ct-pic) .pic:hover{filter:none}
 

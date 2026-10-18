@@ -111,6 +111,11 @@ def head(nav_id, kanji, title, intro=None):
             f'<h2 class="h2">{t(title)}</h2>{p}</div>')
 
 
+def more_link(sec, href):
+    """Link from a landing block to its full page; relative href keeps the visitor's language."""
+    return f'<p class="more-link"><a class="btn btn-ghost" href="{href}">{t(sec["more"])} {ARROW}</a></p>'
+
+
 def split_dash(o):
     """'Name — event' titles -> (name, event) per language, or None."""
     if all(" — " in o[l] for l in LANGS):
@@ -318,6 +323,7 @@ def achievements():
    <ul class="more-list rv">{more}</ul>
    <div class="ach-pics rv">{pics}</div>
   </div>
+  {more_link(a, "achievements/")}
   <div class="cta-band rv">
    <p class="cta-line">{t(C["taglines"][2])}</p>
    <div class="cta-row"><a class="btn btn-wa btn-lg" href="{hero["cta_primary"]["href"]}">{t(hero["cta_primary"])} {ARROW}</a></div>
@@ -339,6 +345,7 @@ def history():
    <div class="hist-pics">{img("camp-group.jpg", "pic")}{img("tour-north-hall.jpg", "pic")}</div>
    <ol class="tl">{items}</ol>
   </div>
+  {more_link(hi, "history/")}
  </div>
  <div class="strip" tabindex="0" role="region" {attr("aria-label", A11Y["gallery"])}>{strip}</div>
 </section>'''
@@ -364,6 +371,7 @@ def tournaments():
   <article class="sumo rv"><div class="sumo-k kj" aria-hidden="true"><span>相撲</span></div>
    <div class="sumo-b"><h3 class="h3 sumo-t">{t(s["title"])}</h3>
    <p>{t(s["text"])}</p></div></article>
+  {more_link(to, "tournaments/")}
  </div>
 </section>'''
 
