@@ -1,0 +1,32 @@
+/* gallery page; palette, .chip and .news layout come from landing.css and news.css */
+.gal-filter { margin-block: 8px 28px; }
+.gal-filter[hidden], .gal-sec[hidden] { display: none; }
+.gal-sec + .gal-sec { margin-block-start: 48px; }
+.gal-h { color: var(--paper); margin-block-end: 8px; }
+.gal-desc { color: var(--mute); margin-block-end: 16px; }
+
+.gal { list-style: none; padding: 0; margin-block-start: 16px; column-count: 2; column-gap: 10px; }
+@media (min-width: 700px) { .gal { column-count: 3; column-gap: 14px; } }
+@media (min-width: 1100px) { .gal { column-count: 4; } }
+.gal li { break-inside: avoid; margin-block-end: 10px; }
+.gal a { display: block; border: 1px solid var(--line); border-radius: 2px; transition: border-color .2s; }
+.gal a:hover { border-color: var(--gold); }
+.gal a:focus-visible { outline: 3px solid var(--gold-2); outline-offset: 2px; }
+.gal img { display: block; inline-size: 100%; block-size: auto; }
+
+/* image, caption and buttons fit any viewport; horizontal pans are left to the swipe handler */
+.lb { inline-size: 100vw; block-size: 100dvh; max-inline-size: none; max-block-size: none; margin: 0; padding: 0; border: 0; background: rgb(0 0 0 / .94); color: var(--paper); touch-action: pan-y pinch-zoom; }
+.lb::backdrop { background: rgb(0 0 0 / .85); }
+.lb[open] { display: grid; }
+.lb-fig { grid-area: 1 / 1; display: grid; grid-template-rows: 1fr auto; place-items: center; min-block-size: 0; margin: 0; padding-block: 56px 8px; padding-inline: 8px; }
+.lb-img, .lb-img picture { display: contents; }
+.lb-img img { max-inline-size: 100%; max-block-size: calc(100dvh - 140px); inline-size: auto; block-size: auto; object-fit: contain; }
+.lb-cap { max-inline-size: 70ch; padding-block: 10px; padding-inline: 56px; text-align: center; font-size: 15px; }
+.lb-n { color: var(--mute); white-space: nowrap; }
+.lb-btn { position: absolute; inline-size: 44px; block-size: 44px; border: 0; border-radius: 50%; background: rgb(19 17 15 / .7); color: var(--paper); font: 400 30px/1 var(--body); cursor: pointer; }
+.lb-btn:hover { background: var(--red); }
+.lb-btn:focus-visible { outline: 3px solid var(--gold-2); outline-offset: 2px; }
+.lb-close { inset-block-start: 8px; inset-inline-end: 8px; }
+.lb-prev, .lb-next { inset-block-start: calc(50% - 22px); }
+.lb-prev { inset-inline-start: 8px; }
+.lb-next { inset-inline-end: 8px; }

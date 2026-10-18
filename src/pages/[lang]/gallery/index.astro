@@ -1,0 +1,200 @@
+---
+import { Picture, getImage } from 'astro:assets';
+import { i18n } from 'astro:config/client';
+import { getRelativeLocaleUrl } from 'astro:i18n';
+import gallery from '../../../../content/gallery.json';
+import fonts from '../../../generated/fonts.json';
+import Base from '../../../layouts/Base.astro';
+import JsonLd from '../../../components/JsonLd.astro';
+import { LANGS, t, type Lang } from '../../../i18n/ui';
+import '../../../styles/landing.css';
+import '../../../styles/news.css';
+import '../../../styles/gallery.css';
+
+export function getStaticPaths() {
+  return i18n!.locales.map((lang) => ({ params: { lang } }));
+}
+
+const lang = Astro.params.lang as Lang;
+const s = {
+  he: {
+    title: 'תמונות',
+    desc: 'תמונות ממועדון הג׳ודו יוניפייט חיפה: אימונים, תחרויות, מחנות אימונים וחיי המועדון.',
+    all: 'הכול',
+    filter: 'סינון לפי אלבום',
+    viewer: 'צפייה בתמונה',
+    close: 'סגירה',
+    prev: 'התמונה הקודמת',
+    next: 'התמונה הבאה',
+  },
+  ru: {
+    title: 'Фото',
+    desc: 'Фотографии клуба дзюдо «Юнифайт Хайфа»: тренировки, соревнования, сборы и жизнь клуба.',
+    all: 'Все',
+    filter: 'Фильтр по альбому',
+    viewer: 'Просмотр фото',
+    close: 'Закрыть',
+    prev: 'Предыдущее фото',
+    next: 'Следующее фото',
+  },
+  en: {
+    title: 'Photos',
+    desc: 'Photos from the Unifight Haifa judo club: training, competitions, camps and club life.',
+    all: 'All',
+    filter: 'Filter by album',
+    viewer: 'Photo viewer',
+    close: 'Close',
+    prev: 'Previous photo',
+    next: 'Next photo',
+  },
+}[lang];
+
+const files = import.meta.glob<{ default: ImageMetadata }>('../../../assets/gallery/*/*.{jpg,jpeg}', { eager: true });
+const src = (file: string) => files[`../../../assets/gallery/${file}`].default;
+const abs = (path: string) => new URL(path, Astro.site).href;
+const url = abs(getRelativeLocaleUrl(lang, 'gallery/'));
+const title = `${s.title} · ${t(lang, 'siteName')}`;
+const LOCALE = { he: 'he_IL', ru: 'ru_RU', en: 'en_US' };
+const WIDTHS = [400, 800, 1600];
+// the no-JS link target; same transform as the srcset's widest entry, so it is built once
+const large = (img: ImageMetadata) => getImage({ src: img, width: Math.min(1600, img.width), format: 'webp' });
+const albums = await Promise.all(
+  gallery.map(async (a) => ({
+    ...a,
+    photos: await Promise.all(a.photos.map(async (p) => ({ ...p, img: src(p.file), large: await large(src(p.file)) }))),
+  })),
+);
+const picks = albums.flatMap((a) => a.photos).filter((p) => p.featured);
+// share cards want 1200 px; a smaller featured photo is only the fallback
+const featured = picks.find((p) => p.img.width >= 1200) ?? picks[0];
+const og = await getImage({ src: featured.img, width: 1200, format: 'jpg' });
+const label = (p: (typeof albums)[number]['photos'][number]) => ('caption' in p && p.caption ? p.caption[lang] : p.alt[lang]);
+const ld = {
+  '@context': 'https://schema.org',
+  '@type': 'ImageGallery',
+  name: title,
+  description: s.desc,
+  url,
+  inLanguage: lang,
+  image: albums.flatMap((a) =>
+    a.photos.map((p) => ({
+      '@type': 'ImageObject',
+      contentUrl: abs(p.large.src),
+      width: p.large.attributes.width,
+      height: p.large.attributes.height,
+      description: p.alt[lang],
+      ...('caption' in p && p.caption && { caption: p.caption[lang] }),
+      ...('year' in p && p.year && { dateCreated: String(p.year) }),
+    })),
+  ),
+};
+---
+<Base lang={lang} title={title} description={s.desc}>
+  <Fragment slot="head">
+    <link rel="canonical" href={url} />
+    {LANGS.map((l) => <link rel="alternate" hreflang={l} href={abs(getRelativeLocaleUrl(l, 'gallery/'))} />)}
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={t(lang, 'siteName')} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={s.desc} />
+    <meta property="og:url" content={url} />
+    <meta property="og:image" content={abs(og.src)} />
+    <meta property="og:image:width" content={String(og.attributes.width)} />
+    <meta property="og:image:height" content={String(og.attributes.height)} />
+    <meta property="og:image:alt" content={featured.alt[lang]} />
+    <meta property="og:locale" content={LOCALE[lang]} />
+    {LANGS.filter((l) => l !== lang).map((l) => <meta property="og:locale:alternate" content={LOCALE[l]} />)}
+    <meta name="twitter:card" content="summary_large_image" />
+    <JsonLd data={ld} />
+    {(fonts as string[]).map((href) => <link rel="stylesheet" href={href} />)}
+  </Fragment>
+  <div class="news">
+    <h1 class="h2">{s.title}</h1>
+    <div class="chips gal-filter" role="group" aria-label={s.filter} data-gal-filter hidden>
+      <button type="button" class="chip" data-filter="" aria-pressed="true">{s.all}</button>
+      {albums.map((a) => <button type="button" class="chip" data-filter={a.id} aria-pressed="false">{a.title[lang]}</button>)}
+    </div>
+    {albums.map((a) => (
+      <section class="gal-sec" data-album={a.id} aria-labelledby={`album-${a.id}`}>
+        <h2 class="h3 gal-h" id={`album-${a.id}`}>{a.title[lang]}</h2>
+        {a.description && <p class="gal-desc">{a.description[lang]}</p>}
+        <ul class="gal">
+          {a.photos.map((p) => (
+            <li>
+              {/* plain link to the large file without JS; the script opens the lightbox instead */}
+              <a href={p.large.src} data-gal-item data-caption={label(p)} data-ga="gallery_open" data-ga-album={a.id}>
+                <Picture src={p.img} alt={p.alt[lang]} widths={WIDTHS.filter((w) => w < p.img.width).concat(Math.min(1600, p.img.width))} sizes="(min-width: 1100px) 270px, (min-width: 700px) 31vw, 46vw" formats={['avif']} fallbackFormat="webp" />
+              </a>
+            </li>
+          ))}
+        </ul>
+      </section>
+    ))}
+  </div>
+  <dialog class="lb" aria-label={s.viewer} data-lb>
+    <figure class="lb-fig">
+      <div class="lb-img"></div>
+      <figcaption class="lb-cap"><span data-lb-cap></span> <span class="lb-n" data-lb-n dir="ltr"></span></figcaption>
+    </figure>
+    <button type="button" class="lb-btn lb-close" data-lb-close aria-label={s.close}>×</button>
+    <button type="button" class="lb-btn lb-prev" data-lb-step="-1" aria-label={s.prev}>‹</button>
+    <button type="button" class="lb-btn lb-next" data-lb-step="1" aria-label={s.next}>›</button>
+  </dialog>
+  <script is:inline>
+    (function () {
+      var dlg = document.querySelector('[data-lb]'), box = dlg.querySelector('.lb-img'), items = [], i = 0, opener, x0;
+      var rtl = document.documentElement.dir === 'rtl';
+      var bar = document.querySelector('[data-gal-filter]');
+      bar.hidden = false;
+      bar.addEventListener('click', function (e) {
+        var b = e.target.closest('[data-filter]');
+        if (!b) return;
+        var f = b.dataset.filter;
+        bar.querySelectorAll('[data-filter]').forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); });
+        document.querySelectorAll('.gal-sec').forEach(function (sec) { sec.hidden = !!f && sec.dataset.album !== f; });
+      });
+      function show(n) {
+        i = (n + items.length) % items.length;
+        var a = items[i], pic = a.querySelector('picture').cloneNode(true), img = pic.querySelector('img');
+        // the grid's srcset already reaches 1600w; a full-viewport sizes makes the browser pick it
+        pic.querySelectorAll('source, img').forEach(function (el) { el.sizes = '100vw'; });
+        img.loading = 'eager';
+        // a native image drag would swallow mouse swipes
+        img.draggable = false;
+        box.replaceChildren(pic);
+        dlg.querySelector('[data-lb-cap]').textContent = a.dataset.caption;
+        dlg.querySelector('[data-lb-n]').textContent = (i + 1) + ' / ' + items.length;
+      }
+      document.addEventListener('click', function (e) {
+        var a = e.target.closest && e.target.closest('a[data-gal-item]');
+        if (!a || e.ctrlKey || e.metaKey || e.shiftKey || e.altKey || e.button) return;
+        e.preventDefault();
+        opener = a;
+        items = [].filter.call(document.querySelectorAll('a[data-gal-item]'), function (x) { return !x.closest('[hidden]'); });
+        show(items.indexOf(a));
+        dlg.showModal();
+        dlg.querySelector('[data-lb-close]').focus();
+      });
+      dlg.addEventListener('click', function (e) {
+        var b = e.target.closest('[data-lb-step]');
+        if (b) show(i + Number(b.dataset.lbStep));
+        else if (e.target === dlg || e.target.closest('[data-lb-close]')) dlg.close();
+      });
+      // arrow keys follow the reading direction
+      dlg.addEventListener('keydown', function (e) {
+        var d = { ArrowLeft: -1, ArrowRight: 1 }[e.key];
+        if (d) { e.preventDefault(); show(i + (rtl ? -d : d)); }
+      });
+      dlg.addEventListener('pointerdown', function (e) { x0 = e.clientX; });
+      dlg.addEventListener('pointerup', function (e) {
+        var dx = e.clientX - x0;
+        if (Math.abs(dx) > 40) show(i + ((dx < 0) !== rtl ? 1 : -1));
+      });
+      // Esc closes natively
+      dlg.addEventListener('close', function () {
+        box.textContent = '';
+        if (opener) opener.focus();
+      });
+    })();
+  </script>
+</Base>

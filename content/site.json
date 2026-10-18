@@ -114,6 +114,13 @@
    "he": "וידאו",
    "ru": "Видео",
    "en": "Video"
+  },
+  {
+   "id": "gallery",
+   "href": "gallery/",
+   "he": "תמונות",
+   "ru": "Фото",
+   "en": "Photos"
   }
  ],
  "language_switch": {

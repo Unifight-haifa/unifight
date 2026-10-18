@@ -6,7 +6,7 @@ from playwright.sync_api import sync_playwright
 base = sys.argv[1]
 # vendored and pinned so the scan is offline and repeatable; .txt keeps node --test from running it
 AXE = Path(__file__).with_name("vendor") / "axe-core" / "axe.min.js.txt"
-PAGES = ("", "news/", "video/", "privacy/", "accessibility/")
+PAGES = ("", "news/", "video/", "gallery/", "privacy/", "accessibility/")
 TAGS = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"]
 
 bad = []
@@ -35,6 +35,13 @@ with sync_playwright() as p:
                     page.click(".tk-pause")
                     looping = page.evaluate("document.getAnimations().filter(a => a.playState === 'running' && a.effect.getTiming().iterations === Infinity).length")
                     assert looping == 0, f"{lang}: {looping} animations still running after pause"
+                if path == "gallery/":
+                    # the open lightbox is scanned too; Esc closes it and focus returns to the photo
+                    page.click("a[data-gal-item]")
+                    res = page.evaluate("t => axe.run(document, {runOnly: {type: 'tag', values: t}})", TAGS)
+                    bad += [f"{lang}/{path}@{width} lightbox: {v['id']}" for v in res["violations"] if v["impact"] in ("serious", "critical")]
+                    page.keyboard.press("Escape")
+                    assert page.evaluate("document.activeElement.matches('a[data-gal-item]')"), f"{lang}: focus lost after the lightbox"
                 page.close()
     browser.close()
 assert not bad, "\n".join(bad)

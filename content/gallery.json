@@ -1,0 +1,665 @@
+[
+ {
+  "id": "training",
+  "title": {
+   "he": "אימונים",
+   "ru": "Тренировки",
+   "en": "Training"
+  },
+  "photos": [
+   {
+    "file": "training/coach-ilana-throw-demo-2.jpg",
+    "alt": {
+     "he": "מאמנת מדגימה הטלה עם שותפה",
+     "ru": "Тренер показывает бросок с партнёршей",
+     "en": "A coach demonstrating a throw with a partner"
+    },
+    "year": 2020
+   },
+   {
+    "file": "training/training-throw-studio.jpg",
+    "alt": {
+     "he": "הדגמת הטלה באוויר",
+     "ru": "Демонстрация броска в полёте",
+     "en": "A throw demonstration caught mid-air"
+    },
+    "year": 2020
+   },
+   {
+    "file": "training/training-throw-studio-2.jpg",
+    "alt": {
+     "he": "הדגמת הטלה על מזרן כחול",
+     "ru": "Демонстрация броска на синем татами",
+     "en": "A throw demonstration on a blue mat"
+    },
+    "year": 2020
+   },
+   {
+    "file": "training/training-outdoor-randori.jpg",
+    "alt": {
+     "he": "אימון רנדורי בחוץ על הדשא",
+     "ru": "Тренировочные схватки на траве",
+     "en": "Outdoor randori practice on grass"
+    },
+    "year": 2020
+   },
+   {
+    "file": "training/groundwork.jpg",
+    "alt": {
+     "he": "שני ג׳ודוקאים מתאמנים בקרב קרקע על המזרן הכחול",
+     "ru": "Двое дзюдоистов отрабатывают борьбу в партере на синем татами",
+     "en": "Two judoka practising groundwork on the blue mat"
+    }
+   },
+   {
+    "file": "training/train-sukkot-randori.jpg",
+    "alt": {
+     "he": "זוגות מתאמנים ברנדורי על המזרן הכחול במחנה האימונים",
+     "ru": "Пары отрабатывают рандори на синем татами во время сборов",
+     "en": "Pairs practising randori on the blue mat at the training camp"
+    },
+    "featured": true
+   },
+   {
+    "file": "training/train-georgia-randori.jpg",
+    "alt": {
+     "he": "בני נוער מתאמנים בהטלות על מזרן צהוב באולם בגאורגיה",
+     "ru": "Подростки отрабатывают броски на жёлтом татами в зале в Грузии",
+     "en": "Teenagers practising throws on a yellow mat in a hall in Georgia"
+    }
+   },
+   {
+    "file": "training/train-georgia-cooldown.jpg",
+    "alt": {
+     "he": "בני נוער מתמתחים ליד קיר מרופד אחרי אימון",
+     "ru": "Подростки растягиваются у мягкой стены после тренировки",
+     "en": "Teenagers stretching against a padded wall after training"
+    }
+   },
+   {
+    "file": "training/rope-climb.jpg",
+    "alt": {
+     "he": "ילדים בחליפות ג׳ודו מטפסים על חבלים באולם האימונים",
+     "ru": "Дети в кимоно лазают по канатам в зале",
+     "en": "Children in judo suits climbing ropes in the training hall"
+    }
+   },
+   {
+    "file": "training/kids-coach.jpg",
+    "alt": {
+     "he": "מאמן עם קבוצת ילדים בחליפות ג׳ודו לבנות וכחולות על המזרן",
+     "ru": "Тренер с группой детей в белых и синих кимоно на татами",
+     "en": "A coach with a group of children in white and blue judo suits on the mat"
+    }
+   },
+   {
+    "file": "training/girls-wrestling-coaching.jpg",
+    "alt": {
+     "he": "מאמנת מדריכה בנות באימון היאבקות",
+     "ru": "Тренер объясняет девочкам упражнение на тренировке по борьбе",
+     "en": "A coach guiding girls during a wrestling session"
+    }
+   }
+  ]
+ },
+ {
+  "id": "competitions",
+  "title": {
+   "he": "תחרויות ופודיומים",
+   "ru": "Соревнования и пьедесталы",
+   "en": "Competitions & podiums"
+  },
+  "photos": [
+   {
+    "file": "competitions/intl-competition-throw.jpg",
+    "alt": {
+     "he": "הטלה בתחרות בינלאומית של איגוד הג׳ודו האירופי",
+     "ru": "Бросок на международном турнире Европейского союза дзюдо",
+     "en": "A throw at a European Judo Union competition"
+    }
+   },
+   {
+    "file": "competitions/intl-competition-throw-2.jpg",
+    "alt": {
+     "he": "הטלה על המזרן הצהוב בתחרות בינלאומית",
+     "ru": "Бросок на жёлтом татами на международном турнире",
+     "en": "A throw on the yellow mat at an international event"
+    }
+   },
+   {
+    "file": "competitions/intl-competition-grips.jpg",
+    "alt": {
+     "he": "מאבק אחיזות בתחרות בינלאומית",
+     "ru": "Борьба за захват на международном турнире",
+     "en": "Grip fighting at an international competition"
+    }
+   },
+   {
+    "file": "competitions/competition-throw-tatami.jpg",
+    "alt": {
+     "he": "הטלה בתחרות על מזרן אדום-צהוב",
+     "ru": "Бросок на соревнованиях на красно-жёлтом татами",
+     "en": "A throw in competition on a red and yellow mat"
+    }
+   },
+   {
+    "file": "competitions/podium-riga-european-cup.jpg",
+    "alt": {
+     "he": "פודיום גביע אירופה לבוגרים בריגה",
+     "ru": "Пьедестал Кубка Европы среди взрослых в Риге",
+     "en": "Podium at the Riga Senior European Cup"
+    },
+    "featured": true
+   },
+   {
+    "file": "competitions/podium-sarajevo.jpg",
+    "alt": {
+     "he": "פודיום בסבב הג׳ודו האירופי בסרייבו",
+     "ru": "Пьедестал Европейского тура по дзюдо в Сараеве",
+     "en": "Podium at the European Judo Tour in Sarajevo"
+    }
+   },
+   {
+    "file": "competitions/podium-sarajevo-silver.jpg",
+    "alt": {
+     "he": "מדליסט כסף בסבב הג׳ודו האירופי בסרייבו",
+     "ru": "Серебряный призёр Европейского тура по дзюдо в Сараеве",
+     "en": "Silver medallist at the European Judo Tour in Sarajevo"
+    }
+   },
+   {
+    "file": "competitions/podium-cadet-european-cup.jpg",
+    "alt": {
+     "he": "פודיום גביע אירופה לקדטים בביילסקו-ביאלה",
+     "ru": "Пьедестал Кубка Европы среди кадетов в Бельско-Бяле",
+     "en": "Podium at the Cadet European Cup in Bielsko-Biala"
+    }
+   },
+   {
+    "file": "competitions/medallists-bronze-coach.jpg",
+    "alt": {
+     "he": "שני מדליסטי ארד עם המאמן",
+     "ru": "Двое бронзовых призёров с тренером",
+     "en": "Two bronze medallists with their coach"
+    }
+   },
+   {
+    "file": "competitions/sambo-federation-podium.jpg",
+    "alt": {
+     "he": "פודיום באליפות של התאחדות הסמבו בישראל",
+     "ru": "Пьедестал соревнований Федерации самбо Израиля",
+     "en": "Podium at an Israel Sambo Federation event"
+    }
+   },
+   {
+    "file": "competitions/medals-team.jpg",
+    "alt": {
+     "he": "ספורטאים עם מדליות ומאמנים על המזרן באולם התחרויות",
+     "ru": "Спортсмены с медалями и тренеры на татами в зале соревнований",
+     "en": "Athletes with medals and coaches on the mat in a competition hall"
+    }
+   },
+   {
+    "file": "competitions/medals-kids.jpg",
+    "alt": {
+     "he": "ילדים מציגים מדליות באליפות ישראל בג׳ודו, לצד שני מאמנים",
+     "ru": "Дети показывают медали на чемпионате Израиля по дзюдо, рядом двое тренеров",
+     "en": "Children showing their medals at the Israel Judo Championships, with two coaches"
+    }
+   },
+   {
+    "file": "competitions/intl-medals.jpg",
+    "alt": {
+     "he": "ג׳ודוקאים צעירים עם מדליות ודגל ישראל בטורניר בינלאומי בארפורט",
+     "ru": "Юные дзюдоисты с медалями и флагом Израиля на международном турнире в Эрфурте",
+     "en": "Young judoka with medals and an Israeli flag at an international tournament in Erfurt"
+    }
+   },
+   {
+    "file": "competitions/result-cadets-trio.jpg",
+    "alt": {
+     "he": "שלושה ג׳ודוקאים צעירים עם מדליות באולם התחרויות",
+     "ru": "Трое юных дзюдоистов с медалями в зале соревнований",
+     "en": "Three young judoka with medals in a competition hall"
+    }
+   },
+   {
+    "file": "competitions/hadera-team.jpg",
+    "alt": {
+     "he": "בני נוער עם מדליות ושני מאמנים מול כרזת האליפות הבינלאומית בג׳ודו בחדרה",
+     "ru": "Подростки с медалями и двое тренеров у баннера международного турнира по дзюдо в Хадере",
+     "en": "Teenagers with medals and two coaches in front of the International Judo Championships banner in Hadera"
+    }
+   },
+   {
+    "file": "competitions/result-jfp-haifa.jpg",
+    "alt": {
+     "he": "שלושה ילדים עם תעודות על הפודיום בטורניר Judo for Peace בחיפה",
+     "ru": "Трое детей с грамотами на пьедестале турнира Judo for Peace в Хайфе",
+     "en": "Three children with certificates on the podium at the Judo for Peace tournament in Haifa"
+    }
+   },
+   {
+    "file": "competitions/tour-north-hall.jpg",
+    "alt": {
+     "he": "ילדים בחליפות ג׳ודו יושבים בשורות לאורך המזרנים באולם מלא צופים",
+     "ru": "Дети в кимоно сидят рядами вдоль татами в зале, полном зрителей",
+     "en": "Rows of children in judo suits sitting along the mats in a hall full of spectators"
+    }
+   },
+   {
+    "file": "competitions/tour-kids-bout.jpg",
+    "alt": {
+     "he": "שני ילדים בקרב ג׳ודו על המזרן בתחרות",
+     "ru": "Двое детей в схватке на татами на турнире",
+     "en": "Two children in a judo bout on the mat at a tournament"
+    }
+   },
+   {
+    "file": "competitions/tour-kids-warmup.jpg",
+    "alt": {
+     "he": "ילדים מתחממים על המזרנים לפני תחרות",
+     "ru": "Дети разминаются на татами перед турниром",
+     "en": "Children warming up on the mats before a tournament"
+    }
+   }
+  ]
+ },
+ {
+  "id": "camps",
+  "title": {
+   "he": "מחנות אימונים",
+   "ru": "Сборы",
+   "en": "Camps"
+  },
+  "photos": [
+   {
+    "file": "camps/camp-beach-throw-sunset.jpg",
+    "alt": {
+     "he": "זריקת ג׳ודו על קו המים בשקיעה",
+     "ru": "Бросок дзюдо у кромки воды на закате",
+     "en": "A judo throw at the water's edge at sunset"
+    },
+    "caption": {
+     "he": "ג׳ודו על החוף, 2018",
+     "ru": "Дзюдо на пляже, 2018",
+     "en": "Beach judo, 2018"
+    },
+    "year": 2018,
+    "featured": true
+   },
+   {
+    "file": "camps/camp-beach-grip-fight.jpg",
+    "alt": {
+     "he": "שני ג׳ודוקאים במאבק אחיזות על החוף",
+     "ru": "Двое дзюдоистов в борьбе за захват на пляже",
+     "en": "Two judoka gripping on the beach"
+    },
+    "year": 2018
+   },
+   {
+    "file": "camps/camp-beach-sunset-workout.jpg",
+    "alt": {
+     "he": "אימון על חוף הים בשקיעה",
+     "ru": "Тренировка на пляже на закате",
+     "en": "Beach workout at sunset"
+    }
+   },
+   {
+    "file": "camps/camp-beach-team-judogi.jpg",
+    "alt": {
+     "he": "הקבוצה בחליפות ג׳ודו על חוף הים",
+     "ru": "Команда в кимоно на пляже",
+     "en": "The team in judogi on the beach"
+    }
+   },
+   {
+    "file": "camps/camp-beach-drills-dusk.jpg",
+    "alt": {
+     "he": "תרגילי כוח בזוגות על החוף",
+     "ru": "Силовые упражнения в парах на пляже",
+     "en": "Partner strength drills on the beach"
+    }
+   },
+   {
+    "file": "camps/camp-erfurt-flag.jpg",
+    "alt": {
+     "he": "הקבוצה עם דגל ישראל בחוץ, במסע לגרמניה",
+     "ru": "Группа с флагом Израиля на улице во время поездки в Германию",
+     "en": "The group with an Israeli flag outdoors on the trip to Germany"
+    }
+   },
+   {
+    "file": "camps/camp-erfurt-square.jpg",
+    "alt": {
+     "he": "הקבוצה בכיכר מרוצפת מול הקתדרלה של ארפורט",
+     "ru": "Группа на мощёной площади у Эрфуртского собора",
+     "en": "The group on a cobbled square in front of Erfurt Cathedral"
+    }
+   },
+   {
+    "file": "camps/dojo-lineup.jpg",
+    "alt": {
+     "he": "ג׳ודוקאים בחליפות לבנות עומדים בשורה באולם, מתחת לשלט Erfurter Judo-Club",
+     "ru": "Дзюдоисты в белых кимоно выстроились в зале под вывеской Erfurter Judo-Club",
+     "en": "Judoka in white suits lined up in a dojo under an Erfurter Judo-Club sign"
+    }
+   },
+   {
+    "file": "camps/camp-ropepark.jpg",
+    "alt": {
+     "he": "הקבוצה בכניסה לפארק חבלים ביער",
+     "ru": "Группа у входа в верёвочный парк в лесу",
+     "en": "The group at the entrance to a rope park in a forest"
+    }
+   },
+   {
+    "file": "camps/georgia-dojo.jpg",
+    "alt": {
+     "he": "ג׳ודוקאים ומאמנים עומדים בשורה באולם אימונים גדול בגאורגיה",
+     "ru": "Дзюдоисты и тренеры выстроились в большом зале в Грузии",
+     "en": "Judoka and coaches lined up in a large training hall in Georgia"
+    }
+   },
+   {
+    "file": "camps/train-georgia-outdoor.jpg",
+    "alt": {
+     "he": "בני נוער מתאמנים בחוץ בין העצים",
+     "ru": "Подростки тренируются на улице среди деревьев",
+     "en": "Teenagers training outdoors among the trees"
+    }
+   },
+   {
+    "file": "camps/camp-snow-wide.jpg",
+    "alt": {
+     "he": "הקבוצה על מדרון מושלג תחת שמיים כחולים",
+     "ru": "Группа на заснеженном склоне под синим небом",
+     "en": "The group on a snowy mountainside under a blue sky"
+    },
+    "featured": true
+   },
+   {
+    "file": "camps/snow-flag.jpg",
+    "alt": {
+     "he": "הקבוצה עם דגל ישראל בשלג, על רקע ההרים",
+     "ru": "Группа с флагом Израиля на снегу на фоне гор",
+     "en": "The group with an Israeli flag in the snow, mountains behind them"
+    }
+   },
+   {
+    "file": "camps/camp-gudauri.jpg",
+    "alt": {
+     "he": "אנשים הולכים בשלג למרגלות ההרים בגודאורי",
+     "ru": "Люди идут по снегу у подножия гор в Гудаури",
+     "en": "People walking across the snow below the mountains at Gudauri"
+    }
+   },
+   {
+    "file": "camps/camp-sukkot-mass.jpg",
+    "alt": {
+     "he": "משתתפי המחנה והמאמנים בתמונה קבוצתית על המזרן הכחול",
+     "ru": "Участники сборов и тренеры на общем фото на синем татами",
+     "en": "Camp participants and coaches in a group photo on the blue mat"
+    }
+   }
+  ]
+ },
+ {
+  "id": "club",
+  "title": {
+   "he": "חיי המועדון ואירועים",
+   "ru": "Жизнь клуба и события",
+   "en": "Club life & events"
+  },
+  "photos": [
+   {
+    "file": "club/club-group-banner.jpg",
+    "alt": {
+     "he": "תמונה קבוצתית של כל המועדון מתחת לשלט המועדון",
+     "ru": "Общее фото клуба под клубным баннером",
+     "en": "Whole-club group photo under the club banner"
+    },
+    "caption": {
+     "he": "יום צילומים במועדון, 2020",
+     "ru": "Фотосессия клуба, 2020",
+     "en": "Club photo shoot, 2020"
+    },
+    "year": 2020,
+    "featured": true
+   },
+   {
+    "file": "club/coaches-lineup-studio.jpg",
+    "alt": {
+     "he": "שישה ממאמני המועדון עומדים בשורה על המזרן",
+     "ru": "Шесть тренеров клуба в ряд на татами",
+     "en": "Six club coaches standing in a row on the mat"
+    },
+    "caption": {
+     "he": "יום צילומים במועדון, 2020",
+     "ru": "Фотосессия клуба, 2020",
+     "en": "Club photo shoot, 2020"
+    },
+    "year": 2020
+   },
+   {
+    "file": "club/coaches-fun-pose.jpg",
+    "alt": {
+     "he": "מאמני המועדון בתמונה קבוצתית משעשעת",
+     "ru": "Тренеры клуба в шуточной групповой позе",
+     "en": "Club coaches in a playful group pose"
+    },
+    "year": 2020
+   },
+   {
+    "file": "club/coach-with-flag.jpg",
+    "alt": {
+     "he": "מאמן בחליפה כחולה מחזיק את דגל ישראל",
+     "ru": "Тренер в синем кимоно с флагом Израиля",
+     "en": "A coach in a blue judogi holding the Israeli flag"
+    },
+    "year": 2020
+   },
+   {
+    "file": "club/coaches-alexander-ilana.jpg",
+    "alt": {
+     "he": "שני מאמני המועדון בחליפות ג׳ודו כחולות",
+     "ru": "Двое тренеров клуба в синих кимоно",
+     "en": "Two club coaches in blue judogi"
+    },
+    "year": 2020
+   },
+   {
+    "file": "club/coach-ilana-jump-flag.jpg",
+    "alt": {
+     "he": "מאמנת בחליפה כחולה קופצת עם דגל ישראל",
+     "ru": "Тренер в синем кимоно в прыжке с флагом Израиля",
+     "en": "A coach in a blue judogi jumping with the Israeli flag"
+    },
+    "year": 2020
+   },
+   {
+    "file": "club/coach-ilana-jump-trophy.jpg",
+    "alt": {
+     "he": "מאמנת בחליפה כחולה קופצת עם גביע",
+     "ru": "Тренер в синем кимоно в прыжке с кубком",
+     "en": "A coach in a blue judogi jumping with a trophy"
+    },
+    "year": 2020
+   },
+   {
+    "file": "club/coach-ilana-beach.jpg",
+    "alt": {
+     "he": "מתאבקת בבגד היאבקות של נבחרת ישראל בחוף הים",
+     "ru": "Борчиха в трико сборной Израиля на пляже",
+     "en": "A wrestler in an Israel team singlet at the beach"
+    },
+    "year": 2018
+   },
+   {
+    "file": "club/squad-lineup-studio.jpg",
+    "alt": {
+     "he": "נבחרת התחרויות של המועדון עם מאמנת",
+     "ru": "Соревновательная команда клуба с тренером",
+     "en": "The club's competition squad with a coach"
+    },
+    "caption": {
+     "he": "יום צילומים במועדון, 2020",
+     "ru": "Фотосессия клуба, 2020",
+     "en": "Club photo shoot, 2020"
+    },
+    "year": 2020
+   },
+   {
+    "file": "club/camp-group.jpg",
+    "alt": {
+     "he": "קבוצה גדולה של ג׳ודוקאים ומאמנים באולם אימונים, מתחת לכרזת ג׳ודו",
+     "ru": "Большая группа дзюдоистов и тренеров в зале под баннером дзюдо",
+     "en": "A large group of judoka and coaches in a training hall, under a judo banner"
+    }
+   },
+   {
+    "file": "club/kids-belt-cheer.jpg",
+    "alt": {
+     "he": "ילדים שמחים עם תעודות וחגורות אחרי מבחן חגורה",
+     "ru": "Дети радуются грамотам и поясам после аттестации",
+     "en": "Children celebrating with certificates and belts after a belt grading"
+    }
+   },
+   {
+    "file": "club/belt-class.jpg",
+    "alt": {
+     "he": "ילדים מניפים תעודות וחגורות חדשות באולם",
+     "ru": "Дети поднимают грамоты и новые пояса в зале",
+     "en": "Children holding up certificates and new belts in the dojo"
+    }
+   },
+   {
+    "file": "club/kids-team-hug.jpg",
+    "alt": {
+     "he": "ילדות בחליפות ג׳ודו מתחבקות במעגל",
+     "ru": "Девочки в кимоно обнимаются в кругу",
+     "en": "Girls in judogi in a group hug"
+    }
+   },
+   {
+    "file": "club/girls-group-dojo.jpg",
+    "alt": {
+     "he": "קבוצת הבנות בדוג׳ו, חלקן קופצות",
+     "ru": "Группа девочек в зале, некоторые в прыжке",
+     "en": "The girls' group in the dojo, some jumping"
+    },
+    "year": 2023
+   }
+  ]
+ },
+ {
+  "id": "history",
+  "title": {
+   "he": "היסטוריה",
+   "ru": "История",
+   "en": "History"
+  },
+  "description": {
+   "he": "תמונות ישנות מארכיון המועדון",
+   "ru": "Старые фото из архива клуба",
+   "en": "Older photos from the club archive"
+  },
+  "photos": [
+   {
+    "file": "history/ilana-wrestling-2013.jpg",
+    "alt": {
+     "he": "קרב היאבקות נשים, 2013",
+     "ru": "Схватка в женской борьбе, 2013",
+     "en": "Women's wrestling bout, 2013"
+    },
+    "year": 2013
+   },
+   {
+    "file": "history/ilana-wrestling-bout.jpg",
+    "alt": {
+     "he": "אילנה קרטיש בקרב היאבקות",
+     "ru": "Илана Кратыш в схватке по борьбе",
+     "en": "Ilana Kratysh in a wrestling bout"
+    },
+    "year": 2016
+   },
+   {
+    "file": "history/ilana-silver-baku-2015.jpg",
+    "alt": {
+     "he": "אילנה קרטיש עם מדליית כסף במשחקים האירופיים באקו 2015",
+     "ru": "Илана Кратыш с серебряной медалью Европейских игр в Баку, 2015",
+     "en": "Ilana Kratysh with a silver medal at the 2015 European Games in Baku"
+    },
+    "caption": {
+     "he": "המשחקים האירופיים, באקו 2015",
+     "ru": "Европейские игры, Баку, 2015",
+     "en": "European Games, Baku 2015"
+    },
+    "year": 2015,
+    "featured": true
+   },
+   {
+    "file": "history/ilana-gold-olympic-qualifier-2016.jpg",
+    "alt": {
+     "he": "אילנה קרטיש עם מדליית הזהב מטורניר הקוולפיקציה לאולימפיאדה, 2016",
+     "ru": "Илана Кратыш с золотой медалью олимпийского квалификационного турнира, 2016",
+     "en": "Ilana Kratysh with her gold medal from the 2016 Olympic qualifying tournament"
+    },
+    "caption": {
+     "he": "טורניר הקוולפיקציה לאולימפיאדה, מונגוליה, אפריל 2016",
+     "ru": "Олимпийский квалификационный турнир, Монголия, апрель 2016",
+     "en": "Olympic qualifying tournament, Mongolia, April 2016"
+    },
+    "year": 2016
+   },
+   {
+    "file": "history/ilana-wrestling-win.jpg",
+    "alt": {
+     "he": "השופט מכריז על ניצחונה של מתאבקת ישראלית",
+     "ru": "Судья объявляет победу израильской борчихи",
+     "en": "The referee raises an Israeli wrestler's hand after a win"
+    }
+   },
+   {
+    "file": "history/podium-israel-championship.jpg",
+    "alt": {
+     "he": "פודיום באליפות ישראל של איגוד הג׳ודו, רעננה",
+     "ru": "Пьедестал чемпионата Израиля по дзюдо, Раанана",
+     "en": "Podium at an Israel Judo Association championship in Ra'anana"
+    }
+   },
+   {
+    "file": "history/sambo-medallists.jpg",
+    "alt": {
+     "he": "שלושה מדליסטים בסמבו",
+     "ru": "Трое призёров по самбо",
+     "en": "Three sambo medallists"
+    }
+   },
+   {
+    "file": "history/medallists-with-coaches.jpg",
+    "alt": {
+     "he": "שני מדליסטים עם המאמנים באליפות ישראל",
+     "ru": "Двое призёров с тренерами на чемпионате Израиля",
+     "en": "Two medallists with their coaches at a national championship"
+    }
+   },
+   {
+    "file": "history/competition-groundwork.jpg",
+    "alt": {
+     "he": "קרב קרקע בתחרות",
+     "ru": "Борьба в партере на соревнованиях",
+     "en": "Groundwork during a competition"
+    }
+   },
+   {
+    "file": "history/history-trophy.jpg",
+    "alt": {
+     "he": "שני אנשי המועדון עם גביע",
+     "ru": "Двое представителей клуба с кубком",
+     "en": "Two club members with a trophy"
+    }
+   }
+  ]
+ }
+]
