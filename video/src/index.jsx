@@ -1,22 +1,31 @@
 import {Composition, registerRoot} from 'remotion';
-import {FPS, timeline} from './data';
 import './fonts';
-import {Profile} from './Profile';
+import {Ilana, ILANA_FRAMES} from './ilana';
+import {Natanel, NATANEL_FRAMES} from './natanel';
 
 const SIZES = {'16x9': [1920, 1080], '9x16': [1080, 1920]};
+const COACHES = {
+  ilana: [Ilana, ILANA_FRAMES],
+  natanel: [Natanel, NATANEL_FRAMES],
+};
+
+const Profile = ({coach, lang}) => {
+  const [Component] = COACHES[coach];
+  return <Component lang={lang} />;
+};
 
 const Root = () => (
   <Composition
     id="CoachProfile"
     component={Profile}
-    fps={FPS}
+    fps={30}
     width={1920}
     height={1080}
     durationInFrames={1}
     defaultProps={{coach: 'ilana', lang: 'ru', format: '16x9'}}
     calculateMetadata={({props}) => {
       const [width, height] = SIZES[props.format];
-      return {width, height, durationInFrames: timeline(props.coach).total};
+      return {width, height, durationInFrames: COACHES[props.coach][1]};
     }}
   />
 );
