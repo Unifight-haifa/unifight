@@ -1,0 +1,31 @@
+{
+ "discipline": "judo",
+ "date": "2025-10-31",
+ "end": "2025-11-01",
+ "name": {
+  "he": "אליפות הצפון בג׳ודו 2025",
+  "ru": "Чемпионат Севера по дзюдо 2025",
+  "en": "Northern Judo Championship 2025"
+ },
+ "venue": {
+  "he": "נשר",
+  "ru": "Нешер",
+  "en": "Nesher"
+ },
+ "role": {
+  "he": "המועדון אירח את התחרות",
+  "ru": "Турнир принимал клуб",
+  "en": "Hosted by the club"
+ },
+ "participants": "1,000+",
+ "summary": {
+  "he": "יומיים של תחרות: ביום שישי כ־250 ילדים מהגן ועד כיתה ב׳, ובשבת — מכיתה ג׳ ועד נוער ובוגרים. יותר מ־20 אגודות, מאשקלון ועד קריית שמונה. התחרות הגדולה ביותר שאירחנו עד היום.",
+  "ru": "Два дня соревнований: в пятницу около 250 малышей от детского сада до второго класса, в субботу — от третьего класса до юношей и взрослых. Более 20 клубов, от Ашкелона до Кирьят-Шмоны. Самый большой турнир, который мы когда-либо проводили.",
+  "en": "Two days of competition: on Friday about 250 kids from kindergarten to 2nd grade, on Saturday from 3rd grade up to youth and adults. More than 20 clubs, from Ashkelon to Kiryat Shmona. The biggest event we've ever hosted."
+ },
+ "sources": [
+  "https://www.facebook.com/unifightjudoclub/posts/pfbid02BZ6xAcdAj2ADbe4p86Dc4nrqKSvtH4CRdSns7FkpWNAffXaWq41XqcE4W7Z5Joj5l"
+ ],
+ "confidence": "likely",
+ "note": "Club Facebook post only. Dates are inferred from a post of ~3 Nov 2025 that says Friday-Saturday; owner to confirm dates and venue hall."
+}

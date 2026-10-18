@@ -1,0 +1,76 @@
+---
+import { Image } from 'astro:assets';
+import { i18n } from 'astro:config/client';
+import { getRelativeLocaleUrl } from 'astro:i18n';
+import site from '../../../../content/site.json';
+import venues from '../../../../content/venues.json';
+import coach from '../../../../content/coaches/natanel-zhurovel.json';
+import Base from '../../../layouts/Base.astro';
+import PageHead from '../../../components/PageHead.astro';
+import { t, type Lang } from '../../../i18n/ui';
+import { achievements, nivheret, nivheretSlots, photo, schedule } from '../../../lib/club';
+import { bidi } from '../../../lib/club-check.mjs';
+import '../../../styles/landing.css';
+import '../../../styles/news.css';
+import '../../../styles/club.css';
+
+export function getStaticPaths() {
+  return i18n!.locales.map((lang) => ({ params: { lang } }));
+}
+
+const lang = Astro.params.lang as Lang;
+const s = {
+  he: { when: 'מתי ואיפה', coach: 'מאמן', grade: (g: number) => `מכיתה ${schedule.grade_letters_he[g]} ומעלה`, wa: 'כתבו לנו בוואטסאפ', results: 'תוצאות של ספורטאי התחרויות שלנו', all: 'כל ההישגים', photos: 'תמונות' },
+  ru: { when: 'Когда и где', coach: 'Тренер', grade: (g: number) => `с ${g}-го класса`, wa: 'Написать в WhatsApp', results: 'Результаты наших спортсменов', all: 'Все достижения', photos: 'Фото' },
+  en: { when: 'When and where', coach: 'Coach', grade: (g: number) => `grade ${g} and up`, wa: 'Message us on WhatsApp', results: 'Results from our competitors', all: 'All achievements', photos: 'Photos' },
+}[lang];
+
+const n = nivheret;
+const title = `${n.title[lang]} · ${t(lang, 'siteName')}`;
+const desc = n.desc[lang];
+const venue = (id: string) => venues[id as keyof typeof venues];
+const slots = nivheretSlots.map((x) => ({ ...x, day: schedule.days[lang][x.day], venue: venue(x.venue) }));
+const brief = `${slots.map((x) => x.day).join(' / ')} ${slots[0].start}, ${slots[0].venue[lang]}`;
+const wa = `https://wa.me/972545664663?text=${encodeURIComponent(n.join.message[lang].replace('{slots}', brief))}`;
+// adults only: cards that name a person, recent first
+const results = achievements.filter((c) => !('minor' in c) && 'person' in c && c.person && Math.max(...c.years) >= 2022).slice(0, 4);
+---
+<Base lang={lang} title={title} description={desc}>
+  <Fragment slot="head"><PageHead lang={lang} path="nivheret/" title={title} desc={desc} /></Fragment>
+  <div class="news club">
+    <h1 class="h2">{n.title[lang]}</h1>
+    <p class="lead" set:html={bidi(lang, site.schedule.nivheret_note[lang])} />
+    <section aria-labelledby="when">
+      <h2 class="h3" id="when">{s.when}</h2>
+      <ul class="club-slots">
+        {slots.map((x) => (
+          <li>
+            <strong>{x.day}</strong>
+            <bdi dir="ltr" class="club-time">{x.start}–{x.end}</bdi>
+            <span>{x.venue[lang]}, <span set:html={bidi(lang, x.venue.address[lang])} /></span>
+            <span>{s.grade(x.grades[0])}</span>
+          </li>
+        ))}
+      </ul>
+      <p>{s.coach}: {coach.name[lang]}</p>
+    </section>
+    <section class="club-join" aria-labelledby="join">
+      <h2 class="h3" id="join">{n.join.title[lang]}</h2>
+      <p set:html={bidi(lang, n.join.text[lang])} />
+      <a class="btn btn-wa" href={wa} target="_blank" rel="noopener" data-ga="whatsapp_click" data-ga-placement="nivheret">{s.wa}</a>
+    </section>
+    <section aria-labelledby="results">
+      <h2 class="h3" id="results">{s.results}</h2>
+      <ul class="club-results">
+        {results.map((c) => <li><bdi dir="ltr">{c.year}</bdi> · <span set:html={bidi(lang, c.title[lang])} /></li>)}
+      </ul>
+      <a class="news-back" href={getRelativeLocaleUrl(lang, 'achievements/')}>{s.all} <span class="arrow" aria-hidden="true">→</span></a>
+    </section>
+    <section aria-labelledby="photos">
+      <h2 class="h3" id="photos">{s.photos}</h2>
+      <div class="club-photos">
+        {n.photos.map((p) => <Image src={photo(p.src)} alt={p.alt[lang]} widths={[400, 800]} sizes="(min-width: 900px) 300px, 100vw" />)}
+      </div>
+    </section>
+  </div>
+</Base>

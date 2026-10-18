@@ -6,7 +6,7 @@ from playwright.sync_api import sync_playwright
 base = sys.argv[1]
 # vendored and pinned so the scan is offline and repeatable; .txt keeps node --test from running it
 AXE = Path(__file__).with_name("vendor") / "axe-core" / "axe.min.js.txt"
-PAGES = ("", "news/", "video/", "gallery/", "privacy/", "accessibility/")
+PAGES = ("", "news/", "video/", "gallery/", "privacy/", "accessibility/", "history/", "achievements/", "tournaments/", "tournaments/north-2022/", "nivheret/")
 TAGS = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"]
 
 bad = []

@@ -1,0 +1,9 @@
+{
+ "discipline": "judo",
+ "date": "2030-05-01",
+ "name": { "he": "טורניר בדיקה לא מאומת", "ru": "Непроверенный тестовый турнир", "en": "Unverified test tournament" },
+ "venue": { "he": "חיפה", "ru": "Хайфа", "en": "Haifa" },
+ "summary": { "he": "טקסט בדיקה.", "ru": "Тестовый текст.", "en": "Test text." },
+ "sources": ["https://example.com/post"],
+ "confidence": "likely"
+}

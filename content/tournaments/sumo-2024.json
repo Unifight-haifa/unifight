@@ -1,0 +1,31 @@
+{
+ "discipline": "sumo",
+ "date": "2024-04-26",
+ "name": {
+  "he": "אליפות ישראל בסומו 2024",
+  "ru": "Чемпионат Израиля по сумо 2024",
+  "en": "Israeli Sumo Championship 2024"
+ },
+ "venue": {
+  "he": "מרכז הספורט ליאו באק, חיפה",
+  "ru": "Спорткомплекс «Лео Бек», Хайфа",
+  "en": "Leo Baeck sports center, Haifa"
+ },
+ "role": {
+  "he": "מנהלת התחרות: אילנה קרטיש, יו״ר העמותה. המארגן: האיגוד לקידום ופיתוח ענף הסומו בישראל",
+  "ru": "Директор соревнований — председатель амуты Илана Кратыш. Организатор — Ассоциация развития сумо в Израиле",
+  "en": "Directed by club chair Ilana Kratysh; organized by Israel's sumo association"
+ },
+ "participants": "~200",
+ "summary": {
+  "he": "כ־200 ספורטאים מגיל 12, גברים ונשים; תחרות מיון לאליפויות אירופה והעולם 2024. התחרות הראשונה בסומו בארץ מזה כ־15 שנה.",
+  "ru": "Около 200 спортсменов от 12 лет, мужчины и женщины; отбор на чемпионаты Европы и мира 2024. Первые соревнования по сумо в стране примерно за 15 лет.",
+  "en": "About 200 athletes aged 12 and up, men and women; a qualifier for the 2024 European and World Championships. Israel's first sumo competition in some 15 years."
+ },
+ "sources": [
+  "https://haipo.co.il/item/513833",
+  "https://carmelist.co.il/item/88156"
+ ],
+ "confidence": "confirmed",
+ "note": "Sources name the sumo association as organizer, not Unifight. Never write 'Unifight organized'."
+}

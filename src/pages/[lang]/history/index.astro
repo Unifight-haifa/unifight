@@ -1,0 +1,56 @@
+---
+import { Image } from 'astro:assets';
+import { i18n } from 'astro:config/client';
+import site from '../../../../content/site.json';
+import Base from '../../../layouts/Base.astro';
+import PageHead from '../../../components/PageHead.astro';
+import { t, type Lang } from '../../../i18n/ui';
+import { about, history, photo, tr } from '../../../lib/club';
+import { bidi } from '../../../lib/club-check.mjs';
+import '../../../styles/landing.css';
+import '../../../styles/news.css';
+import '../../../styles/club.css';
+
+export function getStaticPaths() {
+  return i18n!.locales.map((lang) => ({ params: { lang } }));
+}
+
+const lang = Astro.params.lang as Lang;
+const h = site.history;
+const desc = {
+  he: 'הסיפור של מועדון הג׳ודו יוניפייט חיפה: ציר זמן מאומת מהקמת המועדון ועד היום, ועל העמותה.',
+  ru: 'История клуба дзюдо «Юнифайт Хайфа»: проверенная хронология от основания до наших дней и об амуте.',
+  en: 'The story of the Unifight Haifa judo club: a verified timeline from its founding to today, and about the association.',
+}[lang];
+const title = `${h.title[lang]} · ${t(lang, 'siteName')}`;
+---
+<Base lang={lang} title={title} description={desc}>
+  <Fragment slot="head"><PageHead lang={lang} path="history/" title={title} desc={desc} /></Fragment>
+  <div class="news club">
+    <h1 class="h2">{h.title[lang]}</h1>
+    <p class="lead" set:html={bidi(lang, h.intro[lang])} />
+    <ol class="tl club-tl">
+      {history.map((i) => (
+        <li class="tl-i">
+          <span class="tl-y">{i.when ? <span set:html={bidi(lang, i.when[lang])} /> : <bdi dir="ltr">{i.year}</bdi>}</span>
+          <h2 class="h3 tl-t" set:html={bidi(lang, i.title[lang])} />
+          <p set:html={bidi(lang, i.text[lang])} />
+        </li>
+      ))}
+    </ol>
+    <section class="club-about" aria-labelledby="about">
+      <div>
+        <h2 class="h2" id="about">{about.title[lang]}</h2>
+        <dl>
+          {about.facts.map((f) => (
+            <div>
+              <dt>{f.label[lang]}</dt>
+              <dd>{f.href ? <a href={f.href} rel="noopener"><bdi dir="ltr">{tr(f.value, lang)}</bdi></a> : <span set:html={bidi(lang, tr(f.value, lang))} />}</dd>
+            </div>
+          ))}
+        </dl>
+      </div>
+      <Image src={photo(about.photo)} alt={about.alt[lang]} widths={[400, 800]} sizes="(min-width: 900px) 360px, 100vw" />
+    </section>
+  </div>
+</Base>

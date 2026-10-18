@@ -1,0 +1,52 @@
+/* history, achievements, tournaments and nivheret pages; palette and .tl/.chip/.tag come from landing.css */
+.club [hidden] { display: none !important; }
+.club section { margin-block-start: 48px; }
+.club .h3 { color: var(--paper); margin-block-end: 14px; }
+.club .lead { margin-block-end: 28px; }
+.club a:focus-visible { outline: 3px solid var(--gold-2); outline-offset: 2px; }
+
+.club-tl { margin-block: 36px 0; }
+.club-tl .h3 { margin-block-end: 6px; }
+
+.club-about { display: grid; gap: 24px; align-items: start; }
+.club-about img { inline-size: 100%; max-inline-size: 360px; block-size: auto; border-radius: 2px; }
+.club-about dl, .club-facts { display: grid; gap: 12px; margin: 0; }
+.club-about dl > div, .club-facts > div { display: grid; gap: 2px; padding-block-end: 12px; border-block-end: 1px solid var(--line); }
+.club dt { color: var(--gold); font-size: 14px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; }
+.club dd { margin: 0; color: var(--paper-2); }
+.club dd a { color: var(--gold-2); }
+@media (min-width: 760px) { .club-about { grid-template-columns: 1fr 320px; } }
+
+.club-filters { display: grid; gap: 10px; margin-block-end: 28px; }
+.club-cards, .club-photos { list-style: none; padding: 0; display: grid; gap: 22px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr)); }
+.club-card { display: grid; align-content: start; gap: 8px; background: var(--ink-2); border: 1px solid var(--line); border-radius: 2px; padding-block-end: 18px; }
+.club-card > :not(img) { margin-inline: 18px; }
+.club-card img, .club-photos img { inline-size: 100%; block-size: auto; aspect-ratio: 4 / 3; object-fit: cover; }
+.club-card .h3 { font-size: 20px; margin: 0; }
+.club-card p:last-child { color: var(--paper-2); font-size: 15.5px; }
+.club-card-meta { color: var(--mute); font-size: 14px; }
+.lv-olympics { border-color: var(--gold); }
+
+.club-events, .club-results, .club-slots { list-style: none; padding: 0; display: grid; gap: 12px; }
+.club-events li { padding: 14px 16px; background: var(--ink-2); border: 1px solid var(--line); }
+.club-events a { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; min-block-size: 44px; color: var(--paper); text-decoration: none; font-size: 19px; }
+.club-events a:hover strong { color: var(--gold-2); }
+.club-events p, .club-role { color: var(--mute); font-size: 15px; }
+.club-year { font: 600 26px/1 "Oswald", sans-serif; color: var(--gold-2); margin-block: 24px 12px; }
+.club .club-year { margin-block-start: 24px; }
+.club-empty { color: var(--paper-2); }
+
+.club-facts { margin-block: 20px 24px; }
+.club-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.club-actions .btn { min-block-size: 44px; font-size: 15px; }
+.club-results li { color: var(--paper-2); padding-block-end: 10px; border-block-end: 1px solid var(--line); }
+.club-results a { color: var(--gold-2); }
+.club-sources { margin-block-start: 40px; color: var(--mute); font-size: 14px; }
+.club-sources a { color: var(--gold-2); display: inline-block; min-block-size: 24px; }
+
+.club-slots li { display: flex; flex-wrap: wrap; gap: 4px 16px; padding: 14px 16px; background: var(--ink-2); border: 1px solid var(--line); color: var(--paper-2); }
+.club-slots strong { color: var(--paper); }
+.club-time { color: var(--gold-2); font-weight: 600; }
+.club-join { padding: 24px; border: 1px solid var(--gold); background: var(--ink-2); }
+.club-join p { color: var(--paper-2); margin-block-end: 18px; max-inline-size: 60ch; }
+.club .news-back { display: inline-flex; align-items: center; gap: 6px; min-block-size: 44px; }

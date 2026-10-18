@@ -1,0 +1,29 @@
+{
+ "discipline": "judo",
+ "date": "2022-02-26",
+ "name": {
+  "he": "אליפות הצפון בג׳ודו 2022",
+  "ru": "Чемпионат Севера по дзюдо 2022",
+  "en": "Northern Judo Championship 2022"
+ },
+ "venue": {
+  "he": "אולם הספורט בנשר",
+  "ru": "Спортзал Нешера",
+  "en": "Nesher sports hall"
+ },
+ "role": {
+  "he": "מארגנת: אילנה קרטיש, יו״ר העמותה",
+  "ru": "Организатор — председатель амуты Илана Кратыш",
+  "en": "Organized by club chair Ilana Kratysh"
+ },
+ "participants": "~450",
+ "summary": {
+  "he": "כ־450 משתתפים מכל הגילים, החל מגיל 4. באותה עת אילנה קרטיש ארגנה את התחרות כבר חמש שנים.",
+  "ru": "Около 450 участников всех возрастов, начиная с 4 лет. К тому времени Илана Кратыш проводила этот турнир уже пять лет.",
+  "en": "About 450 competitors of all ages, from 4 years old. By then Ilana Kratysh had been running the championship for five years."
+ },
+ "sources": [
+  "https://haipo.co.il/item/346254"
+ ],
+ "confidence": "confirmed"
+}

@@ -1,0 +1,175 @@
+{
+ "_doc": "Cards for /achievements/. An id that matches content/site.json achievements.highlights or more_results takes its year, title, detail, sources and confidence from there; any other entry carries them itself. Only confirmed/owner entries render.",
+ "items": [
+  {
+   "id": "arshansky-olympics",
+   "level": "olympics",
+   "years": [2012],
+   "photo": "tommy.jpg",
+   "alt": { "he": "טומי ארשנסקי", "ru": "Томи Аршански", "en": "Tommy Arshansky" }
+  },
+  {
+   "id": "kratysh-olympics",
+   "level": "olympics",
+   "years": [2016],
+   "photo": "ilana-gold-olympic-qualifier-2016.jpg",
+   "alt": {
+    "he": "אילנה קרטיש עם מדליית הזהב מטורניר הקוולפיקציה לאולימפיאדה, 2016",
+    "ru": "Илана Кратыш с золотой медалью олимпийского квалификационного турнира, 2016",
+    "en": "Ilana Kratysh with her gold medal from the 2016 Olympic qualifying tournament"
+   }
+  },
+  {
+   "id": "kratysh-euro-wrestling",
+   "level": "europe",
+   "years": [2013, 2014, 2015, 2016],
+   "year": "2013–2016",
+   "person": "Ilana Kratysh",
+   "title": {
+    "he": "אילנה קרטיש — ארבע מדליות כסף באליפויות אירופה בהיאבקות",
+    "ru": "Илана Кратыш — четыре серебра чемпионатов Европы по борьбе",
+    "en": "Ilana Kratysh — four European wrestling silvers"
+   },
+   "detail": {
+    "he": "טביליסי 2013, ואנטה 2014, המשחקים האירופיים בבאקו 2015 וריגה 2016.",
+    "ru": "Тбилиси-2013, Вантаа-2014, Европейские игры в Баку-2015 и Рига-2016.",
+    "en": "Tbilisi 2013, Vantaa 2014, the 2015 European Games in Baku and Riga 2016."
+   },
+   "sources": ["https://en.wikipedia.org/wiki/Ilana_Kratysh", "https://www.davar1.co.il/452598/"],
+   "confidence": "confirmed",
+   "photo": "ilana-silver-baku-2015.jpg",
+   "alt": {
+    "he": "אילנה קרטיש עם מדליית כסף במשחקים האירופיים באקו 2015",
+    "ru": "Илана Кратыш с серебряной медалью Европейских игр в Баку, 2015",
+    "en": "Ilana Kratysh with a silver medal at the 2015 European Games in Baku"
+   }
+  },
+  {
+   "id": "kratysh-sumo",
+   "level": "europe",
+   "years": [2023],
+   "photo": "coach-ilana-jump-trophy.jpg",
+   "alt": { "he": "אילנה קרטיש קופצת עם גביע", "ru": "Илана Кратыш в прыжке с кубком", "en": "Ilana Kratysh jumping with a trophy" }
+  },
+  {
+   "id": "novitzki-gs-tbilisi",
+   "level": "world",
+   "years": [2025],
+   "photo": "intl-competition-throw.jpg",
+   "alt": {
+    "he": "הטלה בתחרות בינלאומית של איגוד הג׳ודו האירופי",
+    "ru": "Бросок на международном турнире Европейского союза дзюдо",
+    "en": "A throw at a European Judo Union competition"
+   }
+  },
+  {
+   "id": "novitzki-junior-euro",
+   "level": "europe",
+   "years": [2022, 2023],
+   "photo": "intl-competition-grips.jpg",
+   "alt": { "he": "מאבק אחיזות בתחרות בינלאומית", "ru": "Борьба за захват на международном турнире", "en": "Grip fighting at an international competition" }
+  },
+  {
+   "id": "novitzki-senior-champion",
+   "level": "israel",
+   "years": [2025],
+   "photo": "medallists-with-coaches.jpg",
+   "alt": { "he": "שני מדליסטים עם המאמנים באליפות ישראל", "ru": "Двое призёров с тренерами на чемпионате Израиля", "en": "Two medallists with their coaches at a national championship" }
+  },
+  {
+   "id": "kloda-poznan",
+   "level": "europe",
+   "years": [2024],
+   "photo": "intl-competition-throw-2.jpg",
+   "alt": { "he": "הטלה על המזרן הצהוב בתחרות בינלאומית", "ru": "Бросок на жёлтом татами на международном турнире", "en": "A throw on the yellow mat at an international event" }
+  },
+  {
+   "id": "kloda-junior-euro",
+   "level": "europe",
+   "years": [2024],
+   "photo": "podium-riga-european-cup.jpg",
+   "alt": { "he": "פודיום גביע אירופה לבוגרים בריגה", "ru": "Пьедестал Кубка Европы среди взрослых в Риге", "en": "Podium at the Riga Senior European Cup" }
+  },
+  {
+   "id": "cadet-euro-bronze",
+   "level": "europe",
+   "years": [2024],
+   "photo": "competition-groundwork.jpg",
+   "alt": { "he": "קרב קרקע בתחרות", "ru": "Борьба в партере на соревнованиях", "en": "Groundwork during a competition" }
+  },
+  {
+   "id": "zhurovel-u23",
+   "level": "israel",
+   "years": [2019, 2021, 2022],
+   "photo": "podium-sarajevo-silver.jpg",
+   "alt": { "he": "מדליסט כסף בסבב הג׳ודו האירופי בסרייבו", "ru": "Серебряный призёр Европейского тура по дзюдо в Сараеве", "en": "Silver medallist at the European Judo Tour in Sarajevo" }
+  },
+  {
+   "id": "cadets-2025-first",
+   "level": "israel",
+   "years": [2025],
+   "photo": "result-cadets-trio.jpg",
+   "alt": { "he": "שלושה ג׳ודוקאים צעירים עם מדליות באולם התחרויות", "ru": "Трое юных дзюдоистов с медалями в зале соревнований", "en": "Three young judoka with medals in a competition hall" }
+  },
+  {
+   "id": "u15-team-2015",
+   "level": "israel",
+   "years": [2015],
+   "photo": "history-trophy.jpg",
+   "alt": { "he": "שני אנשי המועדון עם גביע", "ru": "Двое представителей клуба с кубком", "en": "Two club members with a trophy" }
+  },
+  {
+   "id": "youth-2026",
+   "level": "israel",
+   "years": [2026],
+   "photo": "medals-team.jpg",
+   "alt": { "he": "ספורטאי המועדון ומאמנים עם מדליות באולם התחרויות", "ru": "Спортсмены и тренера клуба с медалями в зале соревнований", "en": "Club athletes and coaches with medals in a competition hall" }
+  },
+  {
+   "id": "boys-children-2026",
+   "level": "israel",
+   "years": [2026],
+   "photo": "medals-kids.jpg",
+   "alt": { "he": "ילדים מציגים מדליות באליפות ישראל בג׳ודו, לצד שני מאמנים", "ru": "Дети показывают медали на чемпионате Израиля по дзюдо, рядом двое тренеров", "en": "Children showing their medals at the Israel Judo Championships, with two coaches" }
+  },
+  {
+   "id": "girls-2026",
+   "level": "israel",
+   "years": [2026],
+   "photo": "medals-team.jpg",
+   "alt": { "he": "ספורטאי המועדון ומאמנים עם מדליות באולם התחרויות", "ru": "Спортсмены и тренера клуба с медалями в зале соревнований", "en": "Club athletes and coaches with medals in a competition hall" }
+  },
+  {
+   "id": "maccabiah-2026",
+   "level": "israel",
+   "years": [2026],
+   "photo": "coach-ilana-beach.jpg",
+   "alt": {
+    "he": "אילנה קרטיש בחוף הים בבגד היאבקות של ישראל",
+    "ru": "Илана Кратыш на пляже в израильском борцовском трико",
+    "en": "Ilana Kratysh at the beach in an Israel wrestling singlet"
+   }
+  },
+  {
+   "id": "u23-2022",
+   "level": "israel",
+   "years": [2022],
+   "photo": "medallists-bronze-coach.jpg",
+   "alt": { "he": "שני מדליסטי ארד עם המאמן", "ru": "Двое бронзовых призёров с тренером", "en": "Two bronze medallists with their coach" }
+  },
+  {
+   "id": "sambo-2025",
+   "level": "israel",
+   "years": [2025],
+   "photo": "sambo-medallists.jpg",
+   "alt": { "he": "שלושה מדליסטים בסמבו", "ru": "Трое призёров по самбо", "en": "Three sambo medallists" }
+  },
+  {
+   "id": "wrestling-2025",
+   "level": "israel",
+   "years": [2025],
+   "photo": "ilana-wrestling-2013.jpg",
+   "alt": { "he": "קרב היאבקות נשים, 2013", "ru": "Схватка в женской борьбе, 2013", "en": "Women's wrestling bout, 2013" }
+  }
+ ]
+}

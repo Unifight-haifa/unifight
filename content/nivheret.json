@@ -1,0 +1,47 @@
+{
+ "_doc": "/nivheret/. Training slots come from content/schedule/natanel-zhurovel.json (kind \"nivheret\"). Nivheret is the club's own selected team; the build fails on national-team wording (BANNED in src/lib/club-check.mjs).",
+ "title": {
+  "he": "נבחרת המועדון",
+  "ru": "Сборная клуба (нивхерет)",
+  "en": "Selected team (nivheret)"
+ },
+ "desc": {
+  "he": "נבחרת המועדון של יוניפייט חיפה: מי אנחנו, מתי ואיפה מתאמנים ואיך ג׳ודוקאים ממועדונים אחרים בצפון מצטרפים.",
+  "ru": "Сборная клуба «Юнифайт Хайфа» (нивхерет): кто мы, когда и где тренируемся и как присоединиться дзюдоистам из других клубов севера.",
+  "en": "Unifight Haifa's selected team (nivheret): who we are, when and where we train, and how judoka from other northern clubs can join."
+ },
+ "join": {
+  "title": {
+   "he": "ממועדון אחר בצפון? בואו להתאמן איתנו",
+   "ru": "Вы из другого клуба на севере? Тренируйтесь с нами",
+   "en": "From another club in the north? Train with us"
+  },
+  "text": {
+   "he": "ג׳ודוקאים ממועדונים אחרים בצפון מוזמנים לפנות אלינו. כתבו לנו בוואטסאפ ונספר איך מצטרפים לאימונים ומה צריך.",
+   "ru": "Дзюдоисты из других клубов севера — напишите нам. В WhatsApp расскажем, как присоединиться к тренировкам и что для этого нужно.",
+   "en": "Judoka from other clubs in the north are welcome to get in touch. Message us on WhatsApp and we'll tell you how to join the sessions and what you need."
+  },
+  "message": {
+   "he": "שלום! אני מתאמן/ת בג׳ודו במועדון אחר בצפון ורוצה להצטרף לאימוני נבחרת המועדון של יוניפייט ({slots}). המועדון שלי: . גיל: .",
+   "ru": "Здравствуйте! Я занимаюсь дзюдо в другом клубе на севере и хочу тренироваться со сборной клуба «Юнифайт» ({slots}). Мой клуб: . Возраст: .",
+   "en": "Hi! I do judo at another club in the north and would like to join Unifight's selected team training ({slots}). My club: . Age: ."
+  },
+  "sources": [".planning/REQUIREMENTS.md TEAM-02 (owner requirement: the page explains how judoka from other northern clubs join)"],
+  "confidence": "owner",
+  "note": "Requirements, fees and eligibility are unknown, so the page sends people to WhatsApp instead of stating rules."
+ },
+ "photos": [
+  {
+   "src": "podium-sarajevo.jpg",
+   "alt": { "he": "פודיום בסבב הג׳ודו האירופי בסרייבו", "ru": "Пьедестал Европейского тура по дзюдо в Сараеве", "en": "Podium at the European Judo Tour in Sarajevo" }
+  },
+  {
+   "src": "intl-competition-grips.jpg",
+   "alt": { "he": "מאבק אחיזות בתחרות בינלאומית", "ru": "Борьба за захват на международном турнире", "en": "Grip fighting at an international competition" }
+  },
+  {
+   "src": "competition-groundwork.jpg",
+   "alt": { "he": "קרב קרקע בתחרות", "ru": "Борьба в партере на соревнованиях", "en": "Groundwork during a competition" }
+  }
+ ]
+}

@@ -1,0 +1,93 @@
+---
+import { Image } from 'astro:assets';
+import { getRelativeLocaleUrl } from 'astro:i18n';
+import videos from '../../../../../content/videos.json';
+import Base from '../../../../layouts/Base.astro';
+import JsonLd from '../../../../components/JsonLd.astro';
+import PageHead from '../../../../components/PageHead.astro';
+import { LANGS, t, type Lang } from '../../../../i18n/ui';
+import { fmtDate } from '../../../../lib/news';
+import { photo, tournamentPath, tournaments, type Tournament } from '../../../../lib/club';
+import { bidi, isUpcoming, lastDay } from '../../../../lib/club-check.mjs';
+import { TS, classifyScript } from '../../../../lib/tournaments-ui';
+import '../../../../styles/landing.css';
+import '../../../../styles/news.css';
+import '../../../../styles/club.css';
+
+export function getStaticPaths() {
+  return LANGS.flatMap((lang) => tournaments.map((ev) => ({ params: { lang, slug: ev.slug }, props: { ev } })));
+}
+
+const lang = Astro.params.lang as Lang;
+const { ev } = Astro.props as { ev: Tournament };
+const s = TS[lang];
+const name = ev.name[lang];
+const title = `${name} · ${t(lang, 'siteName')}`;
+const desc = ev.summary[lang];
+const up = isUpcoming(lastDay(ev), new Date());
+const date = fmtDate(new Date(ev.date), lang) + (ev.end ? ` – ${fmtDate(new Date(ev.end), lang)}` : '');
+const announce = ([['categories', ev.categories], ['weigh_in', ev.weigh_in]] as const).filter(([, v]) => v);
+const links = ([['regulations', ev.regulations], ['registration', ev.registration]] as const).filter(([, v]) => v);
+const clips = videos.filter((v) => ev.videos?.includes(v.id));
+const abs = (p: string) => new URL(p, Astro.site).href;
+const place = ev.address ? `${ev.venue[lang]}, ${ev.address[lang]}` : ev.venue[lang];
+const ld = {
+  '@context': 'https://schema.org',
+  '@type': 'SportsEvent',
+  name,
+  description: desc,
+  sport: ev.discipline === 'judo' ? 'Judo' : 'Sumo',
+  startDate: ev.date,
+  endDate: lastDay(ev),
+  eventStatus: 'https://schema.org/EventScheduled',
+  eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
+  location: { '@type': 'Place', name: ev.venue[lang], address: { '@type': 'PostalAddress', ...(ev.address && { streetAddress: ev.address[lang] }), addressCountry: 'IL' } },
+  url: abs(tournamentPath(lang, ev.slug)),
+  inLanguage: lang,
+};
+---
+<Base lang={lang} title={title} description={desc}>
+  <Fragment slot="head">
+    <PageHead lang={lang} path={`tournaments/${ev.slug}/`} title={title} desc={desc} />
+    <JsonLd data={ld} />
+  </Fragment>
+  <article class="news club">
+    <a class="news-back" href={getRelativeLocaleUrl(lang, 'tournaments/')}>{s.all}</a>
+    <p><span class="tag">{s[ev.discipline]}</span></p>
+    <h1 class="h2" set:html={bidi(lang, name)} />
+    <dl class="club-facts">
+      <div><dt>{s.date}</dt><dd><time datetime={ev.date}>{date}</time></dd></div>
+      <div><dt>{s.venue}</dt><dd set:html={bidi(lang, place)} /></div>
+      {ev.role && <div><dt>{s.role}</dt><dd set:html={bidi(lang, ev.role[lang])} /></div>}
+      {ev.participants && <div><dt>{s.participants}</dt><dd><bdi dir="ltr">{ev.participants}</bdi></dd></div>}
+      {announce.map(([k, v]) => <div data-when="up" data-end={lastDay(ev)} hidden={!up}><dt>{s[k]}</dt><dd set:html={bidi(lang, v![lang])} /></div>)}
+    </dl>
+    <p class="lead" set:html={bidi(lang, desc)} />
+    {(links.length > 0 || up) && (
+      <p class="club-actions" data-when="up" data-end={lastDay(ev)} hidden={!up}>
+        {links.map(([k, href]) => <a class="btn btn-ghost" href={href} rel="noopener">{s[k]}</a>)}
+        {up && <a class="btn btn-ghost" href={`${getRelativeLocaleUrl(lang, 'tournaments/')}${ev.slug}.ics`} download>{s.ics}</a>}
+      </p>
+    )}
+    {(ev.results?.length ?? 0) > 0 && (
+      <section aria-labelledby="results">
+        <h2 class="h3" id="results">{s.results}</h2>
+        <ul class="club-results">{ev.results!.map((r) => <li set:html={bidi(lang, r[lang])} />)}</ul>
+      </section>
+    )}
+    {(ev.photos?.length ?? 0) > 0 && (
+      <section aria-labelledby="photos">
+        <h2 class="h3" id="photos">{s.photos}</h2>
+        <div class="club-photos">{ev.photos!.map((p) => <Image src={photo(p.src)} alt={p.alt[lang]} widths={[400, 800]} sizes="(min-width: 900px) 300px, 100vw" />)}</div>
+      </section>
+    )}
+    {clips.length > 0 && (
+      <section aria-labelledby="videos">
+        <h2 class="h3" id="videos">{s.videos}</h2>
+        <ul class="club-results">{clips.map((v) => <li><a href={`https://youtu.be/${v.id}`}>{v.title[lang]}</a></li>)}</ul>
+      </section>
+    )}
+    <p class="club-sources">{s.sources}: {ev.sources.map((u, i) => <Fragment>{i > 0 && ' · '}{/^https?:/.test(u) ? <a href={u} rel="noopener"><bdi dir="ltr">{new URL(u).hostname.replace(/^www\./, '')}</bdi></a> : u}</Fragment>)}</p>
+  </article>
+  <script is:inline set:html={classifyScript} />
+</Base>

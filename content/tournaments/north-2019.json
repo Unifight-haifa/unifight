@@ -1,0 +1,25 @@
+{
+ "discipline": "judo",
+ "date": "2019-01-19",
+ "name": {
+  "he": "אליפות הצפון השנייה בג׳ודו",
+  "ru": "Второй чемпионат Севера по дзюдо",
+  "en": "2nd Northern Judo Championship"
+ },
+ "venue": {
+  "he": "מתנ״ס ליאו בק, חיפה",
+  "ru": "Матнас «Лео Бек», Хайфа",
+  "en": "Leo Baeck community center, Haifa"
+ },
+ "participants": "~800",
+ "summary": {
+  "he": "כ־800 ספורטאים, מהגן ועד בוגרים. ספורטאי המועדון זכו ביותר מ־50 מדליות.",
+  "ru": "Около 800 спортсменов, от детского сада до взрослых. Спортсмены клуба завоевали более 50 медалей.",
+  "en": "About 800 athletes, from kindergarten to adults. Club athletes won more than 50 medals."
+ },
+ "sources": [
+  "https://haipo.co.il/item/116382"
+ ],
+ "confidence": "unverified",
+ "note": "The event and the club's 50+ medals are confirmed, but no source names Unifight as organizer (Ilana Kratysh was a judge). Owner to confirm the club's role."
+}

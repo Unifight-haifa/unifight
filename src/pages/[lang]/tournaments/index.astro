@@ -1,0 +1,78 @@
+---
+import { i18n } from 'astro:config/client';
+import Base from '../../../layouts/Base.astro';
+import JsonLd from '../../../components/JsonLd.astro';
+import PageHead from '../../../components/PageHead.astro';
+import { t, type Lang } from '../../../i18n/ui';
+import { fmtDate } from '../../../lib/news';
+import { tournamentPath, tournaments, type Tournament } from '../../../lib/club';
+import { bidi, lastDay, splitEvents } from '../../../lib/club-check.mjs';
+import { TS, classifyScript } from '../../../lib/tournaments-ui';
+import '../../../styles/landing.css';
+import '../../../styles/news.css';
+import '../../../styles/club.css';
+
+export function getStaticPaths() {
+  return i18n!.locales.map((lang) => ({ params: { lang } }));
+}
+
+const lang = Astro.params.lang as Lang;
+const s = TS[lang];
+const title = `${s.title} · ${t(lang, 'siteName')}`;
+// build-time guess; the inline script corrects it in the browser
+const { upcoming, years } = splitEvents(tournaments, new Date());
+// every event sits in both places, so the script only toggles `hidden`
+const byYear = new Map(years);
+for (const ev of upcoming) byYear.set(ev.date.slice(0, 4), [ev, ...(byYear.get(ev.date.slice(0, 4)) ?? [])]);
+const archive = [...byYear].sort(([a], [b]) => b.localeCompare(a));
+const abs = (p: string) => new URL(p, Astro.site).href;
+const ld = {
+  '@context': 'https://schema.org',
+  '@type': 'ItemList',
+  name: s.title,
+  itemListElement: [...tournaments].sort((a, b) => b.date.localeCompare(a.date)).map((ev, i) => ({ '@type': 'ListItem', position: i + 1, url: abs(tournamentPath(lang, ev.slug)), name: ev.name[lang] })),
+};
+const date = (ev: Tournament) => fmtDate(new Date(ev.date), lang) + (ev.end ? ` – ${fmtDate(new Date(ev.end), lang)}` : '');
+---
+<Base lang={lang} title={title} description={s.desc}>
+  <Fragment slot="head">
+    <PageHead lang={lang} path="tournaments/" title={title} desc={s.desc} />
+    <JsonLd data={ld} />
+  </Fragment>
+  <div class="news club">
+    <h1 class="h2">{s.title}</h1>
+    <section class="club-sec" data-sec="up" aria-labelledby="up">
+      <h2 class="h3" id="up">{s.upcoming}</h2>
+      <ul class="club-events">
+        {tournaments.map((ev) => {
+          const up = upcoming.includes(ev);
+          return (
+            <li data-when="up" data-end={lastDay(ev)} hidden={!up}>
+              <a href={tournamentPath(lang, ev.slug)}><span class="tag">{s[ev.discipline]}</span><strong set:html={bidi(lang, ev.name[lang])} /></a>
+              <p><time datetime={ev.date}>{date(ev)}</time> · <span set:html={bidi(lang, ev.venue[lang])} /></p>
+            </li>
+          );
+        })}
+      </ul>
+      <p class="club-empty" data-none hidden={upcoming.length > 0}>{s.none}</p>
+    </section>
+    <section class="club-sec" aria-labelledby="archive">
+      <h2 class="h3" id="archive">{s.archive}</h2>
+      {archive.map(([year, list]) => (
+        <section data-sec="past" aria-labelledby={`y${year}`} hidden={!list.some((ev) => !upcoming.includes(ev))}>
+          <h3 class="club-year" id={`y${year}`}><bdi dir="ltr">{year}</bdi></h3>
+          <ul class="club-events">
+            {list.map((ev) => (
+              <li data-when="past" data-end={lastDay(ev)} hidden={upcoming.includes(ev)}>
+                <a href={tournamentPath(lang, ev.slug)}><span class="tag">{s[ev.discipline]}</span><strong set:html={bidi(lang, ev.name[lang])} /></a>
+                <p><time datetime={ev.date}>{date(ev)}</time> · <span set:html={bidi(lang, ev.venue[lang])} /></p>
+                {ev.role && <p class="club-role" set:html={bidi(lang, ev.role[lang])} />}
+              </li>
+            ))}
+          </ul>
+        </section>
+      ))}
+    </section>
+  </div>
+  <script is:inline set:html={classifyScript} />
+</Base>

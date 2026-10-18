@@ -1,0 +1,145 @@
+{
+ "_doc": "/history/ shows content/site.json history.items plus the items below, sorted by `sort` (or year). Only confirmed/owner entries render.",
+ "items": [
+  {
+   "sort": "0000",
+   "when": {
+    "he": "לפני יותר מ־30 שנה",
+    "ru": "Более 30 лет назад",
+    "en": "Over 30 years ago"
+   },
+   "title": {
+    "he": "אלכסנדר קרטיש מקים את המועדון",
+    "ru": "Александр Кратыш основывает клуб",
+    "en": "Alexander Kratysh founds the club"
+   },
+   "text": {
+    "he": "אלכסנדר קרטיש, סגן אלוף ברית המועצות בג׳ודו לשעבר, מקים את המועדון — והוא מאמן בו עד היום.",
+    "ru": "Александр Кратыш, бывший вице-чемпион СССР по дзюдо, основывает клуб — и тренирует в нём до сих пор.",
+    "en": "Alexander Kratysh, a former USSR judo vice-champion, founds the club — and still coaches there today."
+   },
+   "sources": [
+    "content/coaches/alexander-kratysh.json (bio approved by the owner, 2026-10-17)",
+    "https://www.davar1.co.il/452598/"
+   ],
+   "confidence": "owner"
+  },
+  {
+   "year": "2014",
+   "title": {
+    "he": "מחנה J-Sport בכפר גלים",
+    "ru": "Лагерь J-Sport в Кфар-Галим",
+    "en": "J-Sport camp at Kfar Galim"
+   },
+   "text": {
+    "he": "כמאה ילדים מישראל, מאוקראינה ומרוסיה ב־12 ימים של ג׳ודו והיאבקות במחנה הבינלאומי של העמותה. מאז 2011 עברו במחנות J-Sport יותר מ־500 ילדים.",
+    "ru": "Около ста детей из Израиля, Украины и России — 12 дней дзюдо и борьбы в международном лагере амуты. С 2011 года через лагеря J-Sport прошли более 500 детей.",
+    "en": "About a hundred kids from Israel, Ukraine and Russia spend 12 days of judo and wrestling at the association's international camp. Since 2011 more than 500 children have attended J-Sport camps."
+   },
+   "sources": [
+    "https://haifainfo.com/?p=43105"
+   ],
+   "confidence": "confirmed"
+  },
+  {
+   "year": "2023",
+   "title": {
+    "he": "המדליה הראשונה של ישראל בסומו",
+    "ru": "Первая медаль Израиля в сумо",
+    "en": "Israel's first sumo medal"
+   },
+   "text": {
+    "he": "אילנה קרטיש זוכה בכסף באליפות אירופה בסומו בקרוטושין, פולין. יחד עם אביה היא מחדשת את איגוד הסומו בישראל.",
+    "ru": "Илана Кратыш берёт серебро чемпионата Европы по сумо в Кротошине (Польша). Вместе с отцом она возрождает федерацию сумо в Израиле.",
+    "en": "Ilana Kratysh wins silver at the European Sumo Championships in Krotoszyn, Poland. With her father she revives Israel's sumo association."
+   },
+   "sources": [
+    "https://www.davar1.co.il/451513/",
+    "https://carmelist.co.il/item/76590",
+    "https://www.davar1.co.il/452598/"
+   ],
+   "confidence": "confirmed"
+  },
+  {
+   "year": "2024",
+   "title": {
+    "he": "אליפות ישראל בסומו בחיפה",
+    "ru": "Чемпионат Израиля по сумо в Хайфе",
+    "en": "Israeli Sumo Championship in Haifa"
+   },
+   "text": {
+    "he": "אילנה קרטיש מנהלת את אליפות ישראל בסומו במרכז הספורט ליאו באק: כ־200 ספורטאים, התחרות הראשונה בארץ מזה כ־15 שנה.",
+    "ru": "Илана Кратыш руководит чемпионатом Израиля по сумо в спорткомплексе «Лео Бек»: около 200 спортсменов, первый такой турнир в стране примерно за 15 лет.",
+    "en": "Ilana Kratysh directs the Israeli Sumo Championship at the Leo Baeck sports center: about 200 athletes, the first such event in Israel in some 15 years."
+   },
+   "sources": [
+    "https://haipo.co.il/item/513833",
+    "https://carmelist.co.il/item/88156"
+   ],
+   "confidence": "confirmed"
+  }
+ ],
+ "about": {
+  "title": {
+   "he": "על העמותה",
+   "ru": "Об амуте",
+   "en": "About the association"
+  },
+  "photo": "coaches-alexander-ilana.jpg",
+  "alt": {
+   "he": "אלכסנדר ואילנה קרטיש בחליפות ג׳ודו כחולות",
+   "ru": "Александр и Илана Кратыш в синих кимоно",
+   "en": "Alexander and Ilana Kratysh in blue judogi"
+  },
+  "facts": [
+   {
+    "label": { "he": "שם", "ru": "Название", "en": "Name" },
+    "value": { "he": "יוניפייט חיפה (ע״ר)", "ru": "«Юнифайт Хайфа», зарегистрированная амута", "en": "Unifight Haifa, a registered non-profit (amuta)" },
+    "sources": ["https://www.guidestar.org.il/he/organization/580472751"],
+    "confidence": "confirmed"
+   },
+   {
+    "label": { "he": "מספר עמותה", "ru": "Номер амуты", "en": "Registration no." },
+    "value": "580472751",
+    "href": "https://www.guidestar.org.il/he/organization/580472751",
+    "sources": ["https://www.guidestar.org.il/he/organization/580472751"],
+    "confidence": "confirmed"
+   },
+   {
+    "label": { "he": "יו״ר העמותה", "ru": "Председатель амуты", "en": "Chair" },
+    "value": { "he": "אילנה קרטיש", "ru": "Илана Кратыш", "en": "Ilana Kratysh" },
+    "sources": ["https://1075.fm/item/207044/", "https://haipo.co.il/item/346254"],
+    "confidence": "confirmed"
+   },
+   {
+    "label": { "he": "ראש בית הספר לג׳ודו", "ru": "Руководитель школы дзюдо", "en": "Head of the judo school" },
+    "value": { "he": "אלכסנדר קרטיש", "ru": "Александр Кратыш", "en": "Alexander Kratysh" },
+    "sources": ["https://haipo.co.il/item/122821", "content/coaches/alexander-kratysh.json (owner, 2026-10-17)"],
+    "confidence": "confirmed"
+   },
+   {
+    "label": { "he": "ענפים", "ru": "Виды спорта", "en": "Disciplines" },
+    "value": { "he": "ג׳ודו, היאבקות, סמבו", "ru": "дзюдо, борьба, самбо", "en": "judo, wrestling, sambo" },
+    "sources": ["https://www.davar1.co.il/452598/", "http://otzma-sport.com/יוניפייט-חיפה/", "https://1075.fm/item/220812"],
+    "confidence": "confirmed"
+   },
+   {
+    "label": { "he": "סומו", "ru": "Сумо", "en": "Sumo" },
+    "value": { "he": "אימוני סומו במועדון", "ru": "тренировки по сумо в клубе", "en": "sumo training at the club" },
+    "sources": ["https://www.davar1.co.il/452598/"],
+    "confidence": "unverified",
+    "note": "Club people lead Israeli sumo, but no source says the club itself trains sumo. Owner to confirm before sumo is listed as a discipline."
+   },
+   {
+    "label": { "he": "השמות שלנו", "ru": "Наши имена", "en": "Our names" },
+    "value": {
+     "he": "בעיתונות של 2013 הקבוצה מופיעה בשם ״אולימפיקס״, וב־2015 בשם ״יוניפייט״. בעמוד הפייסבוק של המועדון מופיעים שני השמות יחד.",
+     "ru": "В прессе 2013 года команда выступает как «Олимпикс», в 2015-м — как «Юнифайт». На странице клуба в Facebook оба имени стоят рядом.",
+     "en": "In 2013 press reports the team appears as \"Olimpix\", and in 2015 as \"Unifight\". The club's Facebook page carries both names together."
+    },
+    "sources": ["https://haifainfo.com/?p=34416", "https://haifainfo.com/?p=51439", "https://www.facebook.com/unifightjudoclub/"],
+    "confidence": "confirmed"
+   }
+  ]
+ }
+}

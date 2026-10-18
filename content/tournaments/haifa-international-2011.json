@@ -1,0 +1,29 @@
+{
+ "discipline": "judo",
+ "date": "2011-12-17",
+ "name": {
+  "he": "הטורניר הבינלאומי ה־5 בג׳ודו בחיפה",
+  "ru": "5-й международный турнир по дзюдо в Хайфе",
+  "en": "5th Haifa International Judo Tournament"
+ },
+ "venue": {
+  "he": "חיפה",
+  "ru": "Хайфа",
+  "en": "Haifa"
+ },
+ "categories": {
+  "he": "עד גיל 17",
+  "ru": "до 17 лет",
+  "en": "Under 17"
+ },
+ "summary": {
+  "he": "יותר מ־30 קבוצות, עם ספורטאים מרוסיה, מגרמניה ומאוקראינה. ספורטאי המועדון זכו ב־5 תארים.",
+  "ru": "Более 30 команд, спортсмены из России, Германии и Украины. Спортсмены клуба выиграли 5 титулов.",
+  "en": "More than 30 teams, with athletes from Russia, Germany and Ukraine. Club athletes won 5 titles."
+ },
+ "sources": [
+  "https://web.archive.org/web/20190123033944/http://olimpix.info/2011/12/snovo-xajfa-vperedi-5-yj-mezhdunarodnyj-xajfskij-turnir-po-dzyudo/"
+ ],
+ "confidence": "likely",
+ "note": "Archived club site only; written up as the club's home event but the organizer is not stated. Owner to confirm."
+}

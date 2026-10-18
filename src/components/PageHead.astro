@@ -1,0 +1,32 @@
+---
+import { getRelativeLocaleUrl } from 'astro:i18n';
+import fonts from '../generated/fonts.json';
+import { LANGS, t, type Lang } from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+  /** path under /<lang>/, identical across locales */
+  path: string;
+  title: string;
+  desc: string;
+}
+
+const { lang, path, title, desc } = Astro.props;
+const abs = (p: string) => new URL(p, Astro.site).href;
+const url = abs(getRelativeLocaleUrl(lang, path));
+const LOCALE = { he: 'he_IL', ru: 'ru_RU', en: 'en_US' };
+---
+<link rel="canonical" href={url} />
+{LANGS.map((l) => <link rel="alternate" hreflang={l} href={abs(getRelativeLocaleUrl(l, path))} />)}
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content={t(lang, 'siteName')} />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={desc} />
+<meta property="og:url" content={url} />
+<meta property="og:image" content={abs(`${import.meta.env.BASE_URL}og/${lang}.jpg`)} />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:locale" content={LOCALE[lang]} />
+{LANGS.filter((l) => l !== lang).map((l) => <meta property="og:locale:alternate" content={LOCALE[l]} />)}
+<meta name="twitter:card" content="summary_large_image" />
+{(fonts as string[]).map((href) => <link rel="stylesheet" href={href} />)}

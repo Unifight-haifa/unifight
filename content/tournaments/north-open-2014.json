@@ -1,0 +1,25 @@
+{
+ "discipline": "judo",
+ "date": "2014-11-08",
+ "name": {
+  "he": "אליפות הצפון הפתוחה בג׳ודו 2014",
+  "ru": "Открытый чемпионат Севера Израиля по дзюдо 2014",
+  "en": "Northern Israel Open Judo Championship 2014"
+ },
+ "venue": {
+  "he": "חיפה",
+  "ru": "Хайфа",
+  "en": "Haifa"
+ },
+ "summary": {
+  "he": "תחרות לכל הגילים, מגיל 5.",
+  "ru": "Соревнования для всех возрастов, с 5 лет.",
+  "en": "A competition for all ages, from 5 years old."
+ },
+ "sources": [
+  "https://haifainfo.com/?p=47275",
+  "https://web.archive.org/web/2019/http://unifight.info/?p=1479"
+ ],
+ "confidence": "likely",
+ "note": "Announced on the club site and in its haifainfo section; organizer and venue hall not stated. Owner to confirm."
+}

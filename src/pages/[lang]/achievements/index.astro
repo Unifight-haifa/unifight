@@ -1,0 +1,115 @@
+---
+import { Image } from 'astro:assets';
+import { i18n } from 'astro:config/client';
+import site from '../../../../content/site.json';
+import Base from '../../../layouts/Base.astro';
+import JsonLd from '../../../components/JsonLd.astro';
+import PageHead from '../../../components/PageHead.astro';
+import { t, type Lang } from '../../../i18n/ui';
+import { achievements, photo } from '../../../lib/club';
+import { LEVELS, bidi } from '../../../lib/club-check.mjs';
+import '../../../styles/landing.css';
+import '../../../styles/news.css';
+import '../../../styles/club.css';
+
+export function getStaticPaths() {
+  return i18n!.locales.map((lang) => ({ params: { lang } }));
+}
+
+const lang = Astro.params.lang as Lang;
+const s = {
+  he: {
+    desc: 'הישגי מועדון הג׳ודו יוניפייט חיפה: אולימפיאדות, אליפויות העולם ואירופה ואליפויות ישראל.',
+    level: 'סינון לפי רמה',
+    year: 'סינון לפי שנה',
+    all: 'הכול',
+    none: 'אין הישגים שמתאימים לסינון.',
+    levels: { olympics: 'אולימפיאדה', world: 'עולם', europe: 'אירופה', israel: 'ישראל' },
+  },
+  ru: {
+    desc: 'Достижения клуба дзюдо «Юнифайт Хайфа»: Олимпийские игры, турниры мирового и европейского уровня и чемпионаты Израиля.',
+    level: 'Фильтр по уровню',
+    year: 'Фильтр по году',
+    all: 'Все',
+    none: 'Нет достижений для выбранного фильтра.',
+    levels: { olympics: 'Олимпиада', world: 'Мир', europe: 'Европа', israel: 'Израиль' },
+  },
+  en: {
+    desc: 'Achievements of the Unifight Haifa judo club: the Olympics, world and European events, and Israeli championships.',
+    level: 'Filter by level',
+    year: 'Filter by year',
+    all: 'All',
+    none: 'No achievements match this filter.',
+    levels: { olympics: 'Olympics', world: 'World', europe: 'Europe', israel: 'Israel' },
+  },
+}[lang];
+
+const a = site.achievements;
+const title = `${a.title[lang]} · ${t(lang, 'siteName')}`;
+const levels = LEVELS.filter((l) => achievements.some((c) => c.level === l)) as (keyof typeof s.levels)[];
+const years = [...new Set(achievements.flatMap((c) => c.years))].sort((x, y) => y - x);
+// highlights: "Name — event" titles: the name goes above the event, as on the landing cards
+const split = (x: string) => (x.includes(' — ') ? x.split(' — ', 2) : [null, x]);
+const ld = {
+  '@context': 'https://schema.org',
+  '@type': 'ItemList',
+  name: a.title[lang],
+  itemListElement: achievements.map((c, i) => ({ '@type': 'ListItem', position: i + 1, name: c.title[lang] })),
+};
+---
+<Base lang={lang} title={title} description={s.desc}>
+  <Fragment slot="head">
+    <PageHead lang={lang} path="achievements/" title={title} desc={s.desc} />
+    <JsonLd data={ld} />
+  </Fragment>
+  <div class="news club">
+    <h1 class="h2">{a.title[lang]}</h1>
+    <p class="lead" set:html={bidi(lang, a.intro[lang])} />
+    {/* chips stay hidden without JS, so every card shows */}
+    <div class="club-filters" data-filters hidden>
+      <div class="chips" role="group" aria-label={s.level} data-group="level">
+        <button type="button" class="chip" data-v="" aria-pressed="true">{s.all}</button>
+        {levels.map((l) => <button type="button" class="chip" data-v={l} aria-pressed="false">{s.levels[l]}</button>)}
+      </div>
+      <div class="chips" role="group" aria-label={s.year} data-group="year">
+        <button type="button" class="chip" data-v="" aria-pressed="true">{s.all}</button>
+        {years.map((y) => <button type="button" class="chip" data-v={y} aria-pressed="false"><bdi dir="ltr">{y}</bdi></button>)}
+      </div>
+    </div>
+    <ul class="club-cards">
+      {achievements.map((c) => {
+        const [who, what] = 'person' in c ? split(c.title[lang]) : [null, c.title[lang]];
+        return (
+          <li class:list={['club-card', `lv-${c.level}`]} data-level={c.level} data-years={c.years.join(' ')}>
+            <Image src={photo(c.photo)} alt={c.alt[lang]} widths={[400, 800]} sizes="(min-width: 900px) 300px, 100vw" />
+            <p class="club-card-meta"><bdi dir="ltr">{c.year}</bdi> · {s.levels[c.level as keyof typeof s.levels]}</p>
+            {who && <p class="hl-who">{who}</p>}
+            <h2 class="h3" set:html={bidi(lang, what!)} />
+            {c.detail && <p set:html={bidi(lang, c.detail[lang])} />}
+          </li>
+        );
+      })}
+    </ul>
+    <p class="club-empty" data-empty hidden>{s.none}</p>
+  </div>
+  <script is:inline>
+    (function () {
+      var bar = document.querySelector('[data-filters]');
+      var f = { level: '', year: '' };
+      bar.hidden = false;
+      bar.addEventListener('click', function (e) {
+        var b = e.target.closest('[data-v]');
+        if (!b) return;
+        var g = b.parentNode;
+        f[g.dataset.group] = b.dataset.v;
+        g.querySelectorAll('[data-v]').forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); });
+        var shown = 0;
+        document.querySelectorAll('.club-card').forEach(function (li) {
+          li.hidden = !!(f.level && li.dataset.level !== f.level) || !!(f.year && li.dataset.years.split(' ').indexOf(f.year) < 0);
+          if (!li.hidden) shown++;
+        });
+        document.querySelector('[data-empty]').hidden = shown > 0;
+      });
+    })();
+  </script>
+</Base>
