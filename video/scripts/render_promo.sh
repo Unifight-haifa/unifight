@@ -1,11 +1,11 @@
 #!/bin/sh
-# Usage: scripts/render_promo.sh <lang> <format> <out.mp4>   (lang: ru|he|en, format: 16x9|9x16)
+# Usage: scripts/render_promo.sh <format> <out.mp4>   (format: 16x9|9x16)
 # Writes <out.mp4> at -14 LUFS and a 720p preview next to it (<out>-720p.mp4).
 set -eu
 cd "$(dirname "$0")/.."
-lang=$1 format=$2 out=$3
+format=$1 out=$2
 raw="${out%.mp4}.raw.mp4"
-npx remotion render src/index.jsx Promo "$raw" --props="{\"lang\":\"$lang\",\"format\":\"$format\"}" \
+npx remotion render src/index.jsx Promo "$raw" --props="{\"format\":\"$format\"}" \
     --codec=h264 --pixel-format=yuv420p --image-format=jpeg --jpeg-quality=95 --color-space=bt709 \
     --crf=20 --x264-preset=slow --audio-bitrate=192k --log=error
 

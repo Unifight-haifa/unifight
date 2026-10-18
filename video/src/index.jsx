@@ -37,7 +37,7 @@ const Root = () => (
     width={1920}
     height={1080}
     durationInFrames={1}
-    defaultProps={{lang: 'ru', format: '16x9'}}
+    defaultProps={{format: '16x9'}}
     calculateMetadata={({props}) => {
       const [width, height] = SIZES[props.format];
       return {width, height, durationInFrames: promoLength(props.format)};

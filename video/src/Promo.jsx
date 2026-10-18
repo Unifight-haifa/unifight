@@ -1,7 +1,7 @@
 import {AbsoluteFill, Audio, Img, OffthreadVideo, Sequence, interpolate, spring, staticFile, useCurrentFrame, useVideoConfig} from 'remotion';
 import {SITE, WHATSAPP} from './data';
 import {C, fontsFor} from './fonts';
-import {Flash, Grain, Kanji, LightLeak, Rise, Vignette, ease} from './fx';
+import {Flash, Grain, Kanji, LightLeak, Vignette, ease} from './fx';
 import {CLUB, COPY, CUTS, PFPS} from './promoData';
 
 const F = (s) => Math.round(s * PFPS);
@@ -11,9 +11,9 @@ const XF = 3;
 const GRADE = 'contrast(1.06) saturate(0.9) sepia(0.08) brightness(0.97)';
 const LOW_RES = 'saturate(0.7) contrast(1.12)';
 
-const useL = (lang) => {
+const useL = () => {
   const {width, height} = useVideoConfig();
-  return {v: height > width, W: width, H: height, rtl: lang === 'he', ...fontsFor(lang)};
+  return {v: height > width, W: width, H: height};
 };
 
 const cover = (focus) => ({position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: focus});
@@ -96,7 +96,7 @@ const PhotoShot = ({shot, dur, L, dir}) => {
 
 const Shot = ({shot, dur, L, i}) => {
   const f = useCurrentFrame();
-  const dir = (i % 2 ? -1 : 1) * (L.rtl ? -1 : 1);
+  const dir = i % 2 ? -1 : 1;
   const body = shot.kind === 'v' ? <ClipShot shot={shot} dur={dur} L={L} /> : <PhotoShot shot={shot} dur={dur} L={L} dir={dir} />;
   const fade = shot.fadeIn ? ease(f, 0, shot.fadeIn, 0, 1) : 1;
   return (
@@ -127,54 +127,113 @@ const Letterbox = ({shots, L}) => {
   );
 };
 
-const Line = ({line, lang, L, dur}) => {
+const LANGS = ['he', 'ru', 'en'];
+const SHADOW = '0 3px 18px rgba(0,0,0,.9), 0 0 3px rgba(0,0,0,.7)';
+
+// Each language wipes in along its own reading direction, drifting up out of a blur.
+const Wipe = ({lang, at, style, children}) => {
   const f = useCurrentFrame();
-  const out = interpolate(f, [dur - 8, dur], [1, 0], clamp);
-  const text = COPY[line.key][lang];
-  const display = {fontFamily: L.display, fontWeight: 600, color: C.paper, textTransform: L.upper, textShadow: '0 4px 24px rgba(0,0,0,.85)'};
-  if (line.zone === 'cta') {
-    const sizes = L.v ? [84, 44, 42] : [88, 52, 46];
-    const top = (L.v ? [600, 830, 900] : [300, 470, 550])[line.row];
-    return (
-      <div style={{position: 'absolute', left: 70, right: 70, top, textAlign: 'center', opacity: out}}>
-        <Rise
-          text={text}
-          rtl={L.rtl}
-          start={0}
-          style={{
-            ...display, fontSize: sizes[line.row], lineHeight: 1.15,
-            fontFamily: line.row ? L.body : L.display, fontWeight: line.row ? 500 : 600,
-            color: line.row === 1 ? C.gold : C.paper, textTransform: line.row ? 'none' : L.upper,
-          }}
-        />
-      </div>
-    );
-  }
-  const size = L.v ? 74 : 70;
-  const bar = ease(f, 2, 14, 0, 1);
-  // for photos whose faces fill the lower third
-  const top = line.zone === 'top';
+  const p = ease(f, at, at + 12, 0, 1);
+  const rtl = lang === 'he';
+  const cut = `${(1 - p) * 105}%`;
   return (
-    <AbsoluteFill style={{opacity: out}}>
-      <AbsoluteFill style={{background: `linear-gradient(${top ? 180 : 0}deg, rgba(10,9,8,.72), transparent ${L.v ? 42 : 38}%)`, opacity: ease(f, 0, 10, 0, 1)}} />
+    <div
+      dir={rtl ? 'rtl' : 'ltr'}
+      style={{
+        ...style,
+        // negative insets keep the text shadow; Hebrew is revealed from the right edge
+        clipPath: p < 1 ? `inset(-40% ${rtl ? '-8%' : cut} -40% ${rtl ? cut : '-8%'})` : 'none',
+        transform: `translateY(${(1 - p) * 22}px)`,
+        filter: p < 0.99 ? `blur(${(1 - p) * 12}px)` : 'none',
+      }}
+    >
+      {/* keep a dash from opening a wrapped line */}
+      {children.replace(/ —/g, '\u00a0—')}
+    </div>
+  );
+};
+
+const lineStyle = (lang, size, font) => {
+  const fonts = fontsFor(lang);
+  return {
+    fontFamily: font === 'body' ? fonts.body : fonts.display,
+    fontWeight: font === 'body' ? 500 : 600,
+    textTransform: font === 'body' ? 'none' : fonts.upper,
+    // Secular One draws small next to Oswald caps, so Hebrew gets a nudge to match Russian by eye
+    fontSize: Math.round(size * {he: 1.1, ru: 1, en: 0.85}[lang]),
+    lineHeight: 1.12, color: C.paper, textShadow: SHADOW, textWrap: 'balance',
+  };
+};
+
+// Quick slide-down out so the next block always comes in on a clean frame.
+const exitStyle = (f, dur) => {
+  const q = ease(f, dur - 6, dur, 0, 1);
+  return {opacity: 1 - q, transform: `translateY(${q * 40}px)`, filter: q > 0.01 ? `blur(${q * 8}px)` : 'none'};
+};
+
+const Line = ({line, L, dur}) => {
+  const f = useCurrentFrame();
+  const {fps} = useVideoConfig();
+  const {big} = line;
+  const top = line.zone === 'top'; // for photos whose faces fill the lower third
+  const size = Math.round((L.v ? 58 : 60) * (big ? 1.18 : 1));
+  const punch = big ? 1 + 0.08 * (1 - spring({frame: f, fps, config: {damping: 11, stiffness: 160}})) : 1;
+  const hit = big ? ease(f, 0, 14, 1, 0) : 0;
+  const rule = <div style={{height: 4, width: (big ? 220 : 150) * ease(f, 0, 10, 0, 1), background: big ? C.gold : C.red, margin: top ? '22px 0 0' : '0 0 22px'}} />;
+  return (
+    <AbsoluteFill style={exitStyle(f, dur)}>
+      <AbsoluteFill style={{background: `linear-gradient(${top ? 180 : 0}deg, rgba(10,9,8,.8), rgba(10,9,8,.45) ${L.v ? 22 : 26}%, transparent ${L.v ? 46 : 52}%)`, opacity: ease(f, 0, 8, 0, 1)}} />
       <div
-        dir={L.rtl ? 'rtl' : 'ltr'}
-        style={{position: 'absolute', left: L.v ? 70 : 140, right: L.v ? 70 : 140, [top ? 'top' : 'bottom']: top ? 150 : L.v ? 470 : 150, display: 'flex', flexDirection: 'column', alignItems: 'flex-start'}}
+        style={{
+          position: 'absolute', left: L.v ? 60 : big ? 80 : 160, right: L.v ? 60 : big ? 80 : 160, [top ? 'top' : 'bottom']: L.v ? (top ? 260 : 400) : top ? 110 : 96,
+          display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: L.v ? 10 : 6,
+          transform: `scale(${punch})`, transformOrigin: top ? 'center top' : 'center bottom',
+        }}
       >
-        <div style={{height: 6, width: 110 * bar, background: line.big ? C.gold : C.red, marginBottom: 22}} />
-        <Rise text={text} rtl={L.rtl} start={2} stagger={2} style={{...display, fontSize: size, lineHeight: 1.12, maxWidth: L.v ? 940 : 1500}} />
+        {!top && rule}
+        {LANGS.map((lang, k) => (
+          <Wipe key={lang} lang={lang} at={k * (big ? 3 : 4)} style={{...lineStyle(lang, size), ...(hit && {color: `color-mix(in srgb, ${C.gold} ${hit * 100}%, ${C.paper})`, textShadow: `0 0 ${30 * hit}px ${C.gold}, ${SHADOW}`})}}>
+            {COPY[line.key][lang]}
+          </Wipe>
+        ))}
+        {top && rule}
+      </div>
+    </AbsoluteFill>
+  );
+};
+
+// The closing rows share one stacked block; each row still enters on its own beat.
+const Cta = ({rows, L, dur}) => {
+  const f = useCurrentFrame();
+  const at0 = F(rows[0].from);
+  const sizes = L.v ? [62, 40, 38] : [66, 40, 36];
+  return (
+    <AbsoluteFill style={{...exitStyle(f, dur), alignItems: 'center', justifyContent: 'center', paddingBottom: L.v ? 120 : 30}}>
+      <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: L.v ? 56 : 40, padding: L.v ? '0 60px' : '0 160px'}}>
+        {rows.map((r, i) => {
+          const at = F(r.from) - at0;
+          return (
+            <div key={r.key} style={{display: 'flex', flexDirection: 'column', alignItems: 'center', gap: i ? 4 : 8}}>
+              {LANGS.map((lang, k) => (
+                <Wipe key={lang} lang={lang} at={at + k * 4} style={{...lineStyle(lang, sizes[i], i ? 'body' : 'display'), color: i === 1 ? C.gold : C.paper}}>
+                  {COPY[r.key][lang]}
+                </Wipe>
+              ))}
+            </div>
+          );
+        })}
       </div>
     </AbsoluteFill>
   );
 };
 
 const LogoBug = ({L}) => (
-  <div style={{position: 'absolute', top: L.v ? 90 : 46, [L.rtl ? 'left' : 'right']: L.v ? 60 : 56, width: 60, height: 60, borderRadius: '50%', overflow: 'hidden', background: '#fff', opacity: 0.75}}>
+  <div style={{position: 'absolute', top: L.v ? 90 : 46, right: L.v ? 60 : 56, width: 60, height: 60, borderRadius: '50%', overflow: 'hidden', background: '#fff', opacity: 0.75}}>
     <Img src={staticFile('logo.png')} style={{width: '100%', height: '100%', objectFit: 'contain'}} />
   </div>
 );
 
-const EndCard = ({lang, L, dur}) => {
+const EndCard = ({L, dur}) => {
   const f = useCurrentFrame();
   const {fps} = useVideoConfig();
   const s = spring({frame: f, fps, config: {damping: 12, stiffness: 140}});
@@ -190,7 +249,11 @@ const EndCard = ({lang, L, dur}) => {
       </div>
       <div style={{fontFamily: 'Oswald', fontWeight: 600, fontSize: L.v ? 92 : 86, letterSpacing: '0.18em', marginTop: 34, ...row(6)}}>UNIFIGHT HAIFA</div>
       <div style={{width: 220 * ease(f, 12, 28, 0, 1), height: 4, background: C.gold, margin: '18px 0 26px'}} />
-      <div dir={L.rtl ? 'rtl' : 'ltr'} style={{fontFamily: L.body, fontSize: L.v ? 46 : 40, opacity: 0.88, ...row(14)}}>{CLUB[lang]}</div>
+      <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, ...row(14)}}>
+        {LANGS.map((lang) => (
+          <div key={lang} dir={lang === 'he' ? 'rtl' : 'ltr'} style={{fontFamily: fontsFor(lang).body, fontSize: (L.v ? 44 : 38) * (lang === 'en' ? 0.85 : 1), opacity: 0.88}}>{CLUB[lang]}</div>
+        ))}
+      </div>
       <div style={{fontFamily: 'Oswald', fontWeight: 500, fontSize: L.v ? 52 : 48, color: C.gold, marginTop: 40, letterSpacing: '0.03em', ...row(22)}}>{SITE}</div>
       <div dir="ltr" style={{fontFamily: 'Oswald', fontWeight: 500, fontSize: L.v ? 52 : 48, marginTop: 10, letterSpacing: '0.03em', ...row(28)}}>{WHATSAPP}</div>
       <Flash at={0} len={10} color={C.gold} max={0.6} />
@@ -207,12 +270,14 @@ const Sfx = ({at, name, volume = 1}) => (
 
 export const promoLength = (format) => F(CUTS[format].total) + 6;
 
-export const Promo = ({lang, format}) => {
-  const L = useL(lang);
+export const Promo = ({format}) => {
+  const L = useL();
   const cut = CUTS[format];
   const total = promoLength(format);
   const endFrom = F(cut.end);
   const flashes = cut.shots.filter((s) => s.flash).map((s) => s.from);
+  const captions = cut.lines.filter((l) => l.zone !== 'cta');
+  const cta = cut.lines.filter((l) => l.zone === 'cta');
   return (
     <AbsoluteFill style={{background: C.ink}}>
       {cut.music.map((m, k) => {
@@ -252,19 +317,22 @@ export const Promo = ({lang, format}) => {
       <Letterbox shots={cut.shots} L={L} />
       {cut.marks.map((m, k) => (
         <Sequence key={k} from={F(m.from)} durationInFrames={F(m.to) - F(m.from)} layout="none">
-          <Kanji text={m.k} size={L.v ? 120 : 110} start={4} opacity={0.45} style={{top: L.v ? 210 : 150, [L.rtl ? 'left' : 'right']: L.v ? 70 : 66}} />
+          <Kanji text={m.k} size={L.v ? 120 : 110} start={4} opacity={0.45} style={{top: L.v ? 210 : 150, right: L.v ? 70 : 66}} />
         </Sequence>
       ))}
       <Sequence from={F(cut.shots[1].from)} durationInFrames={endFrom - F(cut.shots[1].from)} layout="none">
         <LogoBug L={L} />
       </Sequence>
-      {cut.lines.map((l, k) => (
+      {captions.map((l, k) => (
         <Sequence key={k} from={F(l.from)} durationInFrames={F(l.to) - F(l.from)}>
-          <Line line={l} lang={lang} L={L} dur={F(l.to) - F(l.from)} />
+          <Line line={l} L={L} dur={F(l.to) - F(l.from)} />
         </Sequence>
       ))}
+      <Sequence from={F(cta[0].from)} durationInFrames={F(cta[0].to) - F(cta[0].from)}>
+        <Cta rows={cta} L={L} dur={F(cta[0].to) - F(cta[0].from)} />
+      </Sequence>
       <Sequence from={endFrom} durationInFrames={total - endFrom}>
-        <EndCard lang={lang} L={L} dur={total - endFrom} />
+        <EndCard L={L} dur={total - endFrom} />
       </Sequence>
       <Grain />
     </AbsoluteFill>

@@ -64,11 +64,11 @@ ffmpeg, draws the dot map, tatami strip and ink map, copies the logo and cuts bo
 ## Club promo
 
 `Promo` (`src/Promo.jsx`, copy and shot lists in `src/promoData.js`) is the channel trailer:
-about 71 s in 16:9 and a 40 s 9:16 cutdown, in ru, he or en.
+about 71 s in 16:9 and a 40 s 9:16 cutdown, captioned in Hebrew, Russian and English at once.
 
 ```sh
 python3 -I scripts/prep_promo.py ../assets/source    # clips, photos, music, SFX into public/promo/ (gitignored)
-scripts/render_promo.sh ru 16x9 out/promo-ru-16x9.mp4  # also writes out/promo-ru-16x9-720p.mp4
+scripts/render_promo.sh 16x9 out/promo-16x9.mp4  # also writes out/promo-16x9-720p.mp4
 ```
 
 The render is normalised to -14 LUFS. Only camera material is used; the WhatsApp fight copies

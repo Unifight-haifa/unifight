@@ -82,7 +82,7 @@ const build = ({cuts, shots, lines, marks, drop, end}) => {
     music: segs,
     total: last.at + last.to - last.from,
     shots: shots.map(([a, b, shot]) => ({...shot, from: T(a), to: T(b)})),
-    lines: lines.map(([a, b, key, more]) => ({key, from: T(a) + 0.1, to: T(b) - 0.12, ...more})),
+    lines: lines.map(([a, b, key, more]) => ({key, from: T(a), to: T(b) - 0.12, ...more})),
     drop: B(drop),
     end: B(end),
     marks: marks.map(([a, b, k]) => ({k, from: T(a), to: T(b)})),
