@@ -45,7 +45,7 @@ export const COPY = {
     en: 'And one day, your sweat turns into victory.',
   },
   coaches: {
-    ru: 'Рядом — тренеры, которые сами прошли этот путь.',
+    ru: 'Рядом — тренера, которые сами прошли этот путь.',
     he: 'לצידך — מאמנים שעברו את הדרך הזאת בעצמם.',
     en: "Beside you: coaches who've walked this road themselves.",
   },
