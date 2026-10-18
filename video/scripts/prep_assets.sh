@@ -7,6 +7,7 @@ tmp=$(mktemp -d)
 trap 'rm -rf "$tmp"' EXIT
 
 python3 -I scripts/prep_photos.py "$1"
+cp ../public/coaches/natanel.jpg public/photos/natanel-portrait.jpg
 curl -sfL -o "$tmp/land.geojson" https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_110m_land.geojson
 python3 -I scripts/prep_media.py "$1" "$tmp/land.geojson"
 

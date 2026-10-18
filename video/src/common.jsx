@@ -7,10 +7,58 @@ export const ease = (f, a, b, from, to, e = Easing.bezier(0.22, 1, 0.36, 1)) =>
   interpolate(f, [a, b], [from, to], {...clamp, easing: e});
 export const inOut = Easing.bezier(0.65, 0, 0.35, 1);
 
-export const useLayout = (lang) => {
+export const useLayout = () => {
   const {width, height} = useVideoConfig();
-  return {v: height > width, rtl: lang === 'he', W: width, H: height, ...fontsFor(lang)};
+  return {v: height > width, W: width, H: height};
 };
+
+export const LANGS = ['he', 'ru', 'en'];
+
+// One line in one script, wiped in along its own reading direction (Hebrew from the right).
+// Number ranges in Hebrew are isolated so 2013–2016 doesn't flip.
+const Line = ({lang, text, at, end, size, font = 'display', weight = 600, upper = true, track = 0, style}) => {
+  const f = useCurrentFrame();
+  const F = fontsFor(lang);
+  const rtl = lang === 'he';
+  const p = ease(f, at, at + 14, 0, 1);
+  const o = end === undefined ? 0 : ease(f, end - 6, end, 0, 100, inOut);
+  const hide = (1 - p) * 100;
+  const [l, r] = rtl ? [hide, o] : [o, hide];
+  return (
+    <span
+      dir={rtl ? 'rtl' : 'ltr'}
+      style={{
+        display: 'inline-block', fontFamily: font === 'body' ? F.body : F.display, fontWeight: weight,
+        fontSize: lang === 'en' ? size * 0.85 : size, lineHeight: 1.12, textTransform: upper ? F.upper : 'none',
+        letterSpacing: rtl ? 0 : track, textWrap: 'balance', clipPath: `inset(-30% ${r}% -30% ${l}%)`,
+        transform: `translateY(${(1 - p) * 0.3}em)`, filter: p < 1 ? `blur(${(1 - p) * 8}px)` : 'none', ...style,
+      }}
+    >
+      {rtl ? text.replace(/\d+[–-]\d+/g, '\u2066$&\u2069') : text}
+    </span>
+  );
+};
+
+// Hebrew, Russian, English stacked and centered; one line when all three are the same.
+export const Tri = ({text, start = 0, stagger = 5, gap = 0.12, style, ...line}) => (
+  <div style={{textAlign: 'center', ...style}}>
+    {(text.he === text.en && text.ru === text.en ? ['en'] : LANGS).map((lang, i) => (
+      <div key={lang} style={{marginTop: i ? line.size * gap : 0}}>
+        <Line lang={lang} text={text[lang]} at={start + i * stagger} {...line} />
+      </div>
+    ))}
+  </div>
+);
+
+// The same scripts side by side, for short labels.
+export const Row = ({text, langs = LANGS, start = 0, stagger = 5, style, ...line}) => (
+  <div style={{display: 'flex', justifyContent: 'center', alignItems: 'baseline', gap: line.size * 0.5, direction: 'ltr', ...style}}>
+    {langs.map((lang, i) => [
+      i > 0 && <Line key={'d' + i} lang="en" text="·" at={start + i * stagger} {...line} style={{opacity: 0.5}} />,
+      <Line key={lang} lang={lang} text={text[lang]} at={start + i * stagger} {...line} />,
+    ])}
+  </div>
+);
 
 export const Grain = ({opacity = 0.16}) => {
   const f = useCurrentFrame();
@@ -88,12 +136,12 @@ export const Kanji = ({text, size, start = 0, color = C.gold, opacity = 1, verti
 };
 
 // Words rise out of a mask with a spring, staggered.
-export const Rise = ({text, start = 0, stagger = 2, style, rtl, damping = 16}) => {
+export const Rise = ({text, start = 0, stagger = 2, style, damping = 16}) => {
   const f = useCurrentFrame();
   const {fps} = useVideoConfig();
   const parts = text.split(' ');
   return (
-    <div style={{direction: rtl ? 'rtl' : 'ltr', textWrap: 'balance', ...style}}>
+    <div style={{textWrap: 'balance', ...style}}>
       {parts.map((w, i) => {
         const s = spring({frame: f - start - i * stagger, fps, config: {damping, stiffness: 120, mass: 0.7}});
         return (
@@ -108,8 +156,8 @@ export const Rise = ({text, start = 0, stagger = 2, style, rtl, damping = 16}) =
   );
 };
 
-export const EndCard = ({lang, dur, tagline, site, whatsapp, kanji = '道'}) => {
-  const L = useLayout(lang);
+export const EndCard = ({dur, tagline, site, whatsapp, kanji = '道'}) => {
+  const L = useLayout();
   const f = useCurrentFrame();
   const {fps} = useVideoConfig();
   const s = spring({frame: f - 2, fps, config: {damping: 18, stiffness: 90}});
@@ -123,9 +171,7 @@ export const EndCard = ({lang, dur, tagline, site, whatsapp, kanji = '道'}) => 
       </div>
       <div style={{fontFamily: 'Oswald', fontWeight: 600, fontSize: L.v ? 96 : 88, letterSpacing: '0.18em', marginTop: 30, ...row(8)}}>UNIFIGHT HAIFA</div>
       <div style={{width: 220 * ease(f, 14, 30, 0, 1), height: 4, background: C.gold, margin: '18px 0 28px'}} />
-      <div dir={L.rtl ? 'rtl' : 'ltr'} style={{fontFamily: L.body, fontSize: L.v ? 44 : 38, opacity: 0.85, maxWidth: L.v ? 900 : 1400, ...row(16)}}>
-        {tagline}
-      </div>
+      <Tri text={tagline} start={16} font="body" weight={400} upper={false} size={L.v ? 44 : 38} style={{opacity: 0.88, maxWidth: L.v ? 940 : 1400}} />
       <div style={{fontFamily: 'Oswald', fontWeight: 500, fontSize: L.v ? 50 : 46, color: C.gold, marginTop: 44, letterSpacing: '0.04em', ...row(24)}}>{site}</div>
       <div style={{fontFamily: 'Oswald', fontWeight: 500, fontSize: L.v ? 50 : 46, marginTop: 10, letterSpacing: '0.04em', ...row(30)}}>{whatsapp}</div>
       <AbsoluteFill style={{background: '#000', opacity: fadeOut}} />

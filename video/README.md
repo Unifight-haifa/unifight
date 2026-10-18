@@ -8,14 +8,16 @@ This folder has its own `package.json`; the site doesn't depend on it.
 ```sh
 cd video
 npm ci
-scripts/render.sh <coach> <lang> <format> <out.mp4>
+scripts/render.sh <coach> <format> <out.mp4>
 ```
 
 - `coach`: `ilana` or `natanel`
-- `lang`: `ru`, `he` (RTL) or `en`
 - `format`: `16x9` (1920×1080, YouTube) or `9x16` (1080×1920, Shorts/Reels)
 
-Example: `scripts/render.sh natanel ru 9x16 out/natanel-ru-9x16.mp4`.
+Every caption shows Hebrew, Russian and English together, so there's one render per coach and format.
+Ilana's map cards are laid out for 16x9 only.
+
+Example: `scripts/render.sh natanel 9x16 out/natanel-9x16.mp4`.
 Output is H.264 high, yuv420p, bt709, 30 fps, AAC 192k. Extra flags go straight to `remotion render`.
 
 `npm run studio` opens the Remotion editor; pick `CoachProfile` and set the props there.
@@ -39,8 +41,8 @@ Shared: brand fonts, grain, end card (`src/common.jsx`); all on-screen text is i
   those files or from article quotes in `.planning/research/PHOTOS-2026-10-18.md`.
 - A coach's video talks only about that coach. Other athletes' names on judogi backs are blurred
   in prep; the club randori clip is blurred so no back patch is readable.
-- Camera photos and footage only. The site's studio portraits carry C2PA "trainedAlgorithmicMedia"
-  data, so they stay out of the videos.
+- Camera photos and footage only, except Natanel's closing shot: the site's studio portrait, a
+  stylised photo the owner approved. Mark uploads of his video as altered/synthetic content.
 
 ## Assets
 

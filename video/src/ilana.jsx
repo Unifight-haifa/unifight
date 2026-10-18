@@ -1,6 +1,6 @@
 import {AbsoluteFill, Audio, Img, Sequence, interpolate, random, spring, staticFile, useCurrentFrame, useVideoConfig} from 'remotion';
 import {C, KANJI} from './fonts';
-import {EndCard, Flash, Grain, Photo, Rise, Vignette, clamp, ease, inOut, photo, useLayout} from './common';
+import {EndCard, Flash, Grain, Photo, Row, Tri, Vignette, clamp, ease, inOut, photo, useLayout} from './common';
 import {ILANA, SITE, TAGLINE, WHATSAPP} from './text';
 
 // Heroic Age measures 130.01 BPM and the cut starts on a downbeat, so beat n is frame n * BEAT.
@@ -52,57 +52,53 @@ const Open = () => {
   );
 };
 
-const Title = ({lang}) => {
-  const L = useLayout(lang);
+const Title = () => {
+  const L = useLayout();
   const f = useCurrentFrame();
   const {fps} = useVideoConfig();
-  const [first, ...rest] = ILANA.json.name[lang].split(' ');
+  const name = ILANA.json.name;
+  const [first, ...rest] = name.en.split(' ');
   const slab = spring({frame: f - 4, fps, config: {damping: 13, stiffness: 170}});
-  const words = ILANA.disciplines[lang];
-  const side = L.rtl ? 'left' : 'right';
-  const tside = L.rtl ? 'right' : 'left';
+  const D = ILANA.disciplines;
   const panel = ease(f, 0, 12, 0, 1);
-  const size = L.v ? 170 : 210;
+  const size = L.v ? 150 : 190;
+  const big = {fontFamily: 'Oswald', fontWeight: 700, fontSize: size, lineHeight: 0.95, color: C.paper, textTransform: 'uppercase'};
   return (
     <AbsoluteFill style={{background: C.ink}}>
       <div
         style={{
-          position: 'absolute', top: 0, bottom: L.v ? '45%' : 0, [side]: 0, width: L.v ? '100%' : '46%',
-          clipPath: L.v ? `inset(0 0 ${100 - 100 * panel}% 0)` : `polygon(${L.rtl ? `0 0, ${88 * panel}% 0, ${100 * panel}% 100%, 0 100%` : `${100 - 100 * panel + 12}% 0, 100% 0, 100% 100%, ${100 - 100 * panel}% 100%`})`,
+          position: 'absolute', top: 0, bottom: L.v ? '50%' : 0, right: 0, width: L.v ? '100%' : '46%',
+          clipPath: L.v ? `inset(0 0 ${100 - 100 * panel}% 0)` : `polygon(${100 - 100 * panel + 12}% 0, 100% 0, 100% 100%, ${100 - 100 * panel}% 100%)`,
         }}
       >
         <Photo src="ilana-bw" focus="50% 22%" dur={T.journey - T.title} zoom={[1.15, 1.04]} />
       </div>
       <div
         style={{
-          position: 'absolute', [tside]: L.v ? 70 : 110, [side]: L.v ? 70 : 'auto', top: L.v ? '54%' : 0, bottom: 0,
-          display: 'flex', flexDirection: 'column', justifyContent: L.v ? 'flex-start' : 'center',
-          alignItems: L.rtl ? 'flex-end' : 'flex-start', direction: L.rtl ? 'rtl' : 'ltr',
+          position: 'absolute', left: L.v ? 50 : 60, width: L.v ? L.W - 100 : '50%', top: L.v ? '52%' : 0, bottom: 0,
+          display: 'flex', flexDirection: 'column', justifyContent: L.v ? 'flex-start' : 'center', alignItems: 'center', textAlign: 'center',
         }}
       >
         <div style={{fontFamily: 'Oswald', fontWeight: 600, fontSize: 30, letterSpacing: '0.4em', color: C.gold, opacity: ease(f, 4, 14, 0, 1)}}>UNIFIGHT HAIFA</div>
-        <div style={{fontFamily: L.display, fontWeight: 700, fontSize: size, lineHeight: 0.95, color: C.paper, textTransform: L.upper, marginTop: 10, transform: `translateX(${(L.rtl ? 1 : -1) * (1 - slab) * 140}px)`, opacity: slab}}>
-          {first}
-        </div>
+        <div style={{...big, marginTop: 10, transform: `translateX(${-(1 - slab) * 140}px)`, opacity: slab}}>{first}</div>
         <div style={{position: 'relative', marginTop: 6}}>
-          <div style={{position: 'absolute', inset: '6% -24px 2% -24px', background: C.red, transform: `scaleX(${slab})`, transformOrigin: L.rtl ? 'right' : 'left'}} />
-          <div style={{position: 'relative', fontFamily: L.display, fontWeight: 700, fontSize: size, lineHeight: 0.95, color: C.paper, textTransform: L.upper, clipPath: `inset(0 ${L.rtl ? 0 : 100 - ease(f, 8, 20, 0, 100)}% 0 ${L.rtl ? 100 - ease(f, 8, 20, 0, 100) : 0}%)`}}>
-            {rest.join(' ')}
-          </div>
+          <div style={{position: 'absolute', inset: '6% -24px 2% -24px', background: C.red, transform: `scaleX(${slab})`, transformOrigin: 'left'}} />
+          <div style={{...big, position: 'relative', clipPath: `inset(0 ${100 - ease(f, 8, 20, 0, 100)}% 0 0)`}}>{rest.join(' ')}</div>
         </div>
-        <div style={{display: 'flex', gap: 26, marginTop: 40, flexWrap: 'wrap'}}>
-          {words.map((w, i) => {
+        <Row text={name} langs={['he', 'ru']} start={16} size={L.v ? 48 : 46} weight={500} upper={false} style={{marginTop: 24, color: C.paper}} />
+        <div style={{display: 'flex', gap: 54, marginTop: 34}}>
+          {D.en.map((_, i) => {
             const at = b(4 + 2 * i);
             const s = spring({frame: f - at, fps, config: {damping: 11, stiffness: 200}});
             return (
-              <div key={i} style={{fontFamily: L.display, fontWeight: 700, fontSize: L.v ? 64 : 58, letterSpacing: L.rtl ? 0 : '0.06em', color: i === words.length - 1 ? C.gold : C.paper, opacity: Math.min(1, s * 2), transform: `scale(${1.7 - 0.7 * s})`, WebkitTextStroke: i === 1 ? `2px ${C.paper}` : 'none', WebkitTextFillColor: i === 1 ? 'transparent' : undefined}}>
-                {w}
+              <div key={i} style={{opacity: Math.min(1, s * 2), transform: `scale(${1.5 - 0.5 * s})`, color: i === D.en.length - 1 ? C.gold : C.paper}}>
+                <Tri text={{he: D.he[i], ru: D.ru[i], en: D.en[i]}} start={at - 2} stagger={4} size={46} weight={700} track="0.06em" gap={0.04} />
               </div>
             );
           })}
         </div>
       </div>
-      {words.map((_, i) => <Flash key={i} at={b(4 + 2 * i)} len={4} color={C.red} max={0.25} />)}
+      {D.en.map((_, i) => <Flash key={i} at={b(4 + 2 * i)} len={4} color={C.red} max={0.25} />)}
     </AbsoluteFill>
   );
 };
@@ -128,7 +124,7 @@ const camera = (f, L) => {
   // Beat kick on the map, harder at every station.
   const kick = f < T.today ? (1 - (((f - T.journey) / BEAT) % 1)) ** 4 * 0.01 * (1 + idx * 0.6) : 0;
   let z = base * (1 - Math.min(0.45, far / 260) * Math.sin(Math.PI * t)) * (1 + kick);
-  let ax = L.v ? 0.5 : L.rtl ? 0.7 : 0.3;
+  let ax = L.v ? 0.5 : 0.3;
   let ay = L.v ? 0.3 : 0.4;
   let cx = mx(lon), cy = my(lat);
   if (f >= T.today) {
@@ -136,14 +132,14 @@ const camera = (f, L) => {
     z = z + ((L.v ? 0.26 : 0.32) - z) * w;
     cx = cx + (mx(32) - cx) * w;
     cy = cy + (my(14) - cy) * w;
-    ax = ax + ((L.v ? 0.5 : L.rtl ? 0.64 : 0.36) - ax) * w;
+    ax = ax + ((L.v ? 0.5 : 0.36) - ax) * w;
     ay = ay + (0.5 - ay) * w;
   }
   return {idx, k, t, z, x: L.W * ax - cx * z, y: L.H * ay - cy * z};
 };
 
-const MapLayer = ({lang}) => {
-  const L = useLayout(lang);
+const MapLayer = () => {
+  const L = useLayout();
   const f = useCurrentFrame();
   const cam = camera(f, L);
   const done = f >= T.today ? ST.length : cam.idx;
@@ -170,7 +166,7 @@ const MapLayer = ({lang}) => {
                 {cur && <circle r={14 + 40 * pulse} fill="none" stroke={C.red} strokeWidth={3} opacity={1 - pulse} />}
                 <circle r={cur ? 13 : 9} fill={cur ? C.red : C.gold} stroke={C.ink} strokeWidth={3} />
                 {f >= T.today && i < ST.length - 1 && (
-                  <text x={16} y={-14} fill={C.paper} fontFamily="Oswald" fontWeight={600} fontSize={26} letterSpacing="0.12em">{s.place[lang === 'he' ? 'en' : lang]}</text>
+                  <text x={16} y={-14} fill={C.paper} fontFamily="Oswald" fontWeight={600} fontSize={26} letterSpacing="0.12em">{s.place.en}</text>
                 )}
               </g>
             );
@@ -183,8 +179,8 @@ const MapLayer = ({lang}) => {
 };
 
 // Year odometer: the ones digit rolls continuously, others snap.
-const Counter = ({lang}) => {
-  const L = useLayout(lang);
+const Counter = () => {
+  const L = useLayout();
   const f = useCurrentFrame();
   const cam = camera(f, L);
   const s = ST[cam.idx];
@@ -196,11 +192,10 @@ const Counter = ({lang}) => {
   const digits = String(Math.floor(v)).padStart(4, '0').split('');
   const frac = v - Math.floor(v);
   const H = L.v ? 150 : 132;
-  const place = s.place[lang];
   const out = f >= T.today ? ease(f, T.today, T.today + 12, 1, 0) : 1;
   return (
-    <div style={{position: 'absolute', top: L.v ? 120 : 64, [L.rtl ? 'right' : 'left']: L.v ? 70 : 90, opacity: out, direction: 'ltr', textAlign: L.rtl ? 'right' : 'left'}}>
-      <div style={{display: 'flex', height: H, overflow: 'hidden', fontFamily: 'Oswald', fontWeight: 700, fontSize: H, lineHeight: `${H}px`, color: 'rgba(212,168,75,.14)', WebkitTextStroke: `4px ${C.gold}`, justifyContent: L.rtl ? 'flex-end' : 'flex-start'}}>
+    <div style={{position: 'absolute', top: L.v ? 200 : 64, left: L.v ? 70 : 90, opacity: out}}>
+      <div style={{display: 'flex', height: H, overflow: 'hidden', fontFamily: 'Oswald', fontWeight: 700, fontSize: H, lineHeight: `${H}px`, color: 'rgba(212,168,75,.14)', WebkitTextStroke: `4px ${C.gold}`}}>
         {show ? digits.map((d, i) => {
           const roll = i === 3 ? frac : 0;
           const n = Number(d);
@@ -212,28 +207,28 @@ const Counter = ({lang}) => {
           );
         }) : null}
       </div>
-      <div style={{fontFamily: L.display, fontWeight: 600, fontSize: 34, letterSpacing: L.rtl ? 0 : '0.3em', color: C.paper, marginTop: 10}}>
-        <span style={{display: 'inline-block', width: 34, height: 4, background: C.red, verticalAlign: 'middle', margin: L.rtl ? '0 0 0 14px' : '0 14px 0 0'}} />
-        {place}
+      <div style={{display: 'flex', alignItems: 'center', gap: 14, marginTop: 10, color: C.paper}}>
+        <span style={{width: 34, height: 4, background: C.red}} />
+        <Row key={cam.idx} text={s.place} start={stAt(cam.idx)} size={30} track="0.2em" />
       </div>
     </div>
   );
 };
 
-const PRESS = {ru: 'ПРЕССА', he: 'עיתונות', en: 'PRESS'};
+const PRESS = {he: 'עיתונות', ru: 'ПРЕССА', en: 'PRESS'};
 
-const Cards = ({s, lang, dur}) => {
-  const L = useLayout(lang);
+const Cards = ({s, dur}) => {
+  const L = useLayout();
   const f = useCurrentFrame();
   const {fps} = useVideoConfig();
   const exit = ease(f, dur - 8, dur, 0, 1, inOut);
   return (
-    <AbsoluteFill style={{transform: `translateX(${(L.rtl ? 1 : -1) * exit * 160}px)`, opacity: 1 - exit, filter: `blur(${exit * 10}px)`}}>
+    <AbsoluteFill style={{transform: `translateX(${-exit * 160}px)`, opacity: 1 - exit, filter: `blur(${exit * 10}px)`}}>
       {s.cards.map((c, i) => {
         const at = b(2 + i / 2);
         const sp = spring({frame: f - at, fps, config: {damping: 12, stiffness: 190, mass: 0.8}});
         const shake = f - at > 0 && f - at < 5 ? (random(`c${f}${i}`) - 0.5) * 10 : 0;
-        const x = L.v ? 0.5 - c.w * 0.85 + (c.x - 0.6) * 1.2 : L.rtl ? 1 - c.x - c.w : c.x;
+        const x = L.v ? 0.5 - c.w * 0.85 + (c.x - 0.6) * 1.2 : c.x;
         const w = L.v ? c.w * 1.6 : c.w;
         const y = L.v ? 0.36 + c.y * 0.45 : c.y;
         return (
@@ -241,8 +236,8 @@ const Cards = ({s, lang, dur}) => {
             <div style={{position: 'absolute', inset: 0, background: C.red, transform: 'translate(14px, 14px)'}} />
             <Img src={photo(c.src)} style={{position: 'relative', display: 'block', width: '100%', border: `8px solid ${C.paper}`, boxShadow: '0 30px 70px rgba(0,0,0,.6)', filter: c.press ? 'sepia(.18) contrast(1.05)' : 'none'}} />
             {c.press && (
-              <div style={{position: 'absolute', top: -22, [L.rtl ? 'right' : 'left']: 18, background: C.ink, color: C.gold, fontFamily: L.display, fontWeight: 700, fontSize: 24, letterSpacing: L.rtl ? 0 : '0.3em', padding: '6px 14px', border: `2px solid ${C.gold}`}}>
-                {PRESS[lang]}
+              <div style={{position: 'absolute', top: -24, left: 18, background: C.ink, color: C.gold, padding: '6px 14px', border: `2px solid ${C.gold}`}}>
+                <Row text={PRESS} start={at - 4} stagger={2} size={22} weight={700} track="0.2em" />
               </div>
             )}
           </div>
@@ -252,63 +247,68 @@ const Cards = ({s, lang, dur}) => {
   );
 };
 
-const Credential = ({s, lang, dur}) => {
-  const L = useLayout(lang);
+// Latin headline; Hebrew and Cyrillic beneath only when they differ from it.
+const Headline = ({text, size, start, align = 'center'}) => {
   const f = useCurrentFrame();
   const {fps} = useVideoConfig();
-  const sp = spring({frame: f - b(2), fps, config: {damping: 12, stiffness: 160}});
-  const exit = ease(f, dur - 8, dur, 0, 1, inOut);
-  const big = s.big[lang];
-  const size = big.length > 4 ? (L.v ? 150 : 170) : L.v ? 230 : 250;
+  const sp = spring({frame: f - start, fps, config: {damping: 12, stiffness: 160}});
+  const same = text.he === text.en && text.ru === text.en;
+  return (
+    <>
+      <div style={{fontFamily: 'Oswald', fontWeight: 700, fontSize: size, lineHeight: 0.9, color: C.gold, textShadow: `8px 8px 0 ${C.red}`, textTransform: 'uppercase', whiteSpace: 'nowrap', transform: `scale(${1.5 - 0.5 * sp})`, transformOrigin: `${align} bottom`, opacity: Math.min(1, sp * 2)}}>
+        {text.en}
+      </div>
+      {!same && <Row text={text} langs={['he', 'ru']} start={start + 4} size={44} weight={600} style={{marginTop: 18, color: C.gold}} />}
+    </>
+  );
+};
+
+const Credential = ({s, dur}) => {
+  const L = useLayout();
+  const f = useCurrentFrame();
+  const exit = ease(f, dur - 6, dur, 0, 1, inOut);
+  const size = s.big.en.length > 4 ? 130 : L.v ? 170 : 180;
   return (
     <div
       style={{
-        position: 'absolute', bottom: L.v ? 220 : 80, [L.rtl ? 'right' : 'left']: L.v ? 70 : 90, width: L.v ? '85%' : '46%',
-        direction: L.rtl ? 'rtl' : 'ltr', color: C.paper, opacity: 1 - exit, transform: `translateY(${exit * 40}px)`,
+        position: 'absolute', bottom: L.v ? 360 : 92, left: L.v ? 60 : 50, width: L.v ? L.W - 120 : '49%',
+        display: 'flex', flexDirection: 'column', alignItems: 'center', color: C.paper, opacity: 1 - exit,
       }}
     >
       <div style={{display: 'flex', alignItems: 'flex-end', gap: 22}}>
-        <div dir="auto" style={{fontFamily: L.display, fontWeight: 700, fontSize: size, lineHeight: 0.9, color: C.gold, textShadow: `8px 8px 0 ${C.red}`, transform: `scale(${1.5 - 0.5 * sp})`, transformOrigin: L.rtl ? 'right bottom' : 'left bottom', opacity: Math.min(1, sp * 2), whiteSpace: 'nowrap', textTransform: L.upper}}>
-          {big}
+        <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
+          <Headline text={s.big} size={size} start={b(2)} />
         </div>
         <div style={{fontFamily: KANJI, fontSize: 58, lineHeight: 1.02, color: C.paper, background: C.red, padding: '8px 8px 10px', writingMode: 'vertical-rl', opacity: ease(f, b(2.5), b(2.5) + 6, 0, 1), transform: `scale(${ease(f, b(2.5), b(2.5) + 8, 1.6, 1)})`, marginBottom: 6}}>
           {s.kanji}
         </div>
       </div>
-      <Rise text={s.line[lang]} start={b(2.5)} rtl={L.rtl} style={{fontFamily: L.display, fontWeight: 600, fontSize: L.v ? 64 : 56, lineHeight: 1.08, textTransform: L.upper, marginTop: 26}} />
-      {s.sub && (
-        <div dir="auto" style={{fontFamily: L.body, fontWeight: 500, fontSize: L.v ? 40 : 34, lineHeight: 1.3, marginTop: 14, textAlign: L.rtl ? 'right' : 'left', opacity: 0.85 * ease(f, b(3), b(4), 0, 1), textWrap: 'balance'}}>
-          {s.sub[lang]}
-        </div>
-      )}
+      <Tri text={s.line} start={b(2.5)} end={dur} stagger={4} size={L.v ? 50 : 44} weight={600} gap={0.06} style={{marginTop: 22}} />
+      {s.sub && <Tri text={s.sub} start={b(3)} end={dur} stagger={4} size={L.v ? 34 : 30} font="body" weight={500} upper={false} gap={0.15} style={{marginTop: 14, opacity: 0.85}} />}
     </div>
   );
 };
 
-const Today = ({lang, dur}) => {
-  const L = useLayout(lang);
+const Today = ({dur}) => {
+  const L = useLayout();
   const f = useCurrentFrame();
-  const {fps} = useVideoConfig();
-  const side = L.rtl ? 'left' : 'right';
   const open = ease(f, 6, b(2), 0, 1, inOut);
-  const sp = spring({frame: f - b(2) + 2, fps, config: {damping: 13, stiffness: 150}});
   return (
     <AbsoluteFill>
-      <div style={{position: 'absolute', top: 0, bottom: L.v ? '48%' : 0, [side]: 0, width: L.v ? '100%' : '40%', clipPath: L.v ? `inset(0 0 ${100 - open * 100}% 0)` : `inset(0 ${L.rtl ? 100 - open * 100 : 0}% 0 ${L.rtl ? 0 : 100 - open * 100}%)`}}>
+      <div style={{position: 'absolute', top: 0, bottom: L.v ? '50%' : 0, right: 0, width: L.v ? '100%' : '40%', clipPath: L.v ? `inset(0 0 ${100 - open * 100}% 0)` : `inset(0 0 0 ${100 - open * 100}%)`}}>
         <Photo src="ilana-coach" focus="50% 20%" dur={dur} zoom={[1.1, 1.0]} />
-        <AbsoluteFill style={{background: `linear-gradient(${L.rtl ? 270 : 90}deg, rgba(10,9,8,.55), transparent 30%)`}} />
+        <AbsoluteFill style={{background: 'linear-gradient(90deg, rgba(10,9,8,.55), transparent 30%)'}} />
       </div>
-      <div style={{position: 'absolute', [L.rtl ? 'right' : 'left']: L.v ? 70 : 90, bottom: L.v ? 260 : 110, width: L.v ? '85%' : '52%', direction: L.rtl ? 'rtl' : 'ltr', color: C.paper}}>
-        <div style={{fontFamily: L.display, fontWeight: 700, fontSize: L.v ? 170 : 190, lineHeight: 0.9, color: C.gold, textShadow: `8px 8px 0 ${C.red}`, textTransform: L.upper, transform: `scale(${1.4 - 0.4 * sp})`, transformOrigin: L.rtl ? 'right bottom' : 'left bottom', opacity: Math.min(1, sp * 2)}}>
-          {ILANA.today[lang]}
-        </div>
-        <Rise text={ILANA.todayLine[lang]} start={b(3)} rtl={L.rtl} style={{fontFamily: L.display, fontWeight: 600, fontSize: L.v ? 64 : 58, lineHeight: 1.1, textTransform: L.upper, marginTop: 30}} />
+      <AbsoluteFill style={{background: 'radial-gradient(ellipse at 28% 78%, rgba(10,9,8,.85), transparent 55%)', opacity: ease(f, b(2), b(3), 0, 1)}} />
+      <div style={{position: 'absolute', left: L.v ? 60 : 60, bottom: L.v ? 380 : 110, width: L.v ? L.W - 120 : '54%', display: 'flex', flexDirection: 'column', alignItems: 'center', color: C.paper}}>
+        <Headline text={ILANA.today} size={L.v ? 170 : 190} start={b(2) - 2} />
+        <Tri text={ILANA.todayLine} start={b(3)} end={dur} size={L.v ? 52 : 50} weight={600} gap={0.08} style={{marginTop: 26}} />
       </div>
     </AbsoluteFill>
   );
 };
 
-export const Ilana = ({lang}) => {
+export const Ilana = () => {
   return (
     <AbsoluteFill style={{background: C.ink}}>
       <Audio
@@ -317,31 +317,31 @@ export const Ilana = ({lang}) => {
       />
       <Sequence from={T.journey} durationInFrames={T.end - T.journey}>
         <Sequence from={-T.journey}>
-          <MapLayer lang={lang} />
+          <MapLayer />
         </Sequence>
       </Sequence>
       <Sequence durationInFrames={T.title}>
         <Open />
       </Sequence>
       <Sequence from={T.title} durationInFrames={T.journey - T.title}>
-        <Title lang={lang} />
+        <Title />
       </Sequence>
       {ST.map((s, i) => (
         <Sequence key={i} from={stAt(i)} durationInFrames={b(8)}>
-          <Cards s={s} lang={lang} dur={b(8)} />
-          <Credential s={s} lang={lang} dur={b(8)} />
+          <Cards s={s} dur={b(8)} />
+          <Credential s={s} dur={b(8)} />
         </Sequence>
       ))}
       <Sequence from={T.journey} durationInFrames={T.today + 12 - T.journey}>
         <Sequence from={-T.journey}>
-          <Counter lang={lang} />
+          <Counter />
         </Sequence>
       </Sequence>
       <Sequence from={T.today} durationInFrames={T.end - T.today}>
-        <Today lang={lang} dur={T.end - T.today} />
+        <Today dur={T.end - T.today} />
       </Sequence>
       <Sequence from={T.end} durationInFrames={T.total - T.end}>
-        <EndCard lang={lang} dur={T.total - T.end} tagline={TAGLINE[lang]} site={SITE} whatsapp={WHATSAPP} />
+        <EndCard dur={T.total - T.end} tagline={TAGLINE} site={SITE} whatsapp={WHATSAPP} />
       </Sequence>
       {[T.journey, ...ST.map((_, i) => stAt(i) + b(2)), T.today, T.end].map((a, i) => (
         <Flash key={i} at={a} len={5} max={0.5} />

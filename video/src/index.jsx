@@ -10,9 +10,9 @@ const COACHES = {
   natanel: [Natanel, NATANEL_FRAMES],
 };
 
-const Profile = ({coach, lang}) => {
+const Profile = ({coach}) => {
   const [Component] = COACHES[coach];
-  return <Component lang={lang} />;
+  return <Component />;
 };
 
 const Root = () => (
@@ -24,7 +24,7 @@ const Root = () => (
     width={1920}
     height={1080}
     durationInFrames={1}
-    defaultProps={{coach: 'ilana', lang: 'ru', format: '16x9'}}
+    defaultProps={{coach: 'ilana', format: '16x9'}}
     calculateMetadata={({props}) => {
       const [width, height] = SIZES[props.format];
       return {width, height, durationInFrames: COACHES[props.coach][1]};
