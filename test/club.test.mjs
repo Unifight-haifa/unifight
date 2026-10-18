@@ -2,6 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { BANNED, NIVHERET, checkTournament, ics, isUpcoming, published, splitEvents } from '../src/lib/club-check.mjs';
+import { checkTechniques, norm, polivanov } from '../src/lib/techniques-check.mjs';
 
 const LANGS = [['he', 'rtl'], ['ru', 'ltr'], ['en', 'ltr']];
 const json = (p) => JSON.parse(readFileSync(new URL(p, import.meta.url), 'utf8'));
@@ -10,7 +11,7 @@ const read = (p) => readFileSync(dist(p), 'utf8');
 const tourDir = new URL('../content/tournaments/', import.meta.url);
 const tours = readdirSync(tourDir).map((f) => ({ slug: f.replace(/\.json$/, ''), ...json(`../content/tournaments/${f}`) }));
 const fixture = json('./fixtures/tournament-unverified.json');
-const PAGES = ['history/', 'achievements/', 'tournaments/', 'nivheret/', 'contact/', 'belts/', ...published(tours).map((t) => `tournaments/${t.slug}/`)];
+const PAGES = ['history/', 'achievements/', 'tournaments/', 'nivheret/', 'contact/', 'belts/', 'techniques/', ...published(tours).map((t) => `tournaments/${t.slug}/`)];
 
 test('the new pages exist in he, ru and en with the right lang and dir', () => {
   assert.ok(PAGES.length > 4);
@@ -117,7 +118,7 @@ test('sitemap, landing nav and "more" links reach the new pages', () => {
   const xml = read('sitemap.xml');
   for (const [l] of LANGS) for (const p of PAGES) assert.match(xml, new RegExp(`<loc>[^<]*/${l}/${p}</loc>`), `${l}/${p}`);
   const landing = read('he/index.html');
-  for (const p of ['history/', 'achievements/', 'tournaments/', 'nivheret/', 'contact/', 'belts/']) assert.ok(landing.includes(`href="${p}"`), p);
+  for (const p of ['history/', 'achievements/', 'tournaments/', 'nivheret/', 'contact/', 'belts/', 'techniques/']) assert.ok(landing.includes(`href="${p}"`), p);
   assert.equal(landing.match(/class="more-link"/g).length, 4);
 });
 
@@ -203,4 +204,49 @@ test('belts page: every belt labelled in he/ru/en, drawn in a known colour, cite
     assert.match(html, new RegExp(`<footer class="site-footer">[\\s\\S]*href="[^"]*/${l}/belts/"`), l);
     assert.match(read(`${l}/index.html`), new RegExp(`href="[^"]*/${l}/belts/"`), l);
   }
+});
+
+test('techniques: the 100 Kodokan techniques, each named and described in he/ru/en, one card and player link each', () => {
+  const tq = json('../content/techniques.json');
+  checkTechniques(tq);
+  assert.equal(tq.items.length, 100);
+  const per = (f) => tq.items.filter((x) => tq.groups.find((g) => g.id === x.group).family === f).length;
+  assert.deepEqual([per('nage'), per('katame')], [68, 32]);
+  assert.equal(tq.items.filter((x) => x.gokyo && /^\d$/.test(x.gokyo)).length, 40);
+  const bad = (patch, re) => assert.throws(() => checkTechniques({ ...tq, items: [{ ...tq.items[0], ...patch }] }), re);
+  bad({ video: 'nope' }, /not a YouTube video id/);
+  bad({ group: 'kicks' }, /unknown group/);
+  bad({ tags: ['black'] }, /unknown tag/);
+  bad({ desc: { he: 'x', ru: 'x' } }, /desc\.en is missing/);
+  assert.throws(() => checkTechniques({ ...tq, items: [tq.items[0], tq.items[0]] }), /listed twice/);
+  for (const [l] of LANGS) {
+    const html = read(`${l}/techniques/index.html`);
+    assert.equal(html.match(/<li class="tq-card/g).length, 100, l);
+    for (const x of tq.items) {
+      assert.match(html, new RegExp(`<a class="btn btn-ghost" href="https://youtu.be/${x.video}" data-video="${x.video}"`), `${l}: ${x.id}`);
+      assert.ok(html.includes(x.name[l].replaceAll('"', '&quot;')), `${l}: ${x.id} name`);
+    }
+    assert.match(html, new RegExp(`<footer class="site-footer">[\\s\\S]*href="[^"]*/${l}/techniques/"`), l);
+    assert.match(read(`${l}/index.html`), new RegExp(`href="[^"]*/${l}/techniques/"`), l);
+  }
+});
+
+test('techniques: nothing third-party loads at rest; videos wait for the click-to-load player', () => {
+  for (const [l] of LANGS) {
+    const html = read(`${l}/techniques/index.html`);
+    assert.ok(!/<iframe\b/i.test(html), l);
+    for (const [tag] of html.matchAll(/<(img|iframe|link|source|video|script|use|image)\b[^>]*>/gi)) {
+      for (const [, , url] of tag.matchAll(/\s(src|srcset|href)="([^"]*)"/gi)) assert.ok(!/^(https?:)?\/\//.test(url) || tag.startsWith('<link rel="canonical"') || tag.startsWith('<link rel="alternate"'), `${l}: ${tag}`);
+    }
+    assert.ok(html.includes("'https://www.youtube-nocookie.com/embed/'"), l);
+  }
+});
+
+test('techniques: search folds every script, so seoi-nage is found by romaji, Cyrillic, Hebrew and kanji', () => {
+  assert.equal(polivanov('Seoi-nage'), 'сэой-нагэ');
+  assert.equal(polivanov('Ippon-seoi-nage'), 'иппон-сэой-нагэ');
+  assert.equal(polivanov('Sukui-nage'), 'сукуи-нагэ');
+  assert.equal(polivanov('Ryote-jime'), 'рётэ-дзимэ');
+  const card = read('en/techniques/index.html').match(/<li class="tq-card[^"]*" id="seoi-nage" data-s="([^"]+)"/)[1];
+  for (const q of ['Seoi', 'сэой', 'СЕОИ', 'סאוי', '背負', 'shoulder throw', 'бросок через спину']) assert.ok(card.includes(norm(q)), q);
 });

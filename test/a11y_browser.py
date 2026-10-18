@@ -6,7 +6,7 @@ from playwright.sync_api import sync_playwright
 base = sys.argv[1]
 # vendored and pinned so the scan is offline and repeatable; .txt keeps node --test from running it
 AXE = Path(__file__).with_name("vendor") / "axe-core" / "axe.min.js.txt"
-PAGES = ("", "news/", "video/", "gallery/", "privacy/", "accessibility/", "history/", "achievements/", "tournaments/", "tournaments/north-2022/", "nivheret/", "contact/", "belts/")
+PAGES = ("", "news/", "video/", "gallery/", "privacy/", "accessibility/", "history/", "achievements/", "tournaments/", "tournaments/north-2022/", "nivheret/", "contact/", "belts/", "techniques/")
 TAGS = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"]
 
 bad = []
@@ -63,6 +63,29 @@ with sync_playwright() as p:
                       }
                     }).length""")
                     assert flipped == 0, f"{path}@{width}: {flipped} kanji/logo mirrored"
+                if path == "techniques/" and width == 360:
+                    # search folds every script; filters work from the keyboard and land in the URL
+                    if page.is_visible("[data-consent]"):
+                        page.click("[data-consent-choice=denied]")
+                    for q in ("seoi", "сэой", "סאוי", "背負"):
+                        page.fill(".tq-q input", q)
+                        assert page.is_visible("#seoi-nage"), f"{lang}: {q} did not find seoi-nage"
+                    page.fill(".tq-q input", "")
+                    page.focus("[data-f=t][data-v=brown]")
+                    page.keyboard.press("Enter")
+                    page.focus("a[data-f=g][data-v=koshi]")
+                    page.keyboard.press(" ")
+                    assert page.get_attribute("a[data-f=g][data-v=koshi]", "aria-pressed") == "true", lang
+                    assert page.evaluate("document.querySelectorAll('.tq-card:not([hidden])').length") == 4, lang
+                    assert "g=koshi" in page.url and "t=brown" in page.url, page.url
+                    res = page.evaluate("t => axe.run(document, {runOnly: {type: 'tag', values: t}})", TAGS)
+                    bad += [f"{lang}/{path}@{width} filtered: {v['id']}" for v in res["violations"] if v["impact"] in ("serious", "critical")]
+                    # the player opens on the card's link and gives focus back on Esc
+                    page.click("#o-goshi a[data-video]")
+                    res = page.evaluate("t => axe.run(document, {runOnly: {type: 'tag', values: t}, iframes: false})", TAGS)
+                    bad += [f"{lang}/{path}@{width} player: {v['id']}" for v in res["violations"] if v["impact"] in ("serious", "critical")]
+                    page.keyboard.press("Escape")
+                    assert page.evaluate("document.activeElement.matches('#o-goshi a[data-video]')"), f"{lang}: focus lost after the player"
                 if path == "gallery/":
                     # the open lightbox is scanned too; Esc closes it and focus returns to the photo
                     page.click("a[data-gal-item]")

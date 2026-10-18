@@ -614,9 +614,9 @@ def contact():
 
 
 LEGAL_LINKS = "".join(
-    f'<span data-l="{l}"><a href="%BASE%{l}/contact/">{c}</a> · <a href="%BASE%{l}/belts/">{b}</a> · <a href="%BASE%{l}/accessibility/">{a}</a> · <a href="%BASE%{l}/privacy/">{p}</a></span>'
-    for l, c, b, a, p in (("he", "צרו קשר", "חגורות", "הצהרת נגישות", "מדיניות פרטיות"), ("ru", "Контакты", "Пояса", "Заявление о доступности", "Политика конфиденциальности"),
-                          ("en", "Contact", "Belts", "Accessibility statement", "Privacy policy")))
+    f'<span data-l="{l}"><a href="%BASE%{l}/contact/">{c}</a> · <a href="%BASE%{l}/belts/">{b}</a> · <a href="%BASE%{l}/techniques/">{w}</a> · <a href="%BASE%{l}/accessibility/">{a}</a> · <a href="%BASE%{l}/privacy/">{p}</a></span>'
+    for l, c, b, w, a, p in (("he", "צרו קשר", "חגורות", "טכניקות", "הצהרת נגישות", "מדיניות פרטיות"), ("ru", "Контакты", "Пояса", "Техника", "Заявление о доступности", "Политика конфиденциальности"),
+                             ("en", "Contact", "Belts", "Techniques", "Accessibility statement", "Privacy policy")))
 
 
 def footer():

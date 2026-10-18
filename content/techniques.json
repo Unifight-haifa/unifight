@@ -1,0 +1,2221 @@
+{
+ "_doc": "The 100 Kodokan techniques (official list of 1 April 2017) with the Kodokan x IJF Academy videos. Names and descriptions are ours; videos play in YouTube's own player. Tags come from the IJA grading regulations (belts.json S1, sections 8.1 and 8.4).",
+ "playlist": "PLtz539PTepc16H2iu5F3Q3D7_He1EYlIQ",
+ "trailer": "_GxcFx8LZRk",
+ "groups": [
+  {
+   "id": "te",
+   "family": "nage",
+   "kanji": "手技",
+   "romaji": "Te-waza",
+   "name": {
+    "he": "טכניקות יד",
+    "ru": "Техника рук",
+    "en": "Hand techniques"
+   },
+   "video": "z5qYfCEcZOU"
+  },
+  {
+   "id": "koshi",
+   "family": "nage",
+   "kanji": "腰技",
+   "romaji": "Koshi-waza",
+   "name": {
+    "he": "טכניקות מותן",
+    "ru": "Техника бедра",
+    "en": "Hip techniques"
+   },
+   "video": "cgIby7HnKzA"
+  },
+  {
+   "id": "ashi",
+   "family": "nage",
+   "kanji": "足技",
+   "romaji": "Ashi-waza",
+   "name": {
+    "he": "טכניקות רגל",
+    "ru": "Техника ног",
+    "en": "Foot and leg techniques"
+   },
+   "video": "-Xpmgtaypmg"
+  },
+  {
+   "id": "ma-sutemi",
+   "family": "nage",
+   "kanji": "真捨身技",
+   "romaji": "Ma-sutemi-waza",
+   "name": {
+    "he": "טכניקות הקרבה על הגב",
+    "ru": "Броски с падением на спину",
+    "en": "Rear sacrifice techniques"
+   },
+   "video": "LnjW67efl00"
+  },
+  {
+   "id": "yoko-sutemi",
+   "family": "nage",
+   "kanji": "横捨身技",
+   "romaji": "Yoko-sutemi-waza",
+   "name": {
+    "he": "טכניקות הקרבה הצידה",
+    "ru": "Броски с падением на бок",
+    "en": "Side sacrifice techniques"
+   },
+   "video": "ml_eSxz8OMo"
+  },
+  {
+   "id": "osaekomi",
+   "family": "katame",
+   "kanji": "抑込技",
+   "romaji": "Osaekomi-waza",
+   "name": {
+    "he": "ריתוקים",
+    "ru": "Удержания",
+    "en": "Hold-downs"
+   },
+   "video": "guJ-HlAKEA8"
+  },
+  {
+   "id": "shime",
+   "family": "katame",
+   "kanji": "絞技",
+   "romaji": "Shime-waza",
+   "name": {
+    "he": "חניקות",
+    "ru": "Удушения",
+    "en": "Chokes and strangles"
+   },
+   "video": "bq3cwrcS1-c"
+  },
+  {
+   "id": "kansetsu",
+   "family": "katame",
+   "kanji": "関節技",
+   "romaji": "Kansetsu-waza",
+   "name": {
+    "he": "בריחים",
+    "ru": "Болевые приёмы",
+    "en": "Joint locks"
+   },
+   "video": "QtVipMcTsdw"
+  }
+ ],
+ "items": [
+  {
+   "id": "seoi-nage",
+   "kanji": "背負投",
+   "romaji": "Seoi-nage",
+   "group": "te",
+   "gokyo": "1",
+   "video": "zIq0xI0ogxk",
+   "tags": [
+    "brown",
+    "dan1"
+   ],
+   "he_read": "סאוי נאגה",
+   "name": {
+    "he": "הטלת נשיאת גב",
+    "ru": "Бросок через спину",
+    "en": "Shoulder throw"
+   },
+   "desc": {
+    "he": "מוציאים את היריב משיווי משקל קדימה, מסתובבים עם המרפק מתחת לבית השחי שלו ומטילים אותו מעל הכתף.",
+    "ru": "Выведя партнёра из равновесия вперёд, вы поворачиваетесь спиной, подставляете локоть ему под подмышку и бросаете его через плечо.",
+    "en": "Pull uke forward, turn in with your elbow under their armpit and throw them over your shoulder off your back."
+   }
+  },
+  {
+   "id": "ippon-seoi-nage",
+   "kanji": "一本背負投",
+   "romaji": "Ippon-seoi-nage",
+   "group": "te",
+   "gokyo": "shinmeisho",
+   "video": "FQnOlCxo4oI",
+   "tags": [
+    "brown",
+    "dan1"
+   ],
+   "he_read": "איפון סאוי נאגה",
+   "name": {
+    "he": "הטלת נשיאת גב בנקודה אחת",
+    "ru": "Бросок через спину с захватом руки",
+    "en": "One-arm shoulder throw"
+   },
+   "desc": {
+    "he": "הטלת גב שבה לוכדים את זרוע היריב בכיפוף המרפק ומטילים אותו קדימה מעל הכתף.",
+    "ru": "Бросок через спину, при котором вы зажимаете руку партнёра в сгибе своего локтя и бросаете его вперёд через плечо.",
+    "en": "A shoulder throw in which you trap uke's arm in the crook of your elbow and throw them forward over your shoulder."
+   }
+  },
+  {
+   "id": "seoi-otoshi",
+   "kanji": "背負落",
+   "romaji": "Seoi-otoshi",
+   "group": "te",
+   "gokyo": "habukareta",
+   "video": "vu1TMVNnq34",
+   "tags": [],
+   "he_read": "סאוי אוטושי",
+   "name": {
+    "he": "הטלת נשיאת גב בנפילה",
+    "ru": "Бросок через спину с колен",
+    "en": "Shoulder drop"
+   },
+   "desc": {
+    "he": "הטלת גב שמסיימים בירידה על ברך אחת או שתיים, תוך משיכת היריב קדימה ומטה.",
+    "ru": "Бросок через спину, который завершают, опускаясь на одно или оба колена и увлекая партнёра вперёд и вниз.",
+    "en": "A shoulder throw finished by dropping onto one or both knees, pulling uke forward and down."
+   }
+  },
+  {
+   "id": "tai-otoshi",
+   "kanji": "体落",
+   "romaji": "Tai-otoshi",
+   "group": "te",
+   "gokyo": "2",
+   "video": "4x6S3Q-Ktv8",
+   "tags": [
+    "brown",
+    "dan1"
+   ],
+   "he_read": "טאי אוטושי",
+   "name": {
+    "he": "נפילת הגוף",
+    "ru": "Передняя подножка",
+    "en": "Body drop"
+   },
+   "desc": {
+    "he": "מסתובבים מול היריב, חוסמים את רגלו ברגל מתוחה ומושכים אותו בידיים קדימה מעליה.",
+    "ru": "Развернувшись перед партнёром, вы выставляете ногу перед его ногой и руками бросаете его вперёд через неё.",
+    "en": "Turn in front of uke, block their leg with your outstretched leg and pull them forward over it with your hands."
+   }
+  },
+  {
+   "id": "kata-guruma",
+   "kanji": "肩車",
+   "romaji": "Kata-guruma",
+   "group": "te",
+   "gokyo": "3",
+   "video": "cnHRhSy8yi4",
+   "tags": [
+    "dan1"
+   ],
+   "he_read": "קאטה גורומה",
+   "name": {
+    "he": "גלגל כתפיים",
+    "ru": "«Мельница»",
+    "en": "Shoulder wheel"
+   },
+   "desc": {
+    "he": "מרימים את היריב על שתי הכתפיים תוך אחיזה ברגלו מבפנים, ומגלגלים אותו מהכתפיים קדימה.",
+    "ru": "Вы поднимаете партнёра на плечи, захватив его ногу изнутри, и сбрасываете его вперёд.",
+    "en": "Lift uke across both shoulders, holding a leg from the inside, and roll them off to the front."
+   }
+  },
+  {
+   "id": "sukui-nage",
+   "kanji": "掬投",
+   "romaji": "Sukui-nage",
+   "group": "te",
+   "gokyo": "4",
+   "video": "vU6aJ2kFxoI",
+   "tags": [],
+   "he_read": "סוקוי נאגה",
+   "name": {
+    "he": "הטלת דלייה",
+    "ru": "Бросок зачерпыванием",
+    "en": "Scooping throw"
+   },
+   "desc": {
+    "he": "נכנסים מאחורי היריב, גורפים ביד את רגליו או את ירכו ומפילים אותו לאחור.",
+    "ru": "Зайдя за партнёра, вы подхватываете рукой его ноги или бедро и бросаете его назад.",
+    "en": "Step behind uke, scoop up their legs or a thigh with your arm and drop them backward."
+   }
+  },
+  {
+   "id": "obi-otoshi",
+   "kanji": "帯落",
+   "romaji": "Obi-otoshi",
+   "group": "te",
+   "gokyo": "habukareta",
+   "video": "ff8U2TVZIYI",
+   "tags": [],
+   "he_read": "אובי אוטושי",
+   "name": {
+    "he": "הטלת חגורה",
+    "ru": "Сброс захватом пояса",
+    "en": "Belt drop"
+   },
+   "desc": {
+    "he": "אוחזים בחגורת היריב מלפנים, נכנסים מאחוריו, מרימים ומפילים אותו לאחור.",
+    "ru": "Захватив пояс партнёра спереди и зайдя ему за спину, вы приподнимаете и опрокидываете его назад.",
+    "en": "Grip the front of uke's belt, step behind them and lift and tip them backward."
+   }
+  },
+  {
+   "id": "uki-otoshi",
+   "kanji": "浮落",
+   "romaji": "Uki-otoshi",
+   "group": "te",
+   "gokyo": "4",
+   "video": "6H5tmncOY4Q",
+   "tags": [
+    "dan1"
+   ],
+   "he_read": "אוקי אוטושי",
+   "name": {
+    "he": "הטלה צפה",
+    "ru": "Сброс выведением вперёд",
+    "en": "Floating drop"
+   },
+   "desc": {
+    "he": "הטלת ידיים טהורה: מוציאים את היריב משיווי משקל לפינה הקדמית ומושכים אותו מטה, לעתים תוך ירידה לברך.",
+    "ru": "Чисто ручной бросок: вы выводите партнёра из равновесия в передний угол и тянете его вниз, часто опускаясь на колено.",
+    "en": "A pure hand throw: break uke's balance to their front corner and pull them down, often dropping to one knee."
+   }
+  },
+  {
+   "id": "sumi-otoshi",
+   "kanji": "隅落",
+   "romaji": "Sumi-otoshi",
+   "group": "te",
+   "gokyo": "5",
+   "video": "lLU9wv52ni0",
+   "tags": [],
+   "he_read": "סומי אוטושי",
+   "name": {
+    "he": "הטלת פינה",
+    "ru": "Сброс в угол",
+    "en": "Corner drop"
+   },
+   "desc": {
+    "he": "צועדים לצד היריב ודוחפים אותו בידיים לפינה האחורית, בלי מגע ברגליים.",
+    "ru": "Шагнув к партнёру сбоку, вы руками опрокидываете его в задний угол, не помогая ногами.",
+    "en": "Step to uke's side and push them down into their back corner with your hands, without using your legs."
+   }
+  },
+  {
+   "id": "yama-arashi",
+   "kanji": "山嵐",
+   "romaji": "Yama-arashi",
+   "group": "te",
+   "gokyo": "habukareta",
+   "video": "MGlyKmSuzdc",
+   "tags": [],
+   "he_read": "יאמה הראשי",
+   "name": {
+    "he": "סופה בהרים",
+    "ru": "«Горная буря»",
+    "en": "Mountain storm"
+   },
+   "desc": {
+    "he": "באחיזת שרוול וצווארון באותו צד מרימים את היריב קדימה ובו בזמן גורפים את רגלו.",
+    "ru": "Захватив рукав и воротник с одной стороны, вы поднимаете партнёра вперёд и одновременно подбиваете его ногу.",
+    "en": "With sleeve and collar gripped on the same side, lift uke forward while sweeping their leg."
+   }
+  },
+  {
+   "id": "obi-tori-gaeshi",
+   "kanji": "帯取返",
+   "romaji": "Obi-tori-gaeshi",
+   "group": "te",
+   "gokyo": "shinmeisho",
+   "video": "bpc82SrunUU",
+   "tags": [],
+   "he_read": "אובי טורי גאשי",
+   "name": {
+    "he": "הפיכת תפיסת חגורה",
+    "ru": "Переворот захватом пояса",
+    "en": "Belt-grab reversal"
+   },
+   "desc": {
+    "he": "אוחזים בחגורת היריב מעל כתפו, תופסים יד או רגל, מרימים ומגלגלים אותו מעל הכתף.",
+    "ru": "Захватив пояс партнёра через его плечо и придерживая руку или ногу, вы поднимаете его и перекатываете через своё плечо.",
+    "en": "Reach over uke's shoulder to grab their belt, hold an arm or leg, and lift and roll them over your shoulder."
+   }
+  },
+  {
+   "id": "morote-gari",
+   "kanji": "双手刈",
+   "romaji": "Morote-gari",
+   "group": "te",
+   "gokyo": "shinmeisho",
+   "video": "BHLQS4K85bs",
+   "tags": [],
+   "he_read": "מורוטה גארי",
+   "name": {
+    "he": "קצירה בשתי ידיים",
+    "ru": "Бросок захватом двух ног",
+    "en": "Two-hand reap"
+   },
+   "desc": {
+    "he": "חובקים בשתי הידיים את רגלי היריב מבחוץ ודוחפים קדימה עד שהוא נופל על הגב.",
+    "ru": "Обхватив обе ноги партнёра снаружи, вы продвигаетесь вперёд и опрокидываете его на спину.",
+    "en": "Wrap both arms around uke's legs from the outside and drive forward to put them on their back."
+   }
+  },
+  {
+   "id": "kuchiki-taoshi",
+   "kanji": "朽木倒",
+   "romaji": "Kuchiki-taoshi",
+   "group": "te",
+   "gokyo": "shinmeisho",
+   "video": "ZNL47q1aJNY",
+   "tags": [],
+   "he_read": "קוצ׳יקי טאושי",
+   "name": {
+    "he": "הטלת יד אחת",
+    "ru": "Бросок захватом одной ноги",
+    "en": "Dead-tree drop"
+   },
+   "desc": {
+    "he": "מושכים ביד את אחת מרגלי היריב ודוחפים אותו לאחור, והוא נופל כמו עץ כרות.",
+    "ru": "Подтянув рукой одну ногу партнёра, вы толкаете его назад, и он падает, как подрубленное дерево.",
+    "en": "Pull up one of uke's legs with a hand and push them over backward like a falling tree."
+   }
+  },
+  {
+   "id": "kibisu-gaeshi",
+   "kanji": "踵返",
+   "romaji": "Kibisu-gaeshi",
+   "group": "te",
+   "gokyo": "shinmeisho",
+   "video": "tJylJYfBliA",
+   "tags": [],
+   "he_read": "קיביסו גאשי",
+   "name": {
+    "he": "הפיכת עקב",
+    "ru": "Переворот захватом пятки",
+    "en": "Heel reversal"
+   },
+   "desc": {
+    "he": "תופסים ביד את עקב היריב ומושכים אותו, ובמקביל דוחפים את פלג גופו העליון לאחור.",
+    "ru": "Захватив рукой пятку партнёра, вы тянете её на себя и одновременно толкаете его корпус назад.",
+    "en": "Catch uke's heel with your hand and pull it while pushing their upper body backward."
+   }
+  },
+  {
+   "id": "uchi-mata-sukashi",
+   "kanji": "内股すかし",
+   "romaji": "Uchi-mata-sukashi",
+   "group": "te",
+   "gokyo": "shinmeisho",
+   "video": "V-RS3uhtVWM",
+   "tags": [],
+   "he_read": "אוצ׳י מטה סוקאשי",
+   "name": {
+    "he": "הטלת התחמקות לירך פנימית",
+    "ru": "Уход от подхвата изнутри",
+    "en": "Inner-thigh dodge"
+   },
+   "desc": {
+    "he": "תרגיל נגד: נותנים להתקפת אוצ׳י מטה של היריב לעבור באוויר ומטילים אותו קדימה בידיים.",
+    "ru": "Контрприём: вы пропускаете атаку подхватом изнутри в пустоту и руками бросаете партнёра вперёд.",
+    "en": "A counter: let uke's uchi-mata pass through empty air, then throw them forward with your hands."
+   }
+  },
+  {
+   "id": "ko-uchi-gaeshi",
+   "kanji": "小内返",
+   "romaji": "Ko-uchi-gaeshi",
+   "group": "te",
+   "gokyo": "shinmeisho",
+   "video": "_MWAdYi_LC4",
+   "tags": [],
+   "he_read": "קו אוצ׳י גאשי",
+   "name": {
+    "he": "הטלת נגד לקצירה פנימית קטנה",
+    "ru": "Контрприём от подсечки изнутри",
+    "en": "Minor inner reap counter"
+   },
+   "desc": {
+    "he": "תרגיל נגד: מתחמקים מקו אוצ׳י גארי של היריב ומנצלים את התנופה שלו כדי להפיל אותו בידיים.",
+    "ru": "Контрприём: вы уходите от подсечки изнутри и, используя движение партнёра, руками опрокидываете его.",
+    "en": "A counter: avoid uke's ko-uchi-gari and use their momentum to turn them over with your hands."
+   }
+  },
+  {
+   "id": "uki-goshi",
+   "kanji": "浮腰",
+   "romaji": "Uki-goshi",
+   "group": "koshi",
+   "gokyo": "1",
+   "video": "bPKwtB4lyOQ",
+   "tags": [
+    "brown",
+    "dan1"
+   ],
+   "he_read": "אוקי גושי",
+   "name": {
+    "he": "מותן צפה",
+    "ru": "Бросок через бедро «плавающий»",
+    "en": "Floating hip throw"
+   },
+   "desc": {
+    "he": "חובקים את מותני היריב, מעמיסים אותו קלות על המותן ומטילים אותו בסיבוב הגוף.",
+    "ru": "Обхватив партнёра за пояс, вы лишь слегка подсаживаете его на бедро и бросаете поворотом корпуса.",
+    "en": "With an arm around uke's waist, bring them lightly onto your hip and twist them over it."
+   }
+  },
+  {
+   "id": "o-goshi",
+   "kanji": "大腰",
+   "romaji": "O-goshi",
+   "group": "koshi",
+   "gokyo": "1",
+   "video": "yhu1mfy2vJ4",
+   "tags": [
+    "brown",
+    "dan1"
+   ],
+   "he_read": "או גושי",
+   "name": {
+    "he": "מותן גדולה",
+    "ru": "Бросок через бедро",
+    "en": "Major hip throw"
+   },
+   "desc": {
+    "he": "חובקים את מותני היריב, מצמידים אותו, מעמיסים אותו על גב המותן ומטילים קדימה.",
+    "ru": "Обхватив партнёра за пояс, вы плотно прижимаете его, сажаете на бедро и бросаете вперёд.",
+    "en": "Hug uke's waist, pull them in tight, load them across the back of your hips and throw them forward."
+   }
+  },
+  {
+   "id": "koshi-guruma",
+   "kanji": "腰車",
+   "romaji": "Koshi-guruma",
+   "group": "koshi",
+   "gokyo": "2",
+   "video": "SU7Id6uVJ44",
+   "tags": [
+    "brown",
+    "dan1"
+   ],
+   "he_read": "קושי גורומה",
+   "name": {
+    "he": "גלגל המותן",
+    "ru": "Бросок через бедро с захватом шеи",
+    "en": "Hip wheel"
+   },
+   "desc": {
+    "he": "חובקים את צוואר היריב, מכניסים את המותן עמוק ומגלגלים אותו מעליה.",
+    "ru": "Обхватив шею партнёра и глубоко подставив бедро, вы перекатываете его через себя.",
+    "en": "With an arm around uke's neck and your hips deep across theirs, wheel them over your hip."
+   }
+  },
+  {
+   "id": "tsurikomi-goshi",
+   "kanji": "釣込腰",
+   "romaji": "Tsurikomi-goshi",
+   "group": "koshi",
+   "gokyo": "2",
+   "video": "McfzA0yRVt4",
+   "tags": [
+    "dan1"
+   ],
+   "he_read": "צוריקומי גושי",
+   "name": {
+    "he": "מותן בהרמה-משיכה",
+    "ru": "Бросок через бедро с захватом отворота",
+    "en": "Lift-pull hip throw"
+   },
+   "desc": {
+    "he": "מרימים ומושכים באחיזת הדש, יורדים מתחת ליריב ומטילים אותו מעל המותן.",
+    "ru": "Поднимая и подтягивая партнёра захватом за отворот, вы подседаете под него и бросаете через бедро.",
+    "en": "Lift and pull with your lapel grip as you drop under uke and throw them over your hips."
+   }
+  },
+  {
+   "id": "sode-tsurikomi-goshi",
+   "kanji": "袖釣込腰",
+   "romaji": "Sode-tsurikomi-goshi",
+   "group": "koshi",
+   "gokyo": "shinmeisho",
+   "video": "QsmAxpmYLOI",
+   "tags": [
+    "dan1"
+   ],
+   "he_read": "סודה צוריקומי גושי",
+   "name": {
+    "he": "מותן בהרמה-משיכה בשרוול",
+    "ru": "Бросок через бедро с захватом рукавов",
+    "en": "Sleeve lift-pull hip throw"
+   },
+   "desc": {
+    "he": "בדומה לצוריקומי גושי, אבל היד המרימה אוחזת בשרוול ודוחפת את זרוע היריב למעלה.",
+    "ru": "Похож на цурикоми-госи, но поднимающая рука держит рукав и выводит руку партнёра вверх.",
+    "en": "Like tsurikomi-goshi, but the lifting hand holds uke's sleeve and drives their arm up."
+   }
+  },
+  {
+   "id": "harai-goshi",
+   "kanji": "払腰",
+   "romaji": "Harai-goshi",
+   "group": "koshi",
+   "gokyo": "2",
+   "video": "qTo8HlAAkOo",
+   "tags": [
+    "brown",
+    "dan1"
+   ],
+   "he_read": "הראי גושי",
+   "name": {
+    "he": "טאטוא מותן",
+    "ru": "Подхват бедром",
+    "en": "Sweeping hip throw"
+   },
+   "desc": {
+    "he": "מעמיסים את היריב על המותן וגורפים את רגלו ברגל תוך הטלה קדימה.",
+    "ru": "Посадив партнёра на бедро, вы подхватываете его ногу своей ногой и бросаете вперёд.",
+    "en": "Load uke onto your hip and sweep their leg up with yours as you throw them forward."
+   }
+  },
+  {
+   "id": "tsuri-goshi",
+   "kanji": "釣腰",
+   "romaji": "Tsuri-goshi",
+   "group": "koshi",
+   "gokyo": "3",
+   "video": "51Htlp7xEvE",
+   "tags": [
+    "dan1"
+   ],
+   "he_read": "צורי גושי",
+   "name": {
+    "he": "הרמת מותן",
+    "ru": "Бросок через бедро с захватом пояса",
+    "en": "Belt-lift hip throw"
+   },
+   "desc": {
+    "he": "אוחזים בחגורת היריב מאחור, מרימים אותו על המותן ומטילים קדימה.",
+    "ru": "Захватив пояс партнёра на спине, вы поднимаете его на бедро и бросаете вперёд.",
+    "en": "Grip uke's belt at the back, lift them onto your hips and throw them forward."
+   }
+  },
+  {
+   "id": "hane-goshi",
+   "kanji": "跳腰",
+   "romaji": "Hane-goshi",
+   "group": "koshi",
+   "gokyo": "3",
+   "video": "M9_7De6A1kk",
+   "tags": [],
+   "he_read": "האנה גושי",
+   "name": {
+    "he": "הקפצת המותן",
+    "ru": "Подсад бедром",
+    "en": "Spring hip throw"
+   },
+   "desc": {
+    "he": "מעמיסים את היריב על המותן ומקפיצים אותו ברגל כפופה שנשענת על ירכו מבפנים.",
+    "ru": "Посадив партнёра на бедро, вы подбрасываете его согнутой ногой, упирая её в его бедро изнутри.",
+    "en": "Load uke onto your hip and spring them up with your bent leg against their inner thigh."
+   }
+  },
+  {
+   "id": "utsuri-goshi",
+   "kanji": "移腰",
+   "romaji": "Utsuri-goshi",
+   "group": "koshi",
+   "gokyo": "4",
+   "video": "4pQd_bEnlf0",
+   "tags": [
+    "dan1"
+   ],
+   "he_read": "אוצורי גושי",
+   "name": {
+    "he": "מותן מתחלפת",
+    "ru": "Бросок через бедро с переносом",
+    "en": "Changing hip throw"
+   },
+   "desc": {
+    "he": "תרגיל נגד: בזמן ההתקפה מרימים את היריב ומעבירים אותו אל המותן שלכם להטלה.",
+    "ru": "Контрприём: в момент атаки вы поднимаете партнёра и пересаживаете его на своё бедро для броска.",
+    "en": "A counter: as uke attacks, lift them and switch them onto your own hip to throw."
+   }
+  },
+  {
+   "id": "ushiro-goshi",
+   "kanji": "後腰",
+   "romaji": "Ushiro-goshi",
+   "group": "koshi",
+   "gokyo": "5",
+   "video": "ORIYstuxYT8",
+   "tags": [
+    "dan1"
+   ],
+   "he_read": "אושירו גושי",
+   "name": {
+    "he": "מותן אחורית",
+    "ru": "Задний бросок через бедро",
+    "en": "Rear hip throw"
+   },
+   "desc": {
+    "he": "תרגיל נגד: בזמן התקפת היריב מרימים אותו מאחור עם המותן ומפילים אותו ישר למטה.",
+    "ru": "Контрприём: во время атаки вы поднимаете партнёра сзади бедром и опускаете его вниз на спину.",
+    "en": "A counter: as uke attacks, lift them from behind with your hips and drop them straight down."
+   }
+  },
+  {
+   "id": "de-ashi-harai",
+   "kanji": "出足払",
+   "romaji": "De-ashi-harai",
+   "group": "ashi",
+   "gokyo": "1",
+   "video": "4BUUvqxi_Kk",
+   "tags": [
+    "brown",
+    "dan1"
+   ],
+   "he_read": "דה אשי הראי",
+   "name": {
+    "he": "טאטוא רגל מתקדמת",
+    "ru": "Боковая подсечка",
+    "en": "Forward foot sweep"
+   },
+   "desc": {
+    "he": "גורפים את הרגל המתקדמת של היריב ברגע שהוא מעביר עליה את משקלו.",
+    "ru": "Вы подсекаете выставленную ногу партнёра в момент, когда он переносит на неё вес.",
+    "en": "Sweep uke's advancing foot just as they put their weight on it."
+   }
+  },
+  {
+   "id": "hiza-guruma",
+   "kanji": "膝車",
+   "romaji": "Hiza-guruma",
+   "group": "ashi",
+   "gokyo": "1",
+   "video": "JPJx9-oAVns",
+   "tags": [
+    "brown",
+    "dan1"
+   ],
+   "he_read": "היזא גורומה",
+   "name": {
+    "he": "גלגל הברך",
+    "ru": "Подсечка в колено",
+    "en": "Knee wheel"
+   },
+   "desc": {
+    "he": "חוסמים את ברך היריב בכף הרגל ומסובבים אותו קדימה סביבה.",
+    "ru": "Упираясь стопой в колено партнёра, вы поворотом корпуса бросаете его вперёд вокруг этой точки.",
+    "en": "Block uke's knee with the sole of your foot and turn them forward around it."
+   }
+  },
+  {
+   "id": "sasae-tsurikomi-ashi",
+   "kanji": "支釣込足",
+   "romaji": "Sasae-tsurikomi-ashi",
+   "group": "ashi",
+   "gokyo": "1",
+   "video": "699i--pvYmE",
+   "tags": [
+    "brown",
+    "dan1"
+   ],
+   "he_read": "סזאי צוריקומי אשי",
+   "name": {
+    "he": "עצירת הרגל עם הרמה-משיכה",
+    "ru": "Передняя подсечка",
+    "en": "Propping foot lift-pull throw"
+   },
+   "desc": {
+    "he": "חוסמים את קרסול היריב בכף הרגל ומושכים אותו קדימה ולמעלה מעליה.",
+    "ru": "Упираясь стопой в голеностоп партнёра, вы подтягиваете его вверх и вперёд через эту опору.",
+    "en": "Block uke's ankle with your sole and lift-pull them forward over it."
+   }
+  },
+  {
+   "id": "o-soto-gari",
+   "kanji": "大外刈",
+   "romaji": "O-soto-gari",
+   "group": "ashi",
+   "gokyo": "1",
+   "video": "c-A_nP7mKAc",
+   "tags": [
+    "brown",
+    "dan1"
+   ],
+   "he_read": "או סוטו גארי",
+   "name": {
+    "he": "קצירה חיצונית גדולה",
+    "ru": "Отхват",
+    "en": "Major outer reap"
+   },
+   "desc": {
+    "he": "מוציאים את היריב משיווי משקל לאחור וקוצרים את רגל התמיכה שלו מאחור.",
+    "ru": "Выведя партнёра из равновесия назад, вы сзади выбиваете его опорную ногу своей ногой.",
+    "en": "Break uke's balance backward and reap their supporting leg from behind with your leg."
+   }
+  },
+  {
+   "id": "o-uchi-gari",
+   "kanji": "大内刈",
+   "romaji": "O-uchi-gari",
+   "group": "ashi",
+   "gokyo": "1",
+   "video": "0itJFhV9pDQ",
+   "tags": [
+    "brown",
+    "dan1"
+   ],
+   "he_read": "או אוצ׳י גארי",
+   "name": {
+    "he": "קצירה פנימית גדולה",
+    "ru": "Большая внутренняя подсечка",
+    "en": "Major inner reap"
+   },
+   "desc": {
+    "he": "מוציאים את היריב משיווי משקל לאחור וקוצרים את רגלו מבפנים.",
+    "ru": "Выведя партнёра из равновесия назад, вы изнутри выбиваете его ногу своей ногой.",
+    "en": "Break uke's balance backward and reap their leg from the inside with your leg."
+   }
+  },
+  {
+   "id": "ko-soto-gari",
+   "kanji": "小外刈",
+   "romaji": "Ko-soto-gari",
+   "group": "ashi",
+   "gokyo": "2",
+   "video": "jeQ541ScLB4",
+   "tags": [
+    "dan1"
+   ],
+   "he_read": "קו סוטו גארי",
+   "name": {
+    "he": "קצירה חיצונית קטנה",
+    "ru": "Задняя подсечка",
+    "en": "Minor outer reap"
+   },
+   "desc": {
+    "he": "מוציאים את היריב משיווי משקל לאחור וגורפים את עקבו מבחוץ בכף הרגל.",
+    "ru": "Выведя партнёра из равновесия назад, вы снаружи подсекаете его пятку подошвой.",
+    "en": "Break uke's balance backward and sweep their heel from the outside with your sole."
+   }
+  },
+  {
+   "id": "ko-uchi-gari",
+   "kanji": "小内刈",
+   "romaji": "Ko-uchi-gari",
+   "group": "ashi",
+   "gokyo": "2",
+   "video": "3Jb3tZvr9Ng",
+   "tags": [
+    "brown",
+    "dan1"
+   ],
+   "he_read": "קו אוצ׳י גארי",
+   "name": {
+    "he": "קצירה פנימית קטנה",
+    "ru": "Подсечка изнутри",
+    "en": "Minor inner reap"
+   },
+   "desc": {
+    "he": "מוציאים את היריב משיווי משקל לאחור וגורפים את כף רגלו מבפנים.",
+    "ru": "Выведя партнёра из равновесия назад, вы изнутри подсекаете его стопу.",
+    "en": "Break uke's balance backward and sweep their foot from the inside with your sole."
+   }
+  },
+  {
+   "id": "okuri-ashi-harai",
+   "kanji": "送足払",
+   "romaji": "Okuri-ashi-harai",
+   "group": "ashi",
+   "gokyo": "2",
+   "video": "nw1ZdRjrdRI",
+   "tags": [
+    "brown",
+    "dan1"
+   ],
+   "he_read": "אוקורי אשי הראי",
+   "name": {
+    "he": "טאטוא רגל רודפת",
+    "ru": "Боковая подсечка в темп шагов",
+    "en": "Following foot sweep"
+   },
+   "desc": {
+    "he": "מזיזים את היריב הצידה וגורפים את שתי רגליו יחד בכיוון הצעד שלו.",
+    "ru": "Двигая партнёра вбок, вы в темп его шагов подсекаете обе его ноги вместе.",
+    "en": "Move uke sideways and sweep both of their feet together in the direction they are stepping."
+   }
+  },
+  {
+   "id": "uchi-mata",
+   "kanji": "内股",
+   "romaji": "Uchi-mata",
+   "group": "ashi",
+   "gokyo": "2",
+   "video": "iUpSu5J-bgw",
+   "tags": [
+    "brown",
+    "dan1"
+   ],
+   "he_read": "אוצ׳י מטה",
+   "name": {
+    "he": "ירך פנימית",
+    "ru": "Подхват изнутри",
+    "en": "Inner thigh throw"
+   },
+   "desc": {
+    "he": "מושכים את היריב קדימה ומרימים את ירכו הפנימית בגב הירך שלכם.",
+    "ru": "Выведя партнёра вперёд, вы поднимаете его бедро изнутри задней стороной своего бедра.",
+    "en": "Pull uke forward and lift their inner thigh with the back of your thigh."
+   }
+  },
+  {
+   "id": "ko-soto-gake",
+   "kanji": "小外掛",
+   "romaji": "Ko-soto-gake",
+   "group": "ashi",
+   "gokyo": "3",
+   "video": "8b6kY4s4zH4",
+   "tags": [
+    "dan1"
+   ],
+   "he_read": "קו סוטו גאקה",
+   "name": {
+    "he": "קרס קטן חיצוני",
+    "ru": "Зацеп снаружи",
+    "en": "Minor outer hook"
+   },
+   "desc": {
+    "he": "מכניסים קרס ברגל לרגל היריב מבחוץ ומפילים אותו לאחור מעליה.",
+    "ru": "Зацепив ногу партнёра снаружи, вы опрокидываете его назад.",
+    "en": "Hook uke's leg from the outside with your foot and push them backward over it."
+   }
+  },
+  {
+   "id": "ashi-guruma",
+   "kanji": "足車",
+   "romaji": "Ashi-guruma",
+   "group": "ashi",
+   "gokyo": "3",
+   "video": "ROeayhvom9U",
+   "tags": [
+    "dan1"
+   ],
+   "he_read": "אשי גורומה",
+   "name": {
+    "he": "גלגל הרגל",
+    "ru": "Колесо через ногу",
+    "en": "Leg wheel"
+   },
+   "desc": {
+    "he": "חוסמים את ברך היריב ברגל ישרה ומגלגלים אותו קדימה מעליה.",
+    "ru": "Выставив прямую ногу на уровне колена партнёра, вы перекатываете его вперёд через неё.",
+    "en": "Block uke's knee with your straight leg and wheel them forward over it."
+   }
+  },
+  {
+   "id": "harai-tsurikomi-ashi",
+   "kanji": "払釣込足",
+   "romaji": "Harai-tsurikomi-ashi",
+   "group": "ashi",
+   "gokyo": "3",
+   "video": "gGPXvWL8VbE",
+   "tags": [],
+   "he_read": "הראי צוריקומי אשי",
+   "name": {
+    "he": "טאטוא רגל בהרמה-משיכה",
+    "ru": "Подсечка с подтягиванием",
+    "en": "Lift-pull foot sweep"
+   },
+   "desc": {
+    "he": "מושכים את היריב קדימה ולמעלה וגורפים את קרסולו מלפנים.",
+    "ru": "Подтягивая партнёра вперёд и вверх, вы спереди подсекаете его голеностоп.",
+    "en": "Lift-pull uke forward and sweep their ankle from the front with your sole."
+   }
+  },
+  {
+   "id": "o-guruma",
+   "kanji": "大車",
+   "romaji": "O-guruma",
+   "group": "ashi",
+   "gokyo": "4",
+   "video": "SnZciTAY9vc",
+   "tags": [
+    "dan1"
+   ],
+   "he_read": "או גורומה",
+   "name": {
+    "he": "גלגל גדול",
+    "ru": "Большое колесо",
+    "en": "Major wheel"
+   },
+   "desc": {
+    "he": "מניחים רגל ישרה לרוחב פלג גופו התחתון של היריב ומגלגלים אותו קדימה מעליה.",
+    "ru": "Поставив прямую ногу поперёк бёдер партнёра, вы перекатываете его вперёд через неё.",
+    "en": "Place your straight leg across uke's lower body and wheel them forward over it."
+   }
+  },
+  {
+   "id": "o-soto-guruma",
+   "kanji": "大外車",
+   "romaji": "O-soto-guruma",
+   "group": "ashi",
+   "gokyo": "5",
+   "video": "92KbCm6pQeI",
+   "tags": [],
+   "he_read": "או סוטו גורומה",
+   "name": {
+    "he": "גלגל חיצוני גדול",
+    "ru": "Большое внешнее колесо",
+    "en": "Major outer wheel"
+   },
+   "desc": {
+    "he": "מוציאים את היריב משיווי משקל לאחור, מניחים רגל מאחורי שתי רגליו ומגלגלים אותו מעליה.",
+    "ru": "Выведя партнёра назад, вы ставите ногу за обе его ноги и опрокидываете его через неё.",
+    "en": "Break uke backward, put your leg behind both of theirs and wheel them over it."
+   }
+  },
+  {
+   "id": "o-soto-otoshi",
+   "kanji": "大外落",
+   "romaji": "O-soto-otoshi",
+   "group": "ashi",
+   "gokyo": "habukareta",
+   "video": "2DsVvDw7b8g",
+   "tags": [],
+   "he_read": "או סוטו אוטושי",
+   "name": {
+    "he": "נפילה חיצונית גדולה",
+    "ru": "Большой внешний сброс",
+    "en": "Major outer drop"
+   },
+   "desc": {
+    "he": "מוציאים את היריב לאחור, נכנסים עמוק ברגל מאחוריו ומורידים אותו ישר למטה.",
+    "ru": "Выведя партнёра назад, вы глубоко заходите ногой за его ногу и опускаете его вниз.",
+    "en": "Break uke backward, step deep behind their leg and drive them straight down."
+   }
+  },
+  {
+   "id": "tsubame-gaeshi",
+   "kanji": "燕返",
+   "romaji": "Tsubame-gaeshi",
+   "group": "ashi",
+   "gokyo": "shinmeisho",
+   "video": "GwweWqqFB5g",
+   "tags": [],
+   "he_read": "צובמה גאשי",
+   "name": {
+    "he": "הפיכת הסנונית",
+    "ru": "Контрприём «ласточка»",
+    "en": "Swallow counter"
+   },
+   "desc": {
+    "he": "תרגיל נגד: מתחמקים מהגריפה של היריב וגורפים אותו באותה רגל שהותקפה.",
+    "ru": "Контрприём: вы уводите ногу от подсечки и той же ногой подсекаете партнёра.",
+    "en": "A counter: dodge uke's foot sweep and sweep them with the very foot they attacked."
+   }
+  },
+  {
+   "id": "o-soto-gaeshi",
+   "kanji": "大外返",
+   "romaji": "O-soto-gaeshi",
+   "group": "ashi",
+   "gokyo": "shinmeisho",
+   "video": "8ZjM3X_EANo",
+   "tags": [],
+   "he_read": "או סוטו גאשי",
+   "name": {
+    "he": "הטלת נגד לקצירה חיצונית גדולה",
+    "ru": "Контрприём от отхвата",
+    "en": "Major outer reap counter"
+   },
+   "desc": {
+    "he": "תרגיל נגד לאו סוטו גארי: קוצרים את היריב באותה רגל שניסה לקצור.",
+    "ru": "Контрприём от отхвата: вы выбиваете партнёра той самой ногой, которую он пытался отхватить.",
+    "en": "A counter to o-soto-gari: reap uke with the same leg they tried to reap."
+   }
+  },
+  {
+   "id": "o-uchi-gaeshi",
+   "kanji": "大内返",
+   "romaji": "O-uchi-gaeshi",
+   "group": "ashi",
+   "gokyo": "shinmeisho",
+   "video": "dCyZTXyjIXE",
+   "tags": [],
+   "he_read": "או אוצ׳י גאשי",
+   "name": {
+    "he": "הטלת נגד לקצירה פנימית גדולה",
+    "ru": "Контрприём от большой внутренней подсечки",
+    "en": "Major inner reap counter"
+   },
+   "desc": {
+    "he": "תרגיל נגד לאו אוצ׳י גארי: משתמשים ברגל המותקפת כדי לקצור את היריב.",
+    "ru": "Контрприём от о-ути-гари: атакованной ногой вы сами выбиваете партнёра.",
+    "en": "A counter to o-uchi-gari: use the attacked leg to reap uke instead."
+   }
+  },
+  {
+   "id": "hane-goshi-gaeshi",
+   "kanji": "跳腰返",
+   "romaji": "Hane-goshi-gaeshi",
+   "group": "ashi",
+   "gokyo": "shinmeisho",
+   "video": "9bZAZSBtnGs",
+   "tags": [],
+   "he_read": "האנה גושי גאשי",
+   "name": {
+    "he": "הטלת נגד להקפצת המותן",
+    "ru": "Контрприём от подсада бедром",
+    "en": "Spring hip counter"
+   },
+   "desc": {
+    "he": "תרגיל נגד להאנה גושי: קוצרים או מכניסים קרס לרגל התמיכה של היריב כשהוא נכנס.",
+    "ru": "Контрприём от подсада бедром: в момент входа вы выбиваете или зацепляете опорную ногу партнёра.",
+    "en": "A counter to hane-goshi: reap or hook uke's supporting leg as they turn in."
+   }
+  },
+  {
+   "id": "harai-goshi-gaeshi",
+   "kanji": "払腰返",
+   "romaji": "Harai-goshi-gaeshi",
+   "group": "ashi",
+   "gokyo": "shinmeisho",
+   "video": "4U3It-7PPsc",
+   "tags": [],
+   "he_read": "הראי גושי גאשי",
+   "name": {
+    "he": "הטלת נגד לטאטוא המותן",
+    "ru": "Контрприём от подхвата бедром",
+    "en": "Sweeping hip counter"
+   },
+   "desc": {
+    "he": "תרגיל נגד להראי גושי: קוצרים או מכניסים קרס לרגל התמיכה של היריב כשהוא נכנס.",
+    "ru": "Контрприём от подхвата бедром: в момент входа вы выбиваете или зацепляете опорную ногу партнёра.",
+    "en": "A counter to harai-goshi: reap or hook uke's supporting leg as they turn in."
+   }
+  },
+  {
+   "id": "uchi-mata-gaeshi",
+   "kanji": "内股返",
+   "romaji": "Uchi-mata-gaeshi",
+   "group": "ashi",
+   "gokyo": "shinmeisho",
+   "video": "Sy6sLWxkWYw",
+   "tags": [],
+   "he_read": "אוצ׳י מטה גאשי",
+   "name": {
+    "he": "הטלת נגד לירך פנימית",
+    "ru": "Контрприём от подхвата изнутри",
+    "en": "Inner thigh counter"
+   },
+   "desc": {
+    "he": "תרגיל נגד לאוצ׳י מטה: קוצרים או מכניסים קרס לרגל התמיכה של היריב כשהוא נכנס.",
+    "ru": "Контрприём от подхвата изнутри: в момент входа вы выбиваете или зацепляете опорную ногу партнёра.",
+    "en": "A counter to uchi-mata: reap or hook uke's supporting leg as they turn in."
+   }
+  },
+  {
+   "id": "tomoe-nage",
+   "kanji": "巴投",
+   "romaji": "Tomoe-nage",
+   "group": "ma-sutemi",
+   "gokyo": "3",
+   "video": "880WbHvHv6A",
+   "tags": [
+    "brown",
+    "dan1"
+   ],
+   "he_read": "טומואה נאגה",
+   "name": {
+    "he": "הטלת סחרור",
+    "ru": "Бросок через голову",
+    "en": "Circle throw"
+   },
+   "desc": {
+    "he": "נופלים על הגב, מניחים כף רגל על בטן היריב ומטילים אותו מעל הראש.",
+    "ru": "Падая на спину и упираясь стопой в живот партнёра, вы бросаете его через голову.",
+    "en": "Drop onto your back, put a foot on uke's belly and throw them over your head."
+   }
+  },
+  {
+   "id": "sumi-gaeshi",
+   "kanji": "隅返",
+   "romaji": "Sumi-gaeshi",
+   "group": "ma-sutemi",
+   "gokyo": "4",
+   "video": "5VhduA5xkbA",
+   "tags": [
+    "dan1"
+   ],
+   "he_read": "סומי גאשי",
+   "name": {
+    "he": "הפיכת פינה",
+    "ru": "Бросок через голову подсадом голенью",
+    "en": "Corner reversal"
+   },
+   "desc": {
+    "he": "נופלים על הגב, מושכים את היריב ומרימים את ירכו הפנימית בשוק כדי להטיל אותו מעל הראש.",
+    "ru": "Падая на спину и притягивая партнёра, вы подсаживаете его голенью под бедро изнутри и бросаете через голову.",
+    "en": "Drop onto your back, pull uke in and lift their inner thigh with your shin to throw them over your head."
+   }
+  },
+  {
+   "id": "hikikomi-gaeshi",
+   "kanji": "引込返",
+   "romaji": "Hikikomi-gaeshi",
+   "group": "ma-sutemi",
+   "gokyo": "habukareta",
+   "video": "92zUYWBp5N8",
+   "tags": [],
+   "he_read": "היקיקומי גאשי",
+   "name": {
+    "he": "הפיכה במשיכה למטה",
+    "ru": "Бросок через голову с захватом пояса",
+    "en": "Pull-in reversal"
+   },
+   "desc": {
+    "he": "בדומה לסומי גאשי, אבל אוחזים בחגורת היריב מעל גבו בזמן הנפילה לאחור.",
+    "ru": "Похож на суми-гаэси, но, падая назад, вы держите пояс партнёра через его спину.",
+    "en": "Like sumi-gaeshi, but you grip uke's belt over their back as you roll back."
+   }
+  },
+  {
+   "id": "tawara-gaeshi",
+   "kanji": "俵返",
+   "romaji": "Tawara-gaeshi",
+   "group": "ma-sutemi",
+   "gokyo": "habukareta",
+   "video": "TmTWgrmViZc",
+   "tags": [],
+   "he_read": "טווארה גאשי",
+   "name": {
+    "he": "הטלת שק אורז",
+    "ru": "Переворот «мешок риса»",
+    "en": "Rice-bale reversal"
+   },
+   "desc": {
+    "he": "נשענים על גב היריב, חובקים את גופו בשתי הידיים, נופלים לאחור ומטילים אותו מעל הכתף.",
+    "ru": "Навалившись на спину партнёра и обхватив его корпус, вы падаете назад и бросаете его через плечо.",
+    "en": "Lean over uke's back, wrap their trunk in both arms and roll back, throwing them over your shoulder."
+   }
+  },
+  {
+   "id": "ura-nage",
+   "kanji": "裏投",
+   "romaji": "Ura-nage",
+   "group": "ma-sutemi",
+   "gokyo": "5",
+   "video": "Fgi9b8DJ5sQ",
+   "tags": [
+    "dan1"
+   ],
+   "he_read": "אורא נאגה",
+   "name": {
+    "he": "הפלה לאחור",
+    "ru": "Бросок прогибом",
+    "en": "Rear throw"
+   },
+   "desc": {
+    "he": "תרגיל נגד: חובקים את היריב מאחור או מהצד, מרימים אותו ונופלים לאחור תוך הטלה מעל הכתף.",
+    "ru": "Контрприём: обхватив партнёра сзади или сбоку, вы поднимаете его и, падая назад, бросаете через плечо.",
+    "en": "A counter: hug uke from behind or the side, lift and fall back, throwing them over your shoulder."
+   }
+  },
+  {
+   "id": "yoko-otoshi",
+   "kanji": "横落",
+   "romaji": "Yoko-otoshi",
+   "group": "yoko-sutemi",
+   "gokyo": "3",
+   "video": "MnNG67pF_a0",
+   "tags": [],
+   "he_read": "יוקו אוטושי",
+   "name": {
+    "he": "נפילה צידית",
+    "ru": "Боковой сброс",
+    "en": "Side drop"
+   },
+   "desc": {
+    "he": "מושכים את היריב הצידה ונופלים על הצד, תוך החלקת רגל אל מחוץ לכף רגלו.",
+    "ru": "Выводя партнёра в сторону, вы падаете на бок, выставив ногу снаружи его стопы.",
+    "en": "Pull uke to their side and drop onto your own side, sliding a leg outside their foot."
+   }
+  },
+  {
+   "id": "tani-otoshi",
+   "kanji": "谷落",
+   "romaji": "Tani-otoshi",
+   "group": "yoko-sutemi",
+   "gokyo": "4",
+   "video": "3b9Me3Fohpk",
+   "tags": [
+    "dan1"
+   ],
+   "he_read": "טאני אוטושי",
+   "name": {
+    "he": "נפילה לגיא",
+    "ru": "Сброс «в долину»",
+    "en": "Valley drop"
+   },
+   "desc": {
+    "he": "מוציאים את היריב לאחור ונופלים על הצד, תוך החלקת רגל מאחורי שתי רגליו.",
+    "ru": "Выведя партнёра назад, вы падаете на бок, проводя ногу за обе его ноги.",
+    "en": "Break uke backward and drop onto your side, sliding your leg behind both of theirs."
+   }
+  },
+  {
+   "id": "hane-makikomi",
+   "kanji": "跳巻込",
+   "romaji": "Hane-makikomi",
+   "group": "yoko-sutemi",
+   "gokyo": "4",
+   "video": "6CRBGLGz9j8",
+   "tags": [],
+   "he_read": "האנה מקיקומי",
+   "name": {
+    "he": "כריכת פיתול בהקפצה",
+    "ru": "Подсад бедром с накручиванием",
+    "en": "Springing wrap-around"
+   },
+   "desc": {
+    "he": "האנה גושי שבה לוכדים את זרוע היריב בבית השחי וכורכים אותו סביבכם בנפילה.",
+    "ru": "Подсад бедром, при котором вы прижимаете руку партнёра подмышкой и, падая, накручиваете его на себя.",
+    "en": "A hane-goshi in which you trap uke's arm under your armpit and wrap them around you as you fall."
+   }
+  },
+  {
+   "id": "soto-makikomi",
+   "kanji": "外巻込",
+   "romaji": "Soto-makikomi",
+   "group": "yoko-sutemi",
+   "gokyo": "4",
+   "video": "bWG9O1BVKtQ",
+   "tags": [
+    "dan1"
+   ],
+   "he_read": "סוטו מקיקומי",
+   "name": {
+    "he": "כריכת פיתול חיצונית",
+    "ru": "Наружная накрутка",
+    "en": "Outer wrap-around"
+   },
+   "desc": {
+    "he": "לוכדים את זרוע היריב בבית השחי, מסתובבים עמוק ונופלים קדימה כשהוא כרוך סביבכם.",
+    "ru": "Прижав руку партнёра подмышкой, вы глубоко разворачиваетесь и падаете вперёд, накручивая его на себя.",
+    "en": "Trap uke's arm under your armpit, turn in deep and roll forward, wrapping them over you."
+   }
+  },
+  {
+   "id": "uchi-makikomi",
+   "kanji": "内巻込",
+   "romaji": "Uchi-makikomi",
+   "group": "yoko-sutemi",
+   "gokyo": "habukareta",
+   "video": "5BowcjduxVc",
+   "tags": [],
+   "he_read": "אוצ׳י מקיקומי",
+   "name": {
+    "he": "כריכת פיתול פנימית",
+    "ru": "Внутренняя накрутка",
+    "en": "Inner wrap-around"
+   },
+   "desc": {
+    "he": "כורכים את זרוע היריב מבפנים, מסתובבים עמוק ונופלים קדימה יחד איתו.",
+    "ru": "Обхватив руку партнёра изнутри, вы глубоко разворачиваетесь и падаете вперёд вместе с ним.",
+    "en": "Wrap uke's arm from the inside, turn in deep and roll forward with them."
+   }
+  },
+  {
+   "id": "uki-waza",
+   "kanji": "浮技",
+   "romaji": "Uki-waza",
+   "group": "yoko-sutemi",
+   "gokyo": "5",
+   "video": "weVOpJ63gII",
+   "tags": [],
+   "he_read": "אוקי וואזה",
+   "name": {
+    "he": "תרגיל צף",
+    "ru": "«Плавающий» бросок",
+    "en": "Floating technique"
+   },
+   "desc": {
+    "he": "מושכים את היריב לפינה הקדמית ונופלים על הצד עם רגל מתוחה מחוץ לכף רגלו.",
+    "ru": "Выводя партнёра в передний угол, вы падаете на бок, выставив прямую ногу снаружи его стопы.",
+    "en": "Pull uke to their front corner and drop onto your side with your leg stretched outside their foot."
+   }
+  },
+  {
+   "id": "yoko-wakare",
+   "kanji": "横分",
+   "romaji": "Yoko-wakare",
+   "group": "yoko-sutemi",
+   "gokyo": "5",
+   "video": "bp1tscHlePI",
+   "tags": [],
+   "he_read": "יוקו ווקארה",
+   "name": {
+    "he": "היפרדות צידית",
+    "ru": "Бросок с падением поперёк",
+    "en": "Side separation"
+   },
+   "desc": {
+    "he": "מושכים את היריב קדימה ונופלים על הצד לרוחב תנועתו, כך שהוא מתגלגל מעליכם.",
+    "ru": "Выведя партнёра вперёд, вы падаете на бок поперёк его движения, и он перекатывается через вас.",
+    "en": "Pull uke forward and throw yourself down across their path, so they roll over your body."
+   }
+  },
+  {
+   "id": "yoko-guruma",
+   "kanji": "横車",
+   "romaji": "Yoko-guruma",
+   "group": "yoko-sutemi",
+   "gokyo": "5",
+   "video": "MehP6I5cY2c",
+   "tags": [],
+   "he_read": "יוקו גורומה",
+   "name": {
+    "he": "גלגל צידי",
+    "ru": "Боковое колесо",
+    "en": "Side wheel"
+   },
+   "desc": {
+    "he": "תרגיל נגד: מחליקים רגל בין רגלי היריב ונופלים על הצד, ומגלגלים אותו מעליכם.",
+    "ru": "Контрприём: вы проводите ногу между ног партнёра и, падая на бок, перекатываете его через себя.",
+    "en": "A counter: slide a leg between uke's legs and fall to your side, wheeling them over you."
+   }
+  },
+  {
+   "id": "yoko-gake",
+   "kanji": "横掛",
+   "romaji": "Yoko-gake",
+   "group": "yoko-sutemi",
+   "gokyo": "5",
+   "video": "tP1Sj1uDfSo",
+   "tags": [],
+   "he_read": "יוקו גקה",
+   "name": {
+    "he": "קרס צידי",
+    "ru": "Боковая подсечка с падением",
+    "en": "Side hook"
+   },
+   "desc": {
+    "he": "מטים את היריב אל הצד החיצוני של כף רגלו, גורפים את קרסולו ונופלים על הצד.",
+    "ru": "Наклонив партнёра на внешний край стопы, вы подсекаете его голеностоп и падаете на бок.",
+    "en": "Tilt uke onto the outer edge of their foot, sweep the ankle and drop to your side."
+   }
+  },
+  {
+   "id": "daki-wakare",
+   "kanji": "抱分",
+   "romaji": "Daki-wakare",
+   "group": "yoko-sutemi",
+   "gokyo": "habukareta",
+   "video": "Hr0cOMGBDYo",
+   "tags": [],
+   "he_read": "דאקי ווקארה",
+   "name": {
+    "he": "הפיכת גו",
+    "ru": "Бросок обхватом сзади",
+    "en": "Hugging separation"
+   },
+   "desc": {
+    "he": "כשהיריב על ארבע, חובקים את גופו מאחור ומסתובבים בנפילה כדי להטיל אותו מעליכם.",
+    "ru": "Когда партнёр стоит на четвереньках, вы обхватываете его корпус сзади и, падая с поворотом, перебрасываете через себя.",
+    "en": "When uke is on all fours, hug their trunk from behind and twist as you fall, throwing them over you."
+   }
+  },
+  {
+   "id": "o-soto-makikomi",
+   "kanji": "大外巻込",
+   "romaji": "O-soto-makikomi",
+   "group": "yoko-sutemi",
+   "gokyo": "shinmeisho",
+   "video": "DGDv2oMwmas",
+   "tags": [],
+   "he_read": "או סוטו מקיקומי",
+   "name": {
+    "he": "כריכת פיתול חיצונית גדולה",
+    "ru": "Отхват с накручиванием",
+    "en": "Major outer wrap-around"
+   },
+   "desc": {
+    "he": "או סוטו גארי שמסיימים בלכידת זרוע היריב וכריכתו סביבכם בנפילה.",
+    "ru": "Отхват, который завершают, прижав руку партнёра и накручивая его на себя в падении.",
+    "en": "An o-soto-gari finished by trapping uke's arm and wrapping them down as you fall."
+   }
+  },
+  {
+   "id": "uchi-mata-makikomi",
+   "kanji": "内股巻込",
+   "romaji": "Uchi-mata-makikomi",
+   "group": "yoko-sutemi",
+   "gokyo": "shinmeisho",
+   "video": "jZXENTLpJCI",
+   "tags": [],
+   "he_read": "אוצ׳י מטה מקיקומי",
+   "name": {
+    "he": "ירך פנימית בכריכת פיתול",
+    "ru": "Подхват изнутри с накручиванием",
+    "en": "Inner thigh wrap-around"
+   },
+   "desc": {
+    "he": "אוצ׳י מטה שמסיימים בלכידת זרוע היריב וכריכתו סביבכם בנפילה.",
+    "ru": "Подхват изнутри, который завершают, прижав руку партнёра и накручивая его на себя в падении.",
+    "en": "An uchi-mata finished by trapping uke's arm and wrapping them down as you fall."
+   }
+  },
+  {
+   "id": "harai-makikomi",
+   "kanji": "払巻込",
+   "romaji": "Harai-makikomi",
+   "group": "yoko-sutemi",
+   "gokyo": "shinmeisho",
+   "video": "VBaHzKaCXss",
+   "tags": [],
+   "he_read": "הראי מקיקומי",
+   "name": {
+    "he": "טאטוא מותן בכריכת פיתול",
+    "ru": "Подхват бедром с накручиванием",
+    "en": "Sweeping wrap-around"
+   },
+   "desc": {
+    "he": "הראי גושי שמסיימים בלכידת זרוע היריב וכריכתו סביבכם בנפילה.",
+    "ru": "Подхват бедром, который завершают, прижав руку партнёра и накручивая его на себя в падении.",
+    "en": "A harai-goshi finished by trapping uke's arm and wrapping them down as you fall."
+   }
+  },
+  {
+   "id": "ko-uchi-makikomi",
+   "kanji": "小内巻込",
+   "romaji": "Ko-uchi-makikomi",
+   "group": "yoko-sutemi",
+   "gokyo": "shinmeisho",
+   "video": "_1eygIXLD_w",
+   "tags": [],
+   "he_read": "קו אוצ׳י מקיקומי",
+   "name": {
+    "he": "כריכת פיתול פנימית קטנה",
+    "ru": "Подсечка изнутри с накручиванием",
+    "en": "Minor inner wrap-around"
+   },
+   "desc": {
+    "he": "מכניסים קרס לרגל היריב מבפנים וצוללים קדימה, כך שהוא נופל לאחור מתחתיכם.",
+    "ru": "Зацепив ногу партнёра изнутри, вы падаете вперёд и опрокидываете его на спину под себя.",
+    "en": "Hook uke's leg from the inside and dive forward, taking them down backward under you."
+   }
+  },
+  {
+   "id": "kani-basami",
+   "kanji": "蟹挟",
+   "romaji": "Kani-basami",
+   "group": "yoko-sutemi",
+   "gokyo": "shinmeisho",
+   "video": "OR-HGHnarYc",
+   "tags": [
+    "banned"
+   ],
+   "he_read": "קאני בסאמי",
+   "name": {
+    "he": "הטלת מספריים",
+    "ru": "«Ножницы»",
+    "en": "Crab scissors"
+   },
+   "desc": {
+    "he": "נופלים על הצד, תופסים את רגלי היריב במספריים ברגליים ומפילים אותו לאחור.",
+    "ru": "Падая на бок, вы берёте ноги партнёра «в ножницы» и опрокидываете его назад.",
+    "en": "Fall to your side, scissor uke's legs between yours and take them down backward."
+   }
+  },
+  {
+   "id": "kawazu-gake",
+   "kanji": "河津掛",
+   "romaji": "Kawazu-gake",
+   "group": "yoko-sutemi",
+   "gokyo": "shinmeisho",
+   "video": "w6G57bWACi0",
+   "tags": [
+    "banned"
+   ],
+   "he_read": "קוואזו גאקה",
+   "name": {
+    "he": "כריכת רגל",
+    "ru": "Обвив",
+    "en": "One-leg entanglement"
+   },
+   "desc": {
+    "he": "כורכים רגל סביב רגל היריב מבפנים ונופלים איתו לאחור.",
+    "ru": "Обвив ногу партнёра своей ногой изнутри, вы падаете назад вместе с ним.",
+    "en": "Wrap your leg around uke's leg from the inside and fall back together."
+   }
+  },
+  {
+   "id": "kesa-gatame",
+   "kanji": "袈裟固",
+   "romaji": "Kesa-gatame",
+   "group": "osaekomi",
+   "video": "NDaQuJOFBYk",
+   "escape": "5_TS0YHdxcQ",
+   "tags": [
+    "brown",
+    "dan1"
+   ],
+   "he_read": "קסה גטמה",
+   "name": {
+    "he": "תפיסת צעיף",
+    "ru": "Удержание сбоку",
+    "en": "Scarf hold"
+   },
+   "desc": {
+    "he": "יושבים לצד היריב, לוכדים את זרועו בבית השחי, חובקים את צווארו ומרתקים את פלג גופו העליון בחזה.",
+    "ru": "Сидя сбоку от партнёра, вы прижимаете его руку подмышкой, обхватываете шею и удерживаете корпус грудью.",
+    "en": "From uke's side, clamp their arm under yours, wrap their neck and pin their upper body with your chest."
+   }
+  },
+  {
+   "id": "kuzure-kesa-gatame",
+   "kanji": "崩袈裟固",
+   "romaji": "Kuzure-kesa-gatame",
+   "group": "osaekomi",
+   "video": "Q2fb9jaoUFQ",
+   "escape": "-zFQ6h4yKT4",
+   "tags": [
+    "brown",
+    "dan1"
+   ],
+   "he_read": "קוזורה קסה גטמה",
+   "name": {
+    "he": "תפיסת צעיף שבורה",
+    "ru": "Удержание сбоку с захватом из-под руки",
+    "en": "Broken scarf hold"
+   },
+   "desc": {
+    "he": "בדומה לקסה גטמה, אבל היד השנייה עוברת מתחת לבית השחי הרחוק של היריב במקום סביב הצוואר.",
+    "ru": "Похоже на кэса-гатамэ, но вторая рука проходит под дальнюю подмышку партнёра, а не вокруг шеи.",
+    "en": "Like kesa-gatame, but your other arm goes under uke's far armpit instead of around the neck."
+   }
+  },
+  {
+   "id": "ushiro-kesa-gatame",
+   "kanji": "後袈裟固",
+   "romaji": "Ushiro-kesa-gatame",
+   "group": "osaekomi",
+   "video": "SBapox2M2dE",
+   "escape": "4QuzAAucQsA",
+   "tags": [
+    "brown",
+    "dan1"
+   ],
+   "he_read": "אושירו קסה גטמה",
+   "name": {
+    "he": "תפיסת צעיף אחורית",
+    "ru": "Обратное удержание сбоку",
+    "en": "Reverse scarf hold"
+   },
+   "desc": {
+    "he": "יושבים לצד היריב בפנים לכיוון רגליו, אוחזים בזרועו הקרובה ומרתקים את גופו.",
+    "ru": "Сидя сбоку лицом к ногам партнёра, вы захватываете его ближнюю руку и прижимаете корпус.",
+    "en": "Sit at uke's side facing their legs, hold their near arm and pin their body."
+   }
+  },
+  {
+   "id": "kata-gatame",
+   "kanji": "肩固",
+   "romaji": "Kata-gatame",
+   "group": "osaekomi",
+   "video": "zQR3IOXxO_Q",
+   "escape": "7hP1-W2yovk",
+   "tags": [
+    "brown",
+    "dan1"
+   ],
+   "he_read": "קאטה גטמה",
+   "name": {
+    "he": "תפיסת כתף",
+    "ru": "Удержание с фиксацией плеча",
+    "en": "Shoulder hold"
+   },
+   "desc": {
+    "he": "לוכדים את זרוע היריב כנגד ראשו וצווארו בראש ובשתי הידיים.",
+    "ru": "Вы прижимаете руку партнёра к его голове своей головой и обеими руками.",
+    "en": "Trap uke's arm against their own head and neck with your head and both arms."
+   }
+  },
+  {
+   "id": "kami-shiho-gatame",
+   "kanji": "上四方固",
+   "romaji": "Kami-shiho-gatame",
+   "group": "osaekomi",
+   "video": "HFuMjOv0WN8",
+   "escape": "seGsXy9I4G8",
+   "tags": [
+    "brown",
+    "dan1"
+   ],
+   "he_read": "קאמי שיהו גטמה",
+   "name": {
+    "he": "תפיסת ארבע פינות עילית",
+    "ru": "Удержание со стороны головы",
+    "en": "Upper four-quarter hold"
+   },
+   "desc": {
+    "he": "מצד הראש של היריב אוחזים בחגורתו משני הצדדים ומרתקים אותו בחזה.",
+    "ru": "Со стороны головы партнёра вы захватываете его пояс с обеих сторон и прижимаете его грудью.",
+    "en": "From above uke's head, grip their belt on both sides and pin their chest with yours."
+   }
+  },
+  {
+   "id": "kuzure-kami-shiho-gatame",
+   "kanji": "崩上四方固",
+   "romaji": "Kuzure-kami-shiho-gatame",
+   "group": "osaekomi",
+   "video": "YUrogQWdwiY",
+   "escape": "PPe7E_7d7UI",
+   "tags": [
+    "brown",
+    "dan1"
+   ],
+   "he_read": "קוזורה קאמי שיהו גטמה",
+   "name": {
+    "he": "תפיסת ארבע פינות עילית שבורה",
+    "ru": "Удержание со стороны головы с захватом руки",
+    "en": "Broken upper four-quarter hold"
+   },
+   "desc": {
+    "he": "וריאציה מהאלכסון מעל ראש היריב: יד אחת חובקת את זרועו והשנייה אוחזת בחגורה.",
+    "ru": "Вариант со стороны головы по диагонали: одна рука захватывает руку партнёра, другая держит пояс.",
+    "en": "A variation from diagonally above uke's head: one arm wraps their arm, the other holds the belt."
+   }
+  },
+  {
+   "id": "yoko-shiho-gatame",
+   "kanji": "横四方固",
+   "romaji": "Yoko-shiho-gatame",
+   "group": "osaekomi",
+   "video": "TT7XJVSEQxA",
+   "escape": "yK_GSamSPko",
+   "tags": [
+    "brown",
+    "dan1"
+   ],
+   "he_read": "יוקו שיהו גטמה",
+   "name": {
+    "he": "תפיסת ארבע פינות צידית",
+    "ru": "Удержание поперёк",
+    "en": "Side four-quarter hold"
+   },
+   "desc": {
+    "he": "שוכבים לרוחב היריב מהצד, יד אחת בין רגליו והשנייה סביב צווארו.",
+    "ru": "Лёжа поперёк партнёра, вы проводите одну руку между его ног, а другую под шеей.",
+    "en": "Lie across uke from the side, one arm between their legs and the other around the neck."
+   }
+  },
+  {
+   "id": "tate-shiho-gatame",
+   "kanji": "縦四方固",
+   "romaji": "Tate-shiho-gatame",
+   "group": "osaekomi",
+   "video": "55-rFmBx53g",
+   "escape": "JMJBjnst_DA",
+   "tags": [
+    "brown",
+    "dan1"
+   ],
+   "he_read": "טטה שיהו גטמה",
+   "name": {
+    "he": "תפיסת ארבע פינות ברכיבה",
+    "ru": "Удержание верхом",
+    "en": "Straddle four-quarter hold"
+   },
+   "desc": {
+    "he": "יושבים על היריב ברכיבה, שולטים בזרוע ובצוואר ונועלים את רגליו ברגליים.",
+    "ru": "Сидя верхом на партнёре, вы контролируете его руку и шею, а своими ногами фиксируете его ноги.",
+    "en": "Sit astride uke, control an arm and the neck, and lock their legs with yours."
+   }
+  },
+  {
+   "id": "uki-gatame",
+   "kanji": "浮固",
+   "romaji": "Uki-gatame",
+   "group": "osaekomi",
+   "video": "e_lAjik1SUM",
+   "escape": "AMHWDFR4ryo",
+   "tags": [],
+   "he_read": "אוקי גטמה",
+   "name": {
+    "he": "תפיסה צפה",
+    "ru": "«Плавающее» удержание",
+    "en": "Floating hold"
+   },
+   "desc": {
+    "he": "מהצד לוחצים בברך על חזה היריב, שולטים בזרועו ומותחים את הרגל השנייה לאחור.",
+    "ru": "Сбоку вы прижимаете грудь партнёра коленом, контролируете его руку и отставляете другую ногу назад.",
+    "en": "From the side, press your knee onto uke's chest, control their arm and stretch your other leg back."
+   }
+  },
+  {
+   "id": "ura-gatame",
+   "kanji": "裏固",
+   "romaji": "Ura-gatame",
+   "group": "osaekomi",
+   "video": "eeAHZB0v3XY",
+   "escape": "0aY2Tmchzs8",
+   "tags": [],
+   "he_read": "אורה גטמה",
+   "name": {
+    "he": "תפיסה אחורית",
+    "ru": "Обратное удержание",
+    "en": "Reverse hold"
+   },
+   "desc": {
+    "he": "מרתקים את היריב בגב שלכם על חזהו, תוך אחיזה בזרוע וברגל.",
+    "ru": "Вы прижимаете партнёра своей спиной, захватив его руку и ногу.",
+    "en": "Pin uke with your back across their chest, holding an arm and a leg."
+   }
+  },
+  {
+   "id": "nami-juji-jime",
+   "kanji": "並十字絞",
+   "romaji": "Nami-juji-jime",
+   "group": "shime",
+   "video": "k2cHry9HByQ",
+   "tags": [
+    "dan1"
+   ],
+   "he_read": "נאמי ג׳וג׳י ג׳ימה",
+   "name": {
+    "he": "חניקה בהצלבה עם אגודלים",
+    "ru": "Удушение скрещёнными руками",
+    "en": "Normal cross choke"
+   },
+   "desc": {
+    "he": "מצליבים את פרקי הידיים, אוחזים בצווארון היריב משני הצדדים עם האגודלים פנימה וחונקים.",
+    "ru": "Скрестив руки, вы берёте воротник партнёра с обеих сторон большими пальцами внутрь и душите.",
+    "en": "Cross your wrists, grip both sides of uke's collar thumbs-in and choke."
+   }
+  },
+  {
+   "id": "gyaku-juji-jime",
+   "kanji": "逆十字絞",
+   "romaji": "Gyaku-juji-jime",
+   "group": "shime",
+   "video": "t3tQriIPdlI",
+   "tags": [
+    "dan1"
+   ],
+   "he_read": "גיאקו ג׳וג׳י ג׳ימה",
+   "name": {
+    "he": "חניקה בהצלבת ידיים, אצבעות בפנים",
+    "ru": "Удушение скрещёнными руками обратным хватом",
+    "en": "Reverse cross choke"
+   },
+   "desc": {
+    "he": "חניקה בהצלבת ידיים, כששתי הידיים אוחזות בצווארון עם האצבעות פנימה.",
+    "ru": "Удушение скрещёнными руками, в котором обе руки держат воротник пальцами внутрь.",
+    "en": "A cross choke with both hands gripping the collar fingers-in."
+   }
+  },
+  {
+   "id": "kata-juji-jime",
+   "kanji": "片十字絞",
+   "romaji": "Kata-juji-jime",
+   "group": "shime",
+   "video": "3VZVUAmiMD8",
+   "tags": [
+    "dan1"
+   ],
+   "he_read": "קאטה ג׳וג׳י ג׳ימה",
+   "name": {
+    "he": "חניקה בהצלבת ידיים הפוכות",
+    "ru": "Удушение скрещёнными руками смешанным хватом",
+    "en": "Half cross choke"
+   },
+   "desc": {
+    "he": "חניקה בהצלבת ידיים, כשיד אחת אוחזת עם האגודל פנימה והשנייה עם האצבעות פנימה.",
+    "ru": "Удушение скрещёнными руками: одна рука держит воротник большим пальцем внутрь, другая пальцами внутрь.",
+    "en": "A cross choke with one hand thumb-in and the other fingers-in."
+   }
+  },
+  {
+   "id": "hadaka-jime",
+   "kanji": "裸絞",
+   "romaji": "Hadaka-jime",
+   "group": "shime",
+   "video": "9f0n8jez7iA",
+   "tags": [
+    "brown",
+    "dan1"
+   ],
+   "he_read": "הדקה ג׳ימה",
+   "name": {
+    "he": "חניקה עירומה",
+    "ru": "Удушение без захвата одежды",
+    "en": "Naked choke"
+   },
+   "desc": {
+    "he": "מאחור חונקים את היריב באמה לרוחב הגרון, נעולה ביד השנייה, בלי להשתמש בחליפה.",
+    "ru": "Сзади вы душите партнёра предплечьем поперёк горла, сцепив руки, без захвата одежды.",
+    "en": "From behind, choke uke with your forearm across the throat, locked by your other arm, without using the jacket."
+   }
+  },
+  {
+   "id": "okuri-eri-jime",
+   "kanji": "送襟絞",
+   "romaji": "Okuri-eri-jime",
+   "group": "shime",
+   "video": "EiqyoVcIAi8",
+   "tags": [
+    "dan1"
+   ],
+   "he_read": "אוקורי ארי ג׳ימה",
+   "name": {
+    "he": "חניקה בדש רודף",
+    "ru": "Удушение отворотами сзади",
+    "en": "Sliding lapel choke"
+   },
+   "desc": {
+    "he": "מאחור אוחזים ביד אחת בצווארון היריב מעבר לגרון, וביד השנייה מושכים את הדש שלו למטה.",
+    "ru": "Сзади вы одной рукой держите воротник партнёра через горло, а другой тянете вниз его отворот.",
+    "en": "From behind, grip uke's collar across the throat with one hand and pull their other lapel down with the other."
+   }
+  },
+  {
+   "id": "kataha-jime",
+   "kanji": "片羽絞",
+   "romaji": "Kataha-jime",
+   "group": "shime",
+   "video": "yaTGgRjnwB8",
+   "tags": [
+    "dan1"
+   ],
+   "he_read": "קטהא ג׳ימה",
+   "name": {
+    "he": "חניקת כנף",
+    "ru": "Удушение «крыло»",
+    "en": "Single wing choke"
+   },
+   "desc": {
+    "he": "מאחור חונקים באחיזת צווארון מעבר לגרון, וביד השנייה מרימים את זרוע היריב ודוחפים מאחורי הצוואר.",
+    "ru": "Сзади вы душите захватом воротника через горло, а другой рукой поднимаете руку партнёра и давите за шею.",
+    "en": "From behind, choke with a collar grip across the throat while your other arm lifts uke's arm and pushes behind the neck."
+   }
+  },
+  {
+   "id": "katate-jime",
+   "kanji": "片手絞",
+   "romaji": "Katate-jime",
+   "group": "shime",
+   "video": "cHeIs-fSqwE",
+   "tags": [],
+   "he_read": "קטאטה ג׳ימה",
+   "name": {
+    "he": "חניקה ביד אחת",
+    "ru": "Удушение одной рукой",
+    "en": "One-hand choke"
+   },
+   "desc": {
+    "he": "חניקה באחיזת צווארון אחת: האגרוף והאמה לוחצים על צד הצוואר.",
+    "ru": "Удушение одним захватом воротника: кулак и предплечье давят на шею сбоку.",
+    "en": "A choke with a single collar grip, your fist and forearm pressing into the side of the neck."
+   }
+  },
+  {
+   "id": "ryote-jime",
+   "kanji": "両手絞",
+   "romaji": "Ryote-jime",
+   "group": "shime",
+   "video": "-RHC4V7TQiY",
+   "tags": [],
+   "he_read": "ריוטה ג׳ימה",
+   "name": {
+    "he": "חניקה בשתי ידיים",
+    "ru": "Удушение двумя руками",
+    "en": "Two-hand choke"
+   },
+   "desc": {
+    "he": "מלפנים, בלי להצליב ידיים, אוחזים בצווארון משני הצדדים עם האגודלים פנימה ולוחצים באגרופים.",
+    "ru": "Спереди, не скрещивая рук, вы берёте воротник с обеих сторон большими пальцами внутрь и давите кулаками.",
+    "en": "From the front, grip both sides of the collar thumbs-in without crossing your hands and press with your fists."
+   }
+  },
+  {
+   "id": "sode-guruma-jime",
+   "kanji": "袖車絞",
+   "romaji": "Sode-guruma-jime",
+   "group": "shime",
+   "video": "E3nvQzClcAU",
+   "tags": [],
+   "he_read": "סודה גורומה ג׳ימה",
+   "name": {
+    "he": "חניקה בגלגל שרוול",
+    "ru": "Удушение предплечьями с захватом рукава",
+    "en": "Sleeve wheel choke"
+   },
+   "desc": {
+    "he": "לוכדים את צוואר היריב בין שתי האמות, אחת מלפנים ואחת מאחור, תוך אחיזה בשרוול שלכם.",
+    "ru": "Вы зажимаете шею партнёра между предплечьями, одно спереди, другое сзади, держась за собственный рукав.",
+    "en": "Trap uke's neck between your forearms, one in front and one behind, holding your own sleeve."
+   }
+  },
+  {
+   "id": "tsukkomi-jime",
+   "kanji": "突込絞",
+   "romaji": "Tsukkomi-jime",
+   "group": "shime",
+   "video": "dKKpnD3eLcY",
+   "tags": [],
+   "he_read": "צוקומי ג׳ימה",
+   "name": {
+    "he": "חניקה במשיכה-דחיפה",
+    "ru": "Удушение толчком",
+    "en": "Thrust choke"
+   },
+   "desc": {
+    "he": "אוחזים בשני הדשים של היריב, דוחפים אגרוף אחד לצד הצוואר ומושכים ביד השנייה.",
+    "ru": "Захватив оба отворота партнёра, вы одним кулаком давите ему на шею сбоку, а другой рукой тянете.",
+    "en": "Grip both of uke's lapels and drive one fist into the side of the neck while pulling with the other."
+   }
+  },
+  {
+   "id": "sankaku-jime",
+   "kanji": "三角絞",
+   "romaji": "Sankaku-jime",
+   "group": "shime",
+   "video": "lq1CUBRAm7s",
+   "tags": [
+    "dan1"
+   ],
+   "he_read": "סנקקו ג׳ימה",
+   "name": {
+    "he": "חניקת משולש",
+    "ru": "Удушение «треугольник»",
+    "en": "Triangle choke"
+   },
+   "desc": {
+    "he": "נועלים את ראש היריב וזרוע אחת שלו במשולש של הרגליים ולוחצים.",
+    "ru": "Вы зажимаете голову и руку партнёра в «треугольнике» из своих ног и сдавливаете.",
+    "en": "Lock uke's head and one arm inside a triangle of your legs and squeeze."
+   }
+  },
+  {
+   "id": "do-jime",
+   "kanji": "胴絞",
+   "romaji": "Do-jime",
+   "group": "shime",
+   "video": "D_0fFcoIbvY",
+   "tags": [
+    "banned"
+   ],
+   "he_read": "דו ג׳ימה",
+   "name": {
+    "he": "חניקת הגוף",
+    "ru": "Сдавливание туловища",
+    "en": "Trunk squeeze"
+   },
+   "desc": {
+    "he": "לוחצים על גופו של היריב בין הרגליים.",
+    "ru": "Вы сдавливаете туловище партнёра ногами.",
+    "en": "Squeeze uke's trunk between your legs."
+   }
+  },
+  {
+   "id": "ude-garami",
+   "kanji": "腕緘",
+   "romaji": "Ude-garami",
+   "group": "kansetsu",
+   "video": "AIlTvZb4RlE",
+   "tags": [
+    "brown",
+    "dan1"
+   ],
+   "he_read": "אודה גרמי",
+   "name": {
+    "he": "גלגול יד",
+    "ru": "Узел руки",
+    "en": "Entangled armlock"
+   },
+   "desc": {
+    "he": "מכופפים את זרוע היריב במרפק ומסובבים אותה באחיזה נעולה של שתי הידיים כדי לבצע בריח על המרפק.",
+    "ru": "Согнутую в локте руку партнёра вы проворачиваете сцепленным захватом своих рук и выкручиваете локтевой сустав.",
+    "en": "Bend uke's arm at the elbow and twist it with a locked two-hand grip to lock the elbow."
+   }
+  },
+  {
+   "id": "ude-hishigi-juji-gatame",
+   "kanji": "腕挫十字固",
+   "romaji": "Ude-hishigi-juji-gatame",
+   "group": "kansetsu",
+   "video": "OWgSOlCuMXw",
+   "tags": [
+    "brown",
+    "dan1"
+   ],
+   "he_read": "אודה הישיגי ג׳וג׳י גטמה",
+   "name": {
+    "he": "בריח יד, תפיסת צלב",
+    "ru": "Рычаг локтя через бедро",
+    "en": "Cross armlock"
+   },
+   "desc": {
+    "he": "לוכדים את זרוע היריב בין הירכיים ומיישרים אותה כנגד האגן כדי לבצע בריח על המרפק.",
+    "ru": "Зажав руку партнёра между бёдрами, вы разгибаете её в локте через своё бедро.",
+    "en": "Hold uke's arm between your thighs and straighten it against your hips to lock the elbow."
+   }
+  },
+  {
+   "id": "ude-hishigi-ude-gatame",
+   "kanji": "腕挫腕固",
+   "romaji": "Ude-hishigi-ude-gatame",
+   "group": "kansetsu",
+   "video": "SBf0aTma1VI",
+   "tags": [
+    "brown",
+    "dan1"
+   ],
+   "he_read": "אודה הישיגי אודה גטמה",
+   "name": {
+    "he": "בריח יד, יד ישרה",
+    "ru": "Рычаг локтя руками к плечу",
+    "en": "Arm armlock"
+   },
+   "desc": {
+    "he": "לוכדים את זרוע היריב הישרה כנגד הכתף ולוחצים על המרפק בשתי הידיים.",
+    "ru": "Прижав выпрямленную руку партнёра к своему плечу, вы обеими руками давите на его локоть.",
+    "en": "Trap uke's straight arm against your shoulder and press on the elbow with both hands."
+   }
+  },
+  {
+   "id": "ude-hishigi-hiza-gatame",
+   "kanji": "腕挫膝固",
+   "romaji": "Ude-hishigi-hiza-gatame",
+   "group": "kansetsu",
+   "video": "H2HtAJdiJcE",
+   "tags": [],
+   "he_read": "אודה הישיגי היזא גטמה",
+   "name": {
+    "he": "בריח יד, תפיסת ברך",
+    "ru": "Рычаг локтя коленом",
+    "en": "Knee armlock"
+   },
+   "desc": {
+    "he": "לוכדים את זרוע היריב בבית השחי ומפעילים על המרפק מנוף בעזרת הברך.",
+    "ru": "Зажав руку партнёра подмышкой, вы создаёте рычаг на локоть коленом.",
+    "en": "Hold uke's arm under your armpit and lever the elbow with your knee."
+   }
+  },
+  {
+   "id": "ude-hishigi-waki-gatame",
+   "kanji": "腕挫腋固",
+   "romaji": "Ude-hishigi-waki-gatame",
+   "group": "kansetsu",
+   "video": "8F5p1zuJRG0",
+   "tags": [
+    "dan1"
+   ],
+   "he_read": "אודה הישיגי וואקי גטמה",
+   "name": {
+    "he": "בריח יד, תפיסת בית שחי",
+    "ru": "Рычаг локтя подмышкой",
+    "en": "Armpit armlock"
+   },
+   "desc": {
+    "he": "לוכדים את זרוע היריב הישרה בבית השחי ולוחצים כלפי מטה על המרפק.",
+    "ru": "Зажав выпрямленную руку партнёра подмышкой, вы давите вниз на его локоть.",
+    "en": "Trap uke's straight arm under your armpit and press down on the elbow."
+   }
+  },
+  {
+   "id": "ude-hishigi-hara-gatame",
+   "kanji": "腕挫腹固",
+   "romaji": "Ude-hishigi-hara-gatame",
+   "group": "kansetsu",
+   "video": "ZzEycg8R_9M",
+   "tags": [],
+   "he_read": "אודה הישיגי הרא גטמה",
+   "name": {
+    "he": "בריח יד, תפיסת בטן",
+    "ru": "Рычаг локтя животом",
+    "en": "Stomach armlock"
+   },
+   "desc": {
+    "he": "לוחצים את זרוע היריב הישרה כנגד הבטן כדי לבצע בריח על המרפק.",
+    "ru": "Вы прижимаете выпрямленную руку партнёра к животу и создаёте рычаг на локоть.",
+    "en": "Press uke's straight arm against your stomach to lock the elbow."
+   }
+  },
+  {
+   "id": "ude-hishigi-ashi-gatame",
+   "kanji": "腕挫脚固",
+   "romaji": "Ude-hishigi-ashi-gatame",
+   "group": "kansetsu",
+   "video": "ClY7g_pX-4s",
+   "tags": [],
+   "he_read": "אודה הישיגי אשי גטמה",
+   "name": {
+    "he": "בריח יד, תפיסת רגל",
+    "ru": "Рычаг локтя ногой",
+    "en": "Leg armlock"
+   },
+   "desc": {
+    "he": "כשהיריב שוכב על הבטן, מניחים רגל על זרועו ומבצעים בריח על המרפק.",
+    "ru": "Когда партнёр лежит на животе, вы фиксируете его руку ногой и создаёте рычаг на локоть.",
+    "en": "With uke face down, hook your leg over their arm to lock the elbow."
+   }
+  },
+  {
+   "id": "ude-hishigi-te-gatame",
+   "kanji": "腕挫手固",
+   "romaji": "Ude-hishigi-te-gatame",
+   "group": "kansetsu",
+   "video": "6DnvhY0tQVM",
+   "tags": [],
+   "he_read": "אודה הישיגי טה גטמה",
+   "name": {
+    "he": "בריח יד, תפיסת יד",
+    "ru": "Рычаг локтя руками",
+    "en": "Hand armlock"
+   },
+   "desc": {
+    "he": "מבצעים בריח על המרפק בידיים בלבד, תוך אחיזה בפרק היד של היריב.",
+    "ru": "Вы создаёте рычаг на локоть только руками, удерживая запястье партнёра.",
+    "en": "Lock uke's elbow with your hands alone, holding their wrist and levering the arm."
+   }
+  },
+  {
+   "id": "ude-hishigi-sankaku-gatame",
+   "kanji": "腕挫三角固",
+   "romaji": "Ude-hishigi-sankaku-gatame",
+   "group": "kansetsu",
+   "video": "WefAmW4azhk",
+   "tags": [
+    "dan1"
+   ],
+   "he_read": "אודה הישיגי סנקקו גטמה",
+   "name": {
+    "he": "בריח יד, תפיסת משולש",
+    "ru": "Рычаг локтя из «треугольника»",
+    "en": "Triangle armlock"
+   },
+   "desc": {
+    "he": "כשראש היריב וזרועו נעולים במשולש הרגליים, מיישרים או מסובבים את הזרוע הלכודה.",
+    "ru": "Зажав голову и руку партнёра «треугольником» из ног, вы выпрямляете или проворачиваете захваченную руку.",
+    "en": "With uke's head and arm locked in a triangle of your legs, straighten or twist the trapped arm."
+   }
+  },
+  {
+   "id": "ashi-garami",
+   "kanji": "足緘",
+   "romaji": "Ashi-garami",
+   "group": "kansetsu",
+   "video": "BWWb0GoAtZw",
+   "tags": [
+    "banned"
+   ],
+   "he_read": "אשי גרמי",
+   "name": {
+    "he": "גלגול רגל",
+    "ru": "Узел ноги",
+    "en": "Leg entanglement"
+   },
+   "desc": {
+    "he": "כורכים רגל סביב רגל היריב ומפעילים מנוף על מפרק הברך.",
+    "ru": "Обвив ногу партнёра своей ногой, вы создаёте рычаг на коленный сустав.",
+    "en": "Wrap your leg around uke's leg and lever their knee joint."
+   }
+  }
+ ]
+}

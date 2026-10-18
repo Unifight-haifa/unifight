@@ -1,0 +1,275 @@
+---
+import { i18n } from 'astro:config/client';
+import { getRelativeLocaleUrl } from 'astro:i18n';
+import data from '../../../../content/techniques.json';
+import Base from '../../../layouts/Base.astro';
+import JsonLd from '../../../components/JsonLd.astro';
+import PageHead from '../../../components/PageHead.astro';
+import VideoModal from '../../../components/VideoModal.astro';
+import { t, type Lang } from '../../../i18n/ui';
+import { bidi } from '../../../lib/club-check.mjs';
+import { kanji, kanjiDefs } from '../../../lib/kanji';
+import { GOKYO, TAGS, norm, polivanov } from '../../../lib/techniques-check.mjs';
+import '../../../styles/landing.css';
+import '../../../styles/news.css';
+import '../../../styles/club.css';
+import '../../../styles/techniques.css';
+
+export function getStaticPaths() {
+  return i18n!.locales.map((lang) => ({ params: { lang } }));
+}
+
+const lang = Astro.params.lang as Lang;
+const s = {
+  he: {
+    title: 'טכניקות הג׳ודו של הקודוקאן',
+    desc: '100 הטכניקות הרשמיות של הקודוקאן: הטלות, ריתוקים, חניקות ובריחים, עם הסרטונים של הקודוקאן ו־IJF Academy, חיפוש וסינון.',
+    lead: 'כל 100 הטכניקות ברשימה הרשמית של הקודוקאן (2017): 68 הטלות ו־32 טכניקות קרקע. לכל טכניקה הסבר קצר שלנו וסרטון של הקודוקאן ו־IJF Academy.',
+    tree: 'מבנה הרשימה',
+    families: { nage: 'טכניקות הטלה', katame: 'טכניקות קרקע' },
+    search: 'חיפוש טכניקה',
+    hint: 'שם ביפנית, בעברית, ברוסית או באנגלית',
+    gokyo: 'גוקיו',
+    gokyoNames: { 1: 'גוקיו 1', 2: 'גוקיו 2', 3: 'גוקיו 3', 4: 'גוקיו 4', 5: 'גוקיו 5', habukareta: 'האבוקארטה', shinmeisho: 'שינמיישו' },
+    gokyoNote: 'גוקיו: תוכנית הלימוד של הקודוקאן משנת 1920, 40 הטלות בחמש קבוצות. האבוקארטה: 8 הטלות שהוצאו ממנה ב־1920 והוחזרו לרשימה מאוחר יותר. שינמיישו: הטלות שהוכרו אחריה.',
+    tags: 'מבחנים וכללים',
+    tagNames: { brown: 'מבחן חגורה חומה', dan1: 'מבחן דאן 1', banned: 'אסורה בתחרות' },
+    tagNote: 'מבחני החגורה החומה והדאן הראשון ורשימת הטכניקות האסורות לפי תקנון הדרגות של איגוד הג׳ודו בישראל.',
+    count: (n: number) => `מוצגות ${n} מתוך 100 טכניקות`,
+    clear: 'ניקוי הסינון',
+    empty: 'לא נמצאו טכניקות. נסו מילה אחרת או נקו את הסינון.',
+    watch: 'צפייה',
+    escapes: 'יציאות',
+    overview: 'סקירת הקבוצה',
+    trailer: 'הטריילר של הסדרה',
+    playlist: 'כל הסדרה ב־YouTube',
+    yt: 'ב־YouTube',
+    credit: 'סרטונים: מכון הקודוקאן ו־IJF Academy, ערוץ YouTube הרשמי של הקודוקאן. הם מוטמעים בנגן של YouTube, וכל הזכויות שמורות לקודוקאן. השמות בעברית לפי תקנון הדרגות של איגוד הג׳ודו; ההסברים שלנו.',
+    sources: 'מקורות',
+  },
+  ru: {
+    title: 'Техника дзюдо Кодокан',
+    desc: '100 официальных техник Кодокан: броски, удержания, удушения и болевые приёмы, с видео Кодокан и IJF Academy, поиском и фильтрами.',
+    lead: 'Все 100 техник из официального списка Кодокан (2017): 68 бросков и 32 приёма борьбы лёжа. К каждой короткое описание от нас и видео Кодокан и IJF Academy.',
+    tree: 'Как устроен список',
+    families: { nage: 'Броски', katame: 'Сковывающие приёмы' },
+    search: 'Поиск техники',
+    hint: 'название по-японски, по-русски, на иврите или по-английски',
+    gokyo: 'Гокё',
+    gokyoNames: { 1: 'Гокё 1', 2: 'Гокё 2', 3: 'Гокё 3', 4: 'Гокё 4', 5: 'Гокё 5', habukareta: 'Хабукарэта', shinmeisho: 'Симмэйсё' },
+    gokyoNote: 'Гокё: учебная программа Кодокан 1920 года, 40 бросков в пяти группах. Хабукарэта: 8 бросков, исключённых из неё в 1920 году и позже возвращённых в список. Симмэйсё: броски, признанные после неё.',
+    tags: 'Экзамены и правила',
+    tagNames: { brown: 'Экзамен на коричневый пояс', dan1: 'Экзамен на 1 дан', banned: 'Запрещена в соревнованиях' },
+    tagNote: 'Экзамены на коричневый пояс и 1 дан и список запрещённых техник взяты из положения о степенях Израильской федерации дзюдо.',
+    count: (n: number) => `Показано ${n} из 100 техник`,
+    clear: 'Сбросить фильтры',
+    empty: 'Ничего не найдено. Попробуйте другое слово или сбросьте фильтры.',
+    watch: 'Смотреть',
+    escapes: 'Уходы',
+    overview: 'Обзор группы',
+    trailer: 'Трейлер серии',
+    playlist: 'Вся серия на YouTube',
+    yt: 'На YouTube',
+    credit: 'Видео: Институт Кодокан и IJF Academy, официальный YouTube-канал Кодокан. Они встроены через плеер YouTube, все права принадлежат Кодокан. Описания наши.',
+    sources: 'Источники',
+  },
+  en: {
+    title: 'Kodokan judo techniques',
+    desc: 'The 100 official Kodokan techniques: throws, hold-downs, chokes and joint locks, with the Kodokan and IJF Academy videos, search and filters.',
+    lead: 'All 100 techniques on the official Kodokan list (2017): 68 throws and 32 grappling techniques. Each has a short description of ours and the Kodokan × IJF Academy video.',
+    tree: 'How the list is organised',
+    families: { nage: 'Throwing techniques', katame: 'Grappling techniques' },
+    search: 'Search techniques',
+    hint: 'name in Japanese, English, Hebrew or Russian',
+    gokyo: 'Gokyo',
+    gokyoNames: { 1: 'Gokyo 1', 2: 'Gokyo 2', 3: 'Gokyo 3', 4: 'Gokyo 4', 5: 'Gokyo 5', habukareta: 'Habukareta', shinmeisho: 'Shinmeisho' },
+    gokyoNote: 'Gokyo: the Kodokan teaching syllabus of 1920, 40 throws in five groups. Habukareta: 8 throws left out of it in 1920 and later restored to the list. Shinmeisho: throws recognised after it.',
+    tags: 'Exams and rules',
+    tagNames: { brown: 'Brown belt exam', dan1: '1st dan exam', banned: 'Not allowed in competition' },
+    tagNote: 'The brown belt and 1st dan exam lists and the forbidden techniques follow the Israel Judo Association grading regulations.',
+    count: (n: number) => `Showing ${n} of 100 techniques`,
+    clear: 'Clear filters',
+    empty: 'No techniques found. Try another word or clear the filters.',
+    watch: 'Watch',
+    escapes: 'Escapes',
+    overview: 'Group overview',
+    trailer: 'Series trailer',
+    playlist: 'The whole series on YouTube',
+    yt: 'On YouTube',
+    credit: 'Videos: Kodokan Institute and IJF Academy, on the official Kodokan YouTube channel. They are embedded with YouTube’s player and all rights belong to the Kodokan. Descriptions are ours.',
+    sources: 'Sources',
+  },
+}[lang];
+
+const SOURCES = [
+  { title: 'Kodokan — Names of Judo Techniques', url: 'https://kdkjudo.org/en/techniques/names-of-judo-techniques/' },
+  { title: 'Kodokan × IJF Academy — 100 Techniques (YouTube)', url: `https://www.youtube.com/playlist?list=${data.playlist}` },
+  { title: 'איגוד הג׳ודו בישראל — תקנון דרגות', url: 'https://www.ija.org.il/html5/web/11009/38828ImageFile3.pdf' },
+];
+
+type Item = (typeof data.items)[number];
+const groups = data.groups.map((g) => ({ ...g, items: data.items.filter((x) => x.group === g.id) }));
+const families = (['nage', 'katame'] as const).map((f) => ({ id: f, kanji: f === 'nage' ? '投技' : '固技', groups: groups.filter((g) => g.family === f) }));
+const max = Math.max(...groups.map((g) => g.items.length));
+const yt = (id: string) => `https://youtu.be/${id}`;
+// everything a visitor might type, in every script, folded the same way the page script folds the query
+const index = (x: Item) => norm([x.id, x.romaji, x.kanji, x.he_read, polivanov(x.romaji), ...Object.values(x.name)].join(' '));
+const read = (x: Item) => (lang === 'he' ? x.he_read : lang === 'ru' ? polivanov(x.romaji) : '');
+const words = ['投技', '固技', ...groups.map((g) => g.kanji), ...data.items.map((x) => x.kanji)];
+const title = `${s.title} · ${t(lang, 'siteName')}`;
+const ld = { '@context': 'https://schema.org', '@type': 'WebPage', name: s.title, description: s.desc, inLanguage: lang, citation: SOURCES.map((x) => x.url) };
+const script = `var norm = ${norm.toString()}; var COUNT = ${JSON.stringify(s.count(0).replace('0', '{n}'))};`;
+// filter state lives in the query string so a filtered view can be shared; without JS the bar stays hidden
+const TQ_JS = `(function () {
+  var bar = document.querySelector('[data-tq-find]'), input = bar.querySelector('input');
+  var out = bar.querySelector('[data-tq-count]'), empty = document.querySelector('[data-tq-empty]');
+  var cards = [].slice.call(document.querySelectorAll('.tq-card')), secs = [].slice.call(document.querySelectorAll('.tq-sec'));
+  var ctl = [].slice.call(document.querySelectorAll('[data-f]')), KEYS = ['q', 'g', 'k', 't'], st = {};
+  var url = new URLSearchParams(location.search);
+  KEYS.forEach(function (k) { st[k] = url.get(k) || ''; });
+  input.value = st.q;
+  bar.hidden = false;
+  ctl.forEach(function (b) { if (b.tagName === 'A') b.setAttribute('role', 'button'); });
+  function apply() {
+    var q = norm(st.q), n = 0;
+    cards.forEach(function (c) {
+      var sec = c.parentNode.closest('.tq-sec');
+      var ok = (!q || c.dataset.s.indexOf(q) >= 0) && (!st.g || sec.dataset.g === st.g || sec.dataset.fam === st.g) &&
+        (!st.k || c.dataset.k === st.k) && (!st.t || (' ' + c.dataset.t + ' ').indexOf(' ' + st.t + ' ') >= 0);
+      c.hidden = !ok;
+      if (ok) n++;
+    });
+    secs.forEach(function (s) { s.hidden = !s.querySelector('.tq-card:not([hidden])'); });
+    ctl.forEach(function (b) { b.setAttribute('aria-pressed', String(st[b.dataset.f] === b.dataset.v)); });
+    out.textContent = COUNT.replace('{n}', n);
+    empty.hidden = n > 0;
+    var p = new URLSearchParams();
+    KEYS.forEach(function (k) { if (st[k]) p.set(k, st[k]); });
+    history.replaceState(null, '', p.toString() ? '?' + p : location.pathname);
+  }
+  function pick(e) {
+    var b = e.target.closest('[data-f]');
+    if (!b) return;
+    e.preventDefault();
+    st[b.dataset.f] = st[b.dataset.f] === b.dataset.v ? '' : b.dataset.v;
+    apply();
+  }
+  document.addEventListener('click', pick);
+  // the tree nodes are links turned into toggles, so Space has to work on them too
+  document.addEventListener('keydown', function (e) { if (e.key === ' ' && e.target.matches('a[data-f]')) pick(e); });
+  input.addEventListener('input', function () { st.q = input.value; apply(); });
+  bar.querySelector('[data-tq-clear]').addEventListener('click', function () {
+    KEYS.forEach(function (k) { st[k] = ''; });
+    input.value = '';
+    apply();
+    input.focus();
+  });
+  if (location.search) apply();
+})();`;
+---
+<Base lang={lang} title={title} description={s.desc}>
+  <Fragment slot="head">
+    <PageHead lang={lang} path="techniques/" title={title} desc={s.desc} />
+    <JsonLd data={ld} />
+  </Fragment>
+  <Fragment set:html={kanjiDefs(words)} />
+  <div class="news club tq">
+    <h1 class="h2">{s.title}</h1>
+    <p class="lead" set:html={bidi(lang, s.lead)} />
+
+    <section class="tq-tree" aria-labelledby="tq-tree-h">
+      <h2 class="h4" id="tq-tree-h">{s.tree}</h2>
+      <div class="tq-fams">
+        {families.map((f) => (
+          <div class:list={['tq-fam', `is-${f.id}`]}>
+            <a class="tq-fam-h" href={`#g-${f.groups[0].id}`} data-f="g" data-v={f.id}>
+              <span class="kj" aria-hidden="true" set:html={kanji(f.kanji)} />
+              <span><bdi dir="ltr">{f.id === 'nage' ? 'Nage-waza' : 'Katame-waza'}</bdi><small>{s.families[f.id]}</small></span>
+              <b class="tq-n">{f.groups.reduce((n, g) => n + g.items.length, 0)}</b>
+            </a>
+            <ul>
+              {f.groups.map((g) => (
+                <li>
+                  <a href={`#g-${g.id}`} data-f="g" data-v={g.id} style={`--w:${(g.items.length / max) * 100}%`}>
+                    <span class="kj" aria-hidden="true" set:html={kanji(g.kanji)} />
+                    <span><bdi dir="ltr">{g.romaji}</bdi><small>{g.name[lang]}</small></span>
+                    <b class="tq-n">{g.items.length}</b>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+      <p class="tq-links">
+        <a href={yt(data.trailer)} data-video={data.trailer} data-kind="video" data-title={s.trailer}>{s.trailer}</a>
+        <a href={`https://www.youtube.com/playlist?list=${data.playlist}`} rel="noopener">{s.playlist}</a>
+      </p>
+    </section>
+
+    <search class="tq-find" data-tq-find hidden>
+      <label class="tq-q">
+        <span>{s.search}</span>
+        <input type="search" name="q" autocomplete="off" spellcheck="false" aria-describedby="tq-hint" />
+        <small id="tq-hint">{s.hint}</small>
+      </label>
+      <div class="tq-dim" role="group" aria-labelledby="tq-k">
+        <span class="tq-dim-h" id="tq-k">{s.gokyo}</span>
+        <div class="chips">{GOKYO.map((k) => <button type="button" class="chip" data-f="k" data-v={k} aria-pressed="false">{s.gokyoNames[k as keyof typeof s.gokyoNames]}</button>)}</div>
+      </div>
+      <div class="tq-dim" role="group" aria-labelledby="tq-t">
+        <span class="tq-dim-h" id="tq-t">{s.tags}</span>
+        <div class="chips">{TAGS.map((x) => <button type="button" class="chip" data-f="t" data-v={x} aria-pressed="false">{s.tagNames[x as keyof typeof s.tagNames]}</button>)}</div>
+      </div>
+      <div class="tq-status">
+        <output aria-live="polite" data-tq-count>{s.count(100)}</output>
+        <button type="button" class="btn btn-ghost" data-tq-clear>{s.clear}</button>
+      </div>
+    </search>
+
+    {groups.map((g) => (
+      <section class="tq-sec" id={`g-${g.id}`} data-g={g.id} data-fam={g.family} aria-labelledby={`h-${g.id}`}>
+        <div class="tq-sec-h">
+          <h2 class="h3" id={`h-${g.id}`}>
+            <span class="kj" aria-hidden="true" set:html={kanji(g.kanji)} />
+            <bdi dir="ltr">{g.romaji}</bdi> · {g.name[lang]}
+          </h2>
+          <a class="tq-ov" href={yt(g.video)} data-video={g.video} data-kind="video" data-title={`${g.romaji} · ${g.name[lang]}`}>{s.overview}</a>
+        </div>
+        <ul class="tq-list">
+          {g.items.map((x) => (
+            <li class:list={['tq-card', `is-${g.family}`]} id={x.id} data-s={index(x)} data-k={x.gokyo ?? ''} data-t={x.tags.join(' ')}>
+              <span class="tq-kj" aria-hidden="true" set:html={kanji(x.kanji)} />
+              <div class="tq-body">
+                <h3 class="tq-name"><bdi dir="ltr">{x.romaji}</bdi></h3>
+                <p class="tq-local">{x.name[lang]}{read(x) && <span> · {read(x)}</span>}</p>
+                <p class="tq-desc" set:html={bidi(lang, x.desc[lang])} />
+                <ul class="tq-chips">
+                  <li>{g.name[lang]}</li>
+                  {x.gokyo && <li class="is-gokyo">{s.gokyoNames[x.gokyo as keyof typeof s.gokyoNames]}</li>}
+                  {x.tags.map((tag) => <li class={`is-${tag}`}>{s.tagNames[tag as keyof typeof s.tagNames]}</li>)}
+                </ul>
+                <p class="tq-act">
+                  <a class="btn btn-ghost" href={yt(x.video)} data-video={x.video} data-kind="video" data-title={`${x.romaji} · ${x.name[lang]}`} data-ga="video_play" data-ga-video_id={x.video} data-ga-playlist="techniques">▶ {s.watch}<span class="sr"> {x.romaji}</span></a>
+                  {x.escape && <a class="btn btn-ghost" href={yt(x.escape)} data-video={x.escape} data-kind="video" data-title={`${x.romaji} · ${s.escapes}`}>{s.escapes}<span class="sr"> {x.romaji}</span></a>}
+                  <a class="tq-yt" href={`https://www.youtube.com/watch?v=${x.video}`} rel="noopener">{s.yt}<span class="sr"> {x.romaji}</span></a>
+                </p>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </section>
+    ))}
+    <p class="tq-empty" data-tq-empty hidden>{s.empty}</p>
+
+    <section class="club-sources" aria-labelledby="sources">
+      <h2 class="h3" id="sources">{s.sources}</h2>
+      <p set:html={bidi(lang, s.credit)} />
+      <p set:html={bidi(lang, s.gokyoNote)} />
+      <p>{s.tagNote} <a href={getRelativeLocaleUrl(lang, 'belts/')}>{t(lang, 'belts')}</a></p>
+      <ol>{SOURCES.map((x) => <li><a href={x.url} rel="noopener"><bdi>{x.title}</bdi></a></li>)}</ol>
+    </section>
+  </div>
+  <VideoModal lang={lang} />
+  <script is:inline set:html={script + TQ_JS} />
+</Base>

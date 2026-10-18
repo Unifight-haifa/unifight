@@ -2,14 +2,17 @@ import { defineCollection } from 'astro:content';
 import { glob } from 'astro/loaders';
 import { z } from 'astro/zod';
 import gallery from '../content/gallery.json';
+import techniques from '../content/techniques.json';
 import videos from '../content/videos.json';
 import { checkGallery } from './lib/gallery-check.mjs';
 import { checkNews } from './lib/news-check.mjs';
+import { checkTechniques } from './lib/techniques-check.mjs';
 import { checkVideos } from './lib/videos-check.mjs';
 
 checkNews(new URL('./content/news/', import.meta.url));
 checkVideos(videos, new URL('../public/videos/', import.meta.url));
 checkGallery(gallery, new URL('./assets/gallery/', import.meta.url));
+checkTechniques(techniques);
 
 const news = defineCollection({
   loader: glob({

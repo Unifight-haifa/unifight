@@ -1,0 +1,65 @@
+/* techniques page; palette from tokens.css, .chip/.btn/.kj from landing.css, .club layout from club.css */
+.tq { --acc: var(--red-3); }
+.tq .is-katame { --acc: var(--gold); }
+.tq .sr { position: absolute; clip-path: inset(50%); inline-size: 1px; block-size: 1px; overflow: hidden; white-space: nowrap; }
+.tq .kj { color: var(--acc); line-height: 1; }
+
+/* the classification tree: two families, eight groups, bars scaled to the largest group */
+.tq-tree .h4 { margin-block: 0 14px; text-transform: uppercase; }
+.tq-fams { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; }
+.tq-fam { padding: 16px; background: var(--ink-2); border: 1px solid var(--line); border-block-start: 3px solid var(--acc); }
+.tq-fam ul { list-style: none; padding: 0; margin: 10px 0 0; display: grid; gap: 6px; }
+.tq-fam a { position: relative; display: grid; grid-template-columns: 92px minmax(0, 1fr) auto; align-items: center; gap: 10px; min-block-size: 44px; padding: 6px 10px; color: var(--paper); text-decoration: none; border: 1px solid transparent; border-radius: 2px; isolation: isolate; }
+.tq-fam li a::before { content: ""; position: absolute; inset-block: 0; inset-inline-start: 0; inline-size: var(--w); background: linear-gradient(90deg, color-mix(in srgb, var(--acc) 22%, transparent), color-mix(in srgb, var(--acc) 6%, transparent)); z-index: -1; }
+html[dir=rtl] .tq-fam li a::before { background: linear-gradient(-90deg, color-mix(in srgb, var(--acc) 22%, transparent), color-mix(in srgb, var(--acc) 6%, transparent)); }
+.tq-fam a:hover, .tq-fam a[aria-pressed=true] { border-color: var(--acc); }
+.tq-fam a[aria-pressed=true] { background: color-mix(in srgb, var(--acc) 14%, transparent); }
+.tq-fam a span:not(.kj) { display: grid; justify-items: start; line-height: 1.25; overflow-wrap: anywhere; }
+.tq-fam small { color: var(--paper-2); font-size: 14px; }
+.tq-fam .kj { font-size: 21px; }
+.tq-fam-h { padding-block: 4px 10px !important; border-block-end: 1px solid var(--line) !important; }
+.tq-fam-h .kj { font-size: clamp(28px, 8vw, 38px); }
+.tq-fam-h bdi { font: 600 clamp(17px, 4.6vw, 21px)/1.2 var(--font-oswald, "Oswald"), sans-serif; text-transform: uppercase; letter-spacing: .03em; }
+.tq-n { font: 600 22px/1 var(--num); color: var(--gold-2); }
+.tq-fam-h .tq-n { font-size: clamp(28px, 8vw, 38px); }
+.tq-links { display: flex; flex-wrap: wrap; gap: 0 22px; margin-block: 14px 0; }
+.tq-links a, .tq-ov, .tq-yt { display: inline-flex; align-items: center; min-block-size: 44px; color: var(--gold-2); }
+@media (min-width: 760px) { .tq-fams { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; } }
+
+/* search and filters; shown only once the script runs */
+.tq-find { display: grid; gap: 18px; margin-block: 32px 8px; padding: 18px; background: var(--ink-2); border: 1px solid var(--line); }
+.tq-find[hidden] { display: none; }
+.tq-q { display: grid; gap: 6px; font-weight: 600; }
+.tq-q small { color: var(--mute); font-weight: 400; font-size: 14px; }
+.tq-q input { inline-size: 100%; box-sizing: border-box; min-block-size: 48px; padding: 0 14px; background: var(--ink); color: var(--paper); border: 1px solid var(--gold); border-radius: 2px; font: 400 17px/1.2 var(--body); }
+.tq-dim { display: grid; gap: 8px; }
+.tq-dim-h { color: var(--gold); font-size: 13px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; }
+.tq-status { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 16px; }
+.tq-status output { color: var(--paper-2); }
+.tq-status .btn { min-block-size: 44px; font-size: 15px; padding: .5em 1.1em; }
+
+/* group sections and cards: a vertical kanji strip, then romaji, local name, our text, chips and actions */
+.club .tq-sec { margin-block-start: 44px; }
+.tq-sec-h { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 18px; margin-block-end: 16px; padding-block-end: 10px; border-block-end: 1px solid var(--line); }
+.club .tq-sec-h .h3 { margin: 0; }
+.tq-sec-h .kj { font-size: 1.1em; margin-inline-end: 10px; }
+.tq-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr)); }
+.tq-card { display: grid; grid-template-columns: 64px 1fr; background: var(--ink-2); border: 1px solid var(--line); border-radius: 2px; scroll-margin-block-start: 16px; }
+.tq-card:target { border-color: var(--acc); }
+.tq-kj { display: flex; flex-direction: column; align-items: center; gap: 4px; padding-block: 16px; font-size: 34px; color: var(--acc); background: radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--acc) 18%, transparent), transparent 70%), var(--ink-3); border-inline-end: 1px solid var(--line); }
+.tq-kj bdi { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.tq-kj .kg { margin: 0; vertical-align: 0; }
+.tq-body { display: grid; align-content: start; gap: 8px; padding: 14px 16px 16px; min-inline-size: 0; }
+.tq-name { margin: 0; font: 600 22px/1.15 var(--disp); letter-spacing: .02em; color: var(--paper); }
+html[lang=he] .tq-name { font-family: var(--font-oswald, "Oswald"), sans-serif; }
+.tq-local { margin: 0; color: var(--gold-2); font-size: 15.5px; }
+.tq-local span { color: var(--mute); }
+.tq-desc { margin: 0; color: var(--paper-2); font-size: 15.5px; line-height: 1.55; }
+.tq-chips { list-style: none; padding: 0; margin: 2px 0 0; display: flex; flex-wrap: wrap; gap: 6px; }
+.tq-chips li { padding: 2px 9px; font-size: 12.5px; line-height: 1.5; color: var(--paper-2); border: 1px solid var(--line); border-radius: 12px; }
+.tq-chips .is-gokyo { color: var(--gold-2); border-color: var(--gold); }
+.tq-chips .is-brown, .tq-chips .is-dan1 { color: var(--paper); background: rgba(243,234,216,.06); }
+.tq-chips .is-banned { color: var(--red-3); border-color: var(--red-3); }
+.tq-act { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; margin: 4px 0 0; }
+.tq-act .btn { min-block-size: 44px; font-size: 15px; padding: .45em 1em; }
+.tq-empty { margin-block: 32px; color: var(--paper-2); }

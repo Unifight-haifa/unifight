@@ -95,6 +95,13 @@
    "en": "Belts"
   },
   {
+   "id": "techniques",
+   "href": "techniques/",
+   "he": "טכניקות",
+   "ru": "Техника",
+   "en": "Techniques"
+  },
+  {
    "id": "camps",
    "he": "מחנות אימונים",
    "ru": "Лагеря и сборы",

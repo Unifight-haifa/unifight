@@ -36,6 +36,7 @@ export const ui = {
     skipToContent: 'דילוג לתוכן',
     contact: 'צרו קשר',
     belts: 'חגורות',
+    techniques: 'טכניקות',
   },
   ru: {
     siteName: 'Юнифайт Хайфа',
@@ -67,6 +68,7 @@ export const ui = {
     skipToContent: 'Перейти к содержанию',
     contact: 'Контакты',
     belts: 'Пояса',
+    techniques: 'Техника',
   },
   en: {
     siteName: 'Unifight Haifa',
@@ -98,6 +100,7 @@ export const ui = {
     skipToContent: 'Skip to content',
     contact: 'Contact',
     belts: 'Belts',
+    techniques: 'Techniques',
   },
 };
 

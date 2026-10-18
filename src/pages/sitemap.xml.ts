@@ -7,7 +7,7 @@ import { getPosts } from '../lib/news';
 // indexable pages only; test/seo.test.mjs fails if a built page is missing or a noindex one sneaks in
 export const GET: APIRoute = async ({ site }) => {
   const abs = (path: string) => new URL(path, site).href;
-  const club = ['history/', 'achievements/', 'tournaments/', 'nivheret/', 'belts/', ...tournaments.map((t) => `tournaments/${t.slug}/`)];
+  const club = ['history/', 'achievements/', 'tournaments/', 'nivheret/', 'belts/', 'techniques/', ...tournaments.map((t) => `tournaments/${t.slug}/`)];
   const paths = ['', 'news/', 'video/', 'gallery/', 'contact/', 'privacy/', 'accessibility/', ...club, ...(await getPosts()).map((p) => `news/${p.slug}/`)];
   const urls = paths.flatMap((path) => {
     const alts = LANGS.map((l) => `<xhtml:link rel="alternate" hreflang="${l}" href="${abs(getRelativeLocaleUrl(l, path))}"/>`);
