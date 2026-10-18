@@ -21,7 +21,6 @@
       "disabled": true,
       "credentials": {
         "telegramApi": {
-          "id": "hsPK2WfVUBtOHxl5",
           "name": "Telegram account"
         }
       }
@@ -124,7 +123,6 @@
       "webhookId": "c4b84d3c-aabf-41be-b53b-5217680cf61d",
       "credentials": {
         "telegramApi": {
-          "id": "hsPK2WfVUBtOHxl5",
           "name": "Telegram account"
         }
       }
@@ -260,6 +258,30 @@
               },
               "renameOutput": true,
               "outputKey": "unpublish"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "sched-rule-1",
+                    "leftValue": "={{ $json.cmd }}",
+                    "rightValue": "schedule",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "schedule"
             }
           ]
         },
@@ -614,7 +636,7 @@
       ],
       "parameters": {
         "chatId": "={{ $json.chat_id }}",
-        "text": "Команды:\n/new — новая новость (можно /new ru, если язык текста не определился)\n/done — отправить на перевод и предпросмотр\n/cancel — удалить черновик\n/unpublish <адрес или slug> — снять новость (только админы)",
+        "text": "Команды:\n/new — новая новость (можно /new ru, если язык текста не определился)\n/done — отправить на перевод и предпросмотр\n/cancel — удалить черновик\n/schedule — разовое изменение расписания (отмена, перенос, доп. тренировка, объявление)\n/unpublish <адрес или slug> — снять новость (только админы)\n\nФото и видео без /new (можно альбомом) сохраняются в папку клуба, утверждающие решают: на сайт, на YouTube или оставить в папке. Видео больше 20 МБ загрузите в папку сами и пришлите ссылку.",
         "additionalFields": {
           "appendAttribution": false,
           "disable_web_page_preview": true
@@ -623,7 +645,6 @@
       "webhookId": "7272cad0-b451-467b-a43b-957f3863af8c",
       "credentials": {
         "telegramApi": {
-          "id": "hsPK2WfVUBtOHxl5",
           "name": "Telegram account"
         }
       }
@@ -648,7 +669,6 @@
       "webhookId": "7c56b41d-42d7-4c6b-bac8-3df5a31f40a6",
       "credentials": {
         "telegramApi": {
-          "id": "hsPK2WfVUBtOHxl5",
           "name": "Telegram account"
         }
       }
@@ -663,7 +683,7 @@
         180
       ],
       "parameters": {
-        "jsCode": "\nconst cur = $input.first().json;\nconst p = $('Parse Command').first().json;\nif (!cur.telegram_id) return [{ json: { save: false, reply: 'Сначала отправьте /new.' } }];\nconst photos = JSON.parse(cur.photo_ids || '[]');\nlet note = '';\nif (p.video) note = 'Видео пока не публикуется автоматически, загрузите его на YouTube вручную. ';\nif (p.photo) {\n  if (photos.length >= 6) note += 'Больше 6 фото нельзя, это фото не добавлено. ';\n  else photos.push(p.photo);\n}\nconst text = p.text ? (cur.text ? cur.text + '\\n\\n' + p.text : p.text) : (cur.text || '');\nreturn [{ json: {\n  save: true, telegram_id: cur.telegram_id, text, photo_ids: JSON.stringify(photos),\n  reply: `${note}Принято: текст ${text.length} симв., фото ${photos.length}. Готово — /done.`,\n} }];\n"
+        "jsCode": "\nconst cur = $input.first().json;\nconst p = $('Parse Command').first().json;\nconst m = $('Telegram Trigger').first().json.message;\n// Without an open news draft, photos, videos and Drive links go to the club media folder.\nconst isMedia = !!(p.photo || p.video || /^video\\//.test(m.document?.mime_type || '') || /drive\\.google\\.com\\//.test(p.text));\nif (!cur.telegram_id) {\n  if (isMedia) return [{ json: { save: false, media: true } }];\n  return [{ json: { save: false, reply: 'Сначала отправьте /new для новости. Фото и видео без /new сохраняются в папку клуба.' } }];\n}\nconst photos = JSON.parse(cur.photo_ids || '[]');\nlet note = '';\nif (p.video) note = 'Видео в новость не добавляется. Пришлите его после /done или /cancel, оно уйдёт в папку клуба. ';\nif (p.photo) {\n  if (photos.length >= 6) note += 'Больше 6 фото нельзя, это фото не добавлено. ';\n  else photos.push(p.photo);\n}\nconst text = p.text ? (cur.text ? cur.text + '\\n\\n' + p.text : p.text) : (cur.text || '');\nreturn [{ json: {\n  save: true, telegram_id: cur.telegram_id, text, photo_ids: JSON.stringify(photos),\n  reply: `${note}Принято: текст ${text.length} симв., фото ${photos.length}. Готово — /done.`,\n} }];\n"
       }
     },
     {
@@ -779,7 +799,6 @@
       "webhookId": "5845ae66-b3e2-4ef5-b9af-6401e3dcff14",
       "credentials": {
         "telegramApi": {
-          "id": "hsPK2WfVUBtOHxl5",
           "name": "Telegram account"
         }
       }
@@ -848,7 +867,6 @@
       "webhookId": "7fd26d5e-1d29-47be-9620-be4e929b4fa1",
       "credentials": {
         "telegramApi": {
-          "id": "hsPK2WfVUBtOHxl5",
           "name": "Telegram account"
         }
       }
@@ -873,7 +891,6 @@
       "webhookId": "3d0f00ce-6581-4a41-a537-526f269c6c1c",
       "credentials": {
         "telegramApi": {
-          "id": "hsPK2WfVUBtOHxl5",
           "name": "Telegram account"
         }
       }
@@ -973,7 +990,6 @@
       "webhookId": "8a76540d-0b8f-4f8a-bff3-0129c1f296e4",
       "credentials": {
         "telegramApi": {
-          "id": "hsPK2WfVUBtOHxl5",
           "name": "Telegram account"
         }
       }
@@ -998,7 +1014,6 @@
       "webhookId": "d3878859-eb5e-4511-bfe4-a2bc3647b6b6",
       "credentials": {
         "telegramApi": {
-          "id": "hsPK2WfVUBtOHxl5",
           "name": "Telegram account"
         }
       }
@@ -1053,8 +1068,98 @@
       "webhookId": "0d56ed41-f9ea-453f-8e46-e5b430d02aea",
       "credentials": {
         "telegramApi": {
-          "id": "hsPK2WfVUBtOHxl5",
           "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "id": "dc759c9a-1986-40b1-a982-b686bc67cf54",
+      "name": "Start Schedule Change",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.4,
+      "position": [
+        1100,
+        900
+      ],
+      "parameters": {
+        "mode": "once",
+        "workflowId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "kzFeKCq5mpOnRaMg",
+          "cachedResultName": "schedule-change"
+        },
+        "options": {
+          "waitForSubWorkflow": false
+        }
+      }
+    },
+    {
+      "id": "3850a9d7-e343-44b5-a706-138df4b8af09",
+      "name": "To Media?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1760,
+        320
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "media-1",
+              "leftValue": "={{ $('Append To Draft').first().json.media === true }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "27ecdb76-015a-41fb-953d-4d48b43df927",
+      "name": "Media Item",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1980,
+        420
+      ],
+      "parameters": {
+        "jsCode": "\nconst p = $('Parse Command').first().json;\nreturn [{ json: { message: $('Telegram Trigger').first().json.message,\n  publisher: { coach_id: p.coach_id, name: p.name, role: p.role, telegram_id: p.telegram_id } } }];\n"
+      }
+    },
+    {
+      "id": "e4910bcf-1d66-4e7a-b142-a7cf5b453635",
+      "name": "Start Media Intake",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.4,
+      "position": [
+        2200,
+        420
+      ],
+      "parameters": {
+        "mode": "once",
+        "workflowId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "uoovvya1JSTn5KhR",
+          "cachedResultName": "media-intake"
+        },
+        "options": {
+          "waitForSubWorkflow": false
         }
       }
     }
@@ -1161,6 +1266,13 @@
         ],
         [
           {
+            "node": "Start Schedule Change",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
             "node": "Reply Help",
             "type": "main",
             "index": 0
@@ -1252,7 +1364,7 @@
         ],
         [
           {
-            "node": "Reply Content",
+            "node": "To Media?",
             "type": "main",
             "index": 0
           }
@@ -1337,6 +1449,35 @@
         [
           {
             "node": "Reply Done",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "To Media?": {
+      "main": [
+        [
+          {
+            "node": "Media Item",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Reply Content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Media Item": {
+      "main": [
+        [
+          {
+            "node": "Start Media Intake",
             "type": "main",
             "index": 0
           }

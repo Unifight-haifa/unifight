@@ -1,0 +1,1878 @@
+{
+  "id": "R1UiY24QUcDDBALl",
+  "name": "media-review",
+  "nodes": [
+    {
+      "id": "1e7ac326-8666-4b4b-af91-849fa920aefb",
+      "name": "Start",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        480
+      ],
+      "parameters": {
+        "inputSource": "passthrough"
+      }
+    },
+    {
+      "id": "324d1cfe-a381-4ebb-a78c-1ec8d7c0c821",
+      "name": "Config",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        224,
+        480
+      ],
+      "parameters": {
+        "jsCode": "\n// Owner-editable lists; album ids must match content/gallery.json, playlist ids come from YouTube Studio.\nconst cfg = {\n  site: 'https://unifight-haifa.github.io/unifight',\n  review_chat_id: '',\n  // Originals stay in this private repo; the public site pulls a resized copy via repository_dispatch.\n  staging_repo: 'Unifight-haifa/media-inbox',\n  albums: [\n    { id: 'training', name: 'Тренировки' }, { id: 'competitions', name: 'Соревнования' },\n    { id: 'camps', name: 'Сборы' }, { id: 'club', name: 'Клуб' }, { id: 'history', name: 'История' },\n  ],\n  playlists: [\n    { name: 'Соревнования', id: 'REPLACE_PLAYLIST_ID' }, { name: 'Сборы', id: 'REPLACE_PLAYLIST_ID' },\n    { name: 'Промо-съёмки клуба', id: 'REPLACE_PLAYLIST_ID' },\n  ],\n  yt_title_lang: 'he',\n};\nreturn $input.all().map(it => ({ json: { ...it.json, cfg } }));\n"
+      }
+    },
+    {
+      "id": "42cc596d-39a8-403a-8785-a358790bdc20",
+      "name": "Get Publishers",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        448,
+        480
+      ],
+      "parameters": {
+        "resource": "row",
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "8RXgFKzfwiL9okcq",
+          "cachedResultName": "publishers"
+        },
+        "returnAll": true
+      },
+      "executeOnce": true
+    },
+    {
+      "id": "0d83ff3f-b218-4677-a302-8fa9d39fc898",
+      "name": "Approvers",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        672,
+        480
+      ],
+      "parameters": {
+        "jsCode": "\nconst m = $('Config').first().json;\nconst rows = $input.all().map(i => i.json).filter(r => r.active === true);\nconst approvers = rows.filter(r => ['approver', 'admin'].includes(r.role) && r.telegram_id)\n  .map(r => ({ coach_id: r.coach_id, name: r.name || r.coach_id, telegram_id: String(r.telegram_id) }));\nif (!approvers.length) throw new Error('media-review: no active approver/admin with telegram_id in publishers');\nconst author = rows.find(r => r.coach_id === m.author_id) || {};\nconst kind = m.type === 'video' ? 'Видео' : 'Фото';\nconst card = [\n  `${kind} от ${author.name || m.author_id}`,\n  ...(m.caption ? [`Подпись: ${m.caption}`] : []),\n  `Файл: ${m.file_name}`, `Drive: ${m.drive_link}`, '',\n  m.type === 'video' ? 'Загрузить на YouTube клуба или оставить только в папке?' : 'Поставить в галерею сайта или оставить только в папке?',\n].join('\\n');\nreturn [{ json: {\n  ...m, approvers, approver_ids: approvers.map(a => a.telegram_id).join(','),\n  review_chat: m.cfg.review_chat_id || approvers[0].telegram_id,\n  author_name: author.name || m.author_id, card,\n} }];\n"
+      }
+    },
+    {
+      "id": "9fc19e27-6e3a-47f6-b306-9c1317469f9a",
+      "name": "Preview Kind",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        896,
+        464
+      ],
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "outputKey": "photo",
+              "renameOutput": true,
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.type === 'photo' && !!$json.tg_file_id }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "true",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "outputKey": "video",
+              "renameOutput": true,
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.type === 'video' && !!$json.tg_file_id }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "true",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra",
+          "renameFallbackOutput": "no preview"
+        }
+      }
+    },
+    {
+      "id": "79cd8729-add8-4422-87e1-cde0c3aa847f",
+      "name": "Preview Photo",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1120,
+        288
+      ],
+      "parameters": {
+        "resource": "message",
+        "operation": "sendPhoto",
+        "chatId": "={{ $json.review_chat }}",
+        "binaryData": false,
+        "file": "={{ $json.tg_file_id }}",
+        "additionalFields": {}
+      },
+      "onError": "continueRegularOutput",
+      "webhookId": "48b60326-67d6-4d2e-b9a6-2cffb42e36b1",
+      "credentials": {
+        "telegramApi": {
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "id": "75ba13b6-c8ab-4884-890c-5dc4b748ddb3",
+      "name": "Review Card",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1344,
+        464
+      ],
+      "parameters": {
+        "resource": "message",
+        "operation": "sendAndWait",
+        "chatId": "={{ $('Approvers').first().json.review_chat }}",
+        "message": "={{ $('Approvers').first().json.card }}",
+        "responseType": "approval",
+        "approvalOptions": {
+          "values": {
+            "approvalType": "double",
+            "approveLabel": "={{ $('Approvers').first().json.type === 'video' ? '▶ На YouTube' : '📷 На сайт' }}",
+            "disapproveLabel": "✖ Отклонить"
+          }
+        },
+        "chatApproval": true,
+        "approverIds": "={{ $('Approvers').first().json.approver_ids }}",
+        "unauthorizedReplyText": "Решать могут только утверждающие (роль approver или admin).",
+        "postDecisionBehavior": "showOutcome",
+        "options": {
+          "limitWaitTime": {
+            "values": {
+              "limitType": "afterTimeInterval",
+              "resumeAmount": 14,
+              "resumeUnit": "days"
+            }
+          },
+          "appendAttribution": false
+        }
+      },
+      "webhookId": "77d8f04f-cbec-47e9-8bbe-ff65095b28ef",
+      "credentials": {
+        "telegramApi": {
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "id": "aceda2da-e5a0-4e5c-aec3-1d2f0f483130",
+      "name": "Preview Video",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1120,
+        480
+      ],
+      "parameters": {
+        "resource": "message",
+        "operation": "sendVideo",
+        "chatId": "={{ $json.review_chat }}",
+        "binaryData": false,
+        "file": "={{ $json.tg_file_id }}",
+        "additionalFields": {}
+      },
+      "onError": "continueRegularOutput",
+      "webhookId": "3bed24e6-a688-47d2-b79a-e5babb8cb6b5",
+      "credentials": {
+        "telegramApi": {
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "id": "86f5acb5-13e9-4e0c-bbe2-6d3cb6dbef51",
+      "name": "Decision",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1568,
+        464
+      ],
+      "parameters": {
+        "jsCode": "\n// A timeout also resumes the node; it has no responder, so it must not count as a rejection.\nconst m = $('Approvers').first().json;\nconst d = $input.first().json.data ?? $input.first().json;\nconst who = d.user ?? d.from ?? d.responder ?? {};\nconst tgId = String(who.id ?? d.userId ?? '');\nconst decider = m.approvers.find(a => a.telegram_id === tgId) || { coach_id: tgId ? `tg:${tgId}` : '', name: who.first_name || '', telegram_id: tgId };\nlet decision = 'timeout';\nif (d.approved === true) decision = m.type === 'video' ? 'youtube' : 'site';\nelse if (d.approved === false && tgId) decision = 'reject';\nreturn [{ json: { decision, decider, decider_chat: decider.telegram_id || m.review_chat } }];\n"
+      }
+    },
+    {
+      "id": "19afb60e-2f78-4360-a933-d6ca50fd49fa",
+      "name": "Route Decision",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        1792,
+        448
+      ],
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "outputKey": "site",
+              "renameOutput": true,
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.decision }}",
+                    "rightValue": "site",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "outputKey": "youtube",
+              "renameOutput": true,
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.decision }}",
+                    "rightValue": "youtube",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "outputKey": "reject",
+              "renameOutput": true,
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.decision }}",
+                    "rightValue": "reject",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "8b9eb587-fe80-44f9-9a64-ee250701b5e0",
+      "name": "Site Form",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2016,
+        128
+      ],
+      "parameters": {
+        "resource": "message",
+        "operation": "sendAndWait",
+        "chatId": "={{ $('Decision').first().json.decider_chat }}",
+        "message": "={{ 'Фото ' + $('Approvers').first().json.file_name + ' → галерея сайта. Выберите альбом и коротко опишите, что на фото (на своём языке, без имён детей). Переведу на три языка и покажу перед отправкой.' }}",
+        "responseType": "customForm",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Альбом",
+              "fieldType": "dropdown",
+              "requiredField": true,
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Тренировки"
+                  },
+                  {
+                    "option": "Соревнования"
+                  },
+                  {
+                    "option": "Сборы"
+                  },
+                  {
+                    "option": "Клуб"
+                  },
+                  {
+                    "option": "История"
+                  }
+                ]
+              }
+            },
+            {
+              "fieldLabel": "Что на фото",
+              "fieldType": "textarea",
+              "requiredField": true,
+              "placeholder": "Например: разминка перед тренировкой в Эйн-ха-Ям"
+            }
+          ]
+        },
+        "options": {
+          "limitWaitTime": {
+            "values": {
+              "limitType": "afterTimeInterval",
+              "resumeAmount": 7,
+              "resumeUnit": "days"
+            }
+          },
+          "appendAttribution": false,
+          "messageButtonLabel": "Заполнить",
+          "responseFormTitle": "Фото на сайт"
+        }
+      },
+      "webhookId": "462651da-8fbb-4464-b158-6a292ba89358",
+      "credentials": {
+        "telegramApi": {
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "id": "2dba4688-b083-4cd7-9032-a548a1e1c463",
+      "name": "YouTube Form",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2016,
+        464
+      ],
+      "parameters": {
+        "resource": "message",
+        "operation": "sendAndWait",
+        "chatId": "={{ $('Decision').first().json.decider_chat }}",
+        "message": "={{ 'Видео ' + $('Approvers').first().json.file_name + ' → YouTube клуба. Заполните название и описание на своём языке, переведу на три языка и покажу перед загрузкой.' }}",
+        "responseType": "customForm",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Название",
+              "fieldType": "text",
+              "requiredField": true,
+              "placeholder": "До 100 символов"
+            },
+            {
+              "fieldLabel": "Описание",
+              "fieldType": "textarea"
+            },
+            {
+              "fieldLabel": "Музыка",
+              "fieldType": "text",
+              "placeholder": "Исполнитель — трек, лицензия. Пусто, если музыки нет"
+            },
+            {
+              "fieldLabel": "Доступ",
+              "fieldType": "radio",
+              "requiredField": true,
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "По ссылке (unlisted)"
+                  },
+                  {
+                    "option": "Публично (public)"
+                  }
+                ]
+              }
+            },
+            {
+              "fieldLabel": "Плейлист",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Без плейлиста"
+                  },
+                  {
+                    "option": "Соревнования"
+                  },
+                  {
+                    "option": "Сборы"
+                  },
+                  {
+                    "option": "Промо-съёмки клуба"
+                  }
+                ]
+              }
+            },
+            {
+              "fieldLabel": "В кадре есть дети до 18?",
+              "fieldType": "radio",
+              "requiredField": true,
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Да"
+                  },
+                  {
+                    "option": "Нет"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "options": {
+          "limitWaitTime": {
+            "values": {
+              "limitType": "afterTimeInterval",
+              "resumeAmount": 7,
+              "resumeUnit": "days"
+            }
+          },
+          "appendAttribution": false,
+          "messageButtonLabel": "Заполнить",
+          "responseFormTitle": "Видео на YouTube"
+        }
+      },
+      "webhookId": "6ca755ab-a1ef-4700-9c63-26daa01bfdeb",
+      "credentials": {
+        "telegramApi": {
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "id": "1d43eb3b-8c53-486a-8e7d-e7ca059a7605",
+      "name": "Mark Rejected",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        2016,
+        704
+      ],
+      "parameters": {
+        "resource": "row",
+        "operation": "update",
+        "dataTableId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "w8bTgxbZssHA2cQv",
+          "cachedResultName": "media"
+        },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "media_id",
+              "condition": "eq",
+              "keyValue": "={{ $('Approvers').first().json.media_id }}"
+            }
+          ]
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "matchingColumns": [],
+          "value": {
+            "status": "rejected",
+            "decided_by": "={{ $json.decider.coach_id }}",
+            "decided_at": "={{ $now.toISO() }}",
+            "updated_at": "={{ $now.toISO() }}"
+          },
+          "schema": [
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "decided_by",
+              "displayName": "decided_by",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "decided_at",
+              "displayName": "decided_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "updated_at",
+              "displayName": "updated_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "e68d59b1-f672-489a-a6b9-aebba058ed9e",
+      "name": "Rejected Message",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2240,
+        704
+      ],
+      "parameters": {
+        "jsCode": "\nconst m = $('Approvers').first().json;\nconst kind = m.type === 'video' ? 'Видео' : 'Фото';\nreturn m.author_tg ? [{ json: { chat_id: m.author_tg, text: `${kind} ${m.file_name} осталось в папке клуба, публиковать его не будем.` } }] : [];\n"
+      }
+    },
+    {
+      "id": "6db1093d-3cc5-4041-a35e-2e1664764bea",
+      "name": "Notify Rejected",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.4,
+      "position": [
+        2464,
+        704
+      ],
+      "parameters": {
+        "mode": "once",
+        "workflowId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "BQo47li1zzs8lrGY",
+          "cachedResultName": "bot-notify"
+        },
+        "options": {
+          "waitForSubWorkflow": false
+        }
+      }
+    },
+    {
+      "id": "07d3fac2-92bc-4c0f-87dc-b9dcedc6b5d1",
+      "name": "Site Input",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2240,
+        32
+      ],
+      "parameters": {
+        "jsCode": "\nconst m = $('Approvers').first().json;\nconst d = $input.first().json.data ?? $input.first().json;\nconst album = m.cfg.albums.find(a => a.name === d['Альбом']);\nconst alt = String(d['Что на фото'] ?? '').trim();\n// Form timed out: leave the item as status=new in the media table.\nif (!album || !alt) return [];\nreturn [{ json: { album: album.id, album_name: album.name,\n  context: 'short alt text describing a photo in the club website gallery; never name children', fields: { alt }, limits: { alt: 150 } } }];\n"
+      }
+    },
+    {
+      "id": "73996304-21c5-48fa-b12c-9d887e4951f2",
+      "name": "Translate Alt",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.4,
+      "position": [
+        2464,
+        32
+      ],
+      "parameters": {
+        "mode": "once",
+        "workflowId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "wNJftLMoaebNjtKI",
+          "cachedResultName": "bot-translate"
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      }
+    },
+    {
+      "id": "a4d536ca-361a-43f1-bfee-3ed0d5abd88a",
+      "name": "Site Preview",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2688,
+        32
+      ],
+      "parameters": {
+        "resource": "message",
+        "operation": "sendAndWait",
+        "chatId": "={{ $('Decision').first().json.decider_chat }}",
+        "message": "={{ 'Альбом: ' + $('Site Input').last().json.album_name + '\\nHE: ' + $json.tr.he.alt + '\\nRU: ' + $json.tr.ru.alt + '\\nEN: ' + $json.tr.en.alt + ($json.warnings.length ? '\\n\\nПроверьте: ' + $json.warnings.join('; ') : '') }}",
+        "responseType": "approval",
+        "approvalOptions": {
+          "values": {
+            "approvalType": "double",
+            "approveLabel": "✓ Отправить на сайт",
+            "disapproveLabel": "✏️ Исправить"
+          }
+        },
+        "chatApproval": true,
+        "approverIds": "={{ $('Decision').first().json.decider.telegram_id || $('Approvers').first().json.approver_ids }}",
+        "postDecisionBehavior": "removeButtons",
+        "options": {
+          "limitWaitTime": {
+            "values": {
+              "limitType": "afterTimeInterval",
+              "resumeAmount": 2,
+              "resumeUnit": "days"
+            }
+          },
+          "appendAttribution": false
+        }
+      },
+      "webhookId": "57d4aaf9-27ac-424b-b1c7-e6e7e5f6e581",
+      "credentials": {
+        "telegramApi": {
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "id": "21b8abda-5a4b-4fc8-9c30-d1bed0060113",
+      "name": "Site OK?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2912,
+        128
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.data?.approved === true }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      }
+    },
+    {
+      "id": "acf2ff4d-48f6-4853-95d1-a3d84224d995",
+      "name": "Download Photo",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        3136,
+        128
+      ],
+      "parameters": {
+        "resource": "file",
+        "operation": "download",
+        "authentication": "oAuth2",
+        "fileId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $('Approvers').first().json.drive_file_id }}"
+        },
+        "options": {}
+      },
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "id": "0f0d5ec6-4fa5-45d3-95b2-a09b2c3eb0df",
+      "name": "Gallery Files",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3360,
+        128
+      ],
+      "parameters": {
+        "jsCode": "\nconst m = $('Approvers').first().json;\nconst s = $('Site Input').last().json;\nconst t = $('Translate Alt').last().json;\nconst dec = $('Decision').first().json.decider;\nconst buf = await this.helpers.getBinaryDataBuffer(0, 'data');\nconst file = String(m.file_name).toLowerCase().replace(/[^a-z0-9._-]+/g, '-');\nconst stem = file.replace(/\\.[^.]+$/, '');\nif (!/\\.(jpe?g|png|heic)$/.test(file)) throw new Error(`Gallery intake takes JPEG, PNG or HEIC only: ${file}`);\nconst dir = `incoming/gallery/${s.album}`;\nconst sidecar = { album: s.album, alt: { he: t.tr.he.alt, ru: t.tr.ru.alt, en: t.tr.en.alt }, author: m.author_id, approved_by: dec.coach_id };\nreturn [{ json: {\n  repo: m.cfg.staging_repo, dispatch: { event_type: 'gallery-intake', client_payload: { path: `${dir}/${file}` } },\n  files: [{ path: `${dir}/${file}`, b64: buf.toString('base64') }, { path: `${dir}/${file}.json`, content: JSON.stringify(sidecar, null, 1) + '\\n' }],\n  message: `Gallery: ${s.album}/${file}\\n\\nFrom ${m.author_id} via telegram, approved by ${dec.coach_id}`,\n  live_url: `${m.cfg.site}/gallery.json`, live_match: `\"${stem}\"`, site_path: `${dir}/${file}`,\n} }];\n"
+      }
+    },
+    {
+      "id": "bed7918c-c66a-4894-8737-b6e2127e9417",
+      "name": "Commit Photo",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.4,
+      "position": [
+        3584,
+        128
+      ],
+      "parameters": {
+        "mode": "once",
+        "workflowId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "WioJt6Ls1FOcaET1",
+          "cachedResultName": "bot-git-commit"
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      }
+    },
+    {
+      "id": "d4234f6e-5f60-4afc-bcc3-3d2a8229e225",
+      "name": "Site Done",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3808,
+        128
+      ],
+      "parameters": {
+        "jsCode": "\nconst m = $('Approvers').first().json;\nconst c = $input.first().json;\nconst dec = $('Decision').first().json;\nconst text = c.live\n  ? `Фото в галерее сайта: ${m.cfg.site}/ru/gallery/`\n  : `Фото отправлено на сайт (коммит ${String(c.sha).slice(0, 7)}), но в галерее пока не появилось. Проверьте позже: ${m.cfg.site}/ru/gallery/`;\nconst chats = [...new Set([m.author_tg, dec.decider_chat].filter(Boolean))];\nreturn chats.map(chat_id => ({ json: { chat_id, text, notify_admin: !c.live } }));\n"
+      }
+    },
+    {
+      "id": "7ce36bf4-c35c-493a-9b2a-a9577f7011a4",
+      "name": "Notify Site",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.4,
+      "position": [
+        4032,
+        0
+      ],
+      "parameters": {
+        "mode": "once",
+        "workflowId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "BQo47li1zzs8lrGY",
+          "cachedResultName": "bot-notify"
+        },
+        "options": {
+          "waitForSubWorkflow": false
+        }
+      }
+    },
+    {
+      "id": "1e03a0a7-6aa1-4c49-ab62-70e5b541ea5c",
+      "name": "Mark Site",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        4032,
+        192
+      ],
+      "parameters": {
+        "resource": "row",
+        "operation": "update",
+        "dataTableId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "w8bTgxbZssHA2cQv",
+          "cachedResultName": "media"
+        },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "media_id",
+              "condition": "eq",
+              "keyValue": "={{ $('Approvers').first().json.media_id }}"
+            }
+          ]
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "matchingColumns": [],
+          "value": {
+            "status": "approved_site",
+            "decided_by": "={{ $('Decision').first().json.decider.coach_id }}",
+            "site_path": "={{ $('Gallery Files').first().json.site_path }}",
+            "commit_sha": "={{ $('Commit Photo').first().json.sha }}",
+            "decided_at": "={{ $now.toISO() }}",
+            "updated_at": "={{ $now.toISO() }}"
+          },
+          "schema": [
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "decided_by",
+              "displayName": "decided_by",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "site_path",
+              "displayName": "site_path",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "commit_sha",
+              "displayName": "commit_sha",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "decided_at",
+              "displayName": "decided_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "updated_at",
+              "displayName": "updated_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ]
+        },
+        "options": {}
+      },
+      "executeOnce": true
+    },
+    {
+      "id": "2fee96a4-a03f-4dd5-b30b-2787669828d2",
+      "name": "YT Input",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2240,
+        368
+      ],
+      "parameters": {
+        "jsCode": "\nconst m = $('Approvers').first().json;\nconst d = $input.first().json.data ?? $input.first().json;\nconst title = String(d['Название'] ?? '').trim();\n// Form timed out: leave the item as status=new in the media table.\nif (!title) return [];\nconst pl = m.cfg.playlists.find(p => p.name === d['Плейлист']);\nreturn [{ json: {\n  privacy: /public|Публично/.test(String(d['Доступ'])) ? 'public' : 'unlisted',\n  minors: !/Нет/.test(String(d['В кадре есть дети до 18?'])),\n  music: String(d['Музыка'] ?? '').trim(), playlist_id: pl ? pl.id : '', playlist_name: pl ? pl.name : '',\n  context: 'YouTube video title and description for a judo club channel; never name children',\n  fields: { title, description: String(d['Описание'] ?? '').trim() }, limits: { title: 100, description: 1500 },\n} }];\n"
+      }
+    },
+    {
+      "id": "7e7aa8db-86af-40f8-bf2a-276223e38fc3",
+      "name": "Translate YT",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.4,
+      "position": [
+        2464,
+        368
+      ],
+      "parameters": {
+        "mode": "once",
+        "workflowId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "wNJftLMoaebNjtKI",
+          "cachedResultName": "bot-translate"
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      }
+    },
+    {
+      "id": "7a36f457-8f8d-4b3f-9006-79637a035041",
+      "name": "YT Preview",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2688,
+        368
+      ],
+      "parameters": {
+        "resource": "message",
+        "operation": "sendAndWait",
+        "chatId": "={{ $('Decision').first().json.decider_chat }}",
+        "message": "={{ ['he','ru','en'].map(l => l.toUpperCase() + ': ' + $json.tr[l].title + ($json.tr[l].description ? '\\n' + $json.tr[l].description : '')).join('\\n\\n') + '\\n\\nДоступ: ' + $('YT Input').last().json.privacy + ($('YT Input').last().json.playlist_name ? '\\nПлейлист: ' + $('YT Input').last().json.playlist_name : '') + ($('YT Input').last().json.music ? '\\nМузыка: ' + $('YT Input').last().json.music : '') + ($json.warnings.length ? '\\n\\nПроверьте: ' + $json.warnings.join('; ') : '') }}",
+        "responseType": "approval",
+        "approvalOptions": {
+          "values": {
+            "approvalType": "double",
+            "approveLabel": "✓ Загрузить",
+            "disapproveLabel": "✏️ Исправить"
+          }
+        },
+        "chatApproval": true,
+        "approverIds": "={{ $('Decision').first().json.decider.telegram_id || $('Approvers').first().json.approver_ids }}",
+        "postDecisionBehavior": "removeButtons",
+        "options": {
+          "limitWaitTime": {
+            "values": {
+              "limitType": "afterTimeInterval",
+              "resumeAmount": 2,
+              "resumeUnit": "days"
+            }
+          },
+          "appendAttribution": false
+        }
+      },
+      "webhookId": "8d8a82a1-1531-4c0a-a59f-b1fc00e1920d",
+      "credentials": {
+        "telegramApi": {
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "id": "1f1bffbe-aff5-4e40-8f5a-912ba1da5619",
+      "name": "YT OK?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2912,
+        464
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.data?.approved === true }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      }
+    },
+    {
+      "id": "e77a0028-c0f7-47ec-aec1-ed7079a509e2",
+      "name": "Needs Consent?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        3136,
+        464
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $('YT Input').last().json.privacy === 'public' && $('YT Input').last().json.minors === true }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      }
+    },
+    {
+      "id": "cbce1f3a-08b1-44c9-8f43-b64ba4dc6d81",
+      "name": "Consent",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        3360,
+        384
+      ],
+      "parameters": {
+        "resource": "message",
+        "operation": "sendAndWait",
+        "chatId": "={{ $('Decision').first().json.decider_chat }}",
+        "message": "В кадре дети. Публичным видео можно сделать, только если подписанные согласия родителей всех детей в кадре лежат у клуба. Иначе загружу по ссылке (unlisted).",
+        "responseType": "approval",
+        "approvalOptions": {
+          "values": {
+            "approvalType": "double",
+            "approveLabel": "✓ Согласия на файле",
+            "disapproveLabel": "Загрузить по ссылке"
+          }
+        },
+        "chatApproval": true,
+        "approverIds": "={{ $('Decision').first().json.decider.telegram_id || $('Approvers').first().json.approver_ids }}",
+        "postDecisionBehavior": "showOutcome",
+        "options": {
+          "limitWaitTime": {
+            "values": {
+              "limitType": "afterTimeInterval",
+              "resumeAmount": 2,
+              "resumeUnit": "days"
+            }
+          },
+          "appendAttribution": false
+        }
+      },
+      "webhookId": "3d27d344-466b-4b63-b6a7-1f810ad8d8e1",
+      "credentials": {
+        "telegramApi": {
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "id": "9b7409cd-c15d-406a-ab31-f1149c8100dc",
+      "name": "YT Meta",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3584,
+        464
+      ],
+      "parameters": {
+        "jsCode": "\nconst m = $('Approvers').first().json;\nconst y = $('YT Input').last().json;\nconst t = $('Translate YT').last().json.tr;\nconst consent = $('Consent').isExecuted && ($('Consent').last().json.data ?? {}).approved === true;\nconst privacy = y.privacy === 'public' && (!y.minors || consent) ? 'public' : 'unlisted';\nconst block = l => [t[l].title, t[l].description].filter(Boolean).join('\\n');\nconst description = [block('he'), block('ru'), block('en'), y.music ? `Music: ${y.music}` : '', m.cfg.site]\n  .filter(Boolean).join('\\n\\n').slice(0, 4900);\nreturn [{ json: {\n  title: t[m.cfg.yt_title_lang].title.slice(0, 100), description, privacy,\n  downgraded: privacy !== y.privacy, playlist_id: y.playlist_id,\n  localizations: Object.fromEntries(['he', 'ru', 'en'].map(l => [l, { title: t[l].title.slice(0, 100), description: block(l) || t[l].title }])),\n} }];\n"
+      }
+    },
+    {
+      "id": "487197d7-5d14-4577-8a15-cb07f4d36d11",
+      "name": "Download Video",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        3808,
+        464
+      ],
+      "parameters": {
+        "resource": "file",
+        "operation": "download",
+        "authentication": "oAuth2",
+        "fileId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $('Approvers').first().json.drive_file_id }}"
+        },
+        "options": {}
+      },
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "id": "8fbc2b81-57d4-4a60-90cd-c2326607f179",
+      "name": "YouTube Upload",
+      "type": "n8n-nodes-base.youTube",
+      "typeVersion": 1,
+      "position": [
+        4032,
+        464
+      ],
+      "parameters": {
+        "resource": "video",
+        "operation": "upload",
+        "title": "={{ $('YT Meta').first().json.title }}",
+        "regionCode": "IL",
+        "categoryId": "17",
+        "binaryProperty": "data",
+        "options": {
+          "description": "={{ $('YT Meta').first().json.description }}",
+          "privacyStatus": "={{ $('YT Meta').first().json.privacy }}",
+          "selfDeclaredMadeForKids": false,
+          "notifySubscribers": false,
+          "embeddable": true
+        }
+      }
+    },
+    {
+      "id": "987dd65e-0801-49c0-b2ce-c5af63d4e33e",
+      "name": "Set Translations",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        4256,
+        464
+      ],
+      "parameters": {
+        "method": "PUT",
+        "url": "https://www.googleapis.com/youtube/v3/videos?part=snippet,localizations",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "youTubeOAuth2Api",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ id: $json.uploadId, snippet: { title: $('YT Meta').first().json.title, description: $('YT Meta').first().json.description, categoryId: '17', defaultLanguage: $('Approvers').first().json.cfg.yt_title_lang }, localizations: $('YT Meta').first().json.localizations }) }}",
+        "options": {}
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "id": "4b4fcfe4-9dad-465f-b61a-d08d7fe799c0",
+      "name": "Has Playlist?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        4480,
+        464
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ /^PL/.test($('YT Meta').first().json.playlist_id) }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      }
+    },
+    {
+      "id": "caf9e91d-96f5-413f-9a50-0b71c4b003d3",
+      "name": "Add To Playlist",
+      "type": "n8n-nodes-base.youTube",
+      "typeVersion": 1,
+      "position": [
+        4704,
+        384
+      ],
+      "parameters": {
+        "resource": "playlistItem",
+        "operation": "add",
+        "playlistId": "={{ $('YT Meta').first().json.playlist_id }}",
+        "videoId": "={{ $('YouTube Upload').first().json.uploadId }}",
+        "options": {}
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "id": "46ba7c64-dd5a-4016-a320-f89102012b34",
+      "name": "YT Done",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4928,
+        464
+      ],
+      "parameters": {
+        "jsCode": "\nconst m = $('Approvers').first().json;\nconst meta = $('YT Meta').first().json;\nconst up = $('YouTube Upload').first().json;\nconst dec = $('Decision').first().json;\nconst id = up.uploadId || up.id || '';\nlet pl = '';\nif (meta.playlist_id) {\n  const added = $('Add To Playlist').isExecuted && !!$('Add To Playlist').first().json.id;\n  pl = added ? '\\nДобавлено в плейлист.' : '\\nВ плейлист не добавлено (проверьте id плейлиста в Config).';\n}\nconst text = `Видео на YouTube: https://youtu.be/${id}\\nДоступ: ${meta.privacy === 'public' ? 'публичное' : 'по ссылке'}`\n  + (meta.downgraded ? ' (публичным не сделано: нет подтверждения согласия родителей)' : '') + pl;\nconst chats = [...new Set([m.author_tg, dec.decider_chat].filter(Boolean))];\nreturn chats.map(chat_id => ({ json: { chat_id, text, youtube_id: id } }));\n"
+      }
+    },
+    {
+      "id": "a56ab35c-a657-423f-b4ef-1f0f2d3045c0",
+      "name": "Notify YouTube",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.4,
+      "position": [
+        5152,
+        368
+      ],
+      "parameters": {
+        "mode": "once",
+        "workflowId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "BQo47li1zzs8lrGY",
+          "cachedResultName": "bot-notify"
+        },
+        "options": {
+          "waitForSubWorkflow": false
+        }
+      }
+    },
+    {
+      "id": "1cbb67ee-38e1-45b3-904b-beac2dbb4369",
+      "name": "Mark YouTube",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        5152,
+        560
+      ],
+      "parameters": {
+        "resource": "row",
+        "operation": "update",
+        "dataTableId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "w8bTgxbZssHA2cQv",
+          "cachedResultName": "media"
+        },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "media_id",
+              "condition": "eq",
+              "keyValue": "={{ $('Approvers').first().json.media_id }}"
+            }
+          ]
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "matchingColumns": [],
+          "value": {
+            "status": "approved_youtube",
+            "decided_by": "={{ $('Decision').first().json.decider.coach_id }}",
+            "youtube_id": "={{ $json.youtube_id }}",
+            "decided_at": "={{ $now.toISO() }}",
+            "updated_at": "={{ $now.toISO() }}"
+          },
+          "schema": [
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "decided_by",
+              "displayName": "decided_by",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "youtube_id",
+              "displayName": "youtube_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "decided_at",
+              "displayName": "decided_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "updated_at",
+              "displayName": "updated_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ]
+        },
+        "options": {}
+      },
+      "executeOnce": true
+    },
+    {
+      "id": "0e753fb4-6e87-441f-885b-a20fa3bb99c7",
+      "name": "Sticky Note 48338863",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        192,
+        384
+      ],
+      "parameters": {
+        "content": "## media-review\nCalled by media-intake per stored item. Approvers = publishers with role `approver` or `admin`. Card buttons work inside Telegram (Approve Within Chat).\nPhoto → album + alt (translated, confirmed) → `incoming/gallery/<album>/` via bot-git-commit → wait for gallery.json.\nVideo → title/description (translated, confirmed) → consent gate for public with children → YouTube upload, translations, playlist.\nTimeout leaves status `new`.",
+        "color": 7,
+        "width": 384,
+        "height": 224
+      }
+    }
+  ],
+  "connections": {
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "Config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Config": {
+      "main": [
+        [
+          {
+            "node": "Get Publishers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Publishers": {
+      "main": [
+        [
+          {
+            "node": "Approvers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Approvers": {
+      "main": [
+        [
+          {
+            "node": "Preview Kind",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preview Kind": {
+      "main": [
+        [
+          {
+            "node": "Preview Photo",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Preview Video",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Review Card",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preview Photo": {
+      "main": [
+        [
+          {
+            "node": "Review Card",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Review Card": {
+      "main": [
+        [
+          {
+            "node": "Decision",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preview Video": {
+      "main": [
+        [
+          {
+            "node": "Review Card",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Decision": {
+      "main": [
+        [
+          {
+            "node": "Route Decision",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route Decision": {
+      "main": [
+        [
+          {
+            "node": "Site Form",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "YouTube Form",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Mark Rejected",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Rejected Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Site Form": {
+      "main": [
+        [
+          {
+            "node": "Site Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "YouTube Form": {
+      "main": [
+        [
+          {
+            "node": "YT Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Rejected Message": {
+      "main": [
+        [
+          {
+            "node": "Notify Rejected",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Site Input": {
+      "main": [
+        [
+          {
+            "node": "Translate Alt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Translate Alt": {
+      "main": [
+        [
+          {
+            "node": "Site Preview",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Site Preview": {
+      "main": [
+        [
+          {
+            "node": "Site OK?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Site OK?": {
+      "main": [
+        [
+          {
+            "node": "Download Photo",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Site Form",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download Photo": {
+      "main": [
+        [
+          {
+            "node": "Gallery Files",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gallery Files": {
+      "main": [
+        [
+          {
+            "node": "Commit Photo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Commit Photo": {
+      "main": [
+        [
+          {
+            "node": "Site Done",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Site Done": {
+      "main": [
+        [
+          {
+            "node": "Notify Site",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Mark Site",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "YT Input": {
+      "main": [
+        [
+          {
+            "node": "Translate YT",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Translate YT": {
+      "main": [
+        [
+          {
+            "node": "YT Preview",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "YT Preview": {
+      "main": [
+        [
+          {
+            "node": "YT OK?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "YT OK?": {
+      "main": [
+        [
+          {
+            "node": "Needs Consent?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "YouTube Form",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Needs Consent?": {
+      "main": [
+        [
+          {
+            "node": "Consent",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "YT Meta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Consent": {
+      "main": [
+        [
+          {
+            "node": "YT Meta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "YT Meta": {
+      "main": [
+        [
+          {
+            "node": "Download Video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download Video": {
+      "main": [
+        [
+          {
+            "node": "YouTube Upload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "YouTube Upload": {
+      "main": [
+        [
+          {
+            "node": "Set Translations",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Translations": {
+      "main": [
+        [
+          {
+            "node": "Has Playlist?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has Playlist?": {
+      "main": [
+        [
+          {
+            "node": "Add To Playlist",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "YT Done",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add To Playlist": {
+      "main": [
+        [
+          {
+            "node": "YT Done",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "YT Done": {
+      "main": [
+        [
+          {
+            "node": "Notify YouTube",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Mark YouTube",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "nodeGroups": [
+    {
+      "id": "0b214490-acd7-4354-95ea-14ae30d15cbc",
+      "name": "Card",
+      "nodeNames": [
+        "Config",
+        "Get Publishers",
+        "Approvers",
+        "Preview Kind",
+        "Preview Photo",
+        "Preview Video",
+        "Review Card",
+        "Decision"
+      ],
+      "description": "Find approvers, preview the file, one-tap card: to site / to YouTube / reject"
+    },
+    {
+      "id": "bb84420f-1729-439f-8a59-cde9875186d6",
+      "name": "To site gallery",
+      "nodeNames": [
+        "Download Photo",
+        "Gallery Files",
+        "Commit Photo"
+      ],
+      "description": "Original + sidecar to private media-inbox incoming/gallery/<album>/, repository_dispatch gallery-intake, wait for gallery.json"
+    },
+    {
+      "id": "e37c4a44-cc19-4f83-ab39-283f895b6a26",
+      "name": "To YouTube",
+      "nodeNames": [
+        "Download Video",
+        "YouTube Upload",
+        "Set Translations"
+      ],
+      "description": "Upload from Drive, then he/ru/en title translations"
+    }
+  ],
+  "tags": [],
+  "active": false,
+  "pinData": {}
+}

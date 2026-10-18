@@ -1,0 +1,731 @@
+{
+  "id": "WioJt6Ls1FOcaET1",
+  "name": "bot-git-commit",
+  "nodes": [
+    {
+      "id": "9f4f0466-bfb7-4acd-8f15-69963d8295b3",
+      "name": "Start",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        144
+      ],
+      "parameters": {
+        "inputSource": "passthrough"
+      }
+    },
+    {
+      "id": "f3d0d9c6-1bca-49b4-8377-3c2621cfa2a8",
+      "name": "Config",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        224,
+        144
+      ],
+      "parameters": {
+        "jsCode": "\n// Callers can only touch bot-owned paths per repo; originals live in the private staging repo, never in the public one.\nconst ALLOWED = {\n  'Unifight-haifa/unifight': ['content/schedule-changes/'],\n  'Unifight-haifa/media-inbox': ['incoming/gallery/'],\n};\nconst r = $input.first().json;\nconst repo = r.repo || 'Unifight-haifa/unifight';\nconst prefixes = ALLOWED[repo];\nif (!prefixes) throw new Error(`bot-git-commit: repo not allowed: ${repo}`);\nconst files = Array.isArray(r.files) ? r.files : [];\nif (!files.length || !r.message) throw new Error('bot-git-commit: files and message are required');\nfor (const f of files) {\n  const p = String(f.path || '');\n  if (!prefixes.some(a => p.startsWith(a)) || p.includes('..') || !/^[\\w./-]+$/.test(p)) throw new Error(`bot-git-commit: path not allowed in ${repo}: ${p}`);\n  if (typeof f.content !== 'string' && typeof f.b64 !== 'string') throw new Error(`bot-git-commit: no content for ${p}`);\n}\nconst d = r.dispatch || null;\nif (d && d.event_type !== 'gallery-intake') throw new Error(`bot-git-commit: dispatch not allowed: ${d.event_type}`);\nreturn [{ json: {\n  files, message: String(r.message), dispatch: d,\n  live_url: r.live_url || '', live_match: r.live_match || '', live_checks: Number(r.live_checks) || 16,\n  cfg: { api: `https://api.github.com/repos/${repo}`, dispatch_api: 'https://api.github.com/repos/Unifight-haifa/unifight/dispatches', branch: r.branch || 'main' },\n} }];\n"
+      }
+    },
+    {
+      "id": "59485b7d-e0c0-4507-b08b-27f6a7620df7",
+      "name": "Get Ref",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        448,
+        144
+      ],
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $json.cfg.api }}/git/ref/heads/{{ $json.cfg.branch }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "githubApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/vnd.github+json"
+            },
+            {
+              "name": "X-GitHub-Api-Version",
+              "value": "2026-03-10"
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "f81d7650-c9f1-49a7-8851-394dfe4505cd",
+      "name": "Get Head Commit",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        672,
+        144
+      ],
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $('Config').first().json.cfg.api }}/git/commits/{{ $json.object.sha }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "githubApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/vnd.github+json"
+            },
+            {
+              "name": "X-GitHub-Api-Version",
+              "value": "2026-03-10"
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "b1194521-75d7-4b2f-b164-7304ef7ece03",
+      "name": "Blob Items",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        896,
+        144
+      ],
+      "parameters": {
+        "jsCode": "\nreturn $('Config').first().json.files.map(f => ({ json: typeof f.b64 === 'string'\n  ? { path: f.path, body: { content: f.b64, encoding: 'base64' } }\n  : { path: f.path, body: { content: f.content, encoding: 'utf-8' } } }));\n"
+      }
+    },
+    {
+      "id": "1f9dd0a3-fac3-4c5a-8d0c-15f06d8d8b48",
+      "name": "Create Blob",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        1120,
+        144
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Config').first().json.cfg.api }}/git/blobs",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "githubApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/vnd.github+json"
+            },
+            {
+              "name": "X-GitHub-Api-Version",
+              "value": "2026-03-10"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json.body) }}",
+        "options": {}
+      },
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 5000
+    },
+    {
+      "id": "33192a3b-5edc-412f-b782-1624ed42b835",
+      "name": "Build Tree",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1344,
+        144
+      ],
+      "parameters": {
+        "jsCode": "\nconst paths = $('Blob Items').all().map(i => i.json.path);\nconst shas = $input.all().map(i => i.json.sha);\nif (shas.length !== paths.length || shas.some(s => !s)) throw new Error('Blob upload failed');\nreturn [{ json: {\n  base_tree: $('Get Head Commit').first().json.tree.sha,\n  tree: paths.map((path, k) => ({ path, mode: '100644', type: 'blob', sha: shas[k] })),\n} }];\n"
+      }
+    },
+    {
+      "id": "d56a03fd-8002-4de5-bd00-51f704b961e3",
+      "name": "Create Tree",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        1568,
+        144
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Config').first().json.cfg.api }}/git/trees",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "githubApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/vnd.github+json"
+            },
+            {
+              "name": "X-GitHub-Api-Version",
+              "value": "2026-03-10"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json) }}",
+        "options": {}
+      }
+    },
+    {
+      "id": "717e378e-f0bf-4bfa-96bc-e14be8da6759",
+      "name": "Create Commit",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        1792,
+        144
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Config').first().json.cfg.api }}/git/commits",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "githubApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/vnd.github+json"
+            },
+            {
+              "name": "X-GitHub-Api-Version",
+              "value": "2026-03-10"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ message: $('Config').first().json.message, tree: $json.sha, parents: [$('Get Ref').first().json.object.sha] }) }}",
+        "options": {}
+      }
+    },
+    {
+      "id": "6b8bb4b0-b2ce-4465-84f8-7f2910e6ec42",
+      "name": "Update Ref",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        2016,
+        144
+      ],
+      "parameters": {
+        "method": "PATCH",
+        "url": "={{ $('Config').first().json.cfg.api }}/git/refs/heads/{{ $('Config').first().json.cfg.branch }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "githubApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/vnd.github+json"
+            },
+            {
+              "name": "X-GitHub-Api-Version",
+              "value": "2026-03-10"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ sha: $json.sha, force: false }) }}",
+        "options": {}
+      }
+    },
+    {
+      "id": "f7d5823c-32ee-4e64-8658-a5bb88aa1813",
+      "name": "Committed",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2240,
+        144
+      ],
+      "parameters": {
+        "jsCode": "\nconst c = $('Config').first().json;\nreturn [{ json: { sha: $('Create Commit').first().json.sha, live_url: c.live_url, live_match: c.live_match } }];\n"
+      }
+    },
+    {
+      "id": "fa5d0a12-f316-492e-b5ca-ba173129b0aa",
+      "name": "Wait For Live?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2464,
+        144
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ !!$('Config').first().json.live_url && !!$('Config').first().json.live_match }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      }
+    },
+    {
+      "id": "86ad2d15-248e-47f0-a601-00c5c6603415",
+      "name": "Wait Deploy",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        2688,
+        80
+      ],
+      "parameters": {
+        "resume": "timeInterval",
+        "amount": 45,
+        "unit": "seconds"
+      },
+      "webhookId": "605c62fd-9ddc-4eea-92a0-d03e7dfcd4ac"
+    },
+    {
+      "id": "ec657010-eda5-4d69-9ea8-b69bf61da8ae",
+      "name": "Get Live Page",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        2912,
+        0
+      ],
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $('Config').first().json.live_url + '?t=' + Date.now() }}",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true,
+              "responseFormat": "text"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "32a88f24-f43e-4f8c-b505-4bff95670e41",
+      "name": "Check Live",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3136,
+        0
+      ],
+      "parameters": {
+        "jsCode": "\n// $runIndex counts loop passes; the page is fetched as text, so match is a plain substring.\nconst c = $('Config').first().json;\nconst body = typeof $json.data === 'string' ? $json.data : JSON.stringify($json);\nconst attempt = $runIndex + 1;\nconst live = body.includes(c.live_match);\nreturn [{ json: { state: live ? 'live' : attempt >= c.live_checks ? 'timeout' : 'retry', attempt } }];\n"
+      }
+    },
+    {
+      "id": "929aae88-3413-40dd-a4a5-1dd590de0a04",
+      "name": "Live?",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        3360,
+        80
+      ],
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "outputKey": "retry",
+              "renameOutput": true,
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.state }}",
+                    "rightValue": "retry",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra",
+          "renameFallbackOutput": "done"
+        }
+      }
+    },
+    {
+      "id": "fa0ce6e6-38bf-423f-bdae-c8ecd5492f45",
+      "name": "Result",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3584,
+        144
+      ],
+      "parameters": {
+        "jsCode": "\nconst sha = $('Committed').first().json.sha;\nlet live = null, attempts = 0;\ntry { const s = $('Check Live').last().json; live = s.state === 'live'; attempts = s.attempt; } catch (e) { /* no live check requested */ }\nreturn [{ json: { sha, live, attempts } }];\n"
+      }
+    },
+    {
+      "id": "7d68a08c-b56f-479a-866b-ed1a6bc6a6be",
+      "name": "Sticky Note 51bceeee",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        192,
+        48
+      ],
+      "parameters": {
+        "content": "## bot-git-commit\nOne atomic commit (blobs → tree → commit → ref, force=false) for bot-owned paths only: `incoming/gallery/`, `content/schedule-changes/`.\nInput: `files[{path, content|b64}]`, `message`, optional `branch`, `live_url` + `live_match` (substring polled every 45 s, `live_checks` times).\nOutput: `{sha, live, attempts}`.",
+        "color": 7,
+        "width": 384,
+        "height": 224
+      }
+    },
+    {
+      "id": "52e2d3cb-7ca1-4f21-97b3-3902a1a13252",
+      "name": "Dispatch?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2600,
+        100
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "d1",
+              "leftValue": "={{ !!$('Config').first().json.dispatch }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "18114df1-f368-4548-9715-5422a92f3f0c",
+      "name": "Send Dispatch",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        2800,
+        0
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Config').first().json.cfg.dispatch_api }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "githubApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/vnd.github+json"
+            },
+            {
+              "name": "X-GitHub-Api-Version",
+              "value": "2026-03-10"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($('Config').first().json.dispatch) }}",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "Config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Config": {
+      "main": [
+        [
+          {
+            "node": "Get Ref",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Ref": {
+      "main": [
+        [
+          {
+            "node": "Get Head Commit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Head Commit": {
+      "main": [
+        [
+          {
+            "node": "Blob Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Blob Items": {
+      "main": [
+        [
+          {
+            "node": "Create Blob",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Blob": {
+      "main": [
+        [
+          {
+            "node": "Build Tree",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Tree": {
+      "main": [
+        [
+          {
+            "node": "Create Tree",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Tree": {
+      "main": [
+        [
+          {
+            "node": "Create Commit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Commit": {
+      "main": [
+        [
+          {
+            "node": "Update Ref",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Ref": {
+      "main": [
+        [
+          {
+            "node": "Committed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait For Live?": {
+      "main": [
+        [
+          {
+            "node": "Wait Deploy",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait Deploy": {
+      "main": [
+        [
+          {
+            "node": "Get Live Page",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Live Page": {
+      "main": [
+        [
+          {
+            "node": "Check Live",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Live": {
+      "main": [
+        [
+          {
+            "node": "Live?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Live?": {
+      "main": [
+        [
+          {
+            "node": "Wait Deploy",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Committed": {
+      "main": [
+        [
+          {
+            "node": "Dispatch?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Dispatch?": {
+      "main": [
+        [
+          {
+            "node": "Send Dispatch",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait For Live?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Dispatch": {
+      "main": [
+        [
+          {
+            "node": "Wait For Live?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "nodeGroups": [
+    {
+      "id": "be999062-1079-4c09-b68c-479a3ed603d7",
+      "name": "Commit",
+      "nodeNames": [
+        "Get Ref",
+        "Get Head Commit",
+        "Blob Items",
+        "Create Blob",
+        "Build Tree",
+        "Create Tree",
+        "Create Commit",
+        "Update Ref",
+        "Committed"
+      ],
+      "description": "Git Data API: blobs, tree, commit, fast-forward ref (no force)"
+    }
+  ],
+  "tags": [],
+  "active": false,
+  "pinData": {}
+}

@@ -117,7 +117,6 @@
       "webhookId": "fdb35941-5870-4d6d-95e0-a81c9024adfc",
       "credentials": {
         "telegramApi": {
-          "id": "hsPK2WfVUBtOHxl5",
           "name": "Telegram account"
         }
       }
@@ -164,7 +163,6 @@
       "webhookId": "183ba45d-7f18-471c-923c-8f5e47c5e666",
       "credentials": {
         "telegramApi": {
-          "id": "hsPK2WfVUBtOHxl5",
           "name": "Telegram account"
         }
       }
@@ -192,7 +190,7 @@
         300
       ],
       "parameters": {
-        "jsCode": "\n// Owner-editable settings. Items pass through unchanged.\nconst cfg = {\n  repo: 'Unifight-haifa/unifight',\n  branch: 'main',\n  news_dir: 'src/content/news',\n  site: 'https://unifight-haifa.github.io/unifight',\n  news_json: 'https://unifight-haifa.github.io/unifight/news.json',\n  fb_page_id: 'REPLACE_PAGE_ID',\n  ig_user_id: 'REPLACE_IG_USER_ID',\n  social_langs: ['he', 'ru'],\n  max_posts_per_day: 5,\n  max_revisions: 3,\n  deploy_checks: 16,\n};\nreturn $input.all().map(it => ({ json: { ...it.json, cfg }, binary: it.binary }));\n"
+        "jsCode": "\n// Owner-editable settings. Items pass through unchanged.\nconst cfg = {\n  repo: 'Unifight-haifa/unifight',\n  branch: 'main',\n  news_dir: 'src/content/news',\n  site: 'https://unifight-haifa.github.io/unifight',\n  news_json: 'https://unifight-haifa.github.io/unifight/news.json',\n  fb_page_id: 'REPLACE_PAGE_ID',\n  ig_user_id: 'REPLACE_IG_USER_ID',\n  // Club Telegram channel: '@name' or '-100…' id; empty = skip. The bot must be a channel admin.\n  tg_channel_id: '',\n  social_langs: ['he', 'ru'],\n  max_posts_per_day: 5,\n  max_revisions: 3,\n  deploy_checks: 16,\n};\nreturn $input.all().map(it => ({ json: { ...it.json, cfg }, binary: it.binary }));\n"
       }
     },
     {
@@ -403,7 +401,6 @@
       "waitBetweenTries": 5000,
       "credentials": {
         "anthropicApi": {
-          "id": "G38M3oA58IRqShGZ",
           "name": "Anthropic"
         }
       }
@@ -887,7 +884,6 @@
       "webhookId": "18a9968a-cc86-4d4f-95fe-373a10b40666",
       "credentials": {
         "telegramApi": {
-          "id": "hsPK2WfVUBtOHxl5",
           "name": "Telegram account"
         }
       }
@@ -1609,11 +1605,11 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        7200,
+        7500,
         0
       ],
       "parameters": {
-        "jsCode": "\nconst p = $('Parse Translation').last().json;\nconst c = $('Committed').first().json;\nconst s = $('Build Social').first().json;\nconst get = n => { try { return $(n).first().json; } catch (e) { return {}; } };\nconst fb = get('FB Post'), ig = get('IG Publish'), igc = get('IG Container');\nconst err = o => o.error?.message || o.error || 'нет ответа';\nconst fbId = fb.id || '', igId = ig.id || '';\nconst problems = [];\nif (!fbId) problems.push('Facebook: ' + err(fb));\nif (!igId) problems.push('Instagram: ' + err(igc.error ? igc : ig));\nconst notify = [\n  'Новость на сайте:', `HE ${s.urls.he}`, `RU ${s.urls.ru}`, `EN ${s.urls.en}`, '',\n  `Facebook: ${fbId ? 'опубликовано' : 'не получилось'}`, `Instagram: ${igId ? 'опубликовано' : 'не получилось'}`,\n  ...(problems.length ? ['', ...problems] : []), '',\n  'WhatsApp — откройте ссылку и выберите группу родителей:',\n  `HE ${s.wa.he}`, `RU ${s.wa.ru}`, `EN ${s.wa.en}`,\n].join('\\n');\nreturn [{ json: {\n  channel: p.channel, chat_id: p.chat_id, email: p.email, notify, notify_admin: problems.length > 0,\n  draft: { ...c.draft, status: problems.length ? 'live_partial' : 'live', fb_post_id: fbId, ig_media_id: igId,\n           error: problems.join('; ').slice(0, 500) },\n  audit: { actor_id: p.draft.author_id, action: 'distribute', target: c.draft.folder,\n           result: problems.length ? 'partial' : 'ok', detail: `fb=${fbId} ig=${igId}` },\n} }];\n"
+        "jsCode": "\nconst p = $('Parse Translation').last().json;\nconst c = $('Committed').first().json;\nconst s = $('Build Social').first().json;\nconst cfg = $('Config').first().json.cfg;\nconst get = n => { try { return $(n).first().json; } catch (e) { return {}; } };\nconst fb = get('FB Post'), ig = get('IG Publish'), igc = get('IG Container'), tg = get('TG Channel Post');\nconst err = o => o.error?.message || o.error || o.description || 'нет ответа';\nconst fbId = fb.id || '', igId = ig.id || '', tgId = tg.result?.message_id ? String(tg.result.message_id) : '';\nconst problems = [];\nif (!fbId) problems.push('Facebook: ' + err(fb));\nif (!igId) problems.push('Instagram: ' + err(igc.error ? igc : ig));\nif (cfg.tg_channel_id && !tgId) problems.push('Telegram-канал: ' + err(tg));\nconst notify = [\n  'Новость на сайте:', `HE ${s.urls.he}`, `RU ${s.urls.ru}`, `EN ${s.urls.en}`, '',\n  `Facebook: ${fbId ? 'опубликовано' : 'не получилось'}`, `Instagram: ${igId ? 'опубликовано' : 'не получилось'}`,\n  ...(cfg.tg_channel_id ? [`Telegram-канал: ${tgId ? 'опубликовано' : 'не получилось'}`] : []),\n  ...(problems.length ? ['', ...problems] : []), '',\n  'WhatsApp — откройте ссылку и выберите группу родителей:',\n  `HE ${s.wa.he}`, `RU ${s.wa.ru}`, `EN ${s.wa.en}`,\n].join('\\n');\nreturn [{ json: {\n  channel: p.channel, chat_id: p.chat_id, email: p.email, notify, notify_admin: problems.length > 0,\n  draft: { ...c.draft, status: problems.length ? 'live_partial' : 'live', fb_post_id: fbId, ig_media_id: igId,\n           error: problems.join('; ').slice(0, 500) },\n  audit: { actor_id: p.draft.author_id, action: 'distribute', target: c.draft.folder,\n           result: problems.length ? 'partial' : 'ok', detail: `fb=${fbId} ig=${igId} tg=${tgId}` },\n} }];\n"
       }
     },
     {
@@ -1637,7 +1633,65 @@
       "webhookId": "123d2c88-3dd8-47f4-890a-1e954a4de5af",
       "credentials": {
         "telegramApi": {
-          "id": "hsPK2WfVUBtOHxl5",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "id": "4b32b33d-2557-4fbe-b690-dd792c5ea75c",
+      "name": "TG Channel?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        7100,
+        -200
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "tgc1",
+              "leftValue": "={{ !!$('Config').first().json.cfg.tg_channel_id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "63ba5d1f-4f01-4bc1-a110-fd91e8466576",
+      "name": "TG Channel Post",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        7300,
+        -300
+      ],
+      "parameters": {
+        "chatId": "={{ $('Config').first().json.cfg.tg_channel_id }}",
+        "text": "={{ $('Build Social').first().json.fb_message.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;') }}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "HTML"
+        }
+      },
+      "onError": "continueRegularOutput",
+      "webhookId": "d80395d2-6e3d-4d44-a8fb-3c53f76b5d82",
+      "credentials": {
+        "telegramApi": {
           "name": "Telegram account"
         }
       }
@@ -2168,17 +2222,6 @@
         ]
       ]
     },
-    "IG Publish": {
-      "main": [
-        [
-          {
-            "node": "Summarize",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Summarize": {
       "main": [
         [
@@ -2216,6 +2259,46 @@
         [
           {
             "node": "Ask Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IG Publish": {
+      "main": [
+        [
+          {
+            "node": "TG Channel?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TG Channel?": {
+      "main": [
+        [
+          {
+            "node": "TG Channel Post",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Summarize",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TG Channel Post": {
+      "main": [
+        [
+          {
+            "node": "Summarize",
             "type": "main",
             "index": 0
           }
@@ -2263,16 +2346,18 @@
     },
     {
       "id": "2d0113d0-9ddb-48de-afc7-9d3a81ac1977",
-      "name": "Facebook and Instagram",
+      "name": "Distribution",
       "nodeNames": [
         "Build Social",
         "FB Post",
         "IG Container",
         "Wait IG",
         "IG Publish",
+        "TG Channel?",
+        "TG Channel Post",
         "Summarize"
       ],
-      "description": "Page post with link, Instagram image from news.json cover, WhatsApp share links, summary for the author."
+      "description": "Facebook Page post, Instagram image from news.json cover, optional club Telegram channel, WhatsApp share links, summary."
     }
   ],
   "tags": [],

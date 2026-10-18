@@ -1,0 +1,909 @@
+{
+  "id": "uoovvya1JSTn5KhR",
+  "name": "media-intake",
+  "nodes": [
+    {
+      "id": "2485c9f6-f612-43bd-a2dd-0a6a5746a796",
+      "name": "Start",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        672
+      ],
+      "parameters": {
+        "inputSource": "passthrough"
+      }
+    },
+    {
+      "id": "32a3c53f-9b37-46be-ace7-ecc8d77b887f",
+      "name": "Classify",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        224,
+        672
+      ],
+      "parameters": {
+        "jsCode": "\n// Bot API getFile refuses files over 20 MB, so those go to Drive by hand and come back as a link.\nconst cfg = {\n  drive_root_id: 'REPLACE_DRIVE_FOLDER_ID',\n  drive_root_url: 'https://drive.google.com/drive/folders/REPLACE_DRIVE_FOLDER_ID',\n  max_tg_bytes: 20 * 1024 * 1024,\n};\nconst { message: m, publisher: p } = $input.first().json;\nconst day = new Date().toLocaleDateString('sv-SE', { timeZone: 'Asia/Jerusalem' });\nconst base = {\n  cfg, author_id: p.coach_id, author_tg: String(m.chat.id), caption: String(m.caption || m.text || '').trim().slice(0, 500),\n  media_group_id: String(m.media_group_id || ''), month: day.slice(0, 7), day,\n};\nlet f = null;\nif (m.photo?.length) { const ph = m.photo[m.photo.length - 1]; f = { type: 'photo', id: ph.file_id, uid: ph.file_unique_id, size: ph.file_size, mime: 'image/jpeg', ext: 'jpg' }; }\nelse if (m.video || m.video_note) { const v = m.video || m.video_note; f = { type: 'video', id: v.file_id, uid: v.file_unique_id, size: v.file_size, mime: v.mime_type || 'video/mp4', ext: (v.mime_type || 'video/mp4').split('/')[1] }; }\nelse if (m.document && /^(image|video)\\//.test(m.document.mime_type || '')) {\n  const d = m.document;\n  f = { type: d.mime_type.startsWith('video/') ? 'video' : 'photo', id: d.file_id, uid: d.file_unique_id, size: d.file_size, mime: d.mime_type,\n        ext: (String(d.file_name || '').match(/\\.([a-z0-9]{2,5})$/i)?.[1] || d.mime_type.split('/')[1]).toLowerCase() };\n}\nif (f) {\n  const kind = Number(f.size || 0) > cfg.max_tg_bytes ? 'too_big' : 'file';\n  const ext = f.ext.replace(/[^a-z0-9]/gi, '').toLowerCase() || 'bin';\n  return [{ json: { ...base, kind, type: f.type, tg_file_id: f.id, tg_unique_id: f.uid, size_bytes: Number(f.size || 0), mime: f.mime,\n    file_name: `${day}_${p.coach_id}_${f.uid}.${ext}`, media_id: `${day}-${f.uid}` } }];\n}\nconst link = String(m.text || '').match(/drive\\.google\\.com\\/(?:file\\/d\\/|open\\?id=|uc\\?id=)([\\w-]{20,})/);\nif (link) return [{ json: { ...base, kind: 'drive_link', drive_file_id: link[1], caption: '' } }];\nreturn [{ json: { ...base, kind: 'unsupported' } }];\n"
+      }
+    },
+    {
+      "id": "efba1e86-70f6-4e4e-8d5f-87bc2013bd32",
+      "name": "By Kind",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        448,
+        640
+      ],
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "outputKey": "file",
+              "renameOutput": true,
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.kind }}",
+                    "rightValue": "file",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "outputKey": "too_big",
+              "renameOutput": true,
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.kind }}",
+                    "rightValue": "too_big",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "outputKey": "drive_link",
+              "renameOutput": true,
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.kind }}",
+                    "rightValue": "drive_link",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra",
+          "renameFallbackOutput": "unsupported"
+        }
+      }
+    },
+    {
+      "id": "00311d64-b5c0-412c-b8da-7336d3738aec",
+      "name": "Find Month Folder",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        672,
+        192
+      ],
+      "parameters": {
+        "resource": "fileFolder",
+        "operation": "search",
+        "authentication": "oAuth2",
+        "searchMethod": "name",
+        "queryString": "={{ $json.month }}",
+        "returnAll": false,
+        "limit": 1,
+        "filter": {
+          "folderId": {
+            "__rl": true,
+            "mode": "id",
+            "value": "={{ $json.cfg.drive_root_id }}"
+          },
+          "whatToSearch": "folders"
+        },
+        "options": {}
+      },
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "id": "8d95bdf2-c8cb-48b3-8dc6-9d8ebb5e5482",
+      "name": "Month Exists?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        896,
+        192
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ !!$json.id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      }
+    },
+    {
+      "id": "244fc302-4667-4df6-8c79-08356d52be4f",
+      "name": "Folder",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1344,
+        192
+      ],
+      "parameters": {
+        "jsCode": "\nreturn [{ json: { folder_id: $input.first().json.id } }];\n"
+      }
+    },
+    {
+      "id": "886e9151-dc1d-4aae-b5a8-e8d3bd173fd3",
+      "name": "Create Month Folder",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1120,
+        416
+      ],
+      "parameters": {
+        "resource": "folder",
+        "operation": "create",
+        "authentication": "oAuth2",
+        "name": "={{ $('Classify').first().json.month }}",
+        "folderId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $('Classify').first().json.cfg.drive_root_id }}"
+        },
+        "options": {}
+      },
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "id": "794549ea-720b-4d40-86a2-f33fa57cf1ce",
+      "name": "Too Big Message",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2464,
+        576
+      ],
+      "parameters": {
+        "jsCode": "\nconst c = $input.first().json;\nconst mb = Math.round(c.size_bytes / 1048576);\nreturn [{ json: { chat_id: c.author_tg, text: [\n  `Файл ${mb} МБ: Telegram не даёт боту скачивать файлы больше 20 МБ.`,\n  `Загрузите оригинал сами в папку клуба: ${c.cfg.drive_root_url}`,\n  'Потом откройте файл в Drive → «Поделиться» → «Копировать ссылку» и пришлите ссылку сюда. Бот его зарегистрирует и отправит на просмотр.',\n].join('\\n') } }];\n"
+      }
+    },
+    {
+      "id": "855c2b0a-edd4-44fc-af8b-896ca04f7e6d",
+      "name": "Reply",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.4,
+      "position": [
+        2688,
+        672
+      ],
+      "parameters": {
+        "mode": "once",
+        "workflowId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "BQo47li1zzs8lrGY",
+          "cachedResultName": "bot-notify"
+        },
+        "options": {
+          "waitForSubWorkflow": false
+        }
+      }
+    },
+    {
+      "id": "245d3199-b9fe-4319-87f0-7cf4bc9255ee",
+      "name": "Get Drive File",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        1568,
+        752
+      ],
+      "parameters": {
+        "method": "GET",
+        "url": "=https://www.googleapis.com/drive/v3/files/{{ $json.drive_file_id }}?fields=id,name,mimeType,size,webViewLink&supportsAllDrives=true",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleDriveOAuth2Api",
+        "options": {}
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "id": "279775a2-0419-4984-b01b-8d6d6d818a90",
+      "name": "Link Row",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1792,
+        752
+      ],
+      "parameters": {
+        "jsCode": "\nconst c = $('Classify').first().json;\nconst f = $input.first().json;\nconst mime = String(f.mimeType || '');\nif (!/^(image|video)\\//.test(mime)) {\n  return [{ json: { reject: true, chat_id: c.author_tg, text: 'По ссылке не фото и не видео, или у бота нет доступа к файлу. Загрузите файл в папку клуба и пришлите ссылку ещё раз.' } }];\n}\nconst ext = (String(f.name || '').match(/\\.([a-z0-9]{2,5})$/i)?.[1] || mime.split('/')[1]).toLowerCase();\nreturn [{ json: {\n  media_id: `${c.day}-${f.id}`, type: mime.startsWith('video/') ? 'video' : 'photo', status: 'new',\n  author_id: c.author_id, author_tg: c.author_tg, caption: '', tg_file_id: '', tg_unique_id: '', media_group_id: '',\n  drive_file_id: f.id, drive_link: f.webViewLink || `https://drive.google.com/file/d/${f.id}/view`,\n  file_name: `${c.day}_${c.author_id}_${String(f.id).slice(0, 16)}.${ext}`, mime, size_bytes: Number(f.size || 0),\n} }];\n"
+      }
+    },
+    {
+      "id": "179323f6-f34e-4d9a-a586-011ccf0d4e58",
+      "name": "Link OK?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2016,
+        752
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.reject !== true }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      }
+    },
+    {
+      "id": "e2fd8ef0-3966-44a6-9eb2-266a04202488",
+      "name": "Media Row",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        2240,
+        192
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "788395f5-22b7-4eb5-8ed5-54267fdd283e",
+      "name": "Unsupported Message",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2464,
+        944
+      ],
+      "parameters": {
+        "jsCode": "\nconst c = $input.first().json;\nreturn [{ json: { chat_id: c.author_tg, text: 'Пришлите фото или видео (можно альбомом), или ссылку на файл в Google Drive.' } }];\n"
+      }
+    },
+    {
+      "id": "3f66c895-4a4d-4b5f-bab2-b6dc5091c9fc",
+      "name": "Download From Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1568,
+        192
+      ],
+      "parameters": {
+        "resource": "file",
+        "operation": "get",
+        "fileId": "={{ $('Classify').first().json.tg_file_id }}",
+        "download": true,
+        "additionalFields": {
+          "mimeType": "={{ $('Classify').first().json.mime }}"
+        }
+      },
+      "webhookId": "46cd5c30-e91d-4e51-9514-28c25c572709",
+      "credentials": {
+        "telegramApi": {
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "id": "2dacc20a-93c8-4779-bde7-1c35030641af",
+      "name": "Upload To Drive",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1792,
+        192
+      ],
+      "parameters": {
+        "resource": "file",
+        "operation": "upload",
+        "authentication": "oAuth2",
+        "inputDataFieldName": "data",
+        "name": "={{ $('Classify').first().json.file_name }}",
+        "folderId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $('Folder').first().json.folder_id }}"
+        },
+        "options": {
+          "simplifyOutput": false
+        }
+      },
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "id": "8d2fbbc1-6cd3-4f95-b2e3-91c7cd57d59a",
+      "name": "File Row",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2016,
+        192
+      ],
+      "parameters": {
+        "jsCode": "\nconst c = $('Classify').first().json;\nconst up = $input.first().json;\nreturn [{ json: {\n  media_id: c.media_id, type: c.type, status: 'new', author_id: c.author_id, author_tg: c.author_tg, caption: c.caption,\n  tg_file_id: c.tg_file_id, tg_unique_id: c.tg_unique_id, media_group_id: c.media_group_id,\n  drive_file_id: up.id, drive_link: up.webViewLink || `https://drive.google.com/file/d/${up.id}/view`,\n  file_name: c.file_name, mime: c.mime, size_bytes: c.size_bytes,\n} }];\n"
+      }
+    },
+    {
+      "id": "4746302b-7669-48b3-916c-a8c3625521f5",
+      "name": "Insert Media",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        2464,
+        0
+      ],
+      "parameters": {
+        "resource": "row",
+        "operation": "insert",
+        "dataTableId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "w8bTgxbZssHA2cQv",
+          "cachedResultName": "media"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "matchingColumns": [],
+          "value": {
+            "media_id": "={{ $json.media_id }}",
+            "type": "={{ $json.type }}",
+            "status": "new",
+            "author_id": "={{ $json.author_id }}",
+            "author_tg": "={{ $json.author_tg }}",
+            "caption": "={{ $json.caption }}",
+            "tg_file_id": "={{ $json.tg_file_id }}",
+            "tg_unique_id": "={{ $json.tg_unique_id }}",
+            "media_group_id": "={{ $json.media_group_id }}",
+            "drive_file_id": "={{ $json.drive_file_id }}",
+            "drive_link": "={{ $json.drive_link }}",
+            "file_name": "={{ $json.file_name }}",
+            "mime": "={{ $json.mime }}",
+            "size_bytes": "={{ $json.size_bytes }}",
+            "created_at": "={{ $now.toISO() }}",
+            "updated_at": "={{ $now.toISO() }}"
+          },
+          "schema": [
+            {
+              "id": "media_id",
+              "displayName": "media_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "type",
+              "displayName": "type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "author_id",
+              "displayName": "author_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "author_tg",
+              "displayName": "author_tg",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "caption",
+              "displayName": "caption",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "tg_file_id",
+              "displayName": "tg_file_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "tg_unique_id",
+              "displayName": "tg_unique_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "media_group_id",
+              "displayName": "media_group_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "drive_file_id",
+              "displayName": "drive_file_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "drive_link",
+              "displayName": "drive_link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "file_name",
+              "displayName": "file_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "mime",
+              "displayName": "mime",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "size_bytes",
+              "displayName": "size_bytes",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "created_at",
+              "displayName": "created_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "updated_at",
+              "displayName": "updated_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "304b93de-a583-4ca3-a0b1-e74bf2f6c47f",
+      "name": "Start Review",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.4,
+      "position": [
+        2464,
+        192
+      ],
+      "parameters": {
+        "mode": "once",
+        "workflowId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "R1UiY24QUcDDBALl",
+          "cachedResultName": "media-review"
+        },
+        "options": {
+          "waitForSubWorkflow": false
+        }
+      }
+    },
+    {
+      "id": "c2c8408c-dedd-4244-9e22-c3ef3f3ab3bf",
+      "name": "Stored Message",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2464,
+        384
+      ],
+      "parameters": {
+        "jsCode": "\nconst r = $input.first().json;\nconst kind = r.type === 'video' ? 'Видео' : 'Фото';\nreturn [{ json: { chat_id: r.author_tg, text: `${kind} сохранено в папке клуба. Утверждающие решат, куда его поставить.` } }];\n"
+      }
+    },
+    {
+      "id": "9ab62ce6-8293-4dce-8605-fac71598a018",
+      "name": "Sticky Note 202dd29e",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        192,
+        544
+      ],
+      "parameters": {
+        "content": "## media-intake\nCalled by news-telegram-intake for a photo/video (or a Drive link) sent while no news draft is open. Albums arrive as one update per file.\n≤20 MB: Telegram → Drive `Unifight media/<YYYY-MM>/` → `media` row → media-review.\n>20 MB: reply with the Drive folder link; the pasted Drive link is registered the same way.",
+        "color": 7,
+        "width": 384,
+        "height": 288
+      }
+    }
+  ],
+  "connections": {
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "Classify",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Classify": {
+      "main": [
+        [
+          {
+            "node": "By Kind",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "By Kind": {
+      "main": [
+        [
+          {
+            "node": "Find Month Folder",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Too Big Message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get Drive File",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Unsupported Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find Month Folder": {
+      "main": [
+        [
+          {
+            "node": "Month Exists?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Month Exists?": {
+      "main": [
+        [
+          {
+            "node": "Folder",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create Month Folder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Folder": {
+      "main": [
+        [
+          {
+            "node": "Download From Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Month Folder": {
+      "main": [
+        [
+          {
+            "node": "Folder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Too Big Message": {
+      "main": [
+        [
+          {
+            "node": "Reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Drive File": {
+      "main": [
+        [
+          {
+            "node": "Link Row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Link Row": {
+      "main": [
+        [
+          {
+            "node": "Link OK?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Link OK?": {
+      "main": [
+        [
+          {
+            "node": "Media Row",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Media Row": {
+      "main": [
+        [
+          {
+            "node": "Insert Media",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Start Review",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Stored Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Unsupported Message": {
+      "main": [
+        [
+          {
+            "node": "Reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download From Telegram": {
+      "main": [
+        [
+          {
+            "node": "Upload To Drive",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload To Drive": {
+      "main": [
+        [
+          {
+            "node": "File Row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "File Row": {
+      "main": [
+        [
+          {
+            "node": "Media Row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Stored Message": {
+      "main": [
+        [
+          {
+            "node": "Reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "nodeGroups": [],
+  "tags": [],
+  "active": false,
+  "pinData": {}
+}

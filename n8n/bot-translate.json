@@ -1,0 +1,177 @@
+{
+  "id": "wNJftLMoaebNjtKI",
+  "name": "bot-translate",
+  "nodes": [
+    {
+      "id": "746e465e-3209-4cb8-8fb6-7069ef4a80b5",
+      "name": "Start",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {
+        "inputSource": "passthrough"
+      }
+    },
+    {
+      "id": "1febf494-7b08-4f29-8dda-0659f6fe5083",
+      "name": "Get Glossary",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        224,
+        0
+      ],
+      "parameters": {
+        "method": "GET",
+        "url": "https://raw.githubusercontent.com/Unifight-haifa/unifight/main/content/glossary.json",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 3000
+    },
+    {
+      "id": "1e5fbe9f-2921-4323-b994-74ecb897bb55",
+      "name": "Prepare",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        448,
+        0
+      ],
+      "parameters": {
+        "jsCode": "\n// Same rules and glossary as news Translate; the glossary is read live from the repo so it never drifts.\nconst r = $('Start').first().json;\nconst g = $input.first().json;\nconst fields = r.fields && typeof r.fields === 'object' ? r.fields : {};\nconst keys = Object.keys(fields).filter(k => String(fields[k] ?? '').trim());\nif (!keys.length) throw new Error('bot-translate: no text to translate');\nconst all = keys.map(k => fields[k]).join(' ');\nconst detect = s => /[֐-׿]/.test(s) ? 'he' : /[Ѐ-ӿ]/.test(s) ? 'ru' : 'en';\nconst src = ['he', 'ru', 'en'].includes(r.src_lang) ? r.src_lang : detect(all);\nconst limits = r.limits || {};\nconst system = [\n  'You translate short texts for Unifight Haifa, a judo club in Haifa, Israel. Languages: Hebrew (he), Russian (ru), English (en).',\n  `Context: ${r.context || 'club announcement'}. The input JSON gives source_lang and fields (name -> text).`,\n  '', 'Rules:',\n  '1. Translate faithfully. Do not add, drop, soften or embellish facts. Tone: a club announcement for parents and athletes.',\n  '2. Copy exactly: people\\'s names, places, club names, dates, times, all numbers, scores, ages, belt grades and weight categories. Never convert units, round or reformat numbers or times.',\n  '3. נבחרת on its own means the club squad: «сборная клуба (нивхерет)», \"selected team (nivheret)\". Never \"national team\"; only נבחרת ישראל is Israel\\'s national team.',\n  '4. Never name children in descriptions of photos or videos.',\n  '5. In the source language return each field exactly as given.',\n  `6. Respect these maximum lengths in characters: ${JSON.stringify(limits)}.`,\n  '7. Club glossary: whenever one of these terms or names appears, use exactly its he/ru/en form and follow its rules.',\n  `GLOSSARY: ${JSON.stringify({ rules: g.rules || [], terms: g.terms || {} })}`,\n  '', 'Reply with one JSON object and nothing else: {\"he\": {<same field names>}, \"ru\": {...}, \"en\": {...}}',\n].join('\\n');\nconst input = JSON.stringify({ source_lang: src, fields: Object.fromEntries(keys.map(k => [k, String(fields[k])])) });\nreturn [{ json: { src_lang: src, keys, fields, limits, system, input } }];\n"
+      }
+    },
+    {
+      "id": "4aa2af41-414f-406a-b0dc-ceafd007f2a6",
+      "name": "Translate",
+      "type": "@n8n/n8n-nodes-langchain.anthropic",
+      "typeVersion": 1,
+      "position": [
+        672,
+        0
+      ],
+      "parameters": {
+        "resource": "text",
+        "operation": "message",
+        "modelId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "claude-sonnet-5-5"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={{ $json.input }}"
+            }
+          ]
+        },
+        "options": {
+          "system": "={{ $json.system }}",
+          "maxTokens": 4000,
+          "temperature": 0.2
+        }
+      },
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "anthropicApi": {
+          "name": "Anthropic"
+        }
+      }
+    },
+    {
+      "id": "962aa5b7-0b1a-4b0b-a692-57a500b36744",
+      "name": "Parse Translation",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        896,
+        0
+      ],
+      "parameters": {
+        "jsCode": "\nconst p = $('Prepare').first().json;\nconst r = $input.first().json;\nconst raw = typeof r.content === 'string' ? r.content\n  : (r.content?.[0]?.text ?? r.text ?? r.output ?? r.message?.content ?? JSON.stringify(r));\nconst m = String(raw).match(/\\{[\\s\\S]*\\}/);\nif (!m) throw new Error('Translation reply is not JSON');\nconst t = JSON.parse(m[0]);\nconst warnings = [];\nconst tr = {};\nfor (const l of ['he', 'ru', 'en']) {\n  tr[l] = {};\n  for (const k of p.keys) {\n    let v = l === p.src_lang ? String(p.fields[k]) : String(t[l]?.[k] ?? '').trim();\n    if (!v) throw new Error(`Translation missing ${l}.${k}`);\n    const max = Number(p.limits[k]) || 0;\n    if (max && v.length > max) { v = v.slice(0, max - 1).replace(/\\s+\\S*$/, '') + '…'; warnings.push(`${l.toUpperCase()} ${k}: обрезано до ${max} символов`); }\n    tr[l][k] = v;\n  }\n}\n// Numbers and times must survive translation; the author checks names.\nconst src = p.keys.map(k => p.fields[k]).join(' ');\nconst nums = [...new Set(src.match(/\\d+(?:[.,:]\\d+)*/g) || [])];\nfor (const l of ['he', 'ru', 'en']) {\n  const txt = p.keys.map(k => tr[l][k]).join(' ');\n  const miss = nums.filter(n => !txt.includes(n));\n  if (miss.length) warnings.push(`${l.toUpperCase()}: нет чисел ${miss.join(', ')}`);\n}\nif (/נבחרת/.test(src) && !/ישראל/.test(src) && /national team/i.test(p.keys.map(k => tr.en[k]).join(' '))) {\n  warnings.push('Нивхерет переведена как национальная сборная — исправьте');\n}\nreturn [{ json: { src_lang: p.src_lang, tr, warnings } }];\n"
+      }
+    },
+    {
+      "id": "e297574d-24e9-49fd-a8f6-60ff3ef34c32",
+      "name": "Sticky Note baf39ab5",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        416,
+        -96
+      ],
+      "parameters": {
+        "content": "## bot-translate\nShared he/ru/en translation for the bot (gallery alt text, YouTube title/description, schedule notes). Same model, rules and glossary as news Translate; glossary read live from content/glossary.json.\nInput: `fields{name: text}`, optional `src_lang`, `context`, `limits{name: maxChars}`. Output: `{src_lang, tr{he,ru,en}, warnings}`.",
+        "color": 7,
+        "width": 384,
+        "height": 224
+      }
+    }
+  ],
+  "connections": {
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "Get Glossary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Glossary": {
+      "main": [
+        [
+          {
+            "node": "Prepare",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare": {
+      "main": [
+        [
+          {
+            "node": "Translate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Translate": {
+      "main": [
+        [
+          {
+            "node": "Parse Translation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "nodeGroups": [],
+  "tags": [],
+  "active": false,
+  "pinData": {}
+}

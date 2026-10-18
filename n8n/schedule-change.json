@@ -1,0 +1,1051 @@
+{
+  "id": "kzFeKCq5mpOnRaMg",
+  "name": "schedule-change",
+  "nodes": [
+    {
+      "id": "266ce9ef-1273-49d5-9238-9d2715ebed0b",
+      "name": "Start",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        288
+      ],
+      "parameters": {
+        "inputSource": "passthrough"
+      }
+    },
+    {
+      "id": "d18af10c-3e5f-438a-9403-d0a53b68a1e2",
+      "name": "List Schedules",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        224,
+        288
+      ],
+      "parameters": {
+        "method": "GET",
+        "url": "https://api.github.com/repos/Unifight-haifa/unifight/contents/content/schedule",
+        "options": {}
+      },
+      "retryOnFail": true,
+      "maxTries": 3
+    },
+    {
+      "id": "d30bce1a-df58-413d-a3bb-750f54ef61f8",
+      "name": "Allowed",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        448,
+        288
+      ],
+      "parameters": {
+        "jsCode": "\n// Admins edit any schedule; a coach only the file named after their coach_id.\nconst p = $('Start').first().json;\nconst slugs = $input.all().map(i => i.json.name).filter(n => /\\.json$/.test(n || '')).map(n => n.replace(/\\.json$/, ''));\nconst allowed = p.role === 'admin' ? slugs : slugs.filter(s => s === p.coach_id);\nconst cfg = { site: 'https://unifight-haifa.github.io/unifight', raw: 'https://raw.githubusercontent.com/Unifight-haifa/unifight/main' };\nreturn [{ json: { ...p, cfg, allowed,\n  form_a: JSON.stringify([\n    { fieldLabel: 'Расписание', fieldType: 'dropdown', requiredField: true, fieldOptions: { values: allowed.map(s => ({ option: s })) } },\n    { fieldLabel: 'Что меняем', fieldType: 'radio', requiredField: true,\n      fieldOptions: { values: ['Отмена', 'Перенос', 'Доп. тренировка', 'Объявление'].map(o => ({ option: o })) } },\n  ]),\n  denied: allowed.length ? '' : 'Нет расписания, которое вы можете менять. Расписание тренера меняет он сам или админ.',\n} }];\n"
+      }
+    },
+    {
+      "id": "5dcab592-dbab-4882-909b-52de562733c7",
+      "name": "Any Schedule?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        672,
+        288
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.allowed.length > 0 }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      }
+    },
+    {
+      "id": "7c074249-7062-4124-9e40-fae6107ed27a",
+      "name": "Get Venues",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        896,
+        192
+      ],
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $json.cfg.raw }}/content/venues.json",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "executeOnce": true
+    },
+    {
+      "id": "8b305693-c82b-4a40-a70f-89f826caf371",
+      "name": "Denied Message",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4032,
+        512
+      ],
+      "parameters": {
+        "jsCode": "\nreturn [{ json: { chat_id: $json.chat_id, text: $json.denied } }];\n"
+      }
+    },
+    {
+      "id": "135db012-4a0f-4f80-afcb-a1f750a8361e",
+      "name": "Notify",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.4,
+      "position": [
+        4256,
+        32
+      ],
+      "parameters": {
+        "mode": "once",
+        "workflowId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "BQo47li1zzs8lrGY",
+          "cachedResultName": "bot-notify"
+        },
+        "options": {
+          "waitForSubWorkflow": false
+        }
+      }
+    },
+    {
+      "id": "6aa3f123-f3e7-48e3-93b7-75c735dbb99d",
+      "name": "Form A",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1120,
+        192
+      ],
+      "parameters": {
+        "resource": "message",
+        "operation": "sendAndWait",
+        "chatId": "={{ $('Allowed').first().json.chat_id }}",
+        "message": "Изменение расписания. Шаг 1 из 2: какое расписание и что меняем.",
+        "responseType": "customForm",
+        "defineForm": "json",
+        "jsonOutput": "={{ $('Allowed').first().json.form_a }}",
+        "options": {
+          "limitWaitTime": {
+            "values": {
+              "limitType": "afterTimeInterval",
+              "resumeAmount": 1,
+              "resumeUnit": "days"
+            }
+          },
+          "appendAttribution": false,
+          "messageButtonLabel": "Заполнить",
+          "responseFormTitle": "Изменение расписания"
+        }
+      },
+      "webhookId": "b1dc4fda-6882-4e5d-9f90-f8b481bb5ec0",
+      "credentials": {
+        "telegramApi": {
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "id": "2a781686-ee9c-4c01-925a-81a4fb46937c",
+      "name": "Get Schedule",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        1344,
+        192
+      ],
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $('Allowed').first().json.cfg.raw }}/content/schedule/{{ encodeURIComponent($json.data['Расписание']) }}.json",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "8078ced9-f227-40ea-84a8-9a941cd7ef57",
+      "name": "Sessions",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1568,
+        192
+      ],
+      "parameters": {
+        "jsCode": "\nconst p = $('Allowed').first().json;\nconst a = $('Form A').last().json.data ?? $('Form A').last().json;\nconst sched = $('Get Schedule').last().json;\nconst venues = $('Get Venues').first().json;\nconst TYPES = { 'Отмена': 'cancel', 'Перенос': 'move', 'Доп. тренировка': 'extra', 'Объявление': 'note' };\nconst type = TYPES[a['Что меняем']];\nconst slug = a['Расписание'];\nif (!type || !p.allowed.includes(slug)) return [];\nconst DAYS = ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];\nconst grades = g => !g ? '' : g[0] === 0 ? 'сад' : g[1] == null ? `${g[0]}+ кл.` : g[0] === g[1] ? `${g[0]} кл.` : `${g[0]}–${g[1]} кл.`;\nconst sessions = (sched.sessions || []).map((s, i) => {\n  const kind = sched.kinds?.[s.kind]?.ru;\n  const label = [`${DAYS[s.day]} ${s.start}–${s.end}`, venues[s.venue]?.ru || s.venue, grades(s.grades), kind, s.subgroup ? `гр. ${s.subgroup}` : '']\n    .filter(Boolean).join(' · ');\n  const twin = sched.sessions.filter(o => o.day === s.day && o.start === s.start).length > 1;\n  return { label: `${i + 1}. ${label}`, day: s.day, start: s.start, end: s.end, venue: s.venue, group: twin ? s.kind : undefined };\n});\nconst venueOpts = [...new Set(sched.sessions.map(s => s.venue))].map(v => venues[v]?.ru || v);\nconst sel = { fieldLabel: 'Тренировка', fieldType: 'dropdown', requiredField: type !== 'note',\n  fieldOptions: { values: [...(type === 'note' ? [{ option: 'Всё расписание' }] : []), ...sessions.map(s => ({ option: s.label }))] } };\nconst date = (l, req = true) => ({ fieldLabel: l, fieldType: 'date', requiredField: req });\nconst text = (l, ph, req = false) => ({ fieldLabel: l, fieldType: 'text', placeholder: ph, requiredField: req });\nconst venue = req => ({ fieldLabel: 'Зал', fieldType: 'dropdown', requiredField: req, fieldOptions: { values: [...(req ? [] : [{ option: 'Тот же' }]), ...venueOpts.map(o => ({ option: o }))] } });\nconst note = req => ({ fieldLabel: 'Текст для сайта', fieldType: 'textarea', requiredField: req, placeholder: 'На своём языке. Переведу на иврит, русский и английский' });\nconst forms = {\n  cancel: [sel, date('С'), date('По (пусто = один день)', false), note(true)],\n  move: [sel, date('Дата, которая переносится'), date('Новая дата'), text('Начало', '17:30', true), text('Конец', '19:00', true), venue(false), note(true)],\n  extra: [date('Дата'), text('Начало', '17:30', true), text('Конец', '19:00', true), venue(true), note(true)],\n  note: [sel, date('С'), date('По'), note(true)],\n};\nreturn [{ json: { type, slug, sessions, venues, form_b: JSON.stringify(forms[type]) } }];\n"
+      }
+    },
+    {
+      "id": "59677dc6-8f3b-4147-8b89-d3976a911a4e",
+      "name": "Form B",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1792,
+        192
+      ],
+      "parameters": {
+        "resource": "message",
+        "operation": "sendAndWait",
+        "chatId": "={{ $('Allowed').first().json.chat_id }}",
+        "message": "={{ ($('Build Change').isExecuted && !$('Build Change').last().json.ok ? '⚠ ' + $('Build Change').last().json.errors.join('; ') + '\\n\\n' : '') + 'Шаг 2 из 2: тренировка, даты и текст для сайта. Изменение покажется на сайте только в эти даты, потом расписание вернётся к обычному.' }}",
+        "responseType": "customForm",
+        "defineForm": "json",
+        "jsonOutput": "={{ $('Sessions').last().json.form_b }}",
+        "options": {
+          "limitWaitTime": {
+            "values": {
+              "limitType": "afterTimeInterval",
+              "resumeAmount": 1,
+              "resumeUnit": "days"
+            }
+          },
+          "appendAttribution": false,
+          "messageButtonLabel": "Заполнить",
+          "responseFormTitle": "Изменение расписания"
+        }
+      },
+      "webhookId": "726c32f1-0739-4066-a864-c2d14837f13b",
+      "credentials": {
+        "telegramApi": {
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "id": "43160dd1-16c9-4ba7-a9b3-f991c16680cf",
+      "name": "Build Change",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2016,
+        80
+      ],
+      "parameters": {
+        "jsCode": "\n// Dates are Asia/Jerusalem calendar days; the site hides the change outside [from, to].\nconst s = $('Sessions').last().json;\nconst p = $('Allowed').first().json;\nconst b = $input.first().json.data ?? $input.first().json;\nconst errors = [];\nconst D = v => { const x = String(v || '').slice(0, 10); return /^\\d{4}-\\d{2}-\\d{2}$/.test(x) ? x : ''; };\nconst T = v => { const x = String(v || '').trim().replace('.', ':'); return /^([01]?\\d|2[0-3]):[0-5]\\d$/.test(x) ? x.padStart(5, '0') : ''; };\nconst wd = d => new Date(`${d}T12:00:00Z`).getUTCDay();\nconst today = new Date().toLocaleDateString('sv-SE', { timeZone: 'Asia/Jerusalem' });\nconst pick = s.sessions.find(x => x.label === b['Тренировка']);\nconst venueId = name => Object.keys(s.venues).find(k => s.venues[k].ru === name) || '';\nconst ch = { schedule: s.slug, type: s.type };\nconst sess = x => ({ day: x.day, start: x.start, ...(x.group ? { group: x.group } : {}) });\nif (s.type === 'cancel') {\n  ch.from = D(b['С']); ch.to = D(b['По (пусто = один день)']) || ch.from;\n  if (!pick) errors.push('выберите тренировку');\n  else {\n    ch.session = sess(pick);\n    // The site rejects a cancel whose window has no day matching the class weekday.\n    const days = ch.from && ch.to ? Math.round((Date.parse(ch.to) - Date.parse(ch.from)) / 864e5) : -1;\n    if (days >= 0 && ![...Array(Math.min(days + 1, 7)).keys()].some(i => (wd(ch.from) + i) % 7 === pick.day)) errors.push('в эти даты нет такой тренировки');\n  }\n} else if (s.type === 'move') {\n  ch.from = ch.to = D(b['Дата, которая переносится']);\n  if (!pick) errors.push('выберите тренировку');\n  else { ch.session = sess(pick); if (ch.from && wd(ch.from) !== pick.day) errors.push('дата не совпадает с днём недели тренировки'); }\n  ch.new = { date: D(b['Новая дата']), start: T(b['Начало']), end: T(b['Конец']),\n    venue: b['Зал'] && b['Зал'] !== 'Тот же' ? venueId(b['Зал']) : (pick?.venue || '') };\n} else if (s.type === 'extra') {\n  ch.new = { date: D(b['Дата']), start: T(b['Начало']), end: T(b['Конец']), venue: venueId(b['Зал']) };\n  ch.from = ch.to = ch.new.date;\n} else {\n  ch.from = D(b['С']); ch.to = D(b['По']);\n  if (pick) ch.session = sess(pick);\n}\nif (!ch.from || !ch.to) errors.push('нужны даты');\nelse if (ch.to < ch.from) errors.push('«по» раньше, чем «с»');\nelse if (ch.to < today) errors.push('даты уже прошли');\nif (ch.new) {\n  if (!ch.new.date || !ch.new.start || !ch.new.end) errors.push('новая дата и время в формате ЧЧ:ММ');\n  else if (ch.new.end <= ch.new.start) errors.push('конец раньше начала');\n  else if (wd(ch.new.date) === 6) errors.push('в субботу тренировок нет');\n  if (!ch.new.venue) errors.push('выберите зал');\n}\nconst noteSrc = String(b['Текст для сайта'] || '').trim();\nif (!noteSrc) errors.push('нужен текст для сайта');\nreturn [{ json: { ok: !errors.length, errors, change: ch, note_src: noteSrc, author: p.coach_id,\n  context: 'one-off training schedule change shown on the club website', fields: { note: noteSrc }, limits: { note: 300 } } }];\n"
+      }
+    },
+    {
+      "id": "413f8ce7-9089-4789-ab40-cfa24ac677e0",
+      "name": "Valid?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2240,
+        80
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.ok === true }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      }
+    },
+    {
+      "id": "245c7c84-b14e-4b8e-85c2-63512357c663",
+      "name": "Has Note?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2464,
+        80
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ !!$json.note_src }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      }
+    },
+    {
+      "id": "fe77e71b-ea85-4072-a383-102fccd2a0c8",
+      "name": "Translate Note",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.4,
+      "position": [
+        2688,
+        0
+      ],
+      "parameters": {
+        "mode": "once",
+        "workflowId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "wNJftLMoaebNjtKI",
+          "cachedResultName": "bot-translate"
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      }
+    },
+    {
+      "id": "016af168-4f73-429f-98db-5e300f1e49ca",
+      "name": "Final Change",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2912,
+        80
+      ],
+      "parameters": {
+        "jsCode": "\nconst c = $('Build Change').last().json;\nconst p = $('Allowed').first().json;\nlet note = null;\nif (c.note_src) {\n  const t = $('Translate Note').last().json.tr;\n  note = { he: t.he.note, ru: t.ru.note, en: t.en.note };\n}\nconst ch = c.change;\nconst id = `${ch.from}-${ch.schedule}-${ch.type}-${Math.random().toString(36).slice(2, 6)}`;\nconst file = { id, schedule: ch.schedule, type: ch.type, from: ch.from, to: ch.to,\n  ...(ch.session ? { session: ch.session } : {}), ...(ch.new ? { new: ch.new } : {}), ...(note ? { note } : {}),\n  author: c.author, created: new Date().toISOString() };\nconst TYPE_RU = { cancel: 'Отмена', move: 'Перенос', extra: 'Дополнительная тренировка', note: 'Объявление' };\nconst s = $('Sessions').last().json;\nconst sessLabel = ch.session ? (s.sessions.find(x => x.day === ch.session.day && x.start === ch.session.start)?.label || '') : '';\nconst preview = [\n  `${TYPE_RU[ch.type]} · ${ch.schedule}`, `На сайте: ${ch.from}${ch.to !== ch.from ? ' … ' + ch.to : ''}, потом расписание вернётся к обычному.`,\n  sessLabel ? `Тренировка: ${sessLabel}` : '',\n  ch.new ? `Новое: ${ch.new.date} ${ch.new.start}–${ch.new.end}, ${s.venues[ch.new.venue]?.ru || ch.new.venue}` : '',\n  note ? `\\nHE: ${note.he}\\nRU: ${note.ru}\\nEN: ${note.en}` : '',\n  ...(c.note_src && $('Translate Note').last().json.warnings.length ? ['Проверьте: ' + $('Translate Note').last().json.warnings.join('; ')] : []),\n].filter(Boolean).join('\\n');\nreturn [{ json: { file, preview, chat_id: p.chat_id,\n  commit: { files: [{ path: `content/schedule-changes/${id}.json`, content: JSON.stringify(file, null, 1) + '\\n' }],\n    message: `Schedule: ${ch.type} ${ch.schedule} ${ch.from}${ch.to !== ch.from ? '..' + ch.to : ''}\\n\\nBy ${c.author} via telegram`,\n    live_url: `${p.cfg.site}/schedule-changes.json`, live_match: `\"${id}\"` } } }];\n"
+      }
+    },
+    {
+      "id": "104db16d-c301-4130-8890-b4829bf6424d",
+      "name": "Preview",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        3136,
+        80
+      ],
+      "parameters": {
+        "resource": "message",
+        "operation": "sendAndWait",
+        "chatId": "={{ $json.chat_id }}",
+        "message": "={{ $json.preview }}",
+        "responseType": "approval",
+        "approvalOptions": {
+          "values": {
+            "approvalType": "double",
+            "approveLabel": "✓ Сохранить",
+            "disapproveLabel": "✏️ Исправить"
+          }
+        },
+        "chatApproval": true,
+        "approverIds": "={{ $('Allowed').first().json.telegram_id }}",
+        "postDecisionBehavior": "removeButtons",
+        "options": {
+          "limitWaitTime": {
+            "values": {
+              "limitType": "afterTimeInterval",
+              "resumeAmount": 1,
+              "resumeUnit": "days"
+            }
+          },
+          "appendAttribution": false
+        }
+      },
+      "webhookId": "622dbdb6-5e30-463a-a868-fefbc83badae",
+      "credentials": {
+        "telegramApi": {
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "id": "05277808-403a-4b5c-8cfe-10e696b8bd20",
+      "name": "Save?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        3360,
+        128
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.data?.approved === true }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      }
+    },
+    {
+      "id": "dc43f1fc-2ee6-4e4a-9e3f-3d2b888e7db6",
+      "name": "Commit Input",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3584,
+        128
+      ],
+      "parameters": {
+        "jsCode": "\nreturn [{ json: $('Final Change').last().json.commit }];\n"
+      }
+    },
+    {
+      "id": "51e72b16-805d-4d8d-a56b-f895b47e1239",
+      "name": "Commit Change",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.4,
+      "position": [
+        3808,
+        128
+      ],
+      "parameters": {
+        "mode": "once",
+        "workflowId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "WioJt6Ls1FOcaET1",
+          "cachedResultName": "bot-git-commit"
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      }
+    },
+    {
+      "id": "4818e289-3da1-4d94-b783-ab32a6e5b034",
+      "name": "Saved Message",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4032,
+        128
+      ],
+      "parameters": {
+        "jsCode": "\nconst f = $('Final Change').first().json;\nconst r = $input.first().json;\nconst text = r.live\n  ? `Изменение на сайте (${f.file.from}${f.file.to !== f.file.from ? ' … ' + f.file.to : ''}). После этих дат расписание вернётся само.`\n  : `Изменение сохранено (коммит ${String(r.sha).slice(0, 7)}), но на сайте пока не видно. Проверьте через несколько минут.`;\nreturn [{ json: { chat_id: f.chat_id, text, notify_admin: !r.live } }];\n"
+      }
+    },
+    {
+      "id": "29969ca7-6ef5-4efc-af9a-af7aa0b4b6ba",
+      "name": "Audit",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        4256,
+        224
+      ],
+      "parameters": {
+        "resource": "row",
+        "operation": "insert",
+        "dataTableId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "JefIWDs5Xw3sqWY8",
+          "cachedResultName": "audit_log"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "matchingColumns": [],
+          "value": {
+            "ts": "={{ $now.toISO() }}",
+            "actor_id": "={{ $('Allowed').first().json.coach_id }}",
+            "channel": "telegram",
+            "action": "schedule_change",
+            "target": "={{ $('Final Change').first().json.file.id }}",
+            "result": "={{ $('Commit Change').first().json.live ? 'live' : 'committed' }}",
+            "detail": "={{ $('Commit Change').first().json.sha }}",
+            "execution_id": "={{ $execution.id }}"
+          },
+          "schema": [
+            {
+              "id": "ts",
+              "displayName": "ts",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "actor_id",
+              "displayName": "actor_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "channel",
+              "displayName": "channel",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "action",
+              "displayName": "action",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "target",
+              "displayName": "target",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "result",
+              "displayName": "result",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "detail",
+              "displayName": "detail",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "execution_id",
+              "displayName": "execution_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "ee88193a-943f-4189-8d8a-95b72e988407",
+      "name": "Ask Announce",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        4256,
+        464
+      ],
+      "parameters": {
+        "resource": "message",
+        "operation": "sendAndWait",
+        "chatId": "={{ $('Allowed').first().json.chat_id }}",
+        "message": "Объявить об этом как новость (сайт, Facebook, Instagram, Telegram-канал)? Сначала придёт предпросмотр на трёх языках.",
+        "responseType": "approval",
+        "approvalOptions": {
+          "values": {
+            "approvalType": "double",
+            "approveLabel": "📣 Объявить",
+            "disapproveLabel": "Не надо"
+          }
+        },
+        "chatApproval": true,
+        "approverIds": "={{ $('Allowed').first().json.telegram_id }}",
+        "postDecisionBehavior": "showOutcome",
+        "options": {
+          "limitWaitTime": {
+            "values": {
+              "limitType": "afterTimeInterval",
+              "resumeAmount": 1,
+              "resumeUnit": "days"
+            }
+          },
+          "appendAttribution": false
+        }
+      },
+      "webhookId": "9b9fe855-b3dd-4bb1-a6cb-8225ef2f60a6",
+      "credentials": {
+        "telegramApi": {
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "id": "7ccbc687-478b-4641-888e-bebed39f51d3",
+      "name": "Announce?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        4480,
+        464
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.data?.approved === true }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      }
+    },
+    {
+      "id": "7d6cba66-e69e-4205-9218-be81c05dff41",
+      "name": "Get Cover",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        4704,
+        464
+      ],
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $('Allowed').first().json.cfg.site }}/og/{{ ['he','ru','en'].includes($('Allowed').first().json.lang) ? $('Allowed').first().json.lang : 'ru' }}.jpg",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "5de6a30f-c037-41d0-9e57-3b84d254e1f3",
+      "name": "News Item",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4928,
+        464
+      ],
+      "parameters": {
+        "jsCode": "\n// news-publish takes the post in one language and does translation, preview, commit and social posting itself.\nconst f = $('Final Change').first().json.file;\nconst p = $('Allowed').first().json;\nconst s = $('Sessions').last().json;\nconst lang = f.note ? ($('Translate Note').last().json.src_lang || 'ru') : (['he', 'ru', 'en'].includes(p.lang) ? p.lang : 'ru');\nconst fmt = d => d.split('-').reverse().slice(0, 2).join('.');\nconst span = f.to !== f.from ? `${fmt(f.from)}–${fmt(f.to)}` : fmt(f.from);\nconst sess = f.session ? `${s.sessions.find(x => x.day === f.session.day && x.start === f.session.start)?.label.replace(/^\\d+\\.\\s*/, '') || ''}` : '';\nconst T = {\n  ru: { cancel: `Отмена тренировки ${span}`, move: `Перенос тренировки ${span}`, extra: `Дополнительная тренировка ${span}`, note: `Расписание: ${span}` },\n  he: { cancel: `ביטול אימון ${span}`, move: `שינוי מועד אימון ${span}`, extra: `אימון נוסף ${span}`, note: `מערכת אימונים: ${span}` },\n  en: { cancel: `Training cancelled ${span}`, move: `Training moved ${span}`, extra: `Extra training ${span}`, note: `Schedule update ${span}` },\n};\nconst moved = f.new ? `${fmt(f.new.date)} ${f.new.start}–${f.new.end}, ${s.venues[f.new.venue]?.[lang] || f.new.venue}` : '';\nconst body = [f.note?.[lang], sess, moved].filter(Boolean).join('\\n\\n');\nreturn [{ json: {\n  channel: 'telegram', chat_id: p.chat_id, email: '', author_id: p.coach_id, author_name: p.name,\n  src_lang: lang, title: T[lang][f.type], body: body.length >= 20 ? body : `${body}\\n\\n${p.cfg.site}/${lang}/`.trim(),\n  cover_alt: '', tags: ['schedule'], draft_id: `sched-${f.id}`,\n}, binary: $input.first().binary }];\n"
+      }
+    },
+    {
+      "id": "948b04fd-1f62-4ec1-a7c3-924416ebfc45",
+      "name": "Start News Publish",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.4,
+      "position": [
+        5152,
+        464
+      ],
+      "parameters": {
+        "mode": "once",
+        "workflowId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "lCObmj9hNku4t4NJ",
+          "cachedResultName": "news-publish"
+        },
+        "options": {
+          "waitForSubWorkflow": false
+        }
+      }
+    },
+    {
+      "id": "cf7c5ea2-1f89-4bfd-bdec-a36ec3c4f4e5",
+      "name": "Sticky Note 559214fb",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        416,
+        96
+      ],
+      "parameters": {
+        "content": "## schedule-change\nCalled by news-telegram-intake on /schedule. Admin: any schedule; publisher: only content/schedule/<own coach_id>.json.\nForm A (schedule, type) → Form B (session, dates, text) → validate → translate → preview → `content/schedule-changes/<id>.json` via bot-git-commit → wait for schedule-changes.json → optional announcement through news-publish.",
+        "color": 7,
+        "width": 832,
+        "height": 320
+      }
+    }
+  ],
+  "connections": {
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "List Schedules",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "List Schedules": {
+      "main": [
+        [
+          {
+            "node": "Allowed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Allowed": {
+      "main": [
+        [
+          {
+            "node": "Any Schedule?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Any Schedule?": {
+      "main": [
+        [
+          {
+            "node": "Get Venues",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Denied Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Venues": {
+      "main": [
+        [
+          {
+            "node": "Form A",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Denied Message": {
+      "main": [
+        [
+          {
+            "node": "Notify",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Form A": {
+      "main": [
+        [
+          {
+            "node": "Get Schedule",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Schedule": {
+      "main": [
+        [
+          {
+            "node": "Sessions",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sessions": {
+      "main": [
+        [
+          {
+            "node": "Form B",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Form B": {
+      "main": [
+        [
+          {
+            "node": "Build Change",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Change": {
+      "main": [
+        [
+          {
+            "node": "Valid?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Valid?": {
+      "main": [
+        [
+          {
+            "node": "Has Note?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Form B",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has Note?": {
+      "main": [
+        [
+          {
+            "node": "Translate Note",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Final Change",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Translate Note": {
+      "main": [
+        [
+          {
+            "node": "Final Change",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Final Change": {
+      "main": [
+        [
+          {
+            "node": "Preview",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preview": {
+      "main": [
+        [
+          {
+            "node": "Save?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save?": {
+      "main": [
+        [
+          {
+            "node": "Commit Input",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Form B",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Commit Input": {
+      "main": [
+        [
+          {
+            "node": "Commit Change",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Commit Change": {
+      "main": [
+        [
+          {
+            "node": "Saved Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Saved Message": {
+      "main": [
+        [
+          {
+            "node": "Notify",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Audit",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Ask Announce",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ask Announce": {
+      "main": [
+        [
+          {
+            "node": "Announce?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Announce?": {
+      "main": [
+        [
+          {
+            "node": "Get Cover",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Cover": {
+      "main": [
+        [
+          {
+            "node": "News Item",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "News Item": {
+      "main": [
+        [
+          {
+            "node": "Start News Publish",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "nodeGroups": [],
+  "tags": [],
+  "active": false,
+  "pinData": {}
+}
