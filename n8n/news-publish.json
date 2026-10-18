@@ -1,1350 +1,16 @@
 {
+  "id": "lCObmj9hNku4t4NJ",
   "name": "news-publish",
   "nodes": [
     {
-      "parameters": {
-        "inputSource": "passthrough"
-      },
-      "id": "107c3449-7688-5f4c-909a-188bf7e26591",
-      "name": "Start",
-      "type": "n8n-nodes-base.executeWorkflowTrigger",
-      "typeVersion": 1.1,
-      "position": [
-        0,
-        300
-      ],
-      "_note": "\"Accept all data\" input mode. https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.executeworkflowtrigger/"
-    },
-    {
-      "parameters": {
-        "jsCode": "\n// Owner-editable settings. Items pass through unchanged.\nconst cfg = {\n  repo: 'Unifight-haifa/unifight',\n  branch: 'main',\n  news_dir: 'src/content/news',\n  site: 'https://unifight-haifa.github.io/unifight',\n  news_json: 'https://unifight-haifa.github.io/unifight/news.json',\n  fb_page_id: 'REPLACE_PAGE_ID',\n  ig_user_id: 'REPLACE_IG_USER_ID',\n  social_langs: ['he', 'ru'],\n  max_posts_per_day: 5,\n  max_revisions: 3,\n  deploy_checks: 16,\n};\nreturn $input.all().map(it => ({ json: { ...it.json, cfg }, binary: it.binary }));\n"
-      },
-      "id": "7328a76d-fa43-5778-8a05-44e86ee70644",
-      "name": "Config",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        200,
-        300
-      ]
-    },
-    {
-      "parameters": {
-        "jsCode": "\n// EXIF orientation -> rotation, so pixels stay upright after metadata is stripped.\nfunction orientation(b) {\n  if (b[0] !== 0xFF || b[1] !== 0xD8) return 1;\n  let i = 2;\n  while (i + 4 < b.length && b[i] === 0xFF) {\n    const marker = b[i + 1], len = b.readUInt16BE(i + 2);\n    if (marker === 0xDA) break;\n    if (marker === 0xE1 && b.toString('latin1', i + 4, i + 10) === 'Exif\\0\\0') {\n      const t = i + 10, le = b.toString('latin1', t, t + 2) === 'II';\n      const u16 = o => le ? b.readUInt16LE(o) : b.readUInt16BE(o);\n      const u32 = o => le ? b.readUInt32LE(o) : b.readUInt32BE(o);\n      const ifd = t + u32(t + 4);\n      for (let k = 0, n = u16(ifd); k < n; k++) {\n        const e = ifd + 2 + k * 12;\n        if (u16(e) === 0x0112) return u16(e + 8);\n      }\n      return 1;\n    }\n    i += 2 + len;\n  }\n  return 1;\n}\nconst out = [];\nfor (let i = 0; i < $input.all().length; i++) {\n  const it = $input.all()[i];\n  const buf = await this.helpers.getBinaryDataBuffer(i, 'data');\n  const rotate = { 3: 180, 6: 90, 8: 270 }[orientation(buf)] || 0;\n  out.push({ json: { ...it.json, rotate }, binary: it.binary });\n}\nreturn out;\n"
-      },
-      "id": "2d804053-125f-5721-934c-59dc934ca103",
-      "name": "Read Orientation",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        400,
-        300
-      ]
-    },
-    {
-      "parameters": {
-        "operation": "multiStep",
-        "operations": {
-          "operations": [
-            {
-              "operation": "rotate",
-              "rotate": "={{ $json.rotate }}",
-              "backgroundColor": "#ffffff"
-            },
-            {
-              "operation": "resize",
-              "width": 1600,
-              "height": 1600,
-              "resizeOption": "onlyIfLarger"
-            }
-          ]
-        },
-        "options": {
-          "format": "jpeg",
-          "quality": 85
-        }
-      },
-      "id": "35c5c69f-8e2e-53d8-8e89-cea853722f57",
-      "name": "Resize",
-      "type": "n8n-nodes-base.editImage",
-      "typeVersion": 1,
-      "position": [
-        600,
-        300
-      ],
-      "_note": "Multi Step / Resize \"Only if Larger\" / jpeg output are documented; rotate field names and the quality option are not. Needs GraphicsMagick (present in n8n Docker images; Cloud not stated). https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.editimage/"
-    },
-    {
-      "parameters": {
-        "jsCode": "\n// Drop EXIF/XMP/IPTC/comment segments (GPS lives there), keep JFIF and ICC; one item with base64 files.\nfunction segments(b) {\n  if (b[0] !== 0xFF || b[1] !== 0xD8) throw new Error('Resized image is not a JPEG');\n  const segs = []; let i = 2;\n  while (i + 4 <= b.length) {\n    while (b[i] === 0xFF && b[i + 1] === 0xFF) i++;\n    if (b[i] !== 0xFF) throw new Error('Broken JPEG segment');\n    const m = b[i + 1];\n    if (m === 0xDA) { segs.push({ m, s: i, e: b.length }); break; }\n    const e = i + 2 + b.readUInt16BE(i + 2);\n    segs.push({ m, s: i, e }); i = e;\n  }\n  return segs;\n}\nconst META = (m) => m === 0xE1 || m === 0xED || m === 0xFE || (m >= 0xE3 && m <= 0xEF);\nfunction strip(b) {\n  const keep = segments(b).filter(x => !META(x.m)).map(x => b.subarray(x.s, x.e));\n  const out = Buffer.concat([b.subarray(0, 2), ...keep]);\n  if (segments(out).some(x => META(x.m))) throw new Error('Metadata still present after strip');\n  return out;\n}\nconst items = $input.all();\nconst files = [];\nfor (let i = 0; i < items.length; i++) {\n  const buf = strip(await this.helpers.getBinaryDataBuffer(i, 'data'));\n  files.push({ path: i === 0 ? 'cover.jpg' : `photo-${i + 1}.jpg`, b64: buf.toString('base64'), bytes: buf.length });\n}\nconst { cfg, rotate, index, ...meta } = items[0].json;\nreturn [{ json: { ...meta, files } }];\n"
-      },
-      "id": "a08a7653-0f6b-508e-95f5-d8074fc2f513",
-      "name": "Pack Images",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        800,
-        300
-      ]
-    },
-    {
-      "parameters": {
-        "resource": "row",
-        "operation": "get",
-        "dataTableId": {
-          "__rl": true,
-          "mode": "list",
-          "value": "",
-          "cachedResultName": "publishers"
-        },
-        "filters": {
-          "conditions": [
-            {
-              "keyName": "coach_id",
-              "condition": "eq",
-              "keyValue": "={{ $json.author_id }}"
-            }
-          ]
-        },
-        "limit": 1
-      },
-      "id": "aa6b05b3-8c22-5d3d-9f14-f165ac30e2b8",
-      "name": "Get Publisher",
-      "type": "n8n-nodes-base.dataTable",
-      "typeVersion": 1,
-      "position": [
-        1000,
-        300
-      ],
-      "alwaysOutputData": true,
-      "_note": "Data Table node params (filters/columns/operation names) written from docs operation list, not from an export; re-select the table after import. https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.datatable/"
-    },
-    {
-      "parameters": {
-        "method": "GET",
-        "url": "=https://api.github.com/repos/{{ $('Config').first().json.cfg.repo }}/contents/content/coaches/{{ $('Pack Images').first().json.author_id }}.json?ref={{ $('Config').first().json.cfg.branch }}",
-        "authentication": "predefinedCredentialType",
-        "nodeCredentialType": "githubApi",
-        "sendHeaders": true,
-        "headerParameters": {
-          "parameters": [
-            {
-              "name": "Accept",
-              "value": "application/vnd.github+json"
-            },
-            {
-              "name": "X-GitHub-Api-Version",
-              "value": "2026-03-10"
-            }
-          ]
-        },
-        "options": {
-          "response": {
-            "response": {
-              "neverError": true,
-              "fullResponse": true
-            }
-          }
-        }
-      },
-      "id": "63fd1f8d-1399-5a43-a219-a93550d8558a",
-      "name": "Check Author",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
-      "position": [
-        1100,
-        460
-      ],
-      "credentials": {
-        "githubApi": {
-          "id": "REPLACE_ME",
-          "name": "GitHub unifight contents"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "jsCode": "\nconst pub = $('Get Publisher').first().json;\nconst d = $('Pack Images').first().json;\nconst cfg = $('Config').first().json.cfg;\n// Build fails on an unknown author, so refuse before translating.\nconst authorOk = $input.first().json.statusCode === 200;\nconst today = new Date().toLocaleDateString('sv-SE', { timeZone: 'Asia/Jerusalem' });\nconst count = pub.posts_day === today ? Number(pub.posts_count || 0) : 0;\nconst ok = authorOk && count < cfg.max_posts_per_day;\nreturn [{ json: {\n  ok, today, posts_count: count,\n  src_lang: d.src_lang, title: d.title, body: d.body, cover_alt: d.cover_alt,\n  corrections: '', previous: null, revision: 0,\n  channel: d.channel, chat_id: d.chat_id, email: d.email,\n  notify_admin: !authorOk,\n  notify: ok ? '' : !authorOk ? `Тренер «${d.author_id}» не найден в content/coaches на сайте, новость не принята. Администратор получил сообщение.`\n    : `Лимит: не больше ${cfg.max_posts_per_day} новостей в день. Попробуйте завтра.`,\n  audit: { actor_id: d.author_id, action: authorOk ? 'rate_limited' : 'unknown_author', target: d.draft_id, result: 'denied', detail: String(count) },\n} }];\n"
-      },
-      "id": "45ba856c-4341-5d16-9ad9-d22d0157c428",
-      "name": "Rate Check",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        1200,
-        300
-      ]
-    },
-    {
-      "parameters": {
-        "conditions": {
-          "options": {
-            "caseSensitive": true,
-            "leftValue": "",
-            "typeValidation": "loose",
-            "version": 2
-          },
-          "conditions": [
-            {
-              "id": "9646abd9-e334-5ca7-b61b-f5ff209cd80c",
-              "leftValue": "={{ $json.ok }}",
-              "rightValue": "",
-              "operator": {
-                "type": "boolean",
-                "operation": "true",
-                "singleValue": true
-              }
-            }
-          ],
-          "combinator": "and"
-        },
-        "options": {}
-      },
-      "id": "66404313-ed33-561a-adf5-a09ad22d3f0b",
-      "name": "Rate OK?",
-      "type": "n8n-nodes-base.if",
-      "typeVersion": 2.2,
-      "position": [
-        1400,
-        300
-      ]
-    },
-    {
-      "parameters": {
-        "resource": "text",
-        "operation": "message",
-        "modelId": {
-          "__rl": true,
-          "mode": "id",
-          "value": "claude-sonnet-5-5"
-        },
-        "messages": {
-          "values": [
-            {
-              "content": "={{ JSON.stringify({ source_lang: $json.src_lang, title: $json.title, body: $json.body, cover_hint: $json.cover_alt || undefined, corrections: $json.corrections || undefined, previous: $json.previous || undefined }) }}"
-            }
-          ]
-        },
-        "options": {
-          "system": "You translate news posts for Unifight Haifa, a judo club in Haifa, Israel. Languages: Hebrew (he), Russian (ru), English (en). The input JSON gives source_lang, title, body (Markdown) and optional cover_hint, corrections and previous.\n\nRules:\n1. Translate faithfully. Do not add, drop, soften or embellish facts. Tone: a club announcement for parents and athletes.\n2. Copy exactly, character for character where the script allows: people's names (transliterate consistently; in the source language keep the author's spelling), places, club names, dates, times, all numbers, scores, ages, places taken (1st, 2nd...), belt grades and weight categories such as -60 kg or +100 kg. Never convert units, round or reformat numbers.\n3. Mandatory glossary: נבחרת המועדון = «сборная клуба (нивхерет)» = \"selected team (nivheret)\". At this club the word נבחרת on its own means this club squad. Never translate it as \"national team\", «сборная Израиля» or «национальная сборная». Only נבחרת ישראל (explicitly Israel) is the national team.\n4. Keep the Markdown structure of the source: paragraphs, lists, bold. No headings unless the source has them.\n5. For every language return: title (max 90 characters), summary (one sentence, max 160 characters, no emoji), body (Markdown), cover_alt (one short phrase describing the cover photo from context; never name children).\n6. In the source language keep title and body exactly as given, unless corrections ask to change them.\n7. slug: 2 to 6 lowercase English words joined by hyphens, only a-z, 0-9 and hyphens.\n8. If corrections are present, start from previous, apply exactly the author's corrections and change nothing else.\n\nReply with one JSON object and nothing else:\n{\"slug\": \"...\", \"he\": {\"title\": \"\", \"summary\": \"\", \"body\": \"\", \"cover_alt\": \"\"}, \"ru\": {...}, \"en\": {...}}",
-          "maxTokens": 8000,
-          "temperature": 0.2
-        }
-      },
-      "id": "53f66a05-4b94-5871-9121-7a1fad09c500",
-      "name": "Translate",
-      "type": "@n8n/n8n-nodes-langchain.anthropic",
-      "typeVersion": 1,
-      "position": [
-        1600,
-        300
-      ],
-      "credentials": {
-        "anthropicApi": {
-          "id": "REPLACE_ME",
-          "name": "Anthropic club key"
-        }
-      },
-      "retryOnFail": true,
-      "maxTries": 3,
-      "waitBetweenTries": 5000,
-      "_note": "Anthropic node: docs list Text > Message a Model but not its parameter names; check model/system/maxTokens fields after import. https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-langchain.anthropic/"
-    },
-    {
-      "parameters": {
-        "jsCode": "\n// Validate the translation and flag what the author must check.\nlet st; try { st = $('Decision').last().json; } catch (e) { st = null; }\nif (!st || st.decision !== 'edit') st = $('Rate Check').first().json;\nconst d = $('Pack Images').first().json;\nconst r = $input.first().json;\nconst raw = typeof r.content === 'string' ? r.content\n  : (r.content?.[0]?.text ?? r.text ?? r.output ?? r.message?.content ?? JSON.stringify(r));\nconst m = String(raw).match(/\\{[\\s\\S]*\\}/);\nif (!m) throw new Error('Translation reply is not JSON');\nconst t = JSON.parse(m[0]);\nconst L = ['he', 'ru', 'en'];\nfor (const l of L) {\n  for (const k of ['title', 'summary', 'body']) {\n    if (!t[l] || typeof t[l][k] !== 'string' || !t[l][k].trim()) throw new Error(`Translation missing ${l}.${k}`);\n  }\n  if (t[l].summary.length > 160) t[l].summary = t[l].summary.slice(0, 157).replace(/\\s+\\S*$/, '') + '…';\n  t[l].cover_alt = (t[l].cover_alt || d.cover_alt || t[l].title).slice(0, 200);\n}\nif (!st.corrections) { t[d.src_lang].title = d.title; t[d.src_lang].body = d.body; }\nconst warnings = [];\nconst src = t[d.src_lang].title + ' ' + t[d.src_lang].body;\nconst nums = [...new Set(src.match(/\\d+(?:[.,:]\\d+)*/g) || [])];\nfor (const l of L) {\n  const txt = t[l].title + ' ' + t[l].body;\n  const miss = nums.filter(n => !txt.includes(n));\n  if (miss.length) warnings.push(`${l.toUpperCase()}: нет чисел ${miss.join(', ')}`);\n}\nif (/נבחרת|нивхерет|nivheret/i.test(src) && !/ישראל|Израил|Israel/i.test(src)) {\n  if (!/נבחרת/.test(t.he.body + t.he.title)) warnings.push('HE: нет слова «נבחרת»');\n  if (!/нивхерет/i.test(t.ru.body + t.ru.title)) warnings.push('RU: нет «сборная клуба (нивхерет)»');\n  if (!/nivheret/i.test(t.en.body + t.en.title)) warnings.push('EN: нет \"selected team (nivheret)\"');\n  if (/national team/i.test(t.en.body + t.en.title) || /сборн\\S* (Израиля|страны)|национальн\\S* сборн/i.test(t.ru.body + t.ru.title)) {\n    warnings.push('Нивхерет переведена как национальная сборная — исправьте');\n  }\n}\nlet slug = String(t.slug || '').toLowerCase().replace(/[^a-z0-9-]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 60);\nif (slug.length < 3) slug = 'news';\nconst date = new Date().toLocaleDateString('sv-SE', { timeZone: 'Asia/Jerusalem' });\nreturn [{ json: {\n  tr: { he: t.he, ru: t.ru, en: t.en }, slug, date, folder: `${date}-${slug}`, warnings,\n  revision: st.revision || 0, channel: d.channel, chat_id: d.chat_id, email: d.email,\n  draft: { draft_id: d.draft_id, folder: '', author_id: d.author_id, channel: d.channel, status: 'preview',\n           title_en: t.en.title, commit_sha: '', fb_post_id: '', ig_media_id: '', error: '' },\n} }];\n"
-      },
-      "id": "f9cb7afc-5ec3-532d-9e9b-c2fc21d7e0d0",
-      "name": "Parse Translation",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        1800,
-        300
-      ],
-      "_note": "Relies on $(\"Node\").last() returning the latest run inside the Edit loop; verify on a test run."
-    },
-    {
-      "parameters": {
-        "rules": {
-          "values": [
-            {
-              "conditions": {
-                "options": {
-                  "caseSensitive": true,
-                  "leftValue": "",
-                  "typeValidation": "loose",
-                  "version": 2
-                },
-                "conditions": [
-                  {
-                    "id": "9a59b6c0-c015-5624-8cb9-aaa08d839772",
-                    "leftValue": "={{ $json.channel }}",
-                    "rightValue": "telegram",
-                    "operator": {
-                      "type": "string",
-                      "operation": "equals"
-                    }
-                  }
-                ],
-                "combinator": "and"
-              },
-              "renameOutput": true,
-              "outputKey": "telegram"
-            },
-            {
-              "conditions": {
-                "options": {
-                  "caseSensitive": true,
-                  "leftValue": "",
-                  "typeValidation": "loose",
-                  "version": 2
-                },
-                "conditions": [
-                  {
-                    "id": "dfcb4e51-7ff0-52da-969a-9e2d1a318f44",
-                    "leftValue": "={{ $json.channel }}",
-                    "rightValue": "email",
-                    "operator": {
-                      "type": "string",
-                      "operation": "equals"
-                    }
-                  }
-                ],
-                "combinator": "and"
-              },
-              "renameOutput": true,
-              "outputKey": "email"
-            }
-          ]
-        },
-        "options": {}
-      },
-      "id": "df285576-28ef-5661-8a27-bf56ca1a2a02",
-      "name": "By Channel",
+      "id": "e7c4bdfd-2cdd-49dd-8aa3-65a341d1e022",
+      "name": "Notify",
       "type": "n8n-nodes-base.switch",
       "typeVersion": 3.2,
-      "position": [
-        2000,
-        300
-      ]
-    },
-    {
-      "parameters": {
-        "jsCode": "\n// One Telegram message per language (4096-char limit per message).\nconst p = $('Parse Translation').last().json;\nconst esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');\nreturn ['he', 'ru', 'en'].map(l => ({ json: {\n  chat_id: p.chat_id,\n  text: `<b>${l.toUpperCase()}</b>\\n<b>${esc(p.tr[l].title)}</b>\\n<i>${esc(p.tr[l].summary)}</i>\\n\\n${esc(p.tr[l].body)}`.slice(0, 4000),\n} }));\n"
-      },
-      "id": "7431755c-7993-581a-8b54-c14c96cc35d8",
-      "name": "Preview Items",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        2200,
-        200
-      ]
-    },
-    {
-      "parameters": {
-        "chatId": "={{ $json.chat_id }}",
-        "text": "={{ $json.text }}",
-        "additionalFields": {
-          "appendAttribution": false,
-          "disable_web_page_preview": true,
-          "parse_mode": "HTML"
-        }
-      },
-      "id": "96bed267-f66e-5627-8eea-b83a18534d95",
-      "name": "Send Preview",
-      "type": "n8n-nodes-base.telegram",
-      "typeVersion": 1.2,
-      "position": [
-        2400,
-        200
-      ],
-      "credentials": {
-        "telegramApi": {
-          "id": "REPLACE_ME",
-          "name": "Unifight News Bot"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "operation": "sendAndWait",
-        "chatId": "={{ $('Parse Translation').last().json.chat_id }}",
-        "message": "={{ 'Проверьте текст на трёх языках выше и выберите: опубликовать, исправить (опишите правки) или отменить.' + ($('Parse Translation').last().json.warnings.length ? '\\n\\nПроверьте: ' + $('Parse Translation').last().json.warnings.join('; ') : '') }}",
-        "responseType": "customForm",
-        "formFields": {
-          "values": [
-            {
-              "fieldLabel": "Решение",
-              "fieldType": "radio",
-              "requiredField": true,
-              "fieldOptions": {
-                "values": [
-                  {
-                    "option": "Опубликовать"
-                  },
-                  {
-                    "option": "Исправить"
-                  },
-                  {
-                    "option": "Отменить"
-                  }
-                ]
-              }
-            },
-            {
-              "fieldLabel": "Правки",
-              "fieldType": "textarea",
-              "placeholder": "Например: в русском тексте заменить «турнир» на «первенство»"
-            }
-          ]
-        },
-        "options": {
-          "limitWaitTime": {
-            "values": {
-              "limitType": "afterTimeInterval",
-              "resumeAmount": 48,
-              "resumeUnit": "hours"
-            }
-          },
-          "appendAttribution": false,
-          "messageButtonLabel": "Ответить"
-        }
-      },
-      "id": "53695bb3-138a-5a04-b488-7ac51f94ab79",
-      "name": "Ask Telegram",
-      "type": "n8n-nodes-base.telegram",
-      "typeVersion": 1.2,
-      "position": [
-        2600,
-        200
-      ],
-      "credentials": {
-        "telegramApi": {
-          "id": "REPLACE_ME",
-          "name": "Unifight News Bot"
-        }
-      },
-      "executeOnce": true,
-      "_note": "Send and Wait for Response: operation/field names inferred; docs confirm Response Type Custom Form + Limit Wait Time. https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-base.telegram/message-operations/"
-    },
-    {
-      "parameters": {
-        "operation": "sendAndWait",
-        "fromEmail": "REPLACE_news@club-domain",
-        "sendTo": "={{ $('Parse Translation').last().json.email }}",
-        "subject": "={{ 'Предпросмотр новости: ' + $('Parse Translation').last().json.tr.ru.title }}",
-        "message": "={{ (() => { const p = $('Parse Translation').last().json; const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); return (p.warnings.length ? '<p><b>Проверьте:</b> ' + esc(p.warnings.join('; ')) + '</p>' : '') + ['he','ru','en'].map(l => '<div dir=\"' + (l === 'he' ? 'rtl' : 'ltr') + '\"><h3>' + esc(p.tr[l].title) + '</h3><p><i>' + esc(p.tr[l].summary) + '</i></p><pre style=\"white-space:pre-wrap;font-family:inherit\">' + esc(p.tr[l].body) + '</pre></div><hr>').join(''); })() }}",
-        "responseType": "customForm",
-        "formFields": {
-          "values": [
-            {
-              "fieldLabel": "Решение",
-              "fieldType": "radio",
-              "requiredField": true,
-              "fieldOptions": {
-                "values": [
-                  {
-                    "option": "Опубликовать"
-                  },
-                  {
-                    "option": "Исправить"
-                  },
-                  {
-                    "option": "Отменить"
-                  }
-                ]
-              }
-            },
-            {
-              "fieldLabel": "Правки",
-              "fieldType": "textarea",
-              "placeholder": "Например: в русском тексте заменить «турнир» на «первенство»"
-            }
-          ]
-        },
-        "options": {
-          "limitWaitTime": {
-            "values": {
-              "limitType": "afterTimeInterval",
-              "resumeAmount": 48,
-              "resumeUnit": "hours"
-            }
-          },
-          "appendAttribution": false,
-          "messageButtonLabel": "Ответить"
-        }
-      },
-      "id": "1762e15f-5862-500d-a486-7c4708012c2f",
-      "name": "Ask Email",
-      "type": "n8n-nodes-base.emailSend",
-      "typeVersion": 2.1,
-      "position": [
-        2400,
-        420
-      ],
-      "credentials": {
-        "smtp": {
-          "id": "REPLACE_ME",
-          "name": "Club SMTP"
-        }
-      },
-      "_note": "Send Email > Send and Wait for Response with Custom Form is documented; param keys (sendTo, message, formFields) unverified. https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.sendemail/"
-    },
-    {
-      "parameters": {
-        "jsCode": "\n// Map the form answer; a timeout or anything unclear counts as cancel.\nconst r = $input.first().json;\nconst d = r.data ?? r;\nconst pick = String(d['Решение'] ?? '');\nconst corrections = String(d['Правки'] ?? '').trim();\nconst p = $('Parse Translation').last().json;\nconst base = $('Rate Check').first().json;\nconst cfg = $('Config').first().json.cfg;\nlet decision = /Опубликовать/.test(pick) ? 'publish' : /Исправить/.test(pick) ? 'edit' : 'cancel';\nlet reason = decision === 'cancel' ? (pick ? 'Отменено автором.' : 'Нет ответа 48 часов, черновик отменён.') : '';\nif (decision === 'edit' && p.revision >= cfg.max_revisions) {\n  decision = 'cancel'; reason = `Больше ${cfg.max_revisions} правок — отменено. Отправьте новость заново.`;\n}\nreturn [{ json: {\n  ...base, decision, corrections, previous: p.tr, revision: p.revision + 1,\n  notify: reason,\n} }];\n"
-      },
-      "id": "51fc748d-3612-5665-a470-3ba622953a48",
-      "name": "Decision",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        2800,
-        300
-      ]
-    },
-    {
-      "parameters": {
-        "rules": {
-          "values": [
-            {
-              "conditions": {
-                "options": {
-                  "caseSensitive": true,
-                  "leftValue": "",
-                  "typeValidation": "loose",
-                  "version": 2
-                },
-                "conditions": [
-                  {
-                    "id": "f1711303-6510-55a7-b382-0faf617a9fd2",
-                    "leftValue": "={{ $json.decision }}",
-                    "rightValue": "publish",
-                    "operator": {
-                      "type": "string",
-                      "operation": "equals"
-                    }
-                  }
-                ],
-                "combinator": "and"
-              },
-              "renameOutput": true,
-              "outputKey": "publish"
-            },
-            {
-              "conditions": {
-                "options": {
-                  "caseSensitive": true,
-                  "leftValue": "",
-                  "typeValidation": "loose",
-                  "version": 2
-                },
-                "conditions": [
-                  {
-                    "id": "4a91052e-f46d-5c4c-b3ce-36098683824c",
-                    "leftValue": "={{ $json.decision }}",
-                    "rightValue": "edit",
-                    "operator": {
-                      "type": "string",
-                      "operation": "equals"
-                    }
-                  }
-                ],
-                "combinator": "and"
-              },
-              "renameOutput": true,
-              "outputKey": "edit"
-            }
-          ]
-        },
-        "options": {
-          "fallbackOutput": "extra",
-          "renameFallbackOutput": "cancel"
-        }
-      },
-      "id": "4fe857ff-a0f8-51a1-8295-9b3e21e73b32",
-      "name": "Route Decision",
-      "type": "n8n-nodes-base.switch",
-      "typeVersion": 3.2,
-      "position": [
-        3000,
-        300
-      ]
-    },
-    {
-      "parameters": {
-        "jsCode": "\nconst p = $('Parse Translation').last().json;\nconst d = $('Decision').last().json;\nreturn [{ json: {\n  channel: p.channel, chat_id: p.chat_id, email: p.email, notify: d.notify,\n  draft: { ...p.draft, status: 'cancelled' },\n  audit: { actor_id: p.draft.author_id, action: 'cancel', target: p.draft.draft_id, result: 'ok', detail: d.notify },\n} }];\n"
-      },
-      "id": "0ed3805f-e6be-567d-893b-6f87a69111b4",
-      "name": "Cancelled",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        3200,
-        560
-      ]
-    },
-    {
-      "parameters": {
-        "method": "GET",
-        "url": "=https://api.github.com/repos/{{ $('Config').first().json.cfg.repo }}/contents/{{ $('Config').first().json.cfg.news_dir }}?ref={{ $('Config').first().json.cfg.branch }}",
-        "authentication": "predefinedCredentialType",
-        "nodeCredentialType": "githubApi",
-        "sendHeaders": true,
-        "headerParameters": {
-          "parameters": [
-            {
-              "name": "Accept",
-              "value": "application/vnd.github+json"
-            },
-            {
-              "name": "X-GitHub-Api-Version",
-              "value": "2026-03-10"
-            }
-          ]
-        },
-        "options": {
-          "response": {
-            "response": {
-              "neverError": true,
-              "fullResponse": true
-            }
-          }
-        }
-      },
-      "id": "56656583-8eca-56c2-a594-e06ef96ecdf0",
-      "name": "List News",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
-      "position": [
-        3200,
-        100
-      ],
-      "credentials": {
-        "githubApi": {
-          "id": "REPLACE_ME",
-          "name": "GitHub unifight contents"
-        }
-      },
-      "_note": "HTTP Request with predefined credential type githubApi (assumed available for HTTP Request)."
-    },
-    {
-      "parameters": {
-        "jsCode": "\n// Build the post folder: three Markdown files plus images.\nconst p = $('Parse Translation').last().json;\nconst d = $('Pack Images').first().json;\nconst cfg = $('Config').first().json.cfg;\n// URL is /<lang>/news/<slug>/, so the slug (folder minus date) must be unique across all posts.\nconst res = $input.first().json;\nif (res.statusCode !== 200 && res.statusCode !== 404) throw new Error(`Listing news folder failed: ${res.statusCode}`);\nconst taken = new Set((Array.isArray(res.body) ? res.body : []).map(x => x.name.replace(/^\\d{4}-\\d{2}-\\d{2}-/, '')));\nlet slug = p.slug;\nfor (let n = 2; taken.has(slug); n++) slug = `${p.slug}-${n}`;\nconst folder = `${p.date}-${slug}`;\n// Author text can't form tags, links or images: escape \\ first, then [ ] ( (no literal \"](\" for the source check) and < >.\nconst mdText = v => String(v).replace(/\\\\/g, '\\\\\\\\').replace(/[[\\]()]/g, c => '\\\\' + c)\n  .replace(/</g, '&lt;').replace(/>/g, '&gt;');\n// Frontmatter is plain text; \\u escapes keep the value exact with no literal < > [ ] in the file.\nconst yq = v => JSON.stringify(String(v)).replace(/[<>[\\]]/g, c => '\\\\u' + c.charCodeAt(0).toString(16).padStart(4, '0'));\nconst tags = (d.tags || []).map(String);\nconst alt = p.tr.en.title.replace(/[[\\]\\\\<>()]/g, '');\nconst extra = d.files.slice(1).map(f => `\\n\\n![${alt}](${f.path})`).join('');\nconst md = ['he', 'ru', 'en'].map(l => ({\n  path: `${cfg.news_dir}/${folder}/index.${l}.md`,\n  content: ['---',\n    `title: ${yq(p.tr[l].title)}`, `summary: ${yq(p.tr[l].summary)}`, `date: ${p.date}`,\n    `author: ${yq(d.author_id)}`, 'cover: \"cover.jpg\"', `cover_alt: ${yq(p.tr[l].cover_alt)}`,\n    `tags: [${tags.map(yq).join(', ')}]`, 'draft: false', '---', '',\n  ].join('\\n') + '\\n' + mdText(p.tr[l].body.trim()) + extra + '\\n',\n}));\nreturn [{ json: { folder, slug, md, tr: p.tr, tags } }];\n"
-      },
-      "id": "7c4343b7-9b47-5645-8e96-7ae653f95663",
-      "name": "Final Files",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        3400,
-        100
-      ]
-    },
-    {
-      "parameters": {
-        "method": "GET",
-        "url": "=https://api.github.com/repos/{{ $('Config').first().json.cfg.repo }}/git/ref/heads/{{ $('Config').first().json.cfg.branch }}",
-        "authentication": "predefinedCredentialType",
-        "nodeCredentialType": "githubApi",
-        "sendHeaders": true,
-        "headerParameters": {
-          "parameters": [
-            {
-              "name": "Accept",
-              "value": "application/vnd.github+json"
-            },
-            {
-              "name": "X-GitHub-Api-Version",
-              "value": "2026-03-10"
-            }
-          ]
-        },
-        "options": {}
-      },
-      "id": "c65ab2f7-930a-5b61-b433-ef32b0b2f722",
-      "name": "Get Ref",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
-      "position": [
-        3600,
-        100
-      ],
-      "credentials": {
-        "githubApi": {
-          "id": "REPLACE_ME",
-          "name": "GitHub unifight contents"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "method": "GET",
-        "url": "=https://api.github.com/repos/{{ $('Config').first().json.cfg.repo }}/git/commits/{{ $json.object.sha }}",
-        "authentication": "predefinedCredentialType",
-        "nodeCredentialType": "githubApi",
-        "sendHeaders": true,
-        "headerParameters": {
-          "parameters": [
-            {
-              "name": "Accept",
-              "value": "application/vnd.github+json"
-            },
-            {
-              "name": "X-GitHub-Api-Version",
-              "value": "2026-03-10"
-            }
-          ]
-        },
-        "options": {}
-      },
-      "id": "be8388a7-58a6-5c2d-b990-35f267bd5e14",
-      "name": "Get Head Commit",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
-      "position": [
-        3800,
-        100
-      ],
-      "credentials": {
-        "githubApi": {
-          "id": "REPLACE_ME",
-          "name": "GitHub unifight contents"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "jsCode": "\nconst f = $('Final Files').first().json;\nconst cfg = $('Config').first().json.cfg;\nreturn $('Pack Images').first().json.files.map(x => ({ json: { path: `${cfg.news_dir}/${f.folder}/${x.path}`, b64: x.b64 } }));\n"
-      },
-      "id": "e42f7416-047f-557c-a583-9736ba36b8a7",
-      "name": "Blob Items",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        4000,
-        100
-      ]
-    },
-    {
-      "parameters": {
-        "method": "POST",
-        "url": "=https://api.github.com/repos/{{ $('Config').first().json.cfg.repo }}/git/blobs",
-        "authentication": "predefinedCredentialType",
-        "nodeCredentialType": "githubApi",
-        "sendHeaders": true,
-        "headerParameters": {
-          "parameters": [
-            {
-              "name": "Accept",
-              "value": "application/vnd.github+json"
-            },
-            {
-              "name": "X-GitHub-Api-Version",
-              "value": "2026-03-10"
-            }
-          ]
-        },
-        "options": {},
-        "sendBody": true,
-        "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({ content: $json.b64, encoding: 'base64' }) }}"
-      },
-      "id": "fb38a39c-a185-576c-a295-8f9cf8e9e533",
-      "name": "Create Blob",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
-      "position": [
-        4200,
-        100
-      ],
-      "credentials": {
-        "githubApi": {
-          "id": "REPLACE_ME",
-          "name": "GitHub unifight contents"
-        }
-      },
-      "retryOnFail": true,
-      "maxTries": 3
-    },
-    {
-      "parameters": {
-        "jsCode": "\nconst f = $('Final Files').first().json;\nconst paths = $('Blob Items').all().map(i => i.json.path);\nconst shas = $input.all().map(i => i.json.sha);\nif (shas.length !== paths.length || shas.some(s => !s)) throw new Error('Blob upload failed');\nreturn [{ json: {\n  base_tree: $('Get Head Commit').first().json.tree.sha,\n  tree: [\n    ...f.md.map(m => ({ path: m.path, mode: '100644', type: 'blob', content: m.content })),\n    ...paths.map((path, k) => ({ path, mode: '100644', type: 'blob', sha: shas[k] })),\n  ],\n} }];\n"
-      },
-      "id": "0cf6d401-cd65-5e7a-9165-90e6b67b5cb6",
-      "name": "Build Tree",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        4400,
-        100
-      ]
-    },
-    {
-      "parameters": {
-        "method": "POST",
-        "url": "=https://api.github.com/repos/{{ $('Config').first().json.cfg.repo }}/git/trees",
-        "authentication": "predefinedCredentialType",
-        "nodeCredentialType": "githubApi",
-        "sendHeaders": true,
-        "headerParameters": {
-          "parameters": [
-            {
-              "name": "Accept",
-              "value": "application/vnd.github+json"
-            },
-            {
-              "name": "X-GitHub-Api-Version",
-              "value": "2026-03-10"
-            }
-          ]
-        },
-        "options": {},
-        "sendBody": true,
-        "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify($json) }}"
-      },
-      "id": "ebc80869-c5e7-54f2-a2d6-47ec6f077aef",
-      "name": "Create Tree",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
-      "position": [
-        4600,
-        100
-      ],
-      "credentials": {
-        "githubApi": {
-          "id": "REPLACE_ME",
-          "name": "GitHub unifight contents"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "method": "POST",
-        "url": "=https://api.github.com/repos/{{ $('Config').first().json.cfg.repo }}/git/commits",
-        "authentication": "predefinedCredentialType",
-        "nodeCredentialType": "githubApi",
-        "sendHeaders": true,
-        "headerParameters": {
-          "parameters": [
-            {
-              "name": "Accept",
-              "value": "application/vnd.github+json"
-            },
-            {
-              "name": "X-GitHub-Api-Version",
-              "value": "2026-03-10"
-            }
-          ]
-        },
-        "options": {},
-        "sendBody": true,
-        "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({ message: 'News: ' + $('Final Files').first().json.tr.en.title + '\\n\\nPosted by ' + $('Pack Images').first().json.author_id + ' via ' + $('Pack Images').first().json.channel, tree: $json.sha, parents: [$('Get Ref').first().json.object.sha] }) }}"
-      },
-      "id": "330a1f14-1385-52dd-aec2-6daeca82e9fb",
-      "name": "Create Commit",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
-      "position": [
-        4800,
-        100
-      ],
-      "credentials": {
-        "githubApi": {
-          "id": "REPLACE_ME",
-          "name": "GitHub unifight contents"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "method": "PATCH",
-        "url": "=https://api.github.com/repos/{{ $('Config').first().json.cfg.repo }}/git/refs/heads/{{ $('Config').first().json.cfg.branch }}",
-        "authentication": "predefinedCredentialType",
-        "nodeCredentialType": "githubApi",
-        "sendHeaders": true,
-        "headerParameters": {
-          "parameters": [
-            {
-              "name": "Accept",
-              "value": "application/vnd.github+json"
-            },
-            {
-              "name": "X-GitHub-Api-Version",
-              "value": "2026-03-10"
-            }
-          ]
-        },
-        "options": {},
-        "sendBody": true,
-        "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({ sha: $json.sha, force: false }) }}"
-      },
-      "id": "999cdf68-9d4a-595e-912b-15405ca3d339",
-      "name": "Update Ref",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
-      "position": [
-        5000,
-        100
-      ],
-      "credentials": {
-        "githubApi": {
-          "id": "REPLACE_ME",
-          "name": "GitHub unifight contents"
-        }
-      },
-      "_note": "force:false makes a concurrent push fail (422) instead of overwriting; the error workflow reports it and the author resends."
-    },
-    {
-      "parameters": {
-        "jsCode": "\nconst p = $('Parse Translation').last().json;\nconst f = $('Final Files').first().json;\nconst sha = $input.first().json.object?.sha || $('Create Commit').first().json.sha;\nreturn [{ json: {\n  channel: p.channel, chat_id: p.chat_id, email: p.email,\n  notify: `Новость сохранена (${f.folder}). Сайт обновится через 1–2 минуты, потом опубликую в Facebook и Instagram.`,\n  draft: { ...p.draft, folder: f.folder, status: 'committed', commit_sha: sha },\n  audit: { actor_id: p.draft.author_id, action: 'commit', target: f.folder, result: 'ok', detail: sha },\n} }];\n"
-      },
-      "id": "c8727028-0ee9-5a47-8c65-15e05eee69ac",
-      "name": "Committed",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        5200,
-        100
-      ]
-    },
-    {
-      "parameters": {
-        "resource": "row",
-        "operation": "update",
-        "dataTableId": {
-          "__rl": true,
-          "mode": "list",
-          "value": "",
-          "cachedResultName": "publishers"
-        },
-        "filters": {
-          "conditions": [
-            {
-              "keyName": "coach_id",
-              "condition": "eq",
-              "keyValue": "={{ $('Pack Images').first().json.author_id }}"
-            }
-          ]
-        },
-        "columns": {
-          "mappingMode": "defineBelow",
-          "value": {
-            "posts_day": "={{ $('Rate Check').first().json.today }}",
-            "posts_count": "={{ $('Rate Check').first().json.posts_count + 1 }}"
-          },
-          "matchingColumns": [],
-          "schema": []
-        }
-      },
-      "id": "60e9dc5f-8e39-55d4-a8f3-eb7507b9ac87",
-      "name": "Bump Count",
-      "type": "n8n-nodes-base.dataTable",
-      "typeVersion": 1,
-      "position": [
-        5400,
-        -80
-      ],
-      "_note": "Data Table node params (filters/columns/operation names) written from docs operation list, not from an export; re-select the table after import. https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.datatable/"
-    },
-    {
-      "parameters": {
-        "amount": 45,
-        "unit": "seconds"
-      },
-      "id": "10fe1546-73bf-5b75-93b7-7d97fd6e5292",
-      "name": "Wait Deploy",
-      "type": "n8n-nodes-base.wait",
-      "typeVersion": 1.1,
-      "position": [
-        5400,
-        100
-      ],
-      "_note": "Under 65 s the execution stays in memory instead of being offloaded. https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.wait/"
-    },
-    {
-      "parameters": {
-        "method": "GET",
-        "url": "={{ $('Config').first().json.cfg.news_json + '?t=' + Date.now() }}",
-        "options": {
-          "response": {
-            "response": {
-              "neverError": true
-            }
-          }
-        }
-      },
-      "id": "4745c368-18af-5809-a9e4-6d7dbd0a81d8",
-      "name": "Get News Json",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
-      "position": [
-        5600,
-        100
-      ]
-    },
-    {
-      "parameters": {
-        "jsCode": "\n// Look for the post in news.json; $runIndex counts loop passes.\nconst cfg = $('Config').first().json.cfg;\nconst slug = $('Final Files').first().json.slug;\n// HTTP Request splits a top-level JSON array into one item per post.\nconst post = $input.all().map(i => i.json).find(x => x && x.slug === slug);\nconst attempt = $runIndex + 1;\nreturn [{ json: { state: post ? 'live' : attempt >= cfg.deploy_checks ? 'timeout' : 'retry', post: post || null, attempt } }];\n"
-      },
-      "id": "332f2c74-d2e8-5568-b29b-b57ecee684ca",
-      "name": "Check Live",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        5800,
-        100
-      ]
-    },
-    {
-      "parameters": {
-        "rules": {
-          "values": [
-            {
-              "conditions": {
-                "options": {
-                  "caseSensitive": true,
-                  "leftValue": "",
-                  "typeValidation": "loose",
-                  "version": 2
-                },
-                "conditions": [
-                  {
-                    "id": "332a79c9-bd3c-5a96-b5b1-c9fb2f97bc86",
-                    "leftValue": "={{ $json.state }}",
-                    "rightValue": "live",
-                    "operator": {
-                      "type": "string",
-                      "operation": "equals"
-                    }
-                  }
-                ],
-                "combinator": "and"
-              },
-              "renameOutput": true,
-              "outputKey": "live"
-            },
-            {
-              "conditions": {
-                "options": {
-                  "caseSensitive": true,
-                  "leftValue": "",
-                  "typeValidation": "loose",
-                  "version": 2
-                },
-                "conditions": [
-                  {
-                    "id": "f48edab6-e59f-5498-a94e-44cd81915974",
-                    "leftValue": "={{ $json.state }}",
-                    "rightValue": "retry",
-                    "operator": {
-                      "type": "string",
-                      "operation": "equals"
-                    }
-                  }
-                ],
-                "combinator": "and"
-              },
-              "renameOutput": true,
-              "outputKey": "retry"
-            },
-            {
-              "conditions": {
-                "options": {
-                  "caseSensitive": true,
-                  "leftValue": "",
-                  "typeValidation": "loose",
-                  "version": 2
-                },
-                "conditions": [
-                  {
-                    "id": "85f0707a-9f42-5c00-aa23-29b589192fba",
-                    "leftValue": "={{ $json.state }}",
-                    "rightValue": "timeout",
-                    "operator": {
-                      "type": "string",
-                      "operation": "equals"
-                    }
-                  }
-                ],
-                "combinator": "and"
-              },
-              "renameOutput": true,
-              "outputKey": "timeout"
-            }
-          ]
-        },
-        "options": {}
-      },
-      "id": "02974e41-f60e-5171-841b-c559c5423c93",
-      "name": "Live?",
-      "type": "n8n-nodes-base.switch",
-      "typeVersion": 3.2,
-      "position": [
-        6000,
-        100
-      ]
-    },
-    {
-      "parameters": {
-        "jsCode": "\nconst p = $('Parse Translation').last().json;\nconst f = $('Final Files').first().json;\nreturn [{ json: {\n  channel: p.channel, chat_id: p.chat_id, email: p.email, notify_admin: true,\n  notify: `Новость ${f.folder} сохранена, но за 12 минут не появилась на сайте. Facebook и Instagram не тронуты. Проверьте сборку: https://github.com/Unifight-haifa/unifight/actions`,\n  draft: { ...p.draft, folder: f.folder, status: 'deploy_timeout', commit_sha: $('Committed').first().json.draft.commit_sha },\n  audit: { actor_id: p.draft.author_id, action: 'deploy_wait', target: f.folder, result: 'timeout', detail: '' },\n} }];\n"
-      },
-      "id": "db355054-b822-50d6-9d4f-4646d38a3db0",
-      "name": "Deploy Timeout",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        6200,
-        320
-      ]
-    },
-    {
-      "parameters": {
-        "jsCode": "\nconst cfg = $('Config').first().json.cfg;\nconst f = $('Final Files').first().json;\nconst post = $json.post || {};\nconst url = l => post.url?.[l] || `${cfg.site}/${l}/news/${f.slug}/`;\nconst block = l => `${f.tr[l].title}\\n${f.tr[l].summary}\\n${url(l)}`;\nconst tags = f.tags.map(t => '#' + t.replace(/[\\s#]+/g, '')).join(' ');\nconst ig = cfg.social_langs.map(l => `${f.tr[l].title}\\n${f.tr[l].summary}`).join('\\n\\n')\n  + `\\n\\n${url(cfg.social_langs[0])}` + (tags ? `\\n\\n${tags}` : '');\nreturn [{ json: {\n  urls: { he: url('he'), ru: url('ru'), en: url('en') },\n  fb_message: cfg.social_langs.map(block).join('\\n\\n'),\n  fb_link: url(cfg.social_langs[0]),\n  ig_caption: ig.slice(0, 2200),\n  ig_image: post.cover || '',\n  ig_alt: f.tr.en.cover_alt,\n  // Title + link only: the link preview shows the summary, and Telegram caps a message at 4096 chars.\n  wa: Object.fromEntries(['he', 'ru', 'en'].map(l => [l, 'https://wa.me/?text=' + encodeURIComponent(`${f.tr[l].title}\\n${url(l)}`)])),\n} }];\n"
-      },
-      "id": "7035642b-cb46-52f5-a834-fe67c74d1e31",
-      "name": "Build Social",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        6200,
-        0
-      ]
-    },
-    {
-      "parameters": {
-        "hostUrl": "graph.facebook.com",
-        "httpRequestMethod": "POST",
-        "graphApiVersion": "v25.0",
-        "node": "={{ $('Config').first().json.cfg.fb_page_id }}",
-        "edge": "feed",
-        "options": {
-          "queryParameters": {
-            "parameter": [
-              {
-                "name": "message",
-                "value": "={{ $json.fb_message }}"
-              },
-              {
-                "name": "link",
-                "value": "={{ $json.fb_link }}"
-              }
-            ]
-          }
-        }
-      },
-      "id": "28aafd0a-d22f-59d7-936d-baaf4237666f",
-      "name": "FB Post",
-      "type": "n8n-nodes-base.facebookGraphApi",
-      "typeVersion": 1,
-      "position": [
-        6400,
-        0
-      ],
-      "credentials": {
-        "facebookGraphApi": {
-          "id": "REPLACE_ME",
-          "name": "Facebook Page Unifight"
-        }
-      },
-      "onError": "continueRegularOutput",
-      "_note": "Facebook Graph API node: queryParameters structure and graphApiVersion value unverified; docs list Host URL/Method/Version/Node/Edge. https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-base.facebookgraphapi/"
-    },
-    {
-      "parameters": {
-        "hostUrl": "graph.facebook.com",
-        "httpRequestMethod": "POST",
-        "graphApiVersion": "v25.0",
-        "node": "={{ $('Config').first().json.cfg.ig_user_id }}",
-        "edge": "media",
-        "options": {
-          "queryParameters": {
-            "parameter": [
-              {
-                "name": "image_url",
-                "value": "={{ $('Build Social').first().json.ig_image }}"
-              },
-              {
-                "name": "caption",
-                "value": "={{ $('Build Social').first().json.ig_caption }}"
-              },
-              {
-                "name": "alt_text",
-                "value": "={{ $('Build Social').first().json.ig_alt }}"
-              }
-            ]
-          }
-        }
-      },
-      "id": "94fa1d96-291f-5199-b10e-b113831655a1",
-      "name": "IG Container",
-      "type": "n8n-nodes-base.facebookGraphApi",
-      "typeVersion": 1,
-      "position": [
-        6600,
-        0
-      ],
-      "credentials": {
-        "facebookGraphApi": {
-          "id": "REPLACE_ME",
-          "name": "Facebook Page Unifight"
-        }
-      },
-      "onError": "continueRegularOutput",
-      "_note": "Facebook Graph API node: queryParameters structure and graphApiVersion value unverified; docs list Host URL/Method/Version/Node/Edge. https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-base.facebookgraphapi/"
-    },
-    {
-      "parameters": {
-        "amount": 30,
-        "unit": "seconds"
-      },
-      "id": "02c33150-61e7-5247-935a-5a822794c43d",
-      "name": "Wait IG",
-      "type": "n8n-nodes-base.wait",
-      "typeVersion": 1.1,
-      "position": [
-        6800,
-        0
-      ]
-    },
-    {
-      "parameters": {
-        "hostUrl": "graph.facebook.com",
-        "httpRequestMethod": "POST",
-        "graphApiVersion": "v25.0",
-        "node": "={{ $('Config').first().json.cfg.ig_user_id }}",
-        "edge": "media_publish",
-        "options": {
-          "queryParameters": {
-            "parameter": [
-              {
-                "name": "creation_id",
-                "value": "={{ $('IG Container').first().json.id }}"
-              }
-            ]
-          }
-        }
-      },
-      "id": "f9b934ee-059f-5a15-a47c-d0903405c6be",
-      "name": "IG Publish",
-      "type": "n8n-nodes-base.facebookGraphApi",
-      "typeVersion": 1,
-      "position": [
-        7000,
-        0
-      ],
-      "credentials": {
-        "facebookGraphApi": {
-          "id": "REPLACE_ME",
-          "name": "Facebook Page Unifight"
-        }
-      },
-      "onError": "continueRegularOutput",
-      "_note": "Facebook Graph API node: queryParameters structure and graphApiVersion value unverified; docs list Host URL/Method/Version/Node/Edge. https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-base.facebookgraphapi/"
-    },
-    {
-      "parameters": {
-        "jsCode": "\nconst p = $('Parse Translation').last().json;\nconst c = $('Committed').first().json;\nconst s = $('Build Social').first().json;\nconst get = n => { try { return $(n).first().json; } catch (e) { return {}; } };\nconst fb = get('FB Post'), ig = get('IG Publish'), igc = get('IG Container');\nconst err = o => o.error?.message || o.error || 'нет ответа';\nconst fbId = fb.id || '', igId = ig.id || '';\nconst problems = [];\nif (!fbId) problems.push('Facebook: ' + err(fb));\nif (!igId) problems.push('Instagram: ' + err(igc.error ? igc : ig));\nconst notify = [\n  'Новость на сайте:', `HE ${s.urls.he}`, `RU ${s.urls.ru}`, `EN ${s.urls.en}`, '',\n  `Facebook: ${fbId ? 'опубликовано' : 'не получилось'}`, `Instagram: ${igId ? 'опубликовано' : 'не получилось'}`,\n  ...(problems.length ? ['', ...problems] : []), '',\n  'WhatsApp — откройте ссылку и выберите группу родителей:',\n  `HE ${s.wa.he}`, `RU ${s.wa.ru}`, `EN ${s.wa.en}`,\n].join('\\n');\nreturn [{ json: {\n  channel: p.channel, chat_id: p.chat_id, email: p.email, notify, notify_admin: problems.length > 0,\n  draft: { ...c.draft, status: problems.length ? 'live_partial' : 'live', fb_post_id: fbId, ig_media_id: igId,\n           error: problems.join('; ').slice(0, 500) },\n  audit: { actor_id: p.draft.author_id, action: 'distribute', target: c.draft.folder,\n           result: problems.length ? 'partial' : 'ok', detail: `fb=${fbId} ig=${igId}` },\n} }];\n"
-      },
-      "id": "d1738bf5-a4fa-5930-8cc6-64f73f85bc2a",
-      "name": "Summarize",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        7200,
-        0
-      ]
-    },
-    {
-      "parameters": {
-        "resource": "row",
-        "operation": "insert",
-        "dataTableId": {
-          "__rl": true,
-          "mode": "list",
-          "value": "",
-          "cachedResultName": "audit_log"
-        },
-        "columns": {
-          "mappingMode": "defineBelow",
-          "value": {
-            "ts": "={{ $now.toISO() }}",
-            "actor_id": "={{ $json.audit.actor_id }}",
-            "channel": "={{ $json.channel }}",
-            "action": "={{ $json.audit.action }}",
-            "target": "={{ $json.audit.target }}",
-            "result": "={{ $json.audit.result }}",
-            "detail": "={{ $json.audit.detail }}",
-            "execution_id": "={{ $execution.id }}"
-          },
-          "matchingColumns": [],
-          "schema": []
-        }
-      },
-      "id": "fc0e9572-f13d-5481-a3da-173feab2693d",
-      "name": "Audit",
-      "type": "n8n-nodes-base.dataTable",
-      "typeVersion": 1,
       "position": [
         7400,
-        400
+        760
       ],
-      "_note": "Data Table node params (filters/columns/operation names) written from docs operation list, not from an export; re-select the table after import. https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.datatable/"
-    },
-    {
-      "parameters": {
-        "resource": "row",
-        "operation": "upsert",
-        "dataTableId": {
-          "__rl": true,
-          "mode": "list",
-          "value": "",
-          "cachedResultName": "news_drafts"
-        },
-        "filters": {
-          "conditions": [
-            {
-              "keyName": "draft_id",
-              "condition": "eq",
-              "keyValue": "={{ $json.draft.draft_id }}"
-            }
-          ]
-        },
-        "columns": {
-          "mappingMode": "defineBelow",
-          "value": {
-            "draft_id": "={{ $json.draft.draft_id }}",
-            "folder": "={{ $json.draft.folder }}",
-            "author_id": "={{ $json.draft.author_id }}",
-            "channel": "={{ $json.draft.channel }}",
-            "status": "={{ $json.draft.status }}",
-            "title_en": "={{ $json.draft.title_en }}",
-            "commit_sha": "={{ $json.draft.commit_sha }}",
-            "fb_post_id": "={{ $json.draft.fb_post_id }}",
-            "ig_media_id": "={{ $json.draft.ig_media_id }}",
-            "error": "={{ $json.draft.error }}",
-            "updated_at": "={{ $now.toISO() }}"
-          },
-          "matchingColumns": [],
-          "schema": []
-        }
-      },
-      "id": "ed43423a-a94c-569e-ac0e-53734808acfd",
-      "name": "Update Draft",
-      "type": "n8n-nodes-base.dataTable",
-      "typeVersion": 1,
-      "position": [
-        7400,
-        580
-      ],
-      "_note": "Data Table node params (filters/columns/operation names) written from docs operation list, not from an export; re-select the table after import. https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.datatable/"
-    },
-    {
       "parameters": {
         "rules": {
           "values": [
@@ -1428,17 +94,17 @@
         "options": {
           "allMatchingOutputs": true
         }
-      },
-      "id": "3c37262f-34ff-57aa-9fe9-ee407bfd653b",
-      "name": "Notify",
-      "type": "n8n-nodes-base.switch",
-      "typeVersion": 3.2,
-      "position": [
-        7400,
-        760
-      ]
+      }
     },
     {
+      "id": "19405657-de70-4c17-afec-7ecc28358617",
+      "name": "Notify Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        7640,
+        660
+      ],
       "parameters": {
         "chatId": "={{ $json.chat_id }}",
         "text": "={{ $json.notify.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;') }}",
@@ -1448,22 +114,23 @@
           "parse_mode": "HTML"
         }
       },
-      "id": "8964a9c5-a676-57e3-893d-61f760810d77",
-      "name": "Notify Telegram",
-      "type": "n8n-nodes-base.telegram",
-      "typeVersion": 1.2,
-      "position": [
-        7640,
-        660
-      ],
+      "webhookId": "fdb35941-5870-4d6d-95e0-a81c9024adfc",
       "credentials": {
         "telegramApi": {
-          "id": "REPLACE_ME",
-          "name": "Unifight News Bot"
+          "id": "hsPK2WfVUBtOHxl5",
+          "name": "Telegram account"
         }
       }
     },
     {
+      "id": "ec85f481-396a-47f2-99f9-20d52eba1672",
+      "name": "Notify Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        7640,
+        820
+      ],
       "parameters": {
         "fromEmail": "REPLACE_news@club-domain",
         "toEmail": "={{ $json.email }}",
@@ -1474,23 +141,17 @@
           "appendAttribution": false
         }
       },
-      "id": "436ca513-75c5-574a-b4ac-d487354e88a8",
-      "name": "Notify Email",
-      "type": "n8n-nodes-base.emailSend",
-      "typeVersion": 2.1,
-      "position": [
-        7640,
-        820
-      ],
-      "credentials": {
-        "smtp": {
-          "id": "REPLACE_ME",
-          "name": "Club SMTP"
-        }
-      },
-      "_note": "Send Email type name emailSend and param names (fromEmail/toEmail/emailFormat/text) from memory of v2.1; docs confirm the fields. https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.sendemail/"
+      "webhookId": "9e04d3a8-730a-48e9-a5ef-dd5baa7ce708"
     },
     {
+      "id": "2f75b1b9-2fd1-441b-accc-6c286348508f",
+      "name": "Notify Admin",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        7640,
+        980
+      ],
       "parameters": {
         "chatId": "REPLACE_ADMIN_CHAT_ID",
         "text": "={{ ('[admin] ' + $json.notify).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;') }}",
@@ -1500,18 +161,1484 @@
           "parse_mode": "HTML"
         }
       },
-      "id": "10746f6a-123f-530f-a537-a127eacb7cf0",
-      "name": "Notify Admin",
+      "webhookId": "183ba45d-7f18-471c-923c-8f5e47c5e666",
+      "credentials": {
+        "telegramApi": {
+          "id": "hsPK2WfVUBtOHxl5",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "id": "6511a681-ae97-441c-af32-1d3173fa4b5e",
+      "name": "Start",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        300
+      ],
+      "parameters": {
+        "inputSource": "passthrough"
+      }
+    },
+    {
+      "id": "5b6a2776-241a-46a0-a32b-33865314dab5",
+      "name": "Config",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        200,
+        300
+      ],
+      "parameters": {
+        "jsCode": "\n// Owner-editable settings. Items pass through unchanged.\nconst cfg = {\n  repo: 'Unifight-haifa/unifight',\n  branch: 'main',\n  news_dir: 'src/content/news',\n  site: 'https://unifight-haifa.github.io/unifight',\n  news_json: 'https://unifight-haifa.github.io/unifight/news.json',\n  fb_page_id: 'REPLACE_PAGE_ID',\n  ig_user_id: 'REPLACE_IG_USER_ID',\n  social_langs: ['he', 'ru'],\n  max_posts_per_day: 5,\n  max_revisions: 3,\n  deploy_checks: 16,\n};\nreturn $input.all().map(it => ({ json: { ...it.json, cfg }, binary: it.binary }));\n"
+      }
+    },
+    {
+      "id": "4c519592-655b-46e2-b58e-0823d90ffb06",
+      "name": "Read Orientation",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        400,
+        300
+      ],
+      "parameters": {
+        "jsCode": "\n// EXIF orientation -> rotation, so pixels stay upright after metadata is stripped.\nfunction orientation(b) {\n  if (b[0] !== 0xFF || b[1] !== 0xD8) return 1;\n  let i = 2;\n  while (i + 4 < b.length && b[i] === 0xFF) {\n    const marker = b[i + 1], len = b.readUInt16BE(i + 2);\n    if (marker === 0xDA) break;\n    if (marker === 0xE1 && b.toString('latin1', i + 4, i + 10) === 'Exif\\0\\0') {\n      const t = i + 10, le = b.toString('latin1', t, t + 2) === 'II';\n      const u16 = o => le ? b.readUInt16LE(o) : b.readUInt16BE(o);\n      const u32 = o => le ? b.readUInt32LE(o) : b.readUInt32BE(o);\n      const ifd = t + u32(t + 4);\n      for (let k = 0, n = u16(ifd); k < n; k++) {\n        const e = ifd + 2 + k * 12;\n        if (u16(e) === 0x0112) return u16(e + 8);\n      }\n      return 1;\n    }\n    i += 2 + len;\n  }\n  return 1;\n}\nconst out = [];\nfor (let i = 0; i < $input.all().length; i++) {\n  const it = $input.all()[i];\n  const buf = await this.helpers.getBinaryDataBuffer(i, 'data');\n  const rotate = { 3: 180, 6: 90, 8: 270 }[orientation(buf)] || 0;\n  out.push({ json: { ...it.json, rotate }, binary: it.binary });\n}\nreturn out;\n"
+      }
+    },
+    {
+      "id": "2564b306-0a10-4273-b8e1-2ecd9f42637f",
+      "name": "Resize",
+      "type": "n8n-nodes-base.editImage",
+      "typeVersion": 1.1,
+      "position": [
+        600,
+        300
+      ],
+      "parameters": {
+        "operation": "multiStep",
+        "operations": {
+          "operations": [
+            {
+              "operation": "rotate",
+              "rotate": "={{ $json.rotate }}",
+              "backgroundColor": "#ffffff"
+            },
+            {
+              "operation": "resize",
+              "width": 1600,
+              "height": 1600,
+              "resizeOption": "onlyIfLarger"
+            }
+          ]
+        },
+        "options": {
+          "format": "jpeg",
+          "quality": 85
+        }
+      }
+    },
+    {
+      "id": "40599b22-8b61-43ef-a693-32c0dc058fdb",
+      "name": "Pack Images",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        800,
+        300
+      ],
+      "parameters": {
+        "jsCode": "\n// Drop EXIF/XMP/IPTC/comment segments (GPS lives there), keep JFIF and ICC; one item with base64 files.\nfunction segments(b) {\n  if (b[0] !== 0xFF || b[1] !== 0xD8) throw new Error('Resized image is not a JPEG');\n  const segs = []; let i = 2;\n  while (i + 4 <= b.length) {\n    while (b[i] === 0xFF && b[i + 1] === 0xFF) i++;\n    if (b[i] !== 0xFF) throw new Error('Broken JPEG segment');\n    const m = b[i + 1];\n    if (m === 0xDA) { segs.push({ m, s: i, e: b.length }); break; }\n    const e = i + 2 + b.readUInt16BE(i + 2);\n    segs.push({ m, s: i, e }); i = e;\n  }\n  return segs;\n}\nconst META = (m) => m === 0xE1 || m === 0xED || m === 0xFE || (m >= 0xE3 && m <= 0xEF);\nfunction strip(b) {\n  const keep = segments(b).filter(x => !META(x.m)).map(x => b.subarray(x.s, x.e));\n  const out = Buffer.concat([b.subarray(0, 2), ...keep]);\n  if (segments(out).some(x => META(x.m))) throw new Error('Metadata still present after strip');\n  return out;\n}\nconst items = $input.all();\nconst files = [];\nfor (let i = 0; i < items.length; i++) {\n  const buf = strip(await this.helpers.getBinaryDataBuffer(i, 'data'));\n  files.push({ path: i === 0 ? 'cover.jpg' : `photo-${i + 1}.jpg`, b64: buf.toString('base64'), bytes: buf.length });\n}\nconst { cfg, rotate, index, ...meta } = items[0].json;\nreturn [{ json: { ...meta, files } }];\n"
+      }
+    },
+    {
+      "id": "96f86dc4-d0cf-410d-9ecf-f0c59db5ec38",
+      "name": "Get Publisher",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        1000,
+        300
+      ],
+      "parameters": {
+        "resource": "row",
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "8RXgFKzfwiL9okcq",
+          "cachedResultName": "publishers"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "coach_id",
+              "condition": "eq",
+              "keyValue": "={{ $json.author_id }}"
+            }
+          ]
+        },
+        "limit": 1
+      },
+      "alwaysOutputData": true
+    },
+    {
+      "id": "2c553fac-b88a-49b4-abc5-176b9be310fb",
+      "name": "Check Author",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        1100,
+        460
+      ],
+      "parameters": {
+        "method": "GET",
+        "url": "=https://api.github.com/repos/{{ $('Config').first().json.cfg.repo }}/contents/content/coaches/{{ $('Pack Images').first().json.author_id }}.json?ref={{ $('Config').first().json.cfg.branch }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "githubApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/vnd.github+json"
+            },
+            {
+              "name": "X-GitHub-Api-Version",
+              "value": "2026-03-10"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true,
+              "fullResponse": true
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "671438e0-9370-4a00-9042-bf6ca8705c6f",
+      "name": "Rate Check",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1200,
+        300
+      ],
+      "parameters": {
+        "jsCode": "\nconst pub = $('Get Publisher').first().json;\nconst d = $('Pack Images').first().json;\nconst cfg = $('Config').first().json.cfg;\n// Build fails on an unknown author, so refuse before translating.\nconst authorOk = $input.first().json.statusCode === 200;\nconst today = new Date().toLocaleDateString('sv-SE', { timeZone: 'Asia/Jerusalem' });\nconst count = pub.posts_day === today ? Number(pub.posts_count || 0) : 0;\nconst ok = authorOk && count < cfg.max_posts_per_day;\nreturn [{ json: {\n  ok, today, posts_count: count,\n  src_lang: d.src_lang, title: d.title, body: d.body, cover_alt: d.cover_alt,\n  corrections: '', previous: null, revision: 0,\n  channel: d.channel, chat_id: d.chat_id, email: d.email,\n  notify_admin: !authorOk,\n  notify: ok ? '' : !authorOk ? `Тренер «${d.author_id}» не найден в content/coaches на сайте, новость не принята. Администратор получил сообщение.`\n    : `Лимит: не больше ${cfg.max_posts_per_day} новостей в день. Попробуйте завтра.`,\n  audit: { actor_id: d.author_id, action: authorOk ? 'rate_limited' : 'unknown_author', target: d.draft_id, result: 'denied', detail: String(count) },\n} }];\n"
+      }
+    },
+    {
+      "id": "944971d8-bbae-4353-bee4-48f0472fcbab",
+      "name": "Rate OK?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1400,
+        300
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "9646abd9-e334-5ca7-b61b-f5ff209cd80c",
+              "leftValue": "={{ $json.ok }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "c550c26c-b4d8-433c-b89e-ebdd40715d1b",
+      "name": "Translate",
+      "type": "@n8n/n8n-nodes-langchain.anthropic",
+      "typeVersion": 1,
+      "position": [
+        1600,
+        300
+      ],
+      "parameters": {
+        "resource": "text",
+        "operation": "message",
+        "modelId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "claude-sonnet-5-5"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={{ JSON.stringify({ source_lang: $json.src_lang, title: $json.title, body: $json.body, cover_hint: $json.cover_alt || undefined, corrections: $json.corrections || undefined, previous: $json.previous || undefined }) }}"
+            }
+          ]
+        },
+        "options": {
+          "system": "You translate news posts for Unifight Haifa, a judo club in Haifa, Israel. Languages: Hebrew (he), Russian (ru), English (en). The input JSON gives source_lang, title, body (Markdown) and optional cover_hint, corrections and previous.\n\nRules:\n1. Translate faithfully. Do not add, drop, soften or embellish facts. Tone: a club announcement for parents and athletes.\n2. Copy exactly, character for character where the script allows: people's names (transliterate consistently; in the source language keep the author's spelling), places, club names, dates, times, all numbers, scores, ages, places taken (1st, 2nd...), belt grades and weight categories such as -60 kg or +100 kg. Never convert units, round or reformat numbers.\n3. Mandatory glossary: נבחרת המועדון = «сборная клуба (нивхерет)» = \"selected team (nivheret)\". At this club the word נבחרת on its own means this club squad. Never translate it as \"national team\", «сборная Израиля» or «национальная сборная». Only נבחרת ישראל (explicitly Israel) is the national team.\n4. Keep the Markdown structure of the source: paragraphs, lists, bold. No headings unless the source has them.\n5. For every language return: title (max 90 characters), summary (one sentence, max 160 characters, no emoji), body (Markdown), cover_alt (one short phrase describing the cover photo from context; never name children).\n6. In the source language keep title and body exactly as given, unless corrections ask to change them.\n7. slug: 2 to 6 lowercase English words joined by hyphens, only a-z, 0-9 and hyphens.\n8. If corrections are present, start from previous, apply exactly the author's corrections and change nothing else.\n\nReply with one JSON object and nothing else:\n{\"slug\": \"...\", \"he\": {\"title\": \"\", \"summary\": \"\", \"body\": \"\", \"cover_alt\": \"\"}, \"ru\": {...}, \"en\": {...}}",
+          "maxTokens": 8000,
+          "temperature": 0.2
+        }
+      },
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "anthropicApi": {
+          "id": "G38M3oA58IRqShGZ",
+          "name": "Anthropic"
+        }
+      }
+    },
+    {
+      "id": "b0ddd95c-9586-4011-b00d-0383c4f5f045",
+      "name": "Audit",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        7400,
+        400
+      ],
+      "parameters": {
+        "resource": "row",
+        "operation": "insert",
+        "dataTableId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "JefIWDs5Xw3sqWY8",
+          "cachedResultName": "audit_log"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "ts": "={{ $now.toISO() }}",
+            "actor_id": "={{ $json.audit.actor_id }}",
+            "channel": "={{ $json.channel }}",
+            "action": "={{ $json.audit.action }}",
+            "target": "={{ $json.audit.target }}",
+            "result": "={{ $json.audit.result }}",
+            "detail": "={{ $json.audit.detail }}",
+            "execution_id": "={{ $execution.id }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "ts",
+              "displayName": "ts",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "actor_id",
+              "displayName": "actor_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "channel",
+              "displayName": "channel",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "action",
+              "displayName": "action",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "target",
+              "displayName": "target",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "result",
+              "displayName": "result",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "detail",
+              "displayName": "detail",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "execution_id",
+              "displayName": "execution_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "3564e11c-4c8a-46f7-ab22-d62f08b0f170",
+      "name": "Parse Translation",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1800,
+        300
+      ],
+      "parameters": {
+        "jsCode": "\n// Validate the translation and flag what the author must check.\nlet st; try { st = $('Decision').last().json; } catch (e) { st = null; }\nif (!st || st.decision !== 'edit') st = $('Rate Check').first().json;\nconst d = $('Pack Images').first().json;\nconst r = $input.first().json;\nconst raw = typeof r.content === 'string' ? r.content\n  : (r.content?.[0]?.text ?? r.text ?? r.output ?? r.message?.content ?? JSON.stringify(r));\nconst m = String(raw).match(/\\{[\\s\\S]*\\}/);\nif (!m) throw new Error('Translation reply is not JSON');\nconst t = JSON.parse(m[0]);\nconst L = ['he', 'ru', 'en'];\nfor (const l of L) {\n  for (const k of ['title', 'summary', 'body']) {\n    if (!t[l] || typeof t[l][k] !== 'string' || !t[l][k].trim()) throw new Error(`Translation missing ${l}.${k}`);\n  }\n  if (t[l].summary.length > 160) t[l].summary = t[l].summary.slice(0, 157).replace(/\\s+\\S*$/, '') + '…';\n  t[l].cover_alt = (t[l].cover_alt || d.cover_alt || t[l].title).slice(0, 200);\n}\nif (!st.corrections) { t[d.src_lang].title = d.title; t[d.src_lang].body = d.body; }\nconst warnings = [];\nconst src = t[d.src_lang].title + ' ' + t[d.src_lang].body;\nconst nums = [...new Set(src.match(/\\d+(?:[.,:]\\d+)*/g) || [])];\nfor (const l of L) {\n  const txt = t[l].title + ' ' + t[l].body;\n  const miss = nums.filter(n => !txt.includes(n));\n  if (miss.length) warnings.push(`${l.toUpperCase()}: нет чисел ${miss.join(', ')}`);\n}\nif (/נבחרת|нивхерет|nivheret/i.test(src) && !/ישראל|Израил|Israel/i.test(src)) {\n  if (!/נבחרת/.test(t.he.body + t.he.title)) warnings.push('HE: нет слова «נבחרת»');\n  if (!/нивхерет/i.test(t.ru.body + t.ru.title)) warnings.push('RU: нет «сборная клуба (нивхерет)»');\n  if (!/nivheret/i.test(t.en.body + t.en.title)) warnings.push('EN: нет \"selected team (nivheret)\"');\n  if (/national team/i.test(t.en.body + t.en.title) || /сборн\\S* (Израиля|страны)|национальн\\S* сборн/i.test(t.ru.body + t.ru.title)) {\n    warnings.push('Нивхерет переведена как национальная сборная — исправьте');\n  }\n}\nlet slug = String(t.slug || '').toLowerCase().replace(/[^a-z0-9-]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 60);\nif (slug.length < 3) slug = 'news';\nconst date = new Date().toLocaleDateString('sv-SE', { timeZone: 'Asia/Jerusalem' });\nreturn [{ json: {\n  tr: { he: t.he, ru: t.ru, en: t.en }, slug, date, folder: `${date}-${slug}`, warnings,\n  revision: st.revision || 0, channel: d.channel, chat_id: d.chat_id, email: d.email,\n  draft: { draft_id: d.draft_id, folder: '', author_id: d.author_id, channel: d.channel, status: 'preview',\n           title_en: t.en.title, commit_sha: '', fb_post_id: '', ig_media_id: '', error: '' },\n} }];\n"
+      }
+    },
+    {
+      "id": "a3aeec1f-26bb-4a2b-9868-682fefe9b77c",
+      "name": "By Channel",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        2000,
+        300
+      ],
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "9a59b6c0-c015-5624-8cb9-aaa08d839772",
+                    "leftValue": "={{ $json.channel }}",
+                    "rightValue": "telegram",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "telegram"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "dfcb4e51-7ff0-52da-969a-9e2d1a318f44",
+                    "leftValue": "={{ $json.channel }}",
+                    "rightValue": "email",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "email"
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "d658b84d-26ed-47d0-a134-536cc3a47a7f",
+      "name": "Update Draft",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        7400,
+        580
+      ],
+      "parameters": {
+        "resource": "row",
+        "operation": "upsert",
+        "dataTableId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "19E8nGPYOleEZoie",
+          "cachedResultName": "news_drafts"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "draft_id",
+              "condition": "eq",
+              "keyValue": "={{ $json.draft.draft_id }}"
+            }
+          ]
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "draft_id": "={{ $json.draft.draft_id }}",
+            "folder": "={{ $json.draft.folder }}",
+            "author_id": "={{ $json.draft.author_id }}",
+            "channel": "={{ $json.draft.channel }}",
+            "status": "={{ $json.draft.status }}",
+            "title_en": "={{ $json.draft.title_en }}",
+            "commit_sha": "={{ $json.draft.commit_sha }}",
+            "fb_post_id": "={{ $json.draft.fb_post_id }}",
+            "ig_media_id": "={{ $json.draft.ig_media_id }}",
+            "error": "={{ $json.draft.error }}",
+            "updated_at": "={{ $now.toISO() }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "draft_id",
+              "displayName": "draft_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "folder",
+              "displayName": "folder",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "author_id",
+              "displayName": "author_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "channel",
+              "displayName": "channel",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "title_en",
+              "displayName": "title_en",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "commit_sha",
+              "displayName": "commit_sha",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "fb_post_id",
+              "displayName": "fb_post_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "ig_media_id",
+              "displayName": "ig_media_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "error",
+              "displayName": "error",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "updated_at",
+              "displayName": "updated_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "0316a3e0-74a0-419b-b5e2-6cadcbe80517",
+      "name": "Preview Items",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2200,
+        200
+      ],
+      "parameters": {
+        "jsCode": "\n// One Telegram message per language (4096-char limit per message).\nconst p = $('Parse Translation').last().json;\nconst esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');\nreturn ['he', 'ru', 'en'].map(l => ({ json: {\n  chat_id: p.chat_id,\n  text: `<b>${l.toUpperCase()}</b>\\n<b>${esc(p.tr[l].title)}</b>\\n<i>${esc(p.tr[l].summary)}</i>\\n\\n${esc(p.tr[l].body)}`.slice(0, 4000),\n} }));\n"
+      }
+    },
+    {
+      "id": "7f34b13e-ebeb-454a-8b1a-5f60b7bda82c",
+      "name": "Ask Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        2400,
+        420
+      ],
+      "parameters": {
+        "operation": "sendAndWait",
+        "fromEmail": "REPLACE_news@club-domain",
+        "subject": "={{ 'Предпросмотр новости: ' + $('Parse Translation').last().json.tr.ru.title }}",
+        "message": "={{ (() => { const p = $('Parse Translation').last().json; const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); return (p.warnings.length ? '<p><b>Проверьте:</b> ' + esc(p.warnings.join('; ')) + '</p>' : '') + ['he','ru','en'].map(l => '<div dir=\"' + (l === 'he' ? 'rtl' : 'ltr') + '\"><h3>' + esc(p.tr[l].title) + '</h3><p><i>' + esc(p.tr[l].summary) + '</i></p><pre style=\"white-space:pre-wrap;font-family:inherit\">' + esc(p.tr[l].body) + '</pre></div><hr>').join(''); })() }}",
+        "responseType": "customForm",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Решение",
+              "fieldType": "radio",
+              "requiredField": true,
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Опубликовать"
+                  },
+                  {
+                    "option": "Исправить"
+                  },
+                  {
+                    "option": "Отменить"
+                  }
+                ]
+              }
+            },
+            {
+              "fieldLabel": "Правки",
+              "fieldType": "textarea",
+              "placeholder": "Например: в русском тексте заменить «турнир» на «первенство»"
+            }
+          ]
+        },
+        "options": {
+          "limitWaitTime": {
+            "values": {
+              "limitType": "afterTimeInterval",
+              "resumeAmount": 48,
+              "resumeUnit": "hours"
+            }
+          },
+          "appendAttribution": false,
+          "messageButtonLabel": "Ответить"
+        },
+        "toEmail": "={{ $('Parse Translation').last().json.email }}"
+      },
+      "webhookId": "2039d8ff-ce08-4684-99c5-d1a82b3b7ede"
+    },
+    {
+      "id": "faac3c3d-afc2-4e7b-9d63-35f1b2165dff",
+      "name": "Ask Telegram",
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
       "position": [
-        7640,
-        980
+        2600,
+        200
       ],
+      "parameters": {
+        "operation": "sendAndWait",
+        "chatId": "={{ $('Parse Translation').last().json.chat_id }}",
+        "message": "={{ 'Проверьте текст на трёх языках выше и выберите: опубликовать, исправить (опишите правки) или отменить.' + ($('Parse Translation').last().json.warnings.length ? '\\n\\nПроверьте: ' + $('Parse Translation').last().json.warnings.join('; ') : '') }}",
+        "responseType": "customForm",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Решение",
+              "fieldType": "radio",
+              "requiredField": true,
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Опубликовать"
+                  },
+                  {
+                    "option": "Исправить"
+                  },
+                  {
+                    "option": "Отменить"
+                  }
+                ]
+              }
+            },
+            {
+              "fieldLabel": "Правки",
+              "fieldType": "textarea",
+              "placeholder": "Например: в русском тексте заменить «турнир» на «первенство»"
+            }
+          ]
+        },
+        "options": {
+          "limitWaitTime": {
+            "values": {
+              "limitType": "afterTimeInterval",
+              "resumeAmount": 48,
+              "resumeUnit": "hours"
+            }
+          },
+          "appendAttribution": false,
+          "messageButtonLabel": "Ответить"
+        }
+      },
+      "executeOnce": true,
+      "webhookId": "18a9968a-cc86-4d4f-95fe-373a10b40666",
       "credentials": {
         "telegramApi": {
-          "id": "REPLACE_ME",
-          "name": "Unifight News Bot"
+          "id": "hsPK2WfVUBtOHxl5",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "id": "84dac9c9-86f5-47a5-b731-9338493a9735",
+      "name": "Decision",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2800,
+        300
+      ],
+      "parameters": {
+        "jsCode": "\n// Map the form answer; a timeout or anything unclear counts as cancel.\nconst r = $input.first().json;\nconst d = r.data ?? r;\nconst pick = String(d['Решение'] ?? '');\nconst corrections = String(d['Правки'] ?? '').trim();\nconst p = $('Parse Translation').last().json;\nconst base = $('Rate Check').first().json;\nconst cfg = $('Config').first().json.cfg;\nlet decision = /Опубликовать/.test(pick) ? 'publish' : /Исправить/.test(pick) ? 'edit' : 'cancel';\nlet reason = decision === 'cancel' ? (pick ? 'Отменено автором.' : 'Нет ответа 48 часов, черновик отменён.') : '';\nif (decision === 'edit' && p.revision >= cfg.max_revisions) {\n  decision = 'cancel'; reason = `Больше ${cfg.max_revisions} правок — отменено. Отправьте новость заново.`;\n}\nreturn [{ json: {\n  ...base, decision, corrections, previous: p.tr, revision: p.revision + 1,\n  notify: reason,\n} }];\n"
+      }
+    },
+    {
+      "id": "eb696292-ea71-46c2-bfe3-7c8dbd27d85c",
+      "name": "Route Decision",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        3000,
+        300
+      ],
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "f1711303-6510-55a7-b382-0faf617a9fd2",
+                    "leftValue": "={{ $json.decision }}",
+                    "rightValue": "publish",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "publish"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "4a91052e-f46d-5c4c-b3ce-36098683824c",
+                    "leftValue": "={{ $json.decision }}",
+                    "rightValue": "edit",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "edit"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra",
+          "renameFallbackOutput": "cancel"
+        }
+      }
+    },
+    {
+      "id": "b722a5ad-6b4c-48bb-a4d5-70bc49b6bce7",
+      "name": "List News",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        3200,
+        100
+      ],
+      "parameters": {
+        "method": "GET",
+        "url": "=https://api.github.com/repos/{{ $('Config').first().json.cfg.repo }}/contents/{{ $('Config').first().json.cfg.news_dir }}?ref={{ $('Config').first().json.cfg.branch }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "githubApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/vnd.github+json"
+            },
+            {
+              "name": "X-GitHub-Api-Version",
+              "value": "2026-03-10"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true,
+              "fullResponse": true
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "6d8a376a-5d5b-4342-a2c4-b757ea0b0991",
+      "name": "Cancelled",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3200,
+        560
+      ],
+      "parameters": {
+        "jsCode": "\nconst p = $('Parse Translation').last().json;\nconst d = $('Decision').last().json;\nreturn [{ json: {\n  channel: p.channel, chat_id: p.chat_id, email: p.email, notify: d.notify,\n  draft: { ...p.draft, status: 'cancelled' },\n  audit: { actor_id: p.draft.author_id, action: 'cancel', target: p.draft.draft_id, result: 'ok', detail: d.notify },\n} }];\n"
+      }
+    },
+    {
+      "id": "88ba719e-7a52-44f5-99e1-03499d7e09a1",
+      "name": "Final Files",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3400,
+        100
+      ],
+      "parameters": {
+        "jsCode": "\n// Build the post folder: three Markdown files plus images.\nconst p = $('Parse Translation').last().json;\nconst d = $('Pack Images').first().json;\nconst cfg = $('Config').first().json.cfg;\n// URL is /<lang>/news/<slug>/, so the slug (folder minus date) must be unique across all posts.\nconst res = $input.first().json;\nif (res.statusCode !== 200 && res.statusCode !== 404) throw new Error(`Listing news folder failed: ${res.statusCode}`);\nconst taken = new Set((Array.isArray(res.body) ? res.body : []).map(x => x.name.replace(/^\\d{4}-\\d{2}-\\d{2}-/, '')));\nlet slug = p.slug;\nfor (let n = 2; taken.has(slug); n++) slug = `${p.slug}-${n}`;\nconst folder = `${p.date}-${slug}`;\n// Author text can't form tags, links or images: escape \\ first, then [ ] ( (no literal \"](\" for the source check) and < >.\nconst mdText = v => String(v).replace(/\\\\/g, '\\\\\\\\').replace(/[[\\]()]/g, c => '\\\\' + c)\n  .replace(/</g, '&lt;').replace(/>/g, '&gt;');\n// Frontmatter is plain text; \\u escapes keep the value exact with no literal < > [ ] in the file.\nconst yq = v => JSON.stringify(String(v)).replace(/[<>[\\]]/g, c => '\\\\u' + c.charCodeAt(0).toString(16).padStart(4, '0'));\nconst tags = (d.tags || []).map(String);\nconst alt = p.tr.en.title.replace(/[[\\]\\\\<>()]/g, '');\nconst extra = d.files.slice(1).map(f => `\\n\\n![${alt}](${f.path})`).join('');\nconst md = ['he', 'ru', 'en'].map(l => ({\n  path: `${cfg.news_dir}/${folder}/index.${l}.md`,\n  content: ['---',\n    `title: ${yq(p.tr[l].title)}`, `summary: ${yq(p.tr[l].summary)}`, `date: ${p.date}`,\n    `author: ${yq(d.author_id)}`, 'cover: \"cover.jpg\"', `cover_alt: ${yq(p.tr[l].cover_alt)}`,\n    `tags: [${tags.map(yq).join(', ')}]`, 'draft: false', '---', '',\n  ].join('\\n') + '\\n' + mdText(p.tr[l].body.trim()) + extra + '\\n',\n}));\nreturn [{ json: { folder, slug, md, tr: p.tr, tags } }];\n"
+      }
+    },
+    {
+      "id": "33bc40ce-a5da-4886-a013-3e2c33ef4d60",
+      "name": "Get Ref",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        3600,
+        100
+      ],
+      "parameters": {
+        "method": "GET",
+        "url": "=https://api.github.com/repos/{{ $('Config').first().json.cfg.repo }}/git/ref/heads/{{ $('Config').first().json.cfg.branch }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "githubApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/vnd.github+json"
+            },
+            {
+              "name": "X-GitHub-Api-Version",
+              "value": "2026-03-10"
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "51bb52bc-b93d-4d19-8f3e-6a1699dcce15",
+      "name": "Get Head Commit",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        3800,
+        100
+      ],
+      "parameters": {
+        "method": "GET",
+        "url": "=https://api.github.com/repos/{{ $('Config').first().json.cfg.repo }}/git/commits/{{ $json.object.sha }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "githubApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/vnd.github+json"
+            },
+            {
+              "name": "X-GitHub-Api-Version",
+              "value": "2026-03-10"
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "97ca5681-0987-4e44-b3b2-7cd4016c1edd",
+      "name": "Blob Items",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4000,
+        100
+      ],
+      "parameters": {
+        "jsCode": "\nconst f = $('Final Files').first().json;\nconst cfg = $('Config').first().json.cfg;\nreturn $('Pack Images').first().json.files.map(x => ({ json: { path: `${cfg.news_dir}/${f.folder}/${x.path}`, b64: x.b64 } }));\n"
+      }
+    },
+    {
+      "id": "9b0fc68a-6363-486b-9329-88d87eae3df3",
+      "name": "Create Blob",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        4200,
+        100
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "=https://api.github.com/repos/{{ $('Config').first().json.cfg.repo }}/git/blobs",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "githubApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/vnd.github+json"
+            },
+            {
+              "name": "X-GitHub-Api-Version",
+              "value": "2026-03-10"
+            }
+          ]
+        },
+        "options": {},
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ content: $json.b64, encoding: 'base64' }) }}"
+      },
+      "retryOnFail": true,
+      "maxTries": 3
+    },
+    {
+      "id": "02222bf1-9c42-4f56-9a5f-af7f78f73ff0",
+      "name": "Build Tree",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4400,
+        100
+      ],
+      "parameters": {
+        "jsCode": "\nconst f = $('Final Files').first().json;\nconst paths = $('Blob Items').all().map(i => i.json.path);\nconst shas = $input.all().map(i => i.json.sha);\nif (shas.length !== paths.length || shas.some(s => !s)) throw new Error('Blob upload failed');\nreturn [{ json: {\n  base_tree: $('Get Head Commit').first().json.tree.sha,\n  tree: [\n    ...f.md.map(m => ({ path: m.path, mode: '100644', type: 'blob', content: m.content })),\n    ...paths.map((path, k) => ({ path, mode: '100644', type: 'blob', sha: shas[k] })),\n  ],\n} }];\n"
+      }
+    },
+    {
+      "id": "5dc0b523-9fe6-47c8-97a3-6228d7dab817",
+      "name": "Create Tree",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        4600,
+        100
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "=https://api.github.com/repos/{{ $('Config').first().json.cfg.repo }}/git/trees",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "githubApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/vnd.github+json"
+            },
+            {
+              "name": "X-GitHub-Api-Version",
+              "value": "2026-03-10"
+            }
+          ]
+        },
+        "options": {},
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json) }}"
+      }
+    },
+    {
+      "id": "1071535d-8e4c-4413-b1e4-f4436aa95d67",
+      "name": "Create Commit",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        4800,
+        100
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "=https://api.github.com/repos/{{ $('Config').first().json.cfg.repo }}/git/commits",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "githubApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/vnd.github+json"
+            },
+            {
+              "name": "X-GitHub-Api-Version",
+              "value": "2026-03-10"
+            }
+          ]
+        },
+        "options": {},
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ message: 'News: ' + $('Final Files').first().json.tr.en.title + '\\n\\nPosted by ' + $('Pack Images').first().json.author_id + ' via ' + $('Pack Images').first().json.channel, tree: $json.sha, parents: [$('Get Ref').first().json.object.sha] }) }}"
+      }
+    },
+    {
+      "id": "dbf857f2-7513-42e2-a33a-860250ad37b2",
+      "name": "Update Ref",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        5000,
+        100
+      ],
+      "parameters": {
+        "method": "PATCH",
+        "url": "=https://api.github.com/repos/{{ $('Config').first().json.cfg.repo }}/git/refs/heads/{{ $('Config').first().json.cfg.branch }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "githubApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/vnd.github+json"
+            },
+            {
+              "name": "X-GitHub-Api-Version",
+              "value": "2026-03-10"
+            }
+          ]
+        },
+        "options": {},
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ sha: $json.sha, force: false }) }}"
+      }
+    },
+    {
+      "id": "7ce45058-59b1-488e-90d1-ef33eb3d29aa",
+      "name": "Committed",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        5200,
+        100
+      ],
+      "parameters": {
+        "jsCode": "\nconst p = $('Parse Translation').last().json;\nconst f = $('Final Files').first().json;\nconst sha = $input.first().json.object?.sha || $('Create Commit').first().json.sha;\nreturn [{ json: {\n  channel: p.channel, chat_id: p.chat_id, email: p.email,\n  notify: `Новость сохранена (${f.folder}). Сайт обновится через 1–2 минуты, потом опубликую в Facebook и Instagram.`,\n  draft: { ...p.draft, folder: f.folder, status: 'committed', commit_sha: sha },\n  audit: { actor_id: p.draft.author_id, action: 'commit', target: f.folder, result: 'ok', detail: sha },\n} }];\n"
+      }
+    },
+    {
+      "id": "c5e2c505-16fd-46ed-9933-3523e5d3c89d",
+      "name": "Bump Count",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        5400,
+        -80
+      ],
+      "parameters": {
+        "resource": "row",
+        "operation": "update",
+        "dataTableId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "8RXgFKzfwiL9okcq",
+          "cachedResultName": "publishers"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "coach_id",
+              "condition": "eq",
+              "keyValue": "={{ $('Pack Images').first().json.author_id }}"
+            }
+          ]
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "posts_day": "={{ $('Rate Check').first().json.today }}",
+            "posts_count": "={{ $('Rate Check').first().json.posts_count + 1 }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "posts_day",
+              "displayName": "posts_day",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "posts_count",
+              "displayName": "posts_count",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "7c394285-31ec-42a8-ab70-68f3b6ea0782",
+      "name": "Wait Deploy",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        5400,
+        100
+      ],
+      "parameters": {
+        "amount": 45,
+        "unit": "seconds"
+      },
+      "webhookId": "4294dfb5-42a7-409f-bcd4-1e3e5eb1183d"
+    },
+    {
+      "id": "61d8c2dc-7a78-4970-91e0-a7e58fdec4f9",
+      "name": "Get News Json",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        5600,
+        100
+      ],
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $('Config').first().json.cfg.news_json + '?t=' + Date.now() }}",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "ebc2d3ab-c7ed-4601-982f-7688cc4d7254",
+      "name": "Check Live",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        5800,
+        100
+      ],
+      "parameters": {
+        "jsCode": "\n// Look for the post in news.json; $runIndex counts loop passes.\nconst cfg = $('Config').first().json.cfg;\nconst slug = $('Final Files').first().json.slug;\n// HTTP Request splits a top-level JSON array into one item per post.\nconst post = $input.all().map(i => i.json).find(x => x && x.slug === slug);\nconst attempt = $runIndex + 1;\nreturn [{ json: { state: post ? 'live' : attempt >= cfg.deploy_checks ? 'timeout' : 'retry', post: post || null, attempt } }];\n"
+      }
+    },
+    {
+      "id": "4346e252-5aa8-42a2-bad3-6c90b28294a1",
+      "name": "Live?",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        6000,
+        100
+      ],
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "332a79c9-bd3c-5a96-b5b1-c9fb2f97bc86",
+                    "leftValue": "={{ $json.state }}",
+                    "rightValue": "live",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "live"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "f48edab6-e59f-5498-a94e-44cd81915974",
+                    "leftValue": "={{ $json.state }}",
+                    "rightValue": "retry",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "retry"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "85f0707a-9f42-5c00-aa23-29b589192fba",
+                    "leftValue": "={{ $json.state }}",
+                    "rightValue": "timeout",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "timeout"
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "8e2b2615-f708-4805-bb0f-00aaffecbf2c",
+      "name": "Build Social",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        6200,
+        0
+      ],
+      "parameters": {
+        "jsCode": "\nconst cfg = $('Config').first().json.cfg;\nconst f = $('Final Files').first().json;\nconst post = $json.post || {};\nconst url = l => post.url?.[l] || `${cfg.site}/${l}/news/${f.slug}/`;\nconst block = l => `${f.tr[l].title}\\n${f.tr[l].summary}\\n${url(l)}`;\nconst tags = f.tags.map(t => '#' + t.replace(/[\\s#]+/g, '')).join(' ');\nconst ig = cfg.social_langs.map(l => `${f.tr[l].title}\\n${f.tr[l].summary}`).join('\\n\\n')\n  + `\\n\\n${url(cfg.social_langs[0])}` + (tags ? `\\n\\n${tags}` : '');\nreturn [{ json: {\n  urls: { he: url('he'), ru: url('ru'), en: url('en') },\n  fb_message: cfg.social_langs.map(block).join('\\n\\n'),\n  fb_link: url(cfg.social_langs[0]),\n  ig_caption: ig.slice(0, 2200),\n  ig_image: post.cover || '',\n  ig_alt: f.tr.en.cover_alt,\n  // Title + link only: the link preview shows the summary, and Telegram caps a message at 4096 chars.\n  wa: Object.fromEntries(['he', 'ru', 'en'].map(l => [l, 'https://wa.me/?text=' + encodeURIComponent(`${f.tr[l].title}\\n${url(l)}`)])),\n} }];\n"
+      }
+    },
+    {
+      "id": "2240f0a3-c32f-4183-9f2c-9c8723b92b81",
+      "name": "Deploy Timeout",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        6200,
+        320
+      ],
+      "parameters": {
+        "jsCode": "\nconst p = $('Parse Translation').last().json;\nconst f = $('Final Files').first().json;\nreturn [{ json: {\n  channel: p.channel, chat_id: p.chat_id, email: p.email, notify_admin: true,\n  notify: `Новость ${f.folder} сохранена, но за 12 минут не появилась на сайте. Facebook и Instagram не тронуты. Проверьте сборку: https://github.com/Unifight-haifa/unifight/actions`,\n  draft: { ...p.draft, folder: f.folder, status: 'deploy_timeout', commit_sha: $('Committed').first().json.draft.commit_sha },\n  audit: { actor_id: p.draft.author_id, action: 'deploy_wait', target: f.folder, result: 'timeout', detail: '' },\n} }];\n"
+      }
+    },
+    {
+      "id": "073f4dc9-aeec-418b-addb-5c0dba9b10a0",
+      "name": "FB Post",
+      "type": "n8n-nodes-base.facebookGraphApi",
+      "typeVersion": 1,
+      "position": [
+        6400,
+        0
+      ],
+      "parameters": {
+        "hostUrl": "graph.facebook.com",
+        "httpRequestMethod": "POST",
+        "graphApiVersion": "v25.0",
+        "node": "={{ $('Config').first().json.cfg.fb_page_id }}",
+        "edge": "feed",
+        "options": {
+          "queryParameters": {
+            "parameter": [
+              {
+                "name": "message",
+                "value": "={{ $json.fb_message }}"
+              },
+              {
+                "name": "link",
+                "value": "={{ $json.fb_link }}"
+              }
+            ]
+          }
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "id": "e44122da-cb97-47c3-8dc5-79eaaf982e51",
+      "name": "IG Container",
+      "type": "n8n-nodes-base.facebookGraphApi",
+      "typeVersion": 1,
+      "position": [
+        6600,
+        0
+      ],
+      "parameters": {
+        "hostUrl": "graph.facebook.com",
+        "httpRequestMethod": "POST",
+        "graphApiVersion": "v25.0",
+        "node": "={{ $('Config').first().json.cfg.ig_user_id }}",
+        "edge": "media",
+        "options": {
+          "queryParameters": {
+            "parameter": [
+              {
+                "name": "image_url",
+                "value": "={{ $('Build Social').first().json.ig_image }}"
+              },
+              {
+                "name": "caption",
+                "value": "={{ $('Build Social').first().json.ig_caption }}"
+              },
+              {
+                "name": "alt_text",
+                "value": "={{ $('Build Social').first().json.ig_alt }}"
+              }
+            ]
+          }
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "id": "f9a52397-d1dd-4527-b815-78c6b6da098b",
+      "name": "Wait IG",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        6800,
+        0
+      ],
+      "parameters": {
+        "amount": 30,
+        "unit": "seconds"
+      },
+      "webhookId": "a12abe3c-4450-4fa5-80cb-b49293793e6a"
+    },
+    {
+      "id": "ec9fae1f-390b-4abf-a0f6-264317b613f6",
+      "name": "IG Publish",
+      "type": "n8n-nodes-base.facebookGraphApi",
+      "typeVersion": 1,
+      "position": [
+        7000,
+        0
+      ],
+      "parameters": {
+        "hostUrl": "graph.facebook.com",
+        "httpRequestMethod": "POST",
+        "graphApiVersion": "v25.0",
+        "node": "={{ $('Config').first().json.cfg.ig_user_id }}",
+        "edge": "media_publish",
+        "options": {
+          "queryParameters": {
+            "parameter": [
+              {
+                "name": "creation_id",
+                "value": "={{ $('IG Container').first().json.id }}"
+              }
+            ]
+          }
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "id": "a16ae4bf-1591-4e99-b42b-73caba53ed8f",
+      "name": "Summarize",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        7200,
+        0
+      ],
+      "parameters": {
+        "jsCode": "\nconst p = $('Parse Translation').last().json;\nconst c = $('Committed').first().json;\nconst s = $('Build Social').first().json;\nconst get = n => { try { return $(n).first().json; } catch (e) { return {}; } };\nconst fb = get('FB Post'), ig = get('IG Publish'), igc = get('IG Container');\nconst err = o => o.error?.message || o.error || 'нет ответа';\nconst fbId = fb.id || '', igId = ig.id || '';\nconst problems = [];\nif (!fbId) problems.push('Facebook: ' + err(fb));\nif (!igId) problems.push('Instagram: ' + err(igc.error ? igc : ig));\nconst notify = [\n  'Новость на сайте:', `HE ${s.urls.he}`, `RU ${s.urls.ru}`, `EN ${s.urls.en}`, '',\n  `Facebook: ${fbId ? 'опубликовано' : 'не получилось'}`, `Instagram: ${igId ? 'опубликовано' : 'не получилось'}`,\n  ...(problems.length ? ['', ...problems] : []), '',\n  'WhatsApp — откройте ссылку и выберите группу родителей:',\n  `HE ${s.wa.he}`, `RU ${s.wa.ru}`, `EN ${s.wa.en}`,\n].join('\\n');\nreturn [{ json: {\n  channel: p.channel, chat_id: p.chat_id, email: p.email, notify, notify_admin: problems.length > 0,\n  draft: { ...c.draft, status: problems.length ? 'live_partial' : 'live', fb_post_id: fbId, ig_media_id: igId,\n           error: problems.join('; ').slice(0, 500) },\n  audit: { actor_id: p.draft.author_id, action: 'distribute', target: c.draft.folder,\n           result: problems.length ? 'partial' : 'ok', detail: `fb=${fbId} ig=${igId}` },\n} }];\n"
+      }
+    },
+    {
+      "id": "4e3233d1-b178-417e-bece-dc6c42cb0ac7",
+      "name": "Send Preview",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2400,
+        200
+      ],
+      "parameters": {
+        "chatId": "={{ $json.chat_id }}",
+        "text": "={{ $json.text }}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "disable_web_page_preview": true,
+          "parse_mode": "HTML"
+        }
+      },
+      "webhookId": "123d2c88-3dd8-47f4-890a-1e954a4de5af",
+      "credentials": {
+        "telegramApi": {
+          "id": "hsPK2WfVUBtOHxl5",
+          "name": "Telegram account"
         }
       }
     }
@@ -1698,29 +1825,7 @@
         ]
       ]
     },
-    "Preview Items": {
-      "main": [
-        [
-          {
-            "node": "Send Preview",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Send Preview": {
-      "main": [
-        [
-          {
-            "node": "Ask Telegram",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Ask Telegram": {
+    "Ask Email": {
       "main": [
         [
           {
@@ -1731,7 +1836,7 @@
         ]
       ]
     },
-    "Ask Email": {
+    "Ask Telegram": {
       "main": [
         [
           {
@@ -1778,6 +1883,17 @@
         ]
       ]
     },
+    "List News": {
+      "main": [
+        [
+          {
+            "node": "Final Files",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
     "Cancelled": {
       "main": [
         [
@@ -1793,17 +1909,6 @@
           },
           {
             "node": "Notify",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "List News": {
-      "main": [
-        [
-          {
-            "node": "Final Files",
             "type": "main",
             "index": 0
           }
@@ -1998,6 +2103,17 @@
         ]
       ]
     },
+    "Build Social": {
+      "main": [
+        [
+          {
+            "node": "FB Post",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
     "Deploy Timeout": {
       "main": [
         [
@@ -2013,17 +2129,6 @@
           },
           {
             "node": "Notify",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Build Social": {
-      "main": [
-        [
-          {
-            "node": "FB Post",
             "type": "main",
             "index": 0
           }
@@ -2094,17 +2199,83 @@
           }
         ]
       ]
+    },
+    "Preview Items": {
+      "main": [
+        [
+          {
+            "node": "Send Preview",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Preview": {
+      "main": [
+        [
+          {
+            "node": "Ask Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
-  "active": false,
   "settings": {
     "executionOrder": "v1",
     "saveManualExecutions": true,
-    "errorWorkflow": "REPLACE_WITH_news-error_WORKFLOW_ID"
+    "callerPolicy": "workflowsFromSameOwner"
   },
-  "pinData": {},
-  "meta": {
-    "templateCredsSetupCompleted": false
-  },
-  "tags": []
+  "nodeGroups": [
+    {
+      "id": "a39f35da-2ef0-4203-8929-edd013ddd254",
+      "name": "Photos and author check",
+      "nodeNames": [
+        "Config",
+        "Read Orientation",
+        "Resize",
+        "Pack Images",
+        "Get Publisher",
+        "Check Author",
+        "Rate Check"
+      ],
+      "description": "Rotate, resize and strip EXIF/GPS from photos; refuse unknown authors and over-limit posting."
+    },
+    {
+      "id": "07226c78-d4e1-4a14-b101-87927d6868aa",
+      "name": "Commit to GitHub",
+      "nodeNames": [
+        "List News",
+        "Final Files",
+        "Get Ref",
+        "Get Head Commit",
+        "Blob Items",
+        "Create Blob",
+        "Build Tree",
+        "Create Tree",
+        "Create Commit",
+        "Update Ref",
+        "Committed"
+      ],
+      "description": "Unique slug, escaped Markdown files and images, one commit via the Git Data API (fast-forward only)."
+    },
+    {
+      "id": "2d0113d0-9ddb-48de-afc7-9d3a81ac1977",
+      "name": "Facebook and Instagram",
+      "nodeNames": [
+        "Build Social",
+        "FB Post",
+        "IG Container",
+        "Wait IG",
+        "IG Publish",
+        "Summarize"
+      ],
+      "description": "Page post with link, Instagram image from news.json cover, WhatsApp share links, summary for the author."
+    }
+  ],
+  "tags": [],
+  "active": false,
+  "pinData": {}
 }

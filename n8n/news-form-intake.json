@@ -1,7 +1,16 @@
 {
+  "id": "0OVtxi0XMsEDtKmU",
   "name": "news-form-intake",
   "nodes": [
     {
+      "id": "b65f7d51-477a-44ab-a580-b3975a254c64",
+      "name": "News Form",
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.6,
+      "position": [
+        0,
+        300
+      ],
       "parameters": {
         "authentication": "n8nUserAuth",
         "formTitle": "Новость для сайта Unifight",
@@ -67,28 +76,28 @@
         "options": {
           "path": "unifight-news",
           "appendAttribution": false,
-          "ignoreBots": true
+          "ignoreBots": true,
+          "includeUserInOutput": true
         }
       },
-      "id": "f09b35a8-ebc6-5679-92f4-ca80fbad09a9",
-      "name": "News Form",
-      "type": "n8n-nodes-base.formTrigger",
-      "typeVersion": 2.2,
-      "position": [
-        0,
-        300
-      ],
-      "webhookId": "REPLACE_ME",
-      "_note": "Authentication \"n8n User Auth\" is documented (only logged-in instance users; output adds user id/email/name); the internal value \"n8nUserAuth\", the user output path and field keys (fieldName/multipleFiles/acceptFileTypes) are unverified. https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.formtrigger/"
+      "webhookId": "197995e1-b0cc-4ef2-9fcd-6bf77c87bf40"
     },
     {
+      "id": "149dd391-3696-4427-8d56-c7eb6da6b3b7",
+      "name": "Find Publisher",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        220,
+        300
+      ],
       "parameters": {
         "resource": "row",
         "operation": "get",
         "dataTableId": {
           "__rl": true,
           "mode": "list",
-          "value": "",
+          "value": "8RXgFKzfwiL9okcq",
           "cachedResultName": "publishers"
         },
         "filters": {
@@ -102,18 +111,17 @@
         },
         "limit": 1
       },
-      "id": "5d570fd5-768a-5eeb-accf-5d80bfb8e11a",
-      "name": "Find Publisher",
-      "type": "n8n-nodes-base.dataTable",
-      "typeVersion": 1,
-      "position": [
-        220,
-        300
-      ],
-      "alwaysOutputData": true,
-      "_note": "Data Table node params (filters/columns/operation names) written from docs operation list, not from an export; re-select the table after import. https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.datatable/"
+      "alwaysOutputData": true
     },
     {
+      "id": "6d43121e-d995-4b05-adbe-caec13ecf938",
+      "name": "Is Allowed",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        440,
+        300
+      ],
       "parameters": {
         "conditions": {
           "options": {
@@ -137,24 +145,37 @@
           "combinator": "and"
         },
         "options": {}
-      },
-      "id": "06eefeec-ccb5-5ac9-9e7f-b6d0448a0ff6",
-      "name": "Is Allowed",
-      "type": "n8n-nodes-base.if",
-      "typeVersion": 2.2,
-      "position": [
-        440,
-        300
-      ]
+      }
     },
     {
+      "id": "7a049539-9d58-40c6-8329-009e12209f7b",
+      "name": "Prepare Items",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        660,
+        220
+      ],
+      "parameters": {
+        "jsCode": "\n// Publish input: one item per image (binary \"data\"), cover first, max 6.\nconst f = $('News Form').first();\nconst p = $input.first().json;\nconst v = f.json;\nconst keys = Object.keys(f.binary || {});\nconst order = [...keys.filter(k => k.startsWith('cover')), ...keys.filter(k => !k.startsWith('cover'))].slice(0, 6);\nif (!order.length) throw new Error('Form submitted without a cover image');\nconst lang = (String(v.lang || '').match(/\\((he|ru|en)\\)/) || [])[1] || p.lang || 'he';\nconst meta = {\n  channel: 'email', chat_id: '', email: p.email,\n  author_id: p.coach_id, author_name: p.name || '',\n  src_lang: lang,\n  title: String(v.title || '').trim(), body: String(v.body || '').trim(),\n  cover_alt: String(v.cover_alt || '').trim(),\n  tags: String(v.tags || '').split(',').map(t => t.trim()).filter(Boolean).slice(0, 8),\n  draft_id: `form-${p.coach_id}-${Date.now()}`,\n};\nreturn order.map((k, index) => ({ json: { ...meta, index }, binary: { data: f.binary[k] } }));\n"
+      }
+    },
+    {
+      "id": "4f7b3c6f-5802-4b88-8c26-efe616b2b1d7",
+      "name": "Log Denied",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        660,
+        480
+      ],
       "parameters": {
         "resource": "row",
         "operation": "insert",
         "dataTableId": {
           "__rl": true,
           "mode": "list",
-          "value": "",
+          "value": "JefIWDs5Xw3sqWY8",
           "cachedResultName": "audit_log"
         },
         "columns": {
@@ -170,88 +191,155 @@
             "execution_id": "={{ $execution.id }}"
           },
           "matchingColumns": [],
-          "schema": []
+          "schema": [
+            {
+              "id": "ts",
+              "displayName": "ts",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "actor_id",
+              "displayName": "actor_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "channel",
+              "displayName": "channel",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "action",
+              "displayName": "action",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "target",
+              "displayName": "target",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "result",
+              "displayName": "result",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "detail",
+              "displayName": "detail",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "execution_id",
+              "displayName": "execution_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ]
         }
-      },
-      "id": "b6bc8913-8ac4-53f5-9f17-0fed9655ae8b",
-      "name": "Log Denied",
-      "type": "n8n-nodes-base.dataTable",
-      "typeVersion": 1,
-      "position": [
-        660,
-        480
-      ],
-      "_note": "Data Table node params (filters/columns/operation names) written from docs operation list, not from an export; re-select the table after import. https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.datatable/"
+      }
     },
     {
-      "parameters": {
-        "operation": "completion",
-        "completionTitle": "Нет прав на публикацию",
-        "completionMessage": "Ваш адрес не в списке авторов новостей. Обратитесь к администратору клуба.",
-        "options": {}
-      },
-      "id": "0abc0892-d5a3-5344-b0d6-6d7b28870a26",
-      "name": "Denied Page",
-      "type": "n8n-nodes-base.form",
-      "typeVersion": 1,
+      "id": "733373c3-82e5-4048-a910-486143b27657",
+      "name": "Start Publish",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.4,
       "position": [
         880,
-        480
-      ],
-      "_note": "Form node, Page Type Form Ending (completion). https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.form/"
-    },
-    {
-      "parameters": {
-        "jsCode": "\n// Publish input: one item per image (binary \"data\"), cover first, max 6.\nconst f = $('News Form').first();\nconst p = $input.first().json;\nconst v = f.json;\nconst keys = Object.keys(f.binary || {});\nconst order = [...keys.filter(k => k.startsWith('cover')), ...keys.filter(k => !k.startsWith('cover'))].slice(0, 6);\nif (!order.length) throw new Error('Form submitted without a cover image');\nconst lang = (String(v.lang || '').match(/\\((he|ru|en)\\)/) || [])[1] || p.lang || 'he';\nconst meta = {\n  channel: 'email', chat_id: '', email: p.email,\n  author_id: p.coach_id, author_name: p.name || '',\n  src_lang: lang,\n  title: String(v.title || '').trim(), body: String(v.body || '').trim(),\n  cover_alt: String(v.cover_alt || '').trim(),\n  tags: String(v.tags || '').split(',').map(t => t.trim()).filter(Boolean).slice(0, 8),\n  draft_id: `form-${p.coach_id}-${Date.now()}`,\n};\nreturn order.map((k, index) => ({ json: { ...meta, index }, binary: { data: f.binary[k] } }));\n"
-      },
-      "id": "7becbdb3-42c1-55e7-bdd1-cadf703945bf",
-      "name": "Prepare Items",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        660,
         220
       ],
-      "_note": "Binary keys for multi-file fields assumed to start with the field name (cover, photos_0...)."
-    },
-    {
       "parameters": {
         "workflowId": {
           "__rl": true,
           "mode": "list",
-          "value": "REPLACE_WITH_news-publish_ID",
+          "value": "lCObmj9hNku4t4NJ",
           "cachedResultName": "news-publish"
         },
         "mode": "once",
         "options": {
           "waitForSubWorkflow": false
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
         }
-      },
-      "id": "827249ba-8c75-5be5-9106-c05b951846a7",
-      "name": "Start Publish",
-      "type": "n8n-nodes-base.executeWorkflow",
-      "typeVersion": 1.2,
-      "position": [
-        880,
-        220
-      ]
+      }
     },
     {
+      "id": "520d8caa-10ba-45bd-a1ce-a75cd13b97f4",
+      "name": "Accepted Page",
+      "type": "n8n-nodes-base.form",
+      "typeVersion": 2.5,
+      "position": [
+        1100,
+        220
+      ],
       "parameters": {
         "operation": "completion",
         "completionTitle": "Новость принята",
         "completionMessage": "Через пару минут на вашу почту придёт предпросмотр на трёх языках с кнопкой «Опубликовать / Исправить / Отменить».",
         "options": {}
       },
-      "id": "a8e4adcf-7e8a-5a80-bfbe-7f3a8f05aad6",
-      "name": "Accepted Page",
+      "executeOnce": true,
+      "webhookId": "6f4d98a3-d047-4d04-bce7-58b86b1afcd8"
+    },
+    {
+      "id": "24a7dd40-498a-4454-ae6d-e773ec51f12e",
+      "name": "Denied Page",
       "type": "n8n-nodes-base.form",
-      "typeVersion": 1,
+      "typeVersion": 2.5,
       "position": [
-        1100,
-        220
+        880,
+        480
       ],
-      "executeOnce": true
+      "parameters": {
+        "operation": "completion",
+        "completionTitle": "Нет прав на публикацию",
+        "completionMessage": "Ваш адрес не в списке авторов новостей. Обратитесь к администратору клуба.",
+        "options": {}
+      },
+      "webhookId": "4b81d775-0f8b-424d-8394-adaba40acb76"
     }
   ],
   "connections": {
@@ -306,17 +394,6 @@
         ]
       ]
     },
-    "Start Publish": {
-      "main": [
-        [
-          {
-            "node": "Accepted Page",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Log Denied": {
       "main": [
         [
@@ -327,17 +404,25 @@
           }
         ]
       ]
+    },
+    "Start Publish": {
+      "main": [
+        [
+          {
+            "node": "Accepted Page",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
-  "active": false,
   "settings": {
     "executionOrder": "v1",
-    "saveManualExecutions": true,
-    "errorWorkflow": "REPLACE_WITH_news-error_WORKFLOW_ID"
+    "saveManualExecutions": true
   },
-  "pinData": {},
-  "meta": {
-    "templateCredsSetupCompleted": false
-  },
-  "tags": []
+  "nodeGroups": [],
+  "tags": [],
+  "active": false,
+  "pinData": {}
 }
