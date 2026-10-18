@@ -510,6 +510,17 @@ html[lang=he] .rc-n{font-weight:400}
 .coach-vid{display:inline-flex;align-items:center;gap:.5em;justify-self:start;min-block-size:44px;margin-block-end:12px;padding:.4em .9em;border-radius:2px;box-shadow:inset 0 0 0 1px var(--gold);background:rgba(10,9,8,.35);color:var(--gold-2);font:600 14px/1.2 var(--body);text-decoration:none}
 .coach-vid:hover{background:rgba(212,168,75,.12)}
 .rc .coach-vid{margin:0;font-size:13px}
+.bio-more{justify-self:start;margin-block-start:6px;padding:6px 12px;background:none;border:1px solid var(--line);color:var(--gold-2);font:inherit;font-size:13px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:border-color .2s}
+.bio-more:hover{border-color:var(--gold)}
+.bio-pop{inset:0;margin:auto;width:min(640px,calc(100vw - 32px));max-height:min(80vh,760px);overflow-y:auto;padding:28px 26px 30px;background:var(--ink-2);color:var(--paper-2);border:1px solid var(--gold);font-size:15.5px;line-height:1.65}
+.bio-pop::backdrop{background:rgba(10,9,8,.78)}
+.bio-pop p{margin:0 0 12px}
+.bio-n{font:600 24px/1.15 var(--disp);text-transform:uppercase;color:var(--paper);margin:0 0 16px;padding-inline-end:36px}
+html[lang=he] .bio-n{font-weight:400}
+.bio-h{font-size:12.5px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--red-3);margin:22px 0 10px}
+.bio-appr{margin:0;padding-inline-start:16px;border-inline-start:2px solid var(--gold);color:var(--paper)}
+blockquote.bio-appr{font-style:italic}
+.bio-x{position:absolute;inset-block-start:10px;inset-inline-end:10px;width:36px;height:36px;background:none;border:0;color:var(--paper);font-size:26px;line-height:1;cursor:pointer}
 
 /* ---------- embeddable section ---------- */
 .success-triangle{

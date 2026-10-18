@@ -279,6 +279,9 @@ RAIL_UI = {
     "title": {"he": "צוות המאמנים", "ru": "Команда тренеров", "en": "The coaching team"},
     "prev": {"he": "הקודם", "ru": "Назад", "en": "Previous"},
     "next": {"he": "הבא", "ru": "Дальше", "en": "Next"},
+    "more": {"he": "לקריאה נוספת", "ru": "Подробнее", "en": "Read more"},
+    "approach": {"he": "הגישה המקצועית והחינוכית", "ru": "Подход к тренировкам и воспитанию", "en": "Coaching approach"},
+    "close": {"he": "סגירה", "ru": "Закрыть", "en": "Close"},
 }
 
 
@@ -292,7 +295,21 @@ def rail_card(n, grp, grp_label):
             f'<span class="mono" aria-hidden="true">{t(initials(n["name"]))}</span>')
     bio = f'<p class="rc-bio">{t(n["bio"])}</p>' if n.get("bio") else ""
     return (f'<li class="rc" data-grp="{grp}"><div class="rc-ph{" has-img" if ph else ""}">{face}</div>'
-            f'<span class="rc-tag">{t(grp_label)}</span><h4 class="rc-n">{t(n["name"])}</h4>{bio}{coach_video(n)}</li>')
+            f'<span class="rc-tag">{t(grp_label)}</span><h4 class="rc-n">{t(n["name"])}</h4>{bio}{coach_more(n)}{coach_video(n)}</li>')
+
+
+def coach_more(c):
+    if not c.get("about"):
+        return ""
+    pid = f'bio-{c["id"]}'
+    paras = "".join(f"<p>{t(p)}</p>" for p in c["about"])
+    appr = "".join(f"<p>{t(p)}</p>" for p in c.get("approach", []))
+    if appr:
+        tag = "blockquote" if c.get("approach_own") else "div"
+        appr = f'<h5 class="bio-h">{t(RAIL_UI["approach"])}</h5><{tag} class="bio-appr">{appr}</{tag}>'
+    return (f'<button type="button" class="bio-more" popovertarget="{pid}">{t(RAIL_UI["more"])}</button>'
+            f'<div class="bio-pop" id="{pid}" popover><button type="button" class="bio-x" popovertarget="{pid}" popovertargetaction="hide" {attr("aria-label", RAIL_UI["close"])}>×</button>'
+            f'<h4 class="bio-n">{t(c["name"])}</h4>{paras}{appr}</div>')
 
 
 def coach_video(c):
@@ -315,7 +332,7 @@ def coaches():
    <article class="coach rv"><span class="coach-bg kj" aria-hidden="true">{k}</span>
     {photo(c, k)}
     <div class="coach-b"><h3 class="h3 coach-n">{t(c["name"])}</h3><p class="role">{t(c["role"])}</p>{coach_video(c)}
-    <p class="bio">{t(c["bio"])}</p><p class="dan">{t(c["dan_rank"])}</p></div></article>'''
+    <p class="bio">{t(c["bio"])}</p>{coach_more(c)}<p class="dan">{t(c["dan_rank"])}</p></div></article>'''
                     for c, k in zip(grp("main"), ks))
     groups = [("lead", RAIL_UI["lead"], grp("lead"))] + [(r["group"], r["title"], grp(r["group"])) for r in co["roster"]]
     rail = "".join(rail_card(n, k, lab) for k, lab, ns in groups for n in ns)

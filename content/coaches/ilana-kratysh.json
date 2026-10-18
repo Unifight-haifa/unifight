@@ -18,10 +18,9 @@
   "en": "She grew up on our mat: started judo at five. She later moved to wrestling, won four European silver medals (2013–2016) and represented Israel at the Rio 2016 Olympics. In 2023 she took silver at the European Sumo Championships — Israel's first-ever medal in the sport — and in 2026 Maccabiah gold in beach wrestling. Today she chairs the club and coaches judo and wrestling."
  },
  "dan_rank": {
-  "placeholder": true,
-  "he": "[דרגת דאן — לאישור]",
-  "ru": "[Дан — уточнить]",
-  "en": "[Dan rank — to confirm]"
+  "he": "דאן 2",
+  "ru": "2 дан",
+  "en": "2nd dan"
  },
  "photo": {
   "src": "coaches/ilana.jpg",
@@ -35,6 +34,51 @@
   }
  },
  "youtube": "kMtByOfLWW0",
+ "about": [
+  {
+   "he": "אילנה קרטיש, ספורטאית אולימפית, מאמנת ג׳ודו ואמא לשתי בנות, החלה את דרכה בעולם הג׳ודו בגיל 5 בהדרכת אביה, מאמן ג׳ודו. לאורך השנים זכתה באליפויות ישראל והגיעה למקום החמישי באליפות אירופה.",
+   "ru": "Илана Кратыш — олимпийская спортсменка, тренер по дзюдо и мама двух дочерей. Начала заниматься дзюдо в 5 лет у своего отца, тренера по дзюдо. За эти годы выигрывала чемпионаты Израиля и заняла пятое место на чемпионате Европы.",
+   "en": "Ilana Kratysh, an Olympian, judo coach and mother of two girls, started judo at 5, coached by her father, a judo coach. Over the years she won Israeli championships and finished fifth at the European Championships."
+  },
+  {
+   "he": "בהמשך בחרה לפרוץ דרך בענף ההיאבקות, כנגד כל הסיכויים, ורשמה הישגים היסטוריים: 4 פעמים סגנית אלופת אירופה, מקום שלישי בדירוג העולמי, ובשנת 2016 עשתה היסטוריה כשהפכה לאישה הראשונה שייצגה את ישראל בענף ההיאבקות במשחקים האולימפיים בריו דה ז׳ניירו.",
+   "ru": "Затем вопреки всему решила пробиться в борьбе и вошла в историю: четырёхкратный серебряный призёр чемпионатов Европы, третье место в мировом рейтинге, а в 2016 году — первая женщина, представившая Израиль в борьбе на Олимпийских играх, в Рио-де-Жанейро.",
+   "en": "Against all odds, she then broke into wrestling and made history: four-time European silver medallist, third in the world rankings, and in 2016 the first woman to represent Israel in wrestling at the Olympic Games, in Rio de Janeiro."
+  },
+  {
+   "he": "בשנת 2023 רשמה הישג היסטורי נוסף כשזכתה במדליית כסף באליפות אירופה בסומו.",
+   "ru": "В 2023 году добавила ещё одно историческое достижение — серебро чемпионата Европы по сумо.",
+   "en": "In 2023 she added another historic result: silver at the European Sumo Championships."
+  },
+  {
+   "he": "כיום אילנה נמנית עם המאמנות המובילות בצפון, מנהלת כ־15 מוקדי פעילות ספורטיבית ברחבי חיפה, נשר ועתלית, ומובילה פרויקטים חינוכיים וספורטיביים בשיתוף רשויות מקומיות ואיגודי ספורט.",
+   "ru": "Сегодня Илана — одна из ведущих тренеров Севера. Она руководит примерно 15 спортивными площадками в Хайфе, Нешере и Атлите и ведёт образовательные и спортивные проекты вместе с местными властями и спортивными федерациями.",
+   "en": "Today Ilana is one of the leading coaches in northern Israel. She runs about 15 sports activity sites across Haifa, Nesher and Atlit, and leads education and sports projects with local authorities and sports associations."
+  },
+  {
+   "he": "בעלת תואר ראשון בחינוך גופני (B.Ed), מאמנת ג׳ודו מוסמכת ובעלת דרגת דאן 2 בג׳ודו.",
+   "ru": "Бакалавр физического воспитания (B.Ed.), дипломированный тренер по дзюдо, 2 дан.",
+   "en": "She holds a B.Ed. in physical education, is a certified judo coach and holds a 2nd dan in judo."
+  },
+  {
+   "he": "בנוסף, מרצה ברחבי הארץ עם הרצאת ההשראה שלה ״איך לנצח את הבלתי אפשרי״, המבוססת על סיפור חייה והדרך שעברה עד להגשמת החלום האולימפי.",
+   "ru": "Также выступает по всей стране с вдохновляющей лекцией «Как победить невозможное» — о своей жизни и пути к олимпийской мечте.",
+   "en": "She also speaks across the country with her inspirational talk, “How to Beat the Impossible”, drawn from her life story and her road to the Olympic dream."
+  }
+ ],
+ "approach_own": true,
+ "approach": [
+  {
+   "he": "אני מאמינה שמי שחזק בספורט, יהיה חזק גם בחיים. הספורט העניק לי את הכלים להתמודד עם אתגרים, להתגבר על מכשולים ולהגשים חלומות שנראו בלתי אפשריים.",
+   "ru": "Я верю: кто силён в спорте, будет силён и в жизни. Спорт дал мне инструменты, чтобы справляться с трудностями, преодолевать препятствия и осуществлять мечты, которые казались невозможными.",
+   "en": "I believe that whoever is strong in sport will be strong in life. Sport gave me the tools to face challenges, overcome obstacles and achieve dreams that seemed impossible."
+  },
+  {
+   "he": "היום השליחות שלי היא להעביר את הכלים האלה לדור הצעיר, לחזק את הביטחון העצמי, להקנות ערכים של משמעת, התמדה וכבוד הדדי, ולתת לכל ילד וילדה הזדמנות להאמין בעצמם, לחלום בגדול ולממש את מלוא הפוטנציאל שלהם – על המזרן ומחוצה לו.",
+   "ru": "Сегодня моя миссия — передать эти инструменты молодому поколению: укрепить уверенность в себе, привить дисциплину, упорство и взаимное уважение и дать каждому ребёнку возможность поверить в себя, мечтать о большом и раскрыть весь свой потенциал — на татами и за его пределами.",
+   "en": "Today my mission is to pass those tools on to the next generation: to build self-confidence, instil discipline, perseverance and mutual respect, and give every child the chance to believe in themselves, dream big and reach their full potential, on the mat and off it."
+  }
+ ],
  "sources": [
   {
    "fact": "chair of the amuta, head coach",
@@ -66,6 +110,7 @@
    "fact": "Maccabiah 2026 beach wrestling gold",
    "source": "https://nws.report/sport/150802/",
    "confidence": "confirmed"
-  }
+  },
+  "owner 2026-10-18, official Hebrew bio; ru/en translated"
  ]
 }

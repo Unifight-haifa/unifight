@@ -86,7 +86,8 @@ test('the .ics file is a valid all-day VEVENT', () => {
 
 test('nivheret is never called the Israel national team', () => {
   // real national-team roles of a person stay allowed, but only these exact phrasings
-  const ALLOW = [/מאמן נבחרת ישראל לנוער/, /юниорской сборной Израиля/, /בגד היאבקות של נבחרת ישראל/, /трико сборной Израиля/];
+  const ALLOW = [/מאמן נבחרת ישראל לנוער/, /юниорской сборной Израиля/, /בגד היאבקות של נבחרת ישראל/, /трико сборной Израиля/,
+    /היה חבר בנבחרת ישראל/, /за сборную Израиля/, /членом сборной Израиля по дзюдо/, /Israel national team member/, /the Israeli national judo team/];
   const pages = readdirSync(dist(''), { recursive: true }).filter((f) => f.endsWith('.html'));
   let nivSegments = 0;
   for (const f of pages) {

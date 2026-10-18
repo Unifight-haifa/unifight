@@ -1,17 +1,58 @@
 {
  "id": "alex-kagan",
- "order": 17,
+ "order": 18,
  "group": "young",
  "name": {
   "he": "אלכס קגן",
   "ru": "Алекс Каган",
   "en": "Alex Kagan"
  },
- "sources": [
-  "Lazar Kaplun, Facebook post, text supplied by owner 2026-10-17; he/en spellings are transliterations, unverified; he names = owner's official list 2026-10-17 (Kozlov, Drozhina not on it, removed); owner 2026-10-17: Irina = אירנה ליוהקי, Igor (not Egor) Bitulyaev, Ori Keshet-Halevi confirmed"
- ],
  "photo": {
   "src": "coaches/alex-kagan.jpg",
   "source": "owner 2026-10-18"
- }
+ },
+ "bio": {
+  "he": "בג׳ודו מגיל 5, מדליסט באליפויות ארציות ובתחרויות בינלאומיות, היה חבר בנבחרת ישראל. מאמן ילדים ונוער בחיפה ובעתלית.",
+  "ru": "В дзюдо с 5 лет, призёр национальных чемпионатов и международных турниров, выступал за сборную Израиля. Тренирует детей и подростков в Хайфе и Атлите.",
+  "en": "In judo since age 5, medallist at national championships and international events, former Israel national team member. Coaches children and teens in Haifa and Atlit."
+ },
+ "about": [
+  {
+   "he": "אלכס קגן, בן 21, עוסק בג׳ודו מגיל 5. לאורך הקריירה הספורטיבית שלו התחרה בארץ ובעולם, זכה במדליות באליפויות ארציות ובתחרויות בינלאומיות והיה חבר בנבחרת ישראל בג׳ודו.",
+   "ru": "Алексу Кагану 21 год, он занимается дзюдо с 5 лет. Выступал в Израиле и за рубежом, завоёвывал медали национальных чемпионатов и международных турниров, был членом сборной Израиля по дзюдо.",
+   "en": "Alex Kagan, 21, has done judo since he was 5. He has competed in Israel and abroad, won medals at national championships and international tournaments, and was a member of the Israeli national judo team."
+  },
+  {
+   "he": "אלכס בעל ניסיון של למעלה מ־5 שנים בהדרכת ג׳ודו. לאחר שירותו הצבאי כחייל במילואים, בחר לחזור לעולם האימון ולהמשיך להעביר לדור הצעיר את הידע, הניסיון והערכים שרכש לאורך השנים.",
+   "ru": "У Алекса более 5 лет тренерского опыта. После военной службы в резерве он решил вернуться к тренерской работе и передавать молодому поколению знания, опыт и ценности, накопленные за эти годы.",
+   "en": "Alex has more than five years of coaching experience. After his reserve military service, he chose to return to coaching and pass on to the next generation the knowledge, experience and values he has gained over the years."
+  },
+  {
+   "he": "כיום מאמן ילדים ובני נוער בחיפה, בבתי הספר בן גוריון וברקאי, ובעתלית בבית הספר משעולים.",
+   "ru": "Сегодня тренирует детей и подростков в Хайфе — в школах «Бен-Гурион» и «Баркай» — и в Атлите, в школе «Мишолим».",
+   "en": "Today he coaches children and teens in Haifa, at the Ben Gurion and Barkai schools, and in Atlit, at the Misholim school."
+  }
+ ],
+ "approach_own": true,
+ "approach": [
+  {
+   "he": "עבורי, ג׳ודו הוא הרבה מעבר לספורט – הוא דרך חיים המלמדת משמעת, כבוד הדדי, חוסן מנטלי, ביטחון עצמי והתמדה.",
+   "ru": "Для меня дзюдо — это гораздо больше, чем спорт: это образ жизни, который учит дисциплине, взаимному уважению, психологической устойчивости, уверенности в себе и упорству.",
+   "en": "For me, judo is much more than a sport. It's a way of life that teaches discipline, mutual respect, mental resilience, self-confidence and perseverance."
+  },
+  {
+   "he": "כלוחם במילואים וכמאמן, אני מאמין בחינוך לערכים, אחריות ומצוינות – על המזרן ומחוצה לו.",
+   "ru": "Как боец резерва и тренер, я верю в воспитание ценностей, ответственности и стремления к совершенству — на татами и за его пределами.",
+   "en": "As a reservist combat soldier and a coach, I believe in teaching values, responsibility and excellence, on the mat and off it."
+  },
+  {
+   "he": "המטרה שלי היא להעניק לכל ילד וילדה כלים להתמודדות עם אתגרים, לפתח יכולות פיזיות ומנטליות, לחזק את האמונה בעצמם ולעזור להם לממש את מלוא הפוטנציאל האישי שלהם.",
+   "ru": "Моя цель — дать каждому ребёнку инструменты, чтобы справляться с трудностями, развивать физические и психологические качества, укреплять веру в себя и раскрыть весь свой потенциал.",
+   "en": "My goal is to give every child the tools to handle challenges, develop physically and mentally, believe in themselves and reach their full personal potential."
+  }
+ ],
+ "sources": [
+  "Lazar Kaplun, Facebook post, text supplied by owner 2026-10-17; he/en spellings are transliterations, unverified; he names = owner's official list 2026-10-17 (Kozlov, Drozhina not on it, removed); owner 2026-10-17: Irina = אירנה ליוהקי, Igor (not Egor) Bitulyaev, Ori Keshet-Halevi confirmed",
+  "owner 2026-10-18, official Hebrew bio; ru/en translated"
+ ]
 }

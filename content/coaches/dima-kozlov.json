@@ -1,0 +1,59 @@
+{
+ "id": "dima-kozlov",
+ "order": 14,
+ "group": "club",
+ "name": {
+  "he": "דימה קוזלוב",
+  "ru": "Дима Козлов",
+  "en": "Dima Kozlov"
+ },
+ "bio": {
+  "he": "בג׳ודו מגיל 10, מדליסט באליפויות ארציות ובתחרויות בינלאומיות, שירת בצה״ל כלוחם וכקצין. מאמן ילדים ונוער בטירת כרמל, בחיפה ובמטה אשר.",
+  "ru": "В дзюдо с 10 лет, призёр национальных чемпионатов и международных турниров, служил в ЦАХАЛе бойцом и офицером. Тренирует детей и подростков в Тират-Кармеле, Хайфе и Мате-Ашер.",
+  "en": "In judo since age 10, medallist at national championships and international events, served in the IDF as a combat soldier and officer. Coaches children and teens in Tirat Carmel, Haifa and Mateh Asher."
+ },
+ "photo": {
+  "src": "coaches/dima-kozlov.jpg",
+  "w": 800,
+  "h": 1067,
+  "source": "owner 2026-10-18",
+  "alt": {
+   "he": "דימה קוזלוב בחליפת ג׳ודו לבנה וחגורה שחורה",
+   "ru": "Дима Козлов в белом кимоно с чёрным поясом",
+   "en": "Dima Kozlov in a white judogi with a black belt"
+  }
+ },
+ "about": [
+  {
+   "he": "דימה קוזלוב, בן 33 ואב לשתי בנות, עוסק בג׳ודו מגיל 10. לאורך הקריירה הספורטיבית שלו השתתף בתחרויות בארץ ובעולם וזכה במדליות באליפויות ארציות ובתחרויות בינלאומיות.",
+   "ru": "Диме Козлову 33 года, он отец двух дочерей и занимается дзюдо с 10 лет. За спортивную карьеру выступал на соревнованиях в Израиле и за рубежом, завоёвывал медали национальных чемпионатов и международных турниров.",
+   "en": "Dima Kozlov, 33, is the father of two girls and has done judo since he was 10. He has competed in Israel and abroad, winning medals at national championships and international tournaments."
+  },
+  {
+   "he": "את דרכו בהדרכה החל כבר בגיל צעיר כעוזר מאמן, ובהמשך שירת בצה״ל כלוחם וכקצין.",
+   "ru": "Тренировать начал ещё в юности, помощником тренера, а затем служил в ЦАХАЛе бойцом и офицером.",
+   "en": "He started coaching young, as an assistant coach, and went on to serve in the IDF as a combat soldier and officer."
+  },
+  {
+   "he": "בשנת 2023 חזר לעולם האימון, ומאז מדריך ילדים ובני נוער בטירת כרמל, בחיפה וביישובי מטה אשר. בנוסף, עוסק בתחום הטיפול באמצעות אמנויות לחימה.",
+   "ru": "В 2023 году вернулся к тренерской работе и с тех пор занимается с детьми и подростками в Тират-Кармеле, Хайфе и посёлках Мате-Ашер. Кроме того, работает в области терапии через боевые искусства.",
+   "en": "In 2023 he returned to coaching, and since then has taught children and teens in Tirat Carmel, Haifa and the Mateh Asher communities. He also works in martial-arts-based therapy."
+  }
+ ],
+ "approach_own": true,
+ "approach": [
+  {
+   "he": "עבורי, ג׳ודו הוא הרבה מעבר לספורט. זו דרך חיים שמעניקה לילדים ביטחון עצמי, משמעת, התמדה, אחריות ותחושת שייכות.",
+   "ru": "Для меня дзюдо — это намного больше, чем спорт. Это образ жизни, который даёт детям уверенность в себе, дисциплину, упорство, ответственность и чувство принадлежности.",
+   "en": "For me, judo is much more than a sport. It's a way of life that gives children self-confidence, discipline, perseverance, responsibility and a sense of belonging."
+  },
+  {
+   "he": "כאבא וכמאמן, חשוב לי לראות כל ילד וילדה, להעניק להם סביבה בטוחה ותומכת ולאפשר לכל אחד להתפתח בקצב שלו, להתמודד עם אתגרים, לחוות הצלחות ובעיקר ליהנות מהדרך.",
+   "ru": "Как отцу и тренеру мне важно видеть каждого ребёнка, дать ему безопасную и поддерживающую среду и позволить развиваться в своём темпе, справляться с трудностями, переживать успехи и, главное, получать удовольствие от пути.",
+   "en": "As a father and a coach, it matters to me to see every child, give them a safe and supportive environment, and let each one grow at their own pace, take on challenges, experience success and, above all, enjoy the journey."
+  }
+ ],
+ "sources": [
+  "owner 2026-10-18, official Hebrew bio; ru/en translated"
+ ]
+}

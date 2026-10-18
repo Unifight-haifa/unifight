@@ -3,25 +3,65 @@
  "order": 7,
  "group": "lead",
  "name": {
-  "he": "אירנה ליוהקי",
+  "he": "אירינה ליוהקי",
   "ru": "Ирина Лёгкая",
   "en": "Irina Legkaya"
  },
  "bio": {
-  "he": "מאמנת ותיקה, מדליסטית באליפויות אירופה והעולם.",
-  "ru": "Опытный тренер, неоднократный призёр чемпионатов Европы и мира.",
-  "en": "Experienced coach, multiple European and World championship medallist."
+  "he": "מאסטר בספורט, הייתה חברה בנבחרת בלארוס: אלופת אירופה ומדליסטית ארד באליפות העולם. מכשירה ספורטאים להישגים בינלאומיים.",
+  "ru": "Мастер спорта, выступала за сборную Беларуси: чемпионка Европы и бронзовый призёр чемпионата мира. Готовит спортсменов международного уровня.",
+  "en": "Master of Sport and former Belarus national team member: European champion and World Championship bronze medallist. Trains athletes to international level."
  },
  "photo": {
   "src": "coaches/irina-2.jpg",
   "source": "owner 2026-10-17 (replaces first portrait)",
   "alt": {
-   "he": "אירנה ליוהקי בחליפת ג׳ודו כחולה וחגורה שחורה",
+   "he": "אירינה ליוהקי בחליפת ג׳ודו כחולה וחגורה שחורה",
    "ru": "Ирина Лёгкая в синем кимоно с чёрным поясом",
    "en": "Irina Legkaya in a blue judogi with a black belt"
   }
  },
+ "about": [
+  {
+   "he": "אירינה ליוהקי, בת 36, בעלת תואר ראשון בחינוך גופני וספורט, מאמנת ג׳ודו מוסמכת ובעלת דרגת דאן 2 בג׳ודו.",
+   "ru": "Ирине Лёгкой 36 лет. Бакалавр физического воспитания и спорта, дипломированный тренер по дзюдо, 2 дан.",
+   "en": "Irina Legkaya, 36, holds a bachelor's degree in physical education and sport, is a certified judo coach and holds a 2nd dan in judo."
+  },
+  {
+   "he": "אירינה, שעלתה לישראל מבלארוס, הייתה חברה בנבחרת הלאומית של בלארוס ורשמה הישגים מרשימים בזירה הבינלאומית, בהם זכייה באליפות אירופה ומדליית ארד באליפות העולם. בזכות הישגיה זכתה בתואר מאסטר בספורט.",
+   "ru": "Ирина репатриировалась в Израиль из Беларуси. Она выступала за национальную сборную Беларуси и добилась ярких международных результатов, среди них — победа на чемпионате Европы и бронза чемпионата мира. За эти достижения ей присвоено звание мастера спорта.",
+   "en": "Originally from Belarus, Irina was a member of the Belarus national team and achieved impressive international results, including a European title and a World Championship bronze medal. Her results earned her the title of Master of Sport."
+  },
+  {
+   "he": "מעבר להישגיה האישיים, אירינה ביססה את מעמדה כמאמנת מובילה והכשירה ספורטאים שהגיעו להישגים בינלאומיים יוצאי דופן, בהם אלוף אולימפי לנוער, אלוף אירופה ומדליסטים בגביעי אירופה והעולם. בין חניכיה ספורטאים הנחשבים למועמדים למשחקים האולימפיים בלוס אנג׳לס 2028.",
+   "ru": "Помимо личных достижений, Ирина зарекомендовала себя как ведущий тренер. Её воспитанники добивались выдающихся международных результатов: среди них олимпийский чемпион среди юношей, чемпион Европы, призёры Кубков Европы и мира. Некоторых из них считают кандидатами на Олимпийские игры 2028 года в Лос-Анджелесе.",
+   "en": "Beyond her own career, Irina has established herself as a leading coach. Her athletes have gone on to outstanding international results, among them a Youth Olympic champion, a European champion and medallists at European and World Cups. Some of them are considered candidates for the Los Angeles 2028 Olympic Games."
+  },
+  {
+   "he": "כיום אירינה מביאה עמה ניסיון בינלאומי עשיר, ידע מקצועי ויכולת לפתח ולקדם ספורטאים צעירים, תוך שילוב בין מצוינות ספורטיבית לחינוך לערכים.",
+   "ru": "Сегодня Ирина привносит богатый международный опыт, профессиональные знания и умение растить молодых спортсменов, сочетая спортивное мастерство с воспитанием ценностей.",
+   "en": "Today Irina brings rich international experience, professional knowledge and a talent for developing young athletes, combining sporting excellence with education in values."
+  }
+ ],
+ "approach": [
+  {
+   "he": "אירינה מאמינה בבניית יסודות מקצועיים חזקים, פיתוח יכולות אישיות והתקדמות המותאמת לקצב ולפוטנציאל של כל ילד וילדה.",
+   "ru": "Ирина верит в крепкую техническую базу, развитие личных качеств и прогресс в темпе и по возможностям каждого ребёнка.",
+   "en": "Irina believes in strong technical foundations, developing personal strengths, and progress matched to each child's pace and potential."
+  },
+  {
+   "he": "גישתה משלבת מקצועיות, משמעת והתמדה לצד יחס אישי, שמחת חיים וסביבת אימונים חיובית ומעצימה.",
+   "ru": "Её подход сочетает профессионализм, дисциплину и упорство с личным вниманием, радостью и позитивной, поддерживающей атмосферой на тренировках.",
+   "en": "Her approach combines professionalism, discipline and perseverance with personal attention, joy and a positive, empowering training environment."
+  },
+  {
+   "he": "עבורה, הצלחה אינה נמדדת רק במדליות ובניצחונות, אלא גם בהתקדמות האישית, בחיזוק הביטחון העצמי ובאהבה לספורט. מטרתה להעניק לכל ספורטאי את הכלים להאמין ביכולותיו, לשאוף גבוה ולהגיע למימוש הפוטנציאל שלו.",
+   "ru": "Для неё успех измеряется не только медалями и победами, но и личным ростом, уверенностью в себе и любовью к спорту. Её цель — дать каждому спортсмену инструменты, чтобы поверить в свои силы, стремиться высоко и раскрыть свой потенциал.",
+   "en": "For her, success isn't measured only in medals and wins, but also in personal progress, growing self-confidence and a love of sport. Her goal is to give every athlete the tools to believe in their abilities, aim high and reach their potential."
+  }
+ ],
  "sources": [
-  "Lazar Kaplun, Facebook post, text supplied by owner 2026-10-17; he/en spellings are transliterations, unverified"
+  "Lazar Kaplun, Facebook post, text supplied by owner 2026-10-17; he/en spellings are transliterations, unverified",
+  "owner 2026-10-18, official Hebrew bio; ru/en translated"
  ]
 }
