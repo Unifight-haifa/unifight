@@ -20,6 +20,7 @@ def load(name):
 C, CO, VENUES = load("site.json"), load("coaches/_section.json"), load("venues.json")
 COACHES = sorted((load(f"coaches/{p.name}") for p in (R / "content/coaches").glob("[!_]*.json")), key=lambda c: c["order"])
 SC = load("schedule/natanel-zhurovel.json")
+VIDEOS = {v["id"]: v for v in load("videos.json")}
 LANGS = ("he", "ru", "en")
 WA = "https://wa.me/972545664663"
 WA_NUM = "054-566-4663"
@@ -158,7 +159,16 @@ A11Y = {
     "language": {"he": "שפה", "ru": "Язык", "en": "Language"},
     "gallery": {"he": "גלריית תמונות", "ru": "Фотогалерея", "en": "Photo gallery"},
     "pause": {"he": "עצירת אנימציות", "ru": "Остановить анимацию", "en": "Pause animations"},
+    "film_pause": {"he": "עצירת הסרטון", "ru": "Остановить видео", "en": "Pause video"},
+    "coach_video": {"he": "סרטון היכרות", "ru": "Видеопрофиль", "en": "Video profile"},
 }
+
+
+def yt(vid, cls, label, placement):
+    """A youtu.be link that the page's VideoModal plays in place; nothing from YouTube loads until the click."""
+    v = VIDEOS[vid]  # KeyError: list the upload in content/videos.json first
+    return (f'<a class="{cls}" href="https://youtu.be/{vid}" data-video="{vid}" data-kind="{v["kind"]}" {attr("data-title", v["title"])} '
+            f'{ga("video_play", video_id=vid, placement=placement)}><span class="v-tri" aria-hidden="true"></span>{t(label)}</a>')
 
 
 def header():
@@ -212,6 +222,22 @@ def hero_sec():
   <p class="hero-disc"><span class="kj" aria-hidden="true">柔</span>{t(club["disciplines"])}</p>
  </div>
  <span class="scroll" aria-hidden="true"></span>
+</section>'''
+
+
+def film():
+    f, src = C["film"], f"{PFX}videos/club-teaser"
+    # night.js plays the loop only while in view; under reduced motion or Save-Data the poster stays
+    return f'''
+<section class="sec film" id="film">
+ <div class="wrap">
+  <div class="sh rv"><span class="kicker"><span class="kj" aria-hidden="true">技</span>{t(club["name"])}</span><h2 class="h2">{t(f["title"])}</h2><p class="lead">{t(f["intro"])}</p></div>
+  <div class="film-box rv">
+   <video class="film-v" muted playsinline loop preload="none" poster="{src}.jpg" width="960" height="540" aria-hidden="true"><source src="{src}.webm" type="video/webm; codecs=av01.0.04M.08"><source src="{src}.mp4" type="video/mp4"></video>
+   {yt(f["video"], "btn btn-wa btn-lg film-cta", f["cta"], "landing_film")}
+   <button type="button" class="film-pause" aria-pressed="false" {attr("aria-label", A11Y["film_pause"])}></button>
+  </div>
+ </div>
 </section>'''
 
 
@@ -280,7 +306,11 @@ def rail_card(n, grp, grp_label):
             f'<span class="mono" aria-hidden="true">{t(initials(n["name"]))}</span>')
     bio = f'<p class="rc-bio">{t(n["bio"])}</p>' if n.get("bio") else ""
     return (f'<li class="rc" data-grp="{grp}"><div class="rc-ph{" has-img" if ph else ""}">{face}</div>'
-            f'<span class="rc-tag">{t(grp_label)}</span><h4 class="rc-n">{t(n["name"])}</h4>{bio}</li>')
+            f'<span class="rc-tag">{t(grp_label)}</span><h4 class="rc-n">{t(n["name"])}</h4>{bio}{coach_video(n)}</li>')
+
+
+def coach_video(c):
+    return yt(c["youtube"], "coach-vid", A11Y["coach_video"], "coach") if c.get("youtube") else ""
 
 
 def coaches():
@@ -298,7 +328,7 @@ def coaches():
     cards = "".join(f'''
    <article class="coach rv"><span class="coach-bg kj" aria-hidden="true">{k}</span>
     {photo(c, k)}
-    <div class="coach-b"><h3 class="h3 coach-n">{t(c["name"])}</h3><p class="role">{t(c["role"])}</p>
+    <div class="coach-b"><h3 class="h3 coach-n">{t(c["name"])}</h3><p class="role">{t(c["role"])}</p>{coach_video(c)}
     <p class="bio">{t(c["bio"])}</p><p class="dan">{t(c["dan_rank"])}</p></div></article>'''
                     for c, k in zip(grp("main"), ks))
     groups = [("lead", RAIL_UI["lead"], grp("lead"))] + [(r["group"], r["title"], grp(r["group"])) for r in co["roster"]]
@@ -597,7 +627,7 @@ JS = (HERE / "night.js").read_text()
 def render(site):
     global SITE, PFX
     SITE, PFX = site, ("%BASE%" if site else "")  # the site build swaps in its base path
-    body = kanji(header() + '\n<main id="main">' + hero_sec() + ticker() + parents() + coaches() + achievements() + history() + tournaments() + camps() + schedule() + branches() + contact() + "\n</main>" + footer(), "mincho")
+    body = kanji(header() + '\n<main id="main">' + hero_sec() + ticker() + film() + parents() + coaches() + achievements() + history() + tournaments() + camps() + schedule() + branches() + contact() + "\n</main>" + footer(), "mincho")
     return body + kanji_defs(body)
 
 

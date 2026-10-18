@@ -10,6 +10,7 @@ import { getRelativeLocaleUrl } from 'astro:i18n';
 import Base from '../../layouts/Base.astro';
 import VenueMap from '../../components/VenueMap.astro';
 import JsonLd from '../../components/JsonLd.astro';
+import VideoModal from '../../components/VideoModal.astro';
 import { LANGS, t, type Lang } from '../../i18n/ui';
 import { GA_ID } from '../../lib/analytics';
 import '../../styles/landing.css';
@@ -85,5 +86,6 @@ const club = {
   <Fragment set:html={beforeMap} />
   <VenueMap lang={lang} />
   <Fragment set:html={afterMap} />
+  <VideoModal lang={lang} />
   <script is:inline set:html={js} />
 </Base>

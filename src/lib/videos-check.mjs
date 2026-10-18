@@ -2,7 +2,7 @@ import { existsSync } from 'node:fs';
 
 const LANGS = ['he', 'ru', 'en'];
 const KINDS = ['video', 'short'];
-export const PLAYLISTS = ['promo', 'competitions', 'camps', 'training', 'events'];
+export const PLAYLISTS = ['promo', 'coaches', 'competitions', 'camps', 'training', 'events'];
 const ID = /^[A-Za-z0-9_-]{11}$/;
 
 // content/videos.json is edited by hand; a typo must fail the build rather than ship a broken card.

@@ -86,6 +86,22 @@
 })();
 
 (() => {
+  const v = document.querySelector('.film-v');
+  if (!v) return;
+  const btn = document.querySelector('.film-pause');
+  // the loop is decoration: it waits for a visitor who wants motion and data, and for the box to be in view
+  let paused = matchMedia('(prefers-reduced-motion: reduce)').matches || !!navigator.connection?.saveData, seen = false;
+  const sync = () => {
+    btn.setAttribute('aria-pressed', paused);
+    if (!paused && seen && !document.hidden) v.play().catch(() => {}); else v.pause();
+  };
+  if ('IntersectionObserver' in window) new IntersectionObserver(([e]) => { seen = e.isIntersecting; sync(); }, { threshold: 0.5 }).observe(v);
+  document.addEventListener('visibilitychange', sync);
+  btn.addEventListener('click', () => { paused = !paused; sync(); });
+  sync();
+})();
+
+(() => {
   const w = document.getElementById('team-rail');
   if (!w) return;
   document.documentElement.classList.add('js');

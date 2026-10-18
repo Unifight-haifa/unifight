@@ -1,0 +1,56 @@
+---
+import type { Lang } from '../i18n/ui';
+import '../styles/video.css';
+
+interface Props {
+  lang: Lang;
+}
+
+const s = {
+  he: { close: 'סגירה', note: 'הסרטון מתנגן מ־YouTube.' },
+  ru: { close: 'Закрыть', note: 'Видео воспроизводится с YouTube.' },
+  en: { close: 'Close', note: 'The video plays from YouTube.' },
+}[Astro.props.lang];
+---
+{/* plays any a[data-video] link on the page; youtube-nocookie is only contacted after the click */}
+<dialog class="video-modal" aria-modal="true" aria-labelledby="video-modal-title" data-video-modal>
+  <div class="video-modal-bar">
+    <p class="video-modal-title" id="video-modal-title"></p>
+    <button type="button" class="video-close" data-video-close aria-label={s.close}>×</button>
+  </div>
+  <div class="video-frame"></div>
+  <p class="video-note">{s.note}</p>
+</dialog>
+<script is:inline>
+  (function () {
+    var dlg = document.querySelector('[data-video-modal]'), frame = dlg.querySelector('.video-frame'), opener;
+    document.addEventListener('click', function (e) {
+      var a = e.target.closest && e.target.closest('a[data-video]');
+      // let modified clicks open youtu.be in a new tab as usual
+      if (!a || e.ctrlKey || e.metaKey || e.shiftKey || e.altKey || e.button) return;
+      e.preventDefault();
+      opener = a;
+      var f = document.createElement('iframe');
+      f.src = 'https://www.youtube-nocookie.com/embed/' + encodeURIComponent(a.dataset.video) + '?autoplay=1&rel=0&modestbranding=1&playsinline=1';
+      f.title = a.dataset.title;
+      f.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
+      f.allowFullscreen = true;
+      // YouTube refuses embeds that arrive without a referrer
+      f.referrerPolicy = 'strict-origin-when-cross-origin';
+      frame.textContent = '';
+      frame.appendChild(f);
+      dlg.querySelector('#video-modal-title').textContent = f.title;
+      dlg.classList.toggle('is-short', a.dataset.kind === 'short');
+      dlg.showModal();
+      dlg.querySelector('[data-video-close]').focus();
+    });
+    dlg.addEventListener('click', function (e) {
+      if (e.target === dlg || e.target.closest('[data-video-close]')) dlg.close();
+    });
+    // Esc closes natively; dropping the iframe stops playback
+    dlg.addEventListener('close', function () {
+      frame.textContent = '';
+      if (opener) opener.focus();
+    });
+  })();
+</script>

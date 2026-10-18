@@ -185,6 +185,24 @@
    "en": "From the first belt to the big stage."
   }
  ],
+ "film": {
+  "video": "Wrnbu04Lq1o",
+  "title": {
+   "he": "הסרט של המועדון",
+   "ru": "Фильм о клубе",
+   "en": "The club film"
+  },
+  "intro": {
+   "he": "דקה מהמזרן שלנו: אימונים, נפילות וקימות, ניצחונות.",
+   "ru": "Минута с нашего татами: тренировки, падения и подъёмы, победы.",
+   "en": "A minute from our mat: training, falls, getting up, wins."
+  },
+  "cta": {
+   "he": "לצפייה בסרט",
+   "ru": "Смотреть фильм",
+   "en": "Watch the film"
+  }
+ },
  "kids": {
   "title": {
    "he": "למה ג׳ודו זו בחירה חכמה לילד שלכם",

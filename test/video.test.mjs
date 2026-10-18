@@ -1,11 +1,13 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
 import { checkVideos } from '../src/lib/videos-check.mjs';
 
-const videos = JSON.parse(readFileSync(new URL('../content/videos.json', import.meta.url), 'utf8'));
+const json = (p) => JSON.parse(readFileSync(new URL(`../content/${p}`, import.meta.url), 'utf8'));
+const videos = json('videos.json');
 const thumbs = new URL('../public/videos/', import.meta.url);
 const page = (l) => readFileSync(new URL(`../dist/${l}/video/index.html`, import.meta.url), 'utf8');
+const landing = (l) => readFileSync(new URL(`../dist/${l}/index.html`, import.meta.url), 'utf8');
 const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 const TP = /youtube|ytimg|googlevideo/i;
 
@@ -22,14 +24,28 @@ test('every video renders on all three language pages', () => {
 });
 
 test('nothing from YouTube loads at rest; the player is built only in JS', () => {
-  for (const l of ['he', 'ru', 'en']) {
-    const html = page(l);
+  for (const html of ['he', 'ru', 'en'].flatMap((l) => [page(l), landing(l)])) {
+    const l = html.match(/<html lang="(\w+)"/)[1];
     assert.ok(!/<iframe\b/i.test(html), l);
     for (const [tag] of html.matchAll(/<(img|iframe|link|source|video|script)\b[^>]*>/gi)) {
       for (const [, , url] of tag.matchAll(/\s(src|srcset|href)="([^"]*)"/gi)) assert.ok(!TP.test(url), `${l}: ${tag}`);
     }
     const scripts = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].map((m) => m[1]).join('\n');
     assert.ok(scripts.includes("'https://www.youtube-nocookie.com/embed/'"), l);
+  }
+});
+
+test('the landing film and coach profiles open listed uploads in the player; the teaser loop waits', () => {
+  const coaches = readdirSync(new URL('../content/coaches/', import.meta.url)).filter((f) => !f.startsWith('_')).map((f) => json(`coaches/${f}`));
+  const ids = [json('site.json').film.video, ...coaches.filter((c) => c.youtube).map((c) => c.youtube)];
+  assert.ok(ids.length >= 3);
+  for (const id of ids) assert.ok(videos.some((v) => v.id === id), `${id} is not in videos.json`);
+  for (const l of ['he', 'ru', 'en']) {
+    const html = landing(l);
+    assert.ok(html.includes('data-video-modal'), l);
+    for (const id of ids) assert.match(html, new RegExp(`<a [^>]*href="https://youtu.be/${id}" data-video="${id}" data-kind="video" data-title="[^"]+" data-ga="video_play"`), `${l} ${id}`);
+    const video = html.match(/<video\b[^>]*>/)[0];
+    for (const a of [' muted', ' playsinline', ' loop', ' preload="none"', ' poster="']) assert.ok(video.includes(a), `${l}: ${video}`);
   }
 });
 

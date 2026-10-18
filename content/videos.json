@@ -1,5 +1,59 @@
 [
  {
+  "id": "Wrnbu04Lq1o",
+  "kind": "video",
+  "date": "2026-10-18",
+  "playlist": "promo",
+  "duration": 72,
+  "title": {
+   "he": "יוניפייט חיפה: הדרך שלך מתחילה כאן",
+   "ru": "«Юнифайт Хайфа»: начни свой путь",
+   "en": "Unifight Haifa: start your journey"
+  },
+  "description": {
+   "he": "הסרט של המועדון: מהצעד הראשון על המזרן, דרך אימונים ונפילות, ועד למדליות. ילדים מגיל 5, נוער ומבוגרים. כתוביות בעברית, ברוסית ובאנגלית. מועדון הג׳ודו יוניפייט חיפה, חיפה, קריות ונשר. unifight-haifa.github.io/unifight · WhatsApp 054-566-4663",
+   "ru": "Фильм о клубе: от первого шага на татами через тренировки и падения к медалям. Дети с 5 лет, подростки, взрослые. Субтитры на иврите, русском и английском. Клуб дзюдо «Юнифайт Хайфа», Хайфа, Крайот и Нешер. unifight-haifa.github.io/unifight · WhatsApp 054-566-4663",
+   "en": "The club film: from the first step onto the mat, through training and falls, to the medals. Kids from 5, teens and adults. Captions in Hebrew, Russian and English. Unifight Haifa judo club, Haifa, Krayot and Nesher. unifight-haifa.github.io/unifight · WhatsApp 054-566-4663"
+  },
+  "thumb": "Wrnbu04Lq1o.jpg"
+ },
+ {
+  "id": "kMtByOfLWW0",
+  "kind": "video",
+  "date": "2026-10-18",
+  "playlist": "coaches",
+  "duration": 43,
+  "title": {
+   "he": "אילנה קרטיש, יו״ר המועדון ומאמנת ראשית",
+   "ru": "Илана Кратыш, председатель клуба и главный тренер",
+   "en": "Ilana Kratysh, club chair and head coach"
+  },
+  "description": {
+   "he": "הכירו את אילנה קרטיש: התחילה ג׳ודו בגיל חמש במועדון, ארבע מדליות כסף באליפויות אירופה בהיאבקות, אולימפיאדת ריו 2016, כסף באליפות אירופה בסומו. היום עומדת בראש המועדון ומאמנת. unifight-haifa.github.io/unifight · WhatsApp 054-566-4663",
+   "ru": "Знакомьтесь: Илана Кратыш. Начала дзюдо в пять лет в клубе, четыре серебра чемпионатов Европы по борьбе, Олимпиада в Рио-2016, серебро чемпионата Европы по сумо. Сегодня возглавляет клуб и тренирует. unifight-haifa.github.io/unifight · WhatsApp 054-566-4663",
+   "en": "Meet Ilana Kratysh: she started judo at five in the club, won four European wrestling silvers, competed at the Rio 2016 Olympics and took European sumo silver. Today she chairs the club and coaches. unifight-haifa.github.io/unifight · WhatsApp 054-566-4663"
+  },
+  "thumb": "kMtByOfLWW0.jpg"
+ },
+ {
+  "id": "BOC7YElmwn8",
+  "kind": "video",
+  "date": "2026-10-18",
+  "playlist": "coaches",
+  "duration": 45,
+  "title": {
+   "he": "נתנאל ז׳ורובל, מאמן במועדון",
+   "ru": "Натанель Журовель, тренер клуба",
+   "en": "Natanel Zhurovel, club coach"
+  },
+  "description": {
+   "he": "הכירו את נתנאל ז׳ורובל: בוגר המועדון, אלוף ישראל עד גיל 23 שלוש פעמים, פעמיים כסף בגביע אירופה ב־2022. היום מאמן במועדון. unifight-haifa.github.io/unifight · WhatsApp 054-566-4663",
+   "ru": "Знакомьтесь: Натанель Журовель. Воспитанник клуба, трёхкратный чемпион Израиля до 23 лет, дважды серебряный призёр Кубка Европы 2022. Сейчас тренирует в клубе. unifight-haifa.github.io/unifight · WhatsApp 054-566-4663",
+   "en": "Meet Natanel Zhurovel: raised in the club, three-time Israeli U23 champion and two-time European Cup silver medallist in 2022. Now a club coach. unifight-haifa.github.io/unifight · WhatsApp 054-566-4663"
+  },
+  "thumb": "BOC7YElmwn8.jpg"
+ },
+ {
   "id": "BCyV2Lwp9Y4",
   "kind": "video",
   "date": "2020-02-01",

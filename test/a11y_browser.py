@@ -35,6 +35,11 @@ with sync_playwright() as p:
                     page.click(".tk-pause")
                     looping = page.evaluate("document.getAnimations().filter(a => a.playState === 'running' && a.effect.getTiming().iterations === Infinity).length")
                     assert looping == 0, f"{lang}: {looping} animations still running after pause"
+                    # the film loop starts in view and has its own pause button
+                    page.evaluate("document.querySelector('.film-v').scrollIntoView({block: 'center'})")
+                    page.wait_for_function("!document.querySelector('.film-v').paused")
+                    page.click(".film-pause")
+                    assert page.evaluate("document.querySelector('.film-v').paused"), f"{lang}: film still playing after pause"
                 if lang == "he":
                     # kanji and the logo keep their drawn orientation in RTL, ancestors included
                     flipped = page.evaluate("""[...document.querySelectorAll('.kg, .plate img, .st-center img')].filter(e => {

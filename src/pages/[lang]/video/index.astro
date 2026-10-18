@@ -4,12 +4,12 @@ import { getRelativeLocaleUrl } from 'astro:i18n';
 import videos from '../../../../content/videos.json';
 import Base from '../../../layouts/Base.astro';
 import JsonLd from '../../../components/JsonLd.astro';
+import VideoModal from '../../../components/VideoModal.astro';
 import { LANGS, t, type Lang } from '../../../i18n/ui';
 import { fmtDate } from '../../../lib/news';
 import { PLAYLISTS } from '../../../lib/videos-check.mjs';
 import '../../../styles/landing.css';
 import '../../../styles/news.css';
-import '../../../styles/video.css';
 
 export function getStaticPaths() {
   return i18n!.locales.map((lang) => ({ params: { lang } }));
@@ -22,27 +22,21 @@ const s = {
     desc: 'סרטונים של מועדון הג׳ודו יוניפייט חיפה: אימונים, תחרויות ומחנות אימונים.',
     all: 'הכול',
     filter: 'סינון לפי נושא',
-    close: 'סגירה',
-    note: 'הסרטון מתנגן מ־YouTube.',
-    playlists: { promo: 'צילומי המועדון', competitions: 'תחרויות', camps: 'מחנות אימונים', training: 'אימונים', events: 'אירועים' },
+    playlists: { promo: 'צילומי המועדון', coaches: 'מאמנים', competitions: 'תחרויות', camps: 'מחנות אימונים', training: 'אימונים', events: 'אירועים' },
   },
   ru: {
     title: 'Видео',
     desc: 'Видео клуба дзюдо «Юнифайт Хайфа»: тренировки, турниры и сборы.',
     all: 'Все',
     filter: 'Фильтр по теме',
-    close: 'Закрыть',
-    note: 'Видео воспроизводится с YouTube.',
-    playlists: { promo: 'Промо-съёмки клуба', competitions: 'Соревнования', camps: 'Сборы', training: 'Тренировки', events: 'События' },
+    playlists: { promo: 'Промо-съёмки клуба', coaches: 'Тренера', competitions: 'Соревнования', camps: 'Сборы', training: 'Тренировки', events: 'События' },
   },
   en: {
     title: 'Video',
     desc: 'Videos from the Unifight Haifa judo club: training, competitions and camps.',
     all: 'All',
     filter: 'Filter by topic',
-    close: 'Close',
-    note: 'The video plays from YouTube.',
-    playlists: { promo: 'Club promo footage', competitions: 'Competitions', camps: 'Training camps', training: 'Training', events: 'Events' },
+    playlists: { promo: 'Club promo footage', coaches: 'Coaches', competitions: 'Competitions', camps: 'Training camps', training: 'Training', events: 'Events' },
   },
 }[lang];
 
@@ -100,7 +94,7 @@ const ld = {
           {g.map((v) => (
             <li class="video-card" data-playlist={v.playlist}>
               {/* plain link without JS; the script swaps it for the in-page player */}
-              <a href={`https://youtu.be/${v.id}`} data-video={v.id} data-kind={v.kind} data-ga="video_play" data-ga-video_id={v.id} data-ga-playlist={v.playlist}>
+              <a href={`https://youtu.be/${v.id}`} data-video={v.id} data-kind={v.kind} data-title={v.title[lang]} data-ga="video_play" data-ga-video_id={v.id} data-ga-playlist={v.playlist}>
                 <span class="video-thumb">
                   <img src={thumb(v)} alt="" loading="lazy" decoding="async" />
                   <span class="video-play" aria-hidden="true"></span>
@@ -115,17 +109,9 @@ const ld = {
       </section>
     ))}
   </div>
-  <dialog class="video-modal" aria-modal="true" aria-labelledby="video-modal-title" data-video-modal>
-    <div class="video-modal-bar">
-      <p class="video-modal-title" id="video-modal-title"></p>
-      <button type="button" class="video-close" data-video-close aria-label={s.close}>×</button>
-    </div>
-    <div class="video-frame"></div>
-    <p class="video-note">{s.note}</p>
-  </dialog>
+  <VideoModal lang={lang} />
   <script is:inline>
     (function () {
-      var dlg = document.querySelector('[data-video-modal]'), frame = dlg.querySelector('.video-frame'), opener;
       var bar = document.querySelector('[data-video-filter]');
       bar.hidden = false;
       bar.addEventListener('click', function (e) {
@@ -135,34 +121,6 @@ const ld = {
         bar.querySelectorAll('[data-filter]').forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); });
         document.querySelectorAll('.video-card').forEach(function (li) { li.hidden = !!f && li.dataset.playlist !== f; });
         document.querySelectorAll('.video-sec').forEach(function (sec) { sec.hidden = !sec.querySelector('.video-card:not([hidden])'); });
-      });
-      document.addEventListener('click', function (e) {
-        var a = e.target.closest && e.target.closest('a[data-video]');
-        // let modified clicks open youtu.be in a new tab as usual
-        if (!a || e.ctrlKey || e.metaKey || e.shiftKey || e.altKey || e.button) return;
-        e.preventDefault();
-        opener = a;
-        var f = document.createElement('iframe');
-        f.src = 'https://www.youtube-nocookie.com/embed/' + encodeURIComponent(a.dataset.video) + '?autoplay=1&rel=0&modestbranding=1&playsinline=1';
-        f.title = a.querySelector('.video-title').textContent;
-        f.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
-        f.allowFullscreen = true;
-        // YouTube refuses embeds that arrive without a referrer
-        f.referrerPolicy = 'strict-origin-when-cross-origin';
-        frame.textContent = '';
-        frame.appendChild(f);
-        dlg.querySelector('#video-modal-title').textContent = f.title;
-        dlg.classList.toggle('is-short', a.dataset.kind === 'short');
-        dlg.showModal();
-        dlg.querySelector('[data-video-close]').focus();
-      });
-      dlg.addEventListener('click', function (e) {
-        if (e.target === dlg || e.target.closest('[data-video-close]')) dlg.close();
-      });
-      // Esc closes natively; dropping the iframe stops playback
-      dlg.addEventListener('close', function () {
-        frame.textContent = '';
-        if (opener) opener.focus();
       });
     })();
   </script>
