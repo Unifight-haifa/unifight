@@ -46,7 +46,9 @@ with sync_playwright() as p:
                     assert page.evaluate("document.querySelector('.nr-track').getAnimations().every(a => a.playState === 'paused')"), f"{lang}: news rail still moving"
                     assert page.get_attribute(".nr-pause", "aria-pressed") == "true", lang
                 if path == "news/" and width == 360:
-                    # the mobile news pill is a disclosure; scan it open
+                    # the mobile news pill is a disclosure; scan it open. It waits for the cookie banner
+                    if page.is_visible("[data-consent]"):
+                        page.click("[data-consent-choice=denied]")
                     page.focus(".nr-m summary")
                     page.keyboard.press("Enter")
                     assert page.evaluate("document.querySelector('.nr-m').open"), f"{lang}: news pill did not open"
