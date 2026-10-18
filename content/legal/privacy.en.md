@@ -30,7 +30,6 @@ These settings stay on your device and are never sent to us. You can delete them
 When your browser loads a page, the services below receive technical data such as your IP address and browser type, as part of how the internet works:
 
 - **GitHub Pages** hosts the site.
-- **Google Fonts** supplies some of the fonts on the home page.
 - **OpenStreetMap** supplies the map of our training venues. The map is loaded only after you press the button to show it.
 - **YouTube** hosts the club videos. The player loads only after you press play on a video; from then on YouTube's own privacy policy applies.
 - **Google Analytics** measures how the site is used, but only if you accept analytics (see below).
