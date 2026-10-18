@@ -1,0 +1,13 @@
+{
+ "_doc": "Ready-to-paste social text on news post pages (src/lib/social.mjs). Hashtags: 3-6 per language, letters/digits/underscore only (a geresh or apostrophe ends a hashtag).",
+ "hashtags": {
+  "he": ["#יוניפייט_חיפה", "#חיפה", "#גודו", "#UnifightHaifa", "#judo"],
+  "ru": ["#ЮнифайтХайфа", "#Хайфа", "#дзюдо", "#UnifightHaifa", "#judo"],
+  "en": ["#UnifightHaifa", "#Haifa", "#judo", "#judoclub"]
+ },
+ "link_in_bio": {
+  "he": "הקישור לכתבה המלאה בביו",
+  "ru": "Ссылка на полную новость — в профиле",
+  "en": "Full story: link in bio"
+ }
+}

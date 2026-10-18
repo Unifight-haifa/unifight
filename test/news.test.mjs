@@ -4,7 +4,9 @@ import { cpSync, existsSync, mkdtempSync, readdirSync, readFileSync, rmSync, sta
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
+import { BANNED, NIVHERET } from '../src/lib/club-check.mjs';
 import { checkNews, checkRenderedBody } from '../src/lib/news-check.mjs';
+import { LIMITS, fit, plainText, socialTexts } from '../src/lib/social.mjs';
 
 const dist = new URL('../dist/', import.meta.url);
 const src = new URL('../src/content/news/', import.meta.url);
@@ -150,4 +152,75 @@ test('rendered-body gate rejects unsafe output', () => {
   assert.throws(() => checkRenderedBody('<p><img alt="a>b" onerror=alert(1) src="/x.jpg"></p>'), /event handler/);
   assert.doesNotThrow(() => checkRenderedBody('<p>Hi &lt;img src=x onerror=alert(1)&gt; and src=x onclick=y in prose</p>'));
   assert.doesNotThrow(() => checkRenderedBody('<p><a href="https://example.org">a</a> <img src="/unifight/_astro/c.jpg" srcset="/unifight/_astro/c.jpg 1x, /unifight/_astro/d.jpg 2x"> <a href="#t">t</a></p>'));
+});
+
+const json = (p) => JSON.parse(readFileSync(new URL(`../${p}`, import.meta.url), 'utf8'));
+const social = json('content/social.json');
+const unescape = (s) => s.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&amp;/g, '&');
+
+test('social text: markdown becomes plain text, long posts are trimmed cleanly', () => {
+  assert.equal(
+    plainText('## Hi\n\n**Bold** and _it_ [link](https://x.example) ![p](photo-2.jpg)\n\n- one\n- two\n\n> quote &lt;3 snake_case\n\n[r]: https://x.example'),
+    'Hi\n\nBold and it link\n\n• one\n• two\n\nquote <3 snake_case',
+  );
+  const body = 'слово '.repeat(1000);
+  const t = socialTexts({ title: 'T', body, url: 'https://e.example/p/', hashtags: ['#a', '#b', '#c'], linkInBio: 'bio' });
+  assert.ok(t.instagram.length <= LIMITS.instagram, String(t.instagram.length));
+  assert.match(t.instagram, /слово…\n\nbio\n\n#a #b #c$/);
+  assert.ok(!t.instagram.includes('https://'));
+  for (const k of ['youtube', 'whatsapp']) assert.ok(t[k].includes('\n\nhttps://e.example/p/\n\n#a #b #c') && t[k].length <= LIMITS[k], k);
+  assert.equal(fit('abc', 3), 'abc');
+});
+
+test('social hashtags are 3-6 real hashtags per language', () => {
+  for (const l of Object.keys(LANGS)) {
+    const tags = social.hashtags[l];
+    assert.ok(tags.length >= 3 && tags.length <= 6, l);
+    for (const h of tags) assert.match(h, /^#[\p{L}\p{N}_]+$/u, h);
+    assert.ok(social.link_in_bio[l], l);
+  }
+});
+
+for (const { slug } of published) {
+  for (const l of Object.keys(LANGS)) {
+    test(`${l}/news/${slug}/ has copy-for-social buttons with escaped text and a no-JS fallback`, () => {
+      const html = page(l, slug);
+      const url = meta(html, 'og:url');
+      const items = [...html.matchAll(/<button [^>]*hidden data-copy-text data-ga="news_share" data-ga-channel="text_(\w+)">[^<]+<\/button> <details> <summary>[\s\S]*?<\/summary> <textarea readonly[^>]*>([^<]*)<\/textarea> <\/details>/g)];
+      assert.deepEqual(items.map((m) => m[1]), ['instagram', 'youtube', 'whatsapp']);
+      const text = Object.fromEntries(items.map((m) => [m[1], unescape(m[2])]));
+      assert.ok(!text.instagram.includes('http') && text.instagram.includes(social.link_in_bio[l]));
+      assert.ok(text.instagram.length <= LIMITS.instagram);
+      for (const k of ['youtube', 'whatsapp']) assert.ok(text[k].includes(url), k);
+      for (const k of Object.keys(text)) assert.ok(text[k].endsWith(social.hashtags[l].join(' ')), k);
+      assert.match(html, /<p class="news-social-status" role="status" aria-live="polite"/);
+    });
+  }
+}
+
+const glossary = json('content/glossary.json');
+const triple = (o) => `${o.he}|${o.ru}|${o.en}`;
+
+test('glossary coach names match content/coaches exactly', () => {
+  const dir = new URL('../content/coaches/', import.meta.url);
+  const names = readdirSync(dir).filter((f) => !f.startsWith('_')).map((f) => triple(JSON.parse(readFileSync(new URL(f, dir), 'utf8')).name));
+  assert.deepEqual(glossary.terms.coaches.map(triple).sort(), names.sort());
+});
+
+test('glossary venues match content/venues.json', () => {
+  assert.deepEqual(glossary.terms.venues.map(triple).sort(), Object.values(json('content/venues.json')).map(triple).sort());
+});
+
+test('glossary keeps nivheret as the club team and «тренера» as the plural', () => {
+  const all = Object.values(glossary.terms).flat();
+  for (const e of all) for (const l of Object.keys(LANGS)) assert.ok(e[l]?.trim() && !BANNED.test(e[l]), `${l}: ${e[l]}`);
+  const niv = all.find((e) => e.he === 'נבחרת המועדון');
+  for (const l of Object.keys(LANGS)) assert.match(niv[l], NIVHERET);
+  assert.ok(all.some((e) => e.ru === 'тренера') && glossary.rules.some((r) => r.includes('«тренера»')));
+});
+
+test('the n8n Translate prompt embeds the current glossary', () => {
+  const t = json('n8n/news-publish.json').nodes.find((n) => n.name === 'Translate');
+  const { rules, terms } = glossary;
+  assert.ok(t.parameters.options.system.includes(`GLOSSARY: ${JSON.stringify({ rules, terms })}\n`), 'out of sync: re-embed with the command in docs/n8n-news-design.md §5');
 });

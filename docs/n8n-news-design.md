@@ -179,12 +179,18 @@ Rules:
 6. In the source language keep title and body exactly as given, unless corrections ask to change them.
 7. slug: 2 to 6 lowercase English words joined by hyphens, only a-z, 0-9 and hyphens.
 8. If corrections are present, start from previous, apply exactly the author's corrections and change nothing else.
+9. Club glossary: whenever one of these terms or names appears, use exactly its he/ru/en form and follow its rules.
+GLOSSARY: <rules и terms из content/glossary.json одной строкой JSON>
 
 Reply with one JSON object and nothing else:
 {"slug": "...", "he": {"title": "", "summary": "", "body": "", "cover_alt": ""}, "ru": {...}, "en": {...}}
 ```
 
-Глоссарий взят из сайта (`content/site.json`, строки расписания и `nivheret_note`).
+Глоссарий клуба лежит в `content/glossary.json`: название клуба, города и районы, залы, группы, термины дзюдо, имена тренеров точно как в `content/coaches/*.json` и правило «тренера» во множественном числе. Каждая запись взята с сайта. Он вшит в промпт строкой `GLOSSARY:`, а не скачивается с сайта: так не нужен лишний HTTP-узел, а перевод не зависит от того, доступен ли сайт. `npm test` падает, если промпт в `n8n/news-publish.json` разошёлся с файлом. После правки глоссария обновить промпт и заново импортировать `news-publish` в n8n:
+
+```sh
+node -e "const fs=require('fs'),f='n8n/news-publish.json',w=JSON.parse(fs.readFileSync(f)),{rules,terms}=JSON.parse(fs.readFileSync('content/glossary.json'));const o=w.nodes.find(n=>n.name==='Translate').parameters.options;o.system=o.system.replace(/GLOSSARY: .*\n/,()=>'GLOSSARY: '+JSON.stringify({rules,terms})+'\n');fs.writeFileSync(f,JSON.stringify(w,null,2)+'\n')"
+```
 
 Промпт не единственная защита. `Parse Translation` перепроверяет ответ кодом:
 

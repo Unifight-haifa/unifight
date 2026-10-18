@@ -19,3 +19,12 @@
 .news-body a { color: var(--gold-2); }
 .news-share { display: flex; flex-wrap: wrap; gap: 10px; margin-block-start: 36px; padding-block-start: 24px; border-block-start: 1px solid var(--line); }
 .news-share .btn { min-block-size: 44px; font-size: 15px; padding: .6em 1.1em; }
+.news-social { display: grid; gap: 12px; margin-block-start: 28px; }
+.news-social .h3 { font-size: 20px; color: var(--paper); }
+.news-social-item { display: grid; gap: 8px; justify-items: start; }
+.news-social .btn { min-block-size: 44px; font-size: 15px; padding: .6em 1.1em; }
+.news-social summary { cursor: pointer; color: var(--paper-2); font-size: 15px; min-block-size: 32px; }
+.news-social details { inline-size: 100%; }
+.news-social textarea { inline-size: 100%; max-inline-size: 68ch; margin-block-start: 8px; padding: 10px; background: var(--ink-2); color: var(--paper); border: 1px solid var(--line); border-radius: 2px; font: 15px/1.45 var(--body); resize: vertical; }
+.news-social-status { min-block-size: 1.4em; color: var(--gold-2); font-size: 15px; }
+.news-social .btn[hidden] { display: none; }

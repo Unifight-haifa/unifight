@@ -61,7 +61,7 @@
 | `schedule_filter` | фильтр расписания | `grade` (`-1` = все, `0` = сад) или `venue` (`all` = все) |
 | `map_open` | кнопка карты, Google Maps, Waze, транспорт | `provider`: `osm`, `google_maps`, `waze`, `transit`; `venue` |
 | `language_switch` | переключатель языка | `to` — язык, на который переключили |
-| `news_share` | кнопки «Поделиться» в новости | `channel`: `whatsapp`, `facebook`, `telegram`, `copy` |
+| `news_share` | кнопки «Поделиться» в новости | `channel`: `whatsapp`, `facebook`, `telegram`, `copy`; готовый текст — `text_instagram`, `text_youtube`, `text_whatsapp` |
 
 У каждого события есть ещё `language` — язык страницы.
 
