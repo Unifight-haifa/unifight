@@ -1,10 +1,10 @@
 ---
 import landing from '../../generated/landing.html?raw';
 import js from '../../generated/landing.js?raw';
-import fonts from '../../generated/fonts.json';
 import site from '../../../content/site.json';
 import venues from '../../../content/venues.json';
 import geo from '../../../content/venues-geo.json';
+import { Font } from 'astro:assets';
 import { i18n } from 'astro:config/client';
 import { getRelativeLocaleUrl } from 'astro:i18n';
 import Base from '../../layouts/Base.astro';
@@ -78,9 +78,9 @@ const club = {
     {LANGS.filter((l) => l !== lang).map((l) => <meta property="og:locale:alternate" content={LOCALE[l]} />)}
     <meta name="twitter:card" content="summary_large_image" />
     <JsonLd data={club} />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    {(fonts as string[]).map((href) => <link rel="stylesheet" href={href} />)}
+    {/* success triangle headings */}
+    <Font cssVariable="--font-playfair" />
+    <Font cssVariable="--font-frank" />
   </Fragment>
   <Fragment set:html={beforeMap} />
   <VenueMap lang={lang} />

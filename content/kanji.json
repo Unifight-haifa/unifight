@@ -1,0 +1,37 @@
+{
+  "_doc": "Every kanji word on the site with its meaning, by drawing style (mincho: Shippori Mincho B1 ExtraBold, brush: Yuji Boku). Words are drawn as SVG from src/generated/kanji-glyphs.json; the build fails on a word missing here. After adding one run scripts/landing/kanji.py.",
+  "mincho": {
+    "柔道": "judo, \"the gentle way\"",
+    "柔": "ju, gentle, supple (the first half of judo)",
+    "七転八起": "nanakorobi yaoki, \"fall seven times, get up eight\"",
+    "礼": "rei, bow, respect",
+    "帯": "obi, belt",
+    "受": "uke, to receive (as in ukemi, breakfalls)",
+    "体": "tai, body",
+    "友": "tomo, friend",
+    "起": "oki, to get up, rise",
+    "始": "hajime, begin (the referee's start call)",
+    "三": "san, three",
+    "師": "shi, teacher, master",
+    "道": "do, the way",
+    "技": "waza, technique",
+    "創": "so, to found, create",
+    "五輪": "gorin, the Olympics (\"five rings\")",
+    "一本": "ippon, a full point, the winning score",
+    "歴史": "rekishi, history",
+    "試合": "shiai, match, competition",
+    "相撲": "sumo",
+    "合宿": "gasshuku, training camp",
+    "稽古": "keiko, practice, training",
+    "選": "sen, to select (a selected squad)",
+    "道場": "dojo, training hall",
+    "連絡": "renraku, contact",
+    "世界": "sekai, the world",
+    "欧州": "oshu, Europe"
+  },
+  "brush": {
+    "師": "shi, teacher, coach",
+    "選手": "senshu, athlete",
+    "親": "oya, parent"
+  }
+}

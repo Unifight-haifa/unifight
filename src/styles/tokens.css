@@ -1,0 +1,14 @@
+/* night palette and type for every page; font vars come from <Fonts>, the names after them serve the landing --preview file.
+   :where() keeps this sheet at zero specificity: Astro may emit it after a page's own CSS */
+:root{color-scheme:dark;
+  --ink:#0a0908;--ink-2:#13110f;--ink-3:#1c1915;--paper:#f3ead8;--paper-2:#d9cfbd;--mute:#a99f8d;
+  --gold:#d4a84b;--gold-2:#f1d38a;--red:#c2232e;--red-2:#8e1219;--red-3:#e44f57;--line:rgba(212,168,75,.2);
+  --disp:var(--font-oswald,"Oswald"),var(--font-secular,"Secular One"),Impact,sans-serif;--body:var(--font-body,"Rubik"),system-ui,sans-serif;
+  --num:var(--font-oswald,"Oswald"),var(--body);
+  /* symmetric so the gutter clears a side system bar in both LTR and RTL */
+  --gut:max(clamp(16px,5vw,64px),env(safe-area-inset-left,0px),env(safe-area-inset-right,0px))}
+html[lang=he]{--disp:var(--font-secular,"Secular One"),var(--font-oswald,"Oswald"),sans-serif}
+:where(html){background:var(--ink);scroll-behavior:smooth}
+:where(body){margin:0;background:var(--ink);color:var(--paper);font:400 17px/1.65 var(--body);-webkit-font-smoothing:antialiased;overflow-x:clip}
+:where(a){color:inherit}
+:where(:focus-visible){outline:3px solid var(--gold-2);outline-offset:2px}

@@ -1,4 +1,4 @@
-/* gallery page; palette, .chip and .news layout come from landing.css and news.css */
+/* gallery page; palette from tokens.css; .chip and .news layout come from landing.css and news.css */
 .gal-filter { margin-block: 8px 28px; }
 .gal-filter[hidden], .gal-sec[hidden] { display: none; }
 .gal-sec + .gal-sec { margin-block-start: 48px; }

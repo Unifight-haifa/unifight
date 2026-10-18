@@ -1,7 +1,10 @@
 ---
+import Fonts from '../components/Fonts.astro';
 import LangPick from '../components/LangPick.astro';
 import site from '../../content/site.json';
 import { LANGS, NAMES, dir, t } from '../i18n/ui';
+import '../styles/tokens.css';
+import '../styles/global.css';
 
 const base = import.meta.env.BASE_URL;
 // Search Console checks the property's home page, which is this picker
@@ -19,6 +22,7 @@ const gsc = import.meta.env.PUBLIC_GSC_VERIFICATION;
     <link rel="icon" href={`${base}favicon.ico`} sizes="48x48" />
     <link rel="icon" type="image/png" href={`${base}favicon-32.png`} sizes="32x32" />
     <link rel="apple-touch-icon" href={`${base}apple-touch-icon.png`} />
+    <Fonts lang="he" />
     <LangPick mode="redirect" />
   </head>
   <body>

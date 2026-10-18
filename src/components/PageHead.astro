@@ -1,6 +1,5 @@
 ---
 import { getRelativeLocaleUrl } from 'astro:i18n';
-import fonts from '../generated/fonts.json';
 import { LANGS, t, type Lang } from '../i18n/ui';
 
 interface Props {
@@ -29,4 +28,3 @@ const LOCALE = { he: 'he_IL', ru: 'ru_RU', en: 'en_US' };
 <meta property="og:locale" content={LOCALE[lang]} />
 {LANGS.filter((l) => l !== lang).map((l) => <meta property="og:locale:alternate" content={LOCALE[l]} />)}
 <meta name="twitter:card" content="summary_large_image" />
-{(fonts as string[]).map((href) => <link rel="stylesheet" href={href} />)}

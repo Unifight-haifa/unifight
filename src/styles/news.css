@@ -1,6 +1,4 @@
-/* palette and type come from landing.css; this file only lays out the news pages */
-.site-header a { color: var(--gold-2); text-decoration: none; }
-.site-header .site-name { font: 600 20px/1.2 var(--disp); text-transform: uppercase; color: var(--paper); }
+/* palette comes from tokens.css, type classes from landing.css; this file only lays out the news pages */
 
 .news { padding-block: 1rem 4rem; }
 .news .h2 { font-size: clamp(30px, 6vw, 56px); }

@@ -22,3 +22,5 @@ npm run build && npm test
 Commit the regenerated files together with the content change. Never hand-edit `src/generated/`.
 
 Share previews (`public/og/<lang>.jpg`) use the club name and hero headline. Re-render them after changing either: `python3 scripts/landing/og.py` (needs Pillow with libraqm, and downloads Rubik on the first run).
+
+Kanji are drawn as SVG, not set in a font. Every kanji word needs its meaning in `content/kanji.json` (the build fails otherwise); after adding one run `python3 scripts/landing/kanji.py` (needs fontTools, and downloads Shippori Mincho B1 and Yuji Boku on the first run) and commit `src/generated/kanji-*`. Text fonts are self-hosted through Astro (`fonts` in `astro.config.mjs`); colours and base type for every page are in `src/styles/tokens.css`.

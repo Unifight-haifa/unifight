@@ -2,7 +2,6 @@
 import { Image } from 'astro:assets';
 import { i18n } from 'astro:config/client';
 import { getRelativeLocaleUrl } from 'astro:i18n';
-import fonts from '../../../generated/fonts.json';
 import Base from '../../../layouts/Base.astro';
 import { LANGS, t, type Lang } from '../../../i18n/ui';
 import { fmtDate, getPosts, postPath } from '../../../lib/news';
@@ -23,7 +22,6 @@ const title = `${t(lang, 'newsTitle')} · ${t(lang, 'siteName')}`;
     <link rel="canonical" href={abs(getRelativeLocaleUrl(lang, 'news/'))} />
     {LANGS.map((l) => <link rel="alternate" hreflang={l} href={abs(getRelativeLocaleUrl(l, 'news/'))} />)}
     <link rel="alternate" type="application/rss+xml" title={title} href={getRelativeLocaleUrl(lang, 'news/rss.xml')} />
-    {(fonts as string[]).map((href) => <link rel="stylesheet" href={href} />)}
   </Fragment>
   <div class="news">
     <h1 class="h2">{t(lang, 'newsTitle')}</h1>

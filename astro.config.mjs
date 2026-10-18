@@ -12,14 +12,21 @@ export default defineConfig({
     defaultLocale: 'he',
     routing: { prefixDefaultLocale: true, redirectToDefaultLocale: false },
   },
+  // fallbacks: [] drops Astro's metric-matched Arial: it has no unicode-range, so it would draw what a
+  // family lacks (Hebrew in Oswald, arrows in Rubik) before the next font in the tokens.css stacks
   fonts: [
-    {
-      provider: fontProviders.fontsource(),
-      name: 'Rubik',
-      cssVariable: '--font-body',
-      weights: ['300 900'],
-      styles: ['normal'],
-      subsets: ['hebrew', 'cyrillic', 'latin'],
-    },
-  ],
+    ['Rubik', '--font-body', ['300 900'], ['hebrew', 'cyrillic', 'latin', 'latin-ext']],
+    ['Oswald', '--font-oswald', ['500 700'], ['cyrillic', 'latin', 'latin-ext']],
+    ['Secular One', '--font-secular', [400], ['hebrew', 'latin']],
+    ['Playfair Display', '--font-playfair', ['600 800'], ['cyrillic', 'latin']],
+    ['Frank Ruhl Libre', '--font-frank', ['500 900'], ['hebrew']],
+  ].map(([name, cssVariable, weights, subsets]) => ({
+    provider: fontProviders.fontsource(),
+    name,
+    cssVariable,
+    weights,
+    styles: ['normal'],
+    subsets,
+    fallbacks: [],
+  })),
 });

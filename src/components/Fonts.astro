@@ -1,0 +1,16 @@
+---
+import { Font } from 'astro:assets';
+import type { Lang } from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const subset = { he: 'hebrew', ru: 'cyrillic', en: 'latin' }[lang];
+// preload only the first screen's faces: body text and headings in the page's own script
+const pre = [{ subset }];
+---
+<Font cssVariable="--font-body" preload={pre} />
+<Font cssVariable="--font-oswald" preload={lang !== 'he' && pre} />
+<Font cssVariable="--font-secular" preload={lang === 'he' && pre} />

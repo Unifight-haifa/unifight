@@ -66,6 +66,29 @@ def ltr(s):
     return f'<bdi dir="ltr">{esc(s)}</bdi>'
 
 
+KANJI, GLYPHS = load("kanji.json"), json.loads((R / "src/generated/kanji-glyphs.json").read_text())
+# a seal stacks a word with <br>, still one word
+CJK = re.compile(r"[\u3000-\u9fff]+(?:<br>[\u3000-\u9fff]+)*")
+
+
+def kanji(s, style):
+    """Kanji words in s become SVG glyphs, as in src/lib/kanji.ts; kanji_defs() supplies the outlines."""
+    def word(m):
+        w = m.group().replace("<br>", "")
+        assert w in KANJI[style], f"{w}: add it with its meaning to content/kanji.json ({style})"
+        svgs = "<br>".join("".join(f'<svg class="kg" viewBox="{GLYPHS[style]["viewBox"]}" aria-hidden="true"><use href="#k-{style}-{ord(c):x}"/></svg>' for c in part)
+                           for part in m.group().split("<br>"))
+        # inline SVGs are bidi-neutral, so on RTL pages a word would read backwards
+        return f'<bdi dir="ltr">{svgs}</bdi>' if len(w) > 1 else svgs
+    return CJK.sub(word, s)
+
+
+def kanji_defs(s):
+    ids = sorted(set(re.findall(r'href="#k-(\w+)-([0-9a-f]+)"', s)))
+    paths = "".join(f'<path id="k-{st}-{h}" d="{GLYPHS[st]["glyphs"][chr(int(h, 16))]}" vector-effect="non-scaling-stroke"/>' for st, h in ids)
+    return f'<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>{paths}</defs></svg>'
+
+
 def attr(name, o):
     """A per-language attribute: pages/[lang]/index.astro keeps the page language's <name>-<l>."""
     if SITE:
@@ -563,9 +586,8 @@ src = (HERE / "success-triangle.html").read_text()
 st_css = src[src.index("/* ---------- embeddable section ---------- */"):src.index("/* social-image renders")]
 st_sec = src[src.index('<section class="success-triangle"'):src.index("</section>", src.index('<section class="success-triangle"')) + len("</section>")]
 st_sec = st_sec.replace('<section class="success-triangle"',
-                        '<section class="success-triangle rv" data-theme="night" style="--st-paper:#13110f;--st-ink:#f3ead8;--st-text:#cfc5b2;--st-accent:#e44f57;--st-blossom:#e9a0a8;--st-card:#1c1915"', 1)
-TRIANGLE = st_sec
-st_fonts = re.findall(r'<link rel="stylesheet" href="(https://fonts.googleapis.com/[^"]+)">', src)
+                        '<section class="success-triangle rv" data-theme="night" style="--st-paper:#13110f;--st-ink:#f3ead8;--st-text:#cfc5b2;--st-accent:#e44f57;--st-blossom:#e9a0a8;--st-card:#1c1915;--st-kanji:kj"', 1)
+TRIANGLE = kanji(st_sec, "brush")
 
 CSS = (HERE / "night.css").read_text()
 JS = (HERE / "night.js").read_text()
@@ -575,15 +597,11 @@ JS = (HERE / "night.js").read_text()
 def render(site):
     global SITE, PFX
     SITE, PFX = site, ("%BASE%" if site else "")  # the site build swaps in its base path
-    return header() + '\n<main id="main">' + hero_sec() + ticker() + parents() + coaches() + achievements() + history() + tournaments() + camps() + schedule() + branches() + contact() + "\n</main>" + footer()
+    body = kanji(header() + '\n<main id="main">' + hero_sec() + ticker() + parents() + coaches() + achievements() + history() + tournaments() + camps() + schedule() + branches() + contact() + "\n</main>" + footer(), "mincho")
+    return body + kanji_defs(body)
 
 
 body = render(True)
-kanji = "".join(sorted({ch for ch in body + "柔道" if "　" <= ch <= "鿿"}))
-fonts = [
-    "https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Rubik:wght@400;500;600;700&family=Secular+One&display=swap",
-    "https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@800&text=" + urllib.parse.quote(kanji) + "&display=swap",
-] + st_fonts
 
 (R / "src/generated").mkdir(parents=True, exist_ok=True)
 (R / "src/generated/landing.html").write_text(body)
@@ -591,15 +609,14 @@ fonts = [
 site_js, n = re.subn(r"  // the real site has one URL.*?\n  }\n", "", JS, count=1, flags=re.S)
 assert n == 1 and "data-set-lang" not in site_js
 (R / "src/generated/landing.js").write_text(site_js)
-(R / "src/generated/fonts.json").write_text(json.dumps(fonts))
 (R / "src/styles/landing.css").write_text(CSS + "\n" + st_css)
 print(len(body), "bytes body;", len(set(USED)), "images")
 
 if PREVIEW:
     out = ('<title>Unifight Dojo Night</title>\n<meta name="claude:viewport-fit-sides" content="cover">\n'
-           '<link rel="preconnect" href="https://fonts.googleapis.com">\n<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n'
-           + "".join(f'<link rel="stylesheet" href="{html.escape(u)}">\n' for u in fonts)
-           + "<style>\n" + CSS + "\n" + st_css + "</style>\n" + render(False) + "\n<script>\n" + JS + "</script>\n")
+           # the site self-hosts these through Astro; this local file can only borrow them
+           '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&amp;family=Rubik:wght@400;500;600;700&amp;family=Secular+One&amp;family=Frank+Ruhl+Libre:wght@500;700;900&amp;family=Playfair+Display:wght@600;700;800&amp;display=swap">\n'
+           + "<style>\n" + (R / "src/styles/tokens.css").read_text() + CSS + "\n" + st_css + "</style>\n" + render(False) + "\n<script>\n" + JS + "</script>\n")
     PREVIEW.mkdir(parents=True, exist_ok=True)
     (PREVIEW / "night.html").write_text(out)
     print("preview:", PREVIEW / "night.html", "(images: publish with root=public/)")

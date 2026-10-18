@@ -1,4 +1,4 @@
-/* video page; palette, .chip and .news layout come from landing.css and news.css */
+/* video page; palette from tokens.css; .chip and .news layout come from landing.css and news.css */
 .video-filter { margin-block: 8px 28px; }
 .video-filter[hidden], .video-card[hidden], .video-sec[hidden] { display: none; }
 .video-sec + .video-sec { margin-block-start: 48px; }

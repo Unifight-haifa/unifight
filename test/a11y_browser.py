@@ -35,6 +35,15 @@ with sync_playwright() as p:
                     page.click(".tk-pause")
                     looping = page.evaluate("document.getAnimations().filter(a => a.playState === 'running' && a.effect.getTiming().iterations === Infinity).length")
                     assert looping == 0, f"{lang}: {looping} animations still running after pause"
+                if lang == "he":
+                    # kanji and the logo keep their drawn orientation in RTL, ancestors included
+                    flipped = page.evaluate("""[...document.querySelectorAll('.kg, .plate img, .st-center img')].filter(e => {
+                      for (let n = e; n; n = n.parentElement) {
+                        const cs = getComputedStyle(n);
+                        if (new DOMMatrix(cs.transform).a < 0 || parseFloat(cs.scale) < 0) return true;
+                      }
+                    }).length""")
+                    assert flipped == 0, f"{path}@{width}: {flipped} kanji/logo mirrored"
                 if path == "gallery/":
                     # the open lightbox is scanned too; Esc closes it and focus returns to the photo
                     page.click("a[data-gal-item]")

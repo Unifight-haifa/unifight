@@ -3,7 +3,6 @@ import { Picture, getImage } from 'astro:assets';
 import { i18n } from 'astro:config/client';
 import { getRelativeLocaleUrl } from 'astro:i18n';
 import gallery from '../../../../content/gallery.json';
-import fonts from '../../../generated/fonts.json';
 import Base from '../../../layouts/Base.astro';
 import JsonLd from '../../../components/JsonLd.astro';
 import { LANGS, t, type Lang } from '../../../i18n/ui';
@@ -106,7 +105,6 @@ const ld = {
     {LANGS.filter((l) => l !== lang).map((l) => <meta property="og:locale:alternate" content={LOCALE[l]} />)}
     <meta name="twitter:card" content="summary_large_image" />
     <JsonLd data={ld} />
-    {(fonts as string[]).map((href) => <link rel="stylesheet" href={href} />)}
   </Fragment>
   <div class="news">
     <h1 class="h2">{s.title}</h1>

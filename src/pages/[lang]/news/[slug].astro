@@ -2,7 +2,6 @@
 import { Image } from 'astro:assets';
 import { render } from 'astro:content';
 import { getRelativeLocaleUrl } from 'astro:i18n';
-import fonts from '../../../generated/fonts.json';
 import Base from '../../../layouts/Base.astro';
 import JsonLd from '../../../components/JsonLd.astro';
 import { LANGS, t, type Lang } from '../../../i18n/ui';
@@ -69,7 +68,6 @@ const share = [
     <meta property="article:published_time" content={d.date.toISOString()} />
     <meta name="twitter:card" content="summary_large_image" />
     <JsonLd data={article} />
-    {(fonts as string[]).map((href) => <link rel="stylesheet" href={href} />)}
   </Fragment>
   <article class="news post">
     <a class="news-back" href={getRelativeLocaleUrl(lang, 'news/')}>{t(lang, 'newsAll')}</a>

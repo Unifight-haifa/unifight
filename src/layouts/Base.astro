@@ -1,9 +1,10 @@
 ---
-import { Font } from 'astro:assets';
 import { getRelativeLocaleUrl } from 'astro:i18n';
 import Consent from '../components/Consent.astro';
+import Fonts from '../components/Fonts.astro';
 import { LANGS, NAMES, dir, t, type Lang } from '../i18n/ui';
 import { GA_ID } from '../lib/analytics';
+import '../styles/tokens.css';
 import '../styles/global.css';
 
 interface Props {
@@ -16,7 +17,6 @@ interface Props {
 }
 
 const { lang, title, description, noindex, bare } = Astro.props;
-const subset = { he: 'hebrew', ru: 'cyrillic', en: 'latin' }[lang];
 // path after /<base>/<lang>/; slugs are identical across locales
 const rest = Astro.url.pathname.slice(import.meta.env.BASE_URL.length).split('/').slice(1).join('/');
 ---
@@ -31,7 +31,7 @@ const rest = Astro.url.pathname.slice(import.meta.env.BASE_URL.length).split('/'
     <link rel="apple-touch-icon" href={`${import.meta.env.BASE_URL}apple-touch-icon.png`} />
     {description && <meta name="description" content={description} />}
     {noindex && <meta name="robots" content="noindex" />}
-    <Font cssVariable="--font-body" preload={[{ subset }]} />
+    <Fonts lang={lang} />
     <slot name="head" />
   </head>
   <body>
