@@ -1,0 +1,24 @@
+{
+ "id": "2026-10-21-natanel-move",
+ "schedule": "natanel-zhurovel",
+ "type": "move",
+ "from": "2026-10-21",
+ "to": "2026-10-21",
+ "session": {
+  "day": 3,
+  "start": "13:40"
+ },
+ "new": {
+  "date": "2026-10-22",
+  "start": "16:00",
+  "end": "16:50",
+  "venue": "leo-baeck-hadar"
+ },
+ "note": {
+  "he": "האולם תפוס ביום רביעי",
+  "ru": "В среду зал занят",
+  "en": "The hall is booked on Wednesday"
+ },
+ "author": "natanel-zhurovel",
+ "created": "2026-10-17T09:00:00+03:00"
+}

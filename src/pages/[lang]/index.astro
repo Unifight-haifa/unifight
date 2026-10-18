@@ -13,6 +13,8 @@ import JsonLd from '../../components/JsonLd.astro';
 import VideoModal from '../../components/VideoModal.astro';
 import { LANGS, t, type Lang } from '../../i18n/ui';
 import { GA_ID } from '../../lib/analytics';
+import { CHANGES, TODAY, schedules } from '../../lib/changes';
+import { GATE_JS, fillSchedule, renderSchedule } from '../../lib/schedule-changes.mjs';
 import '../../styles/landing.css';
 
 export function getStaticPaths() {
@@ -28,6 +30,9 @@ for (const l of LANGS) {
 }
 body = body.replace('<!--COOKIES-->', GA_ID ? ` · <button type="button" class="consent-open" data-consent-open>${t(lang, 'cookieSettings')}</button>` : '');
 body = body.replace(/([a-z-]+)-he="([^"]*)" \1-ru="([^"]*)" \1-en="([^"]*)"/g, (_, a, he, ru, en) => `${a}="${{ he, ru, en }[lang]}"`);
+// dated schedule changes go into the markers build.py leaves in the schedule
+const colors = Object.fromEntries([...body.matchAll(/data-venue="([a-z-]+)"[^>]*--vc:(#\w+)/g)].map((m) => [m[1], m[2]]));
+body = fillSchedule(body, renderSchedule(CHANGES, lang, TODAY, schedules, venues, colors));
 // share scrapers need absolute URLs
 const abs = (path: string) => new URL(path, Astro.site).href;
 const LOCALE = { he: 'he_IL', ru: 'ru_RU', en: 'en_US' };
@@ -87,5 +92,5 @@ const club = {
   <VenueMap lang={lang} />
   <Fragment set:html={afterMap} />
   <VideoModal lang={lang} />
-  <script is:inline set:html={js} />
+  <script is:inline set:html={GATE_JS + js} />
 </Base>

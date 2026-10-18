@@ -481,14 +481,15 @@ def schedule():
                 badge += f'<span class="ses-kind">{t({l: {"he": "קבוצה", "ru": "Группа", "en": "Group"}[l] + " " + str(s["subgroup"]) for l in LANGS})}</span>'
             note = f'<span class="ses-note">{t(s["note"])}</span>' if s.get("note") else ""
             v = VENUES[s["venue"]]
-            cards += (f'<li class="ses" data-v="{s["venue"]}" data-g="{hi}-{lo}" style="--vc:{VENUE_COLOR[s["venue"]]}">'
+            # markers: the landing page slots dated changes (content/schedule-changes) in at build
+            cards += (f'<li class="ses" data-v="{s["venue"]}" data-g="{hi}-{lo}" style="--vc:{VENUE_COLOR[s["venue"]]}"><!--SES {d}-{s["start"]}-->'
                       f'<span class="ses-time">{ltr(s["start"] + "–" + s["end"])}</span>'
                       f'<span class="ses-grade">{t(grade_label(s["grades"]))}</span>'
                       f'<span class="ses-venue"><i aria-hidden="true"></i>{t({l: v[l] for l in LANGS})}</span>{badge}{note}'
                       f'<a class="ses-wa" href="{WA}" target="_blank" rel="noopener" {ga("whatsapp_click", placement="schedule", venue=s["venue"])}>{WA_SVG}{t(U["join"])}</a></li>')
         name = {l: SC["days"][l][d] for l in LANGS}
         days += (f'<section class="day" data-day="{d}"><h4 class="day-h">{t(name)}<span class="day-today">{t(U["today"])}</span></h4>'
-                 f'<ul class="ses-list">{cards}</ul><p class="day-none">{t(U["none_day"])}</p></section>')
+                 f'<ul class="ses-list"><!--SES_X {d}-->{cards}</ul><p class="day-none">{t(U["none_day"])}</p></section>')
     tabs = "".join(f'<button type="button" class="tab" data-tab="{d}" aria-pressed="false">{t({l: DAY_SHORT[l][d] for l in LANGS})}<b class="tab-n"></b></button>' for d in range(6))
     grades = [(-1, U["all"])] + [(0, {"he": "גן", "ru": "Сад", "en": "KG"})] + [
         (g, {"he": SC["grade_letters_he"][g] + ("+" if g == 8 else ""), "ru": f"{g}{'+' if g == 8 else ''}", "en": f"{g}{'+' if g == 8 else ''}"}) for g in range(1, 9)]
@@ -511,6 +512,7 @@ def schedule():
    <div class="fl"><p class="fl-q" id="fl-venue">{t(U["venue_q"])}</p><div class="chips" role="group" aria-labelledby="fl-venue">{vchips}</div></div>
   </div>
   <p class="sc-count vh" aria-live="polite">{t(U["count"])}<b></b></p>
+  <!--SCHED_CHANGES-->
   <div class="tabs" role="group" {attr("aria-label", U["days"])}>{tabs}</div>
   <div class="week" id="week">{days}</div>
   <div class="sc-none">{t(U["none_all"])}{wa(C["kids"]["first_class"]["cta"], "schedule_none")}</div>

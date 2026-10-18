@@ -1,0 +1,24 @@
+{
+ "id": "2026-10-23-natanel-extra",
+ "schedule": "natanel-zhurovel",
+ "type": "extra",
+ "from": "2026-10-18",
+ "to": "2026-10-23",
+ "session": {
+  "day": 1,
+  "start": "18:00"
+ },
+ "new": {
+  "date": "2026-10-23",
+  "start": "10:00",
+  "end": "11:30",
+  "venue": "ein-hayam"
+ },
+ "note": {
+  "he": "אימון הכנה לתחרות",
+  "ru": "Подготовка к турниру",
+  "en": "Tournament prep session"
+ },
+ "author": "natanel-zhurovel",
+ "created": "2026-10-17T09:00:00+03:00"
+}

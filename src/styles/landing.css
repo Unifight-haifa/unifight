@@ -434,6 +434,18 @@ html[lang=he] .day-h{font-weight:400}
 .ses.off{display:none}
 .sc-none{display:none;padding:18px;border:1px dashed var(--red-3);margin-block-start:14px}
 .sc-none.on{display:grid;gap:12px}
+/* dated changes from content/schedule-changes; [hidden] has to beat .ses{display:grid} */
+.ses[hidden],.chg[hidden],.ses-chg[hidden]{display:none}
+.ses:has(> .ses-chg:not([hidden]):is(.chg-cancel,.chg-move)) :is(.ses-time,.ses-grade){text-decoration:line-through 2px var(--red-3);opacity:.75}
+.ses-chg{justify-self:start;font-size:13.5px;color:var(--paper-2)}
+.ses-chg b{display:inline-block;padding:.2em .55em;margin-inline-end:.4em;border-radius:3px;background:var(--red);color:#fff;font-weight:600}
+.ses-chg.chg-new b{background:var(--gold);color:var(--ink)}
+.ses-x{background:rgba(212,168,75,.14);box-shadow:inset 0 0 0 2px var(--gold)}
+.sc-chg{margin-block:0 18px;padding:14px 16px;border:1px solid var(--red-3);border-inline-start-width:4px;background:rgba(10,9,8,.88)}
+.sc-chg:not(:has(.chg:not([hidden]))){display:none}
+.sc-chg .h4{margin-block-end:8px;color:var(--gold-2)}
+.sc-chg ul{margin:0;padding-inline-start:1.1em;display:grid;gap:6px;color:var(--paper-2);font-size:15px}
+.chg b{color:var(--paper);font-weight:600}
 .sc-vals{color:var(--gold);letter-spacing:.08em;font-size:14px;margin-block-start:18px}
 .sc-others{color:var(--mute);font-size:14px;margin-block-start:6px}
 /* phones: one day at a time once JS is running; without JS every day stays visible */

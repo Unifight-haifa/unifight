@@ -6,6 +6,10 @@ name: Deploy to GitHub Pages
     branches: [main]
   pull_request:
   workflow_dispatch:
+  # daily after midnight in Israel (00:15 IST / 01:15 IDT): dated schedule
+  # changes leave the HTML once they end
+  schedule:
+    - cron: "15 22 * * *"
 
 permissions:
   contents: read

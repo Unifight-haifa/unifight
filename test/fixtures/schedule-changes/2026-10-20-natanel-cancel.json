@@ -1,0 +1,18 @@
+{
+ "id": "2026-10-20-natanel-cancel",
+ "schedule": "natanel-zhurovel",
+ "type": "cancel",
+ "from": "2026-10-20",
+ "to": "2026-10-20",
+ "session": {
+  "day": 2,
+  "start": "17:30"
+ },
+ "note": {
+  "he": "המאמן בתחרות",
+  "ru": "Тренер на соревнованиях",
+  "en": "The coach is at a tournament"
+ },
+ "author": "natanel-zhurovel",
+ "created": "2026-10-17T09:00:00+03:00"
+}

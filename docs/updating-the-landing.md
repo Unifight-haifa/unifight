@@ -5,7 +5,7 @@ Text, coaches, schedule and venues live in `content/`:
 - `content/site.json`: shared page copy in he/ru/en (hero, kids, achievements, history, contacts…); owner only
 - `content/coaches/<id>.json`: one file per coach. `group` is `main` | `lead` | `club` | `young`, `order` sorts the page
 - `content/coaches/_section.json`: the coaches section's title, intro, team photo and roster group titles
-- `content/schedule/<id>.json`: a coach's groups (day 0 = Sunday; grades `[from, to]`, `to: null` = "and up", `0` = kindergarten). Only `natanel-zhurovel.json` is on the page so far
+- `content/schedule/<id>.json`: a coach's groups (day 0 = Sunday; grades `[from, to]`, `to: null` = "and up", `0` = kindergarten). Only `natanel-zhurovel.json` is on the page so far. One-off cancellations, moves and extra classes go in `content/schedule-changes/` (see [bot-content-contracts.md](bot-content-contracts.md)), never in the schedule file
 - `kids.first_class` in `content/site.json`: the "first training" block after the schedule (steps, what to bring, WhatsApp prefill in `cta.message`). `price` and `judogi` are still `"placeholder": true` and stay hidden; write the text in he/ru/en and remove `placeholder` to show them
 - `content/venues.json`: training venues and addresses, shared by all schedules
 - `content/videos.json`: the /video/ page. One entry per YouTube upload: `id` (11 chars from the youtu.be link), `kind` `video` | `short`, `date` (YYYY-MM-DD), `playlist` `promo` | `coaches` | `competitions` | `camps` | `training` | `events`, `title` and `description` in he/ru/en, optional `duration` in seconds, and `thumb`, a JPEG in `public/videos/` (1280 px wide at most, under 200 KB). The build checks every field

@@ -51,7 +51,7 @@
     let total = 0;
     days.forEach((d, i) => {
       let n = 0;
-      d.querySelectorAll('.ses').forEach(s => {
+      d.querySelectorAll('.ses:not([hidden])').forEach(s => {
         const [a, b] = s.dataset.g.split('-').map(Number);
         const ok = (grade < 0 || (a <= grade && grade <= b)) && (!venue || s.dataset.v === venue);
         s.classList.toggle('off', !ok); n += ok;

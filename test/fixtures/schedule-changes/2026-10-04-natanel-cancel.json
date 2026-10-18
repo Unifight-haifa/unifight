@@ -1,0 +1,18 @@
+{
+ "id": "2026-10-04-natanel-cancel",
+ "schedule": "natanel-zhurovel",
+ "type": "cancel",
+ "from": "2026-10-04",
+ "to": "2026-10-04",
+ "session": {
+  "day": 0,
+  "start": "14:00"
+ },
+ "note": {
+  "he": "חג",
+  "ru": "Праздник",
+  "en": "Holiday"
+ },
+ "author": "natanel-zhurovel",
+ "created": "2026-10-17T09:00:00+03:00"
+}
