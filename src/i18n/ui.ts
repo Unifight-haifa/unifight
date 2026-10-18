@@ -34,6 +34,7 @@ export const ui = {
     accessibilityStatement: 'הצהרת נגישות',
     privacyPolicy: 'מדיניות פרטיות',
     skipToContent: 'דילוג לתוכן',
+    contact: 'צרו קשר',
   },
   ru: {
     siteName: 'Юнифайт Хайфа',
@@ -63,6 +64,7 @@ export const ui = {
     accessibilityStatement: 'Заявление о доступности',
     privacyPolicy: 'Политика конфиденциальности',
     skipToContent: 'Перейти к содержанию',
+    contact: 'Контакты',
   },
   en: {
     siteName: 'Unifight Haifa',
@@ -92,6 +94,7 @@ export const ui = {
     accessibilityStatement: 'Accessibility statement',
     privacyPolicy: 'Privacy policy',
     skipToContent: 'Skip to content',
+    contact: 'Contact',
   },
 };
 

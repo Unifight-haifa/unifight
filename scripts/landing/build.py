@@ -122,8 +122,10 @@ def ga(event, **params):
     return f'data-ga="{event}"' + "".join(f' data-ga-{k}="{v}"' for k, v in params.items())
 
 
-def wa(label, placement, extra=""):
-    return (f'<div class="wa-row {extra}"><a class="btn btn-wa" href="{WA}" target="_blank" rel="noopener" {ga("whatsapp_click", placement=placement)}>{WA_SVG}{t(label)}</a>'
+def wa(label, placement, extra="", msg=None):
+    """msg: {he, ru, en} text prefilled in the chat, in the page language."""
+    href = attr("href", {l: f"{WA}?text={urllib.parse.quote(msg[l])}" for l in LANGS}) if msg else f'href="{WA}"'
+    return (f'<div class="wa-row {extra}"><a class="btn btn-wa" {href} target="_blank" rel="noopener" {ga("whatsapp_click", placement=placement)}>{WA_SVG}{t(label)}</a>'
             f'<a class="wa-num" href="tel:+972545664663" {ga("phone_click", placement=placement)}>{ltr(WA_NUM)}</a></div>')
 
 
@@ -258,9 +260,6 @@ def parents():
         f'<h3 class="h3">{t(b["title"])}</h3><p>{t(b["text"])}</p></article>'
         for i, b in enumerate(kids["benefits"]))
     mos = "".join(f'<figure class="mo mo{i}">{img(n, "pic")}</figure>' for i, n in enumerate(["kids-coach.jpg", "rope-climb.jpg", "belt-class.jpg", "kids-belt-cheer.jpg"]))
-    bring = "".join(f'<li>{t(x)}</li>' for x in fc["bring"])
-    expect = "".join(f'<li>{t(x)}</li>' for x in fc["expect"])
-    qs = "".join(t(q) for q in fc["open_questions"])
     st = C["success_triangle"]
     return f'''
 <section class="sec tatami" id="parents">
@@ -268,19 +267,6 @@ def parents():
   {head("parents", "礼", kids["title"], kids["intro"])}
   <div class="mosaic rv">{mos}</div>
   <div class="bens">{bens}</div>
-  <div class="fc rv" id="first-class">
-   <div class="fc-main">
-    <span class="fc-k kj" aria-hidden="true">始</span>
-    <h3 class="h3 fc-t">{t(fc["title"])}</h3>
-    <div class="fc-cols">
-     <div><h4 class="h4">{t(fc["bring_title"])}</h4><ul class="dl">{bring}</ul></div>
-     <div><h4 class="h4">{t(fc["expect_title"])}</h4><ol class="nl">{expect}</ol></div>
-    </div>
-    <div class="qs">{qs}</div>
-    {wa(fc["cta"], "first_class")}
-   </div>
-   <div class="fc-pics">{img("result-jfp-mascot.jpg", "pic")}{img("result-kids-certificates.jpg", "pic")}</div>
-  </div>
   <p class="st-intro rv"><span class="kj" aria-hidden="true">三</span>{t(st["intro"])}</p>
   {TRIANGLE}
  </div>
@@ -536,6 +522,37 @@ def schedule():
 </section>'''
 
 
+def first_class():
+    def step(i, s):
+        h = t(s["title"])
+        h = f'<a href="{s["href"]}">{h}</a>' if s.get("href") else h
+        return f'<li class="fs"><span class="fs-n" aria-hidden="true">{i}</span><h3 class="h4">{h}</h3><p>{t(s["text"])}</p></li>'
+    steps = "".join(step(i, s) for i, s in enumerate(fc["steps"], 1))
+    bring = "".join(f'<li>{t(x)}</li>' for x in fc["bring"])
+    expect = "".join(f'<li>{t(x)}</li>' for x in fc["expect"])
+    # price and judogi stay placeholders (t() drops them) until the owner confirms
+    notes = "".join(f'<p class="fc-note">{n}</p>' for n in map(t, [fc["price"], fc["judogi"], *fc["open_questions"]]) if n)
+    return f'''
+<section class="sec" id="first-class">
+ <div class="wrap">
+  <div class="sh rv"><span class="kicker"><span class="kj" aria-hidden="true">始</span>{t(club["name"])}</span><h2 class="h2">{t(fc["title"])}</h2><p class="lead">{t(fc["who"])}</p></div>
+  <ol class="fsteps rv">{steps}</ol>
+  <div class="fc rv">
+   <div class="fc-main">
+    <span class="fc-k kj" aria-hidden="true">始</span>
+    <div class="fc-cols">
+     <div><h3 class="h4">{t(fc["bring_title"])}</h3><ul class="dl">{bring}</ul></div>
+     <div><h3 class="h4">{t(fc["expect_title"])}</h3><ol class="nl">{expect}</ol></div>
+    </div>
+    {notes}
+    {wa(fc["cta"], "first_class", msg=fc["cta"]["message"])}
+   </div>
+   <div class="fc-pics">{img("result-jfp-mascot.jpg", "pic")}{img("result-kids-certificates.jpg", "pic")}</div>
+  </div>
+ </div>
+</section>'''
+
+
 BR_UI = {"days": {"he": "ימי אימון", "ru": "Дни тренировок", "en": "Training days"},
          "bus": {"he": "איך מגיעים באוטובוס", "ru": "Как доехать на автобусе", "en": "Bus directions"}}
 
@@ -589,14 +606,15 @@ def contact():
    </div>
    <div class="ct-pic rv">{img("belts-air.jpg", "pic")}</div>
   </div>
+  {more_link(co, "contact/")}
  </div>
 </section>'''
 
 
 LEGAL_LINKS = "".join(
-    f'<span data-l="{l}"><a href="%BASE%{l}/accessibility/">{a}</a> · <a href="%BASE%{l}/privacy/">{p}</a></span>'
-    for l, a, p in (("he", "הצהרת נגישות", "מדיניות פרטיות"), ("ru", "Заявление о доступности", "Политика конфиденциальности"),
-                    ("en", "Accessibility statement", "Privacy policy")))
+    f'<span data-l="{l}"><a href="%BASE%{l}/contact/">{c}</a> · <a href="%BASE%{l}/accessibility/">{a}</a> · <a href="%BASE%{l}/privacy/">{p}</a></span>'
+    for l, c, a, p in (("he", "צרו קשר", "הצהרת נגישות", "מדיניות פרטיות"), ("ru", "Контакты", "Заявление о доступности", "Политика конфиденциальности"),
+                       ("en", "Contact", "Accessibility statement", "Privacy policy")))
 
 
 def footer():
@@ -627,7 +645,7 @@ JS = (HERE / "night.js").read_text()
 def render(site):
     global SITE, PFX
     SITE, PFX = site, ("%BASE%" if site else "")  # the site build swaps in its base path
-    body = kanji(header() + '\n<main id="main">' + hero_sec() + ticker() + film() + parents() + coaches() + achievements() + history() + tournaments() + camps() + schedule() + branches() + contact() + "\n</main>" + footer(), "mincho")
+    body = kanji(header() + '\n<main id="main">' + hero_sec() + ticker() + film() + parents() + coaches() + achievements() + history() + tournaments() + camps() + schedule() + first_class() + branches() + contact() + "\n</main>" + footer(), "mincho")
     return body + kanji_defs(body)
 
 

@@ -304,8 +304,64 @@
    "title": {
     "he": "האימון הראשון",
     "ru": "Первая тренировка",
-    "en": "Your first class"
+    "en": "Your first training"
    },
+   "who": {
+    "he": "ילדים מגיל הגן, נוער ומבוגרים. לא צריך ניסיון — פשוט באים.",
+    "ru": "Дети с детсадовского возраста, подростки и взрослые. Опыт не нужен — просто приходите.",
+    "en": "Kids from kindergarten age, teens and adults. No experience needed, just come."
+   },
+   "steps": [
+    {
+     "title": {
+      "he": "כתבו לנו בוואטסאפ",
+      "ru": "Напишите в WhatsApp",
+      "en": "Message us on WhatsApp"
+     },
+     "text": {
+      "he": "ספרו גיל ושכונה, ונציע קבוצה מתאימה.",
+      "ru": "Расскажите возраст и район — подскажем группу.",
+      "en": "Tell us the age and area, and we'll suggest a group."
+     }
+    },
+    {
+     "title": {
+      "he": "בחרו קבוצה ומקום",
+      "ru": "Выберите группу и зал",
+      "en": "Pick a group and venue"
+     },
+     "text": {
+      "he": "יום, שעה ואולם — בלוח האימונים.",
+      "ru": "День, время и место — в расписании.",
+      "en": "Day, time and hall are in the schedule."
+     },
+     "href": "#schedule"
+    },
+    {
+     "title": {
+      "he": "הגיעו 10 דקות לפני",
+      "ru": "Приходите за 10 минут",
+      "en": "Come 10 minutes early"
+     },
+     "text": {
+      "he": "יש זמן להחליף בגדים ולהכיר את המאמן.",
+      "ru": "Успеете переодеться и познакомиться с тренером.",
+      "en": "Time to change and meet the coach."
+     }
+    },
+    {
+     "title": {
+      "he": "עולים על המזרן",
+      "ru": "На татами!",
+      "en": "Step on the mat"
+     },
+     "text": {
+      "he": "המאמן ילווה אתכם צעד אחר צעד.",
+      "ru": "Тренер всё покажет шаг за шагом.",
+      "en": "The coach takes you through it step by step."
+     }
+    }
+   ],
    "bring_title": {
     "he": "מה להביא",
     "ru": "Что взять с собой",
@@ -313,14 +369,19 @@
    },
    "bring": [
     {
-     "he": "בגדי ספורט נוחים (בלי רוכסנים וכפתורים)",
-     "ru": "Удобную спортивную одежду (без молний и пуговиц)",
-     "en": "Comfortable sports clothes (no zips or buttons)"
+     "he": "חולצת טי ומכנסי טרנינג נוחים, בלי רוכסנים וכפתורים",
+     "ru": "Футболку и спортивные штаны, без молний и пуговиц",
+     "en": "A T-shirt and sweatpants, no zips or buttons"
     },
     {
      "he": "בקבוק מים",
      "ru": "Бутылку воды",
      "en": "A water bottle"
+    },
+    {
+     "he": "כפכפים להליכה עד המזרן",
+     "ru": "Шлёпанцы, чтобы дойти до татами",
+     "en": "Flip-flops for walking to the mat"
     },
     {
      "he": "שיער ארוך אסוף, בלי תכשיטים",
@@ -355,34 +416,27 @@
      "en": "Time to ask the coach anything after class"
     }
    ],
+   "price": {
+    "placeholder": true,
+    "he": "[מחיר האימון הראשון — לאישור הבעלים]",
+    "ru": "[Стоимость первой тренировки — уточнить у владельца]",
+    "en": "[Price of the first training — owner to confirm]",
+    "note": "Owner: write he/ru/en and remove placeholder to show it in the first-training block. Replaces the old trial_class and fees questions."
+   },
+   "judogi": {
+    "placeholder": true,
+    "he": "[חליפת ג׳ודו (ג׳ודוגי): השאלה / רכישה דרך המועדון — לאישור הבעלים]",
+    "ru": "[Кимоно (дзюдоги): выдаётся / покупается через клуб — уточнить у владельца]",
+    "en": "[Judo suit (judogi): loaned or bought through the club — owner to confirm]",
+    "note": "Owner: write he/ru/en and remove placeholder to show it in the first-training block."
+   },
    "open_questions": [
-    {
-     "placeholder": true,
-     "id": "trial_class",
-     "he": "[אימון ניסיון: בתשלום / ללא תשלום — לאישור הבעלים]",
-     "ru": "[Пробное занятие: платно / бесплатно — уточнить у владельца]",
-     "en": "[Trial class: free or paid — owner to confirm]"
-    },
-    {
-     "placeholder": true,
-     "id": "judogi",
-     "he": "[חליפת ג׳ודו (ג׳ודוגי): השאלה / רכישה דרך המועדון — לאישור הבעלים]",
-     "ru": "[Кимоно (дзюдоги): выдаётся / покупается через клуб — уточнить у владельца]",
-     "en": "[Judo suit (judogi): loaned or bought through the club — owner to confirm]"
-    },
     {
      "placeholder": true,
      "id": "min_age",
      "he": "[מאיזה גיל מקבלים — לאישור הבעלים]",
      "ru": "[С какого возраста принимают — уточнить у владельца]",
      "en": "[Youngest age we accept — owner to confirm]"
-    },
-    {
-     "placeholder": true,
-     "id": "fees",
-     "he": "[מחירים ותשלום — לאישור הבעלים]",
-     "ru": "[Стоимость и оплата — уточнить у владельца]",
-     "en": "[Fees and payment — owner to confirm]"
     },
     {
      "placeholder": true,
@@ -396,7 +450,12 @@
     "he": "קבעו אימון ראשון בוואטסאפ",
     "ru": "Записаться на первую тренировку в WhatsApp",
     "en": "Book a first class on WhatsApp",
-    "href": "#contact"
+    "href": "#contact",
+    "message": {
+     "he": "שלום! אשמח לקבוע אימון ראשון ביוניפייט.",
+     "ru": "Здравствуйте! Хотим записаться на первую тренировку в «Юнифайт».",
+     "en": "Hi! I'd like to book a first training session at Unifight."
+    }
    }
   }
  },
@@ -1879,7 +1938,12 @@
     "ru": "[TikTok — ссылка от владельца]",
     "en": "[TikTok — handle from owner]"
    }
-  ]
+  ],
+  "more": {
+   "he": "כל פרטי הקשר ואיך מגיעים",
+   "ru": "Все контакты и как добраться",
+   "en": "All contacts and directions"
+  }
  },
  "footer": {
   "tagline": {

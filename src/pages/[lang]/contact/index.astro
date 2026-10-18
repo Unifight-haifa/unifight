@@ -1,0 +1,160 @@
+---
+import { i18n } from 'astro:config/client';
+import { getRelativeLocaleUrl } from 'astro:i18n';
+import site from '../../../../content/site.json';
+import venues from '../../../../content/venues.json';
+import Base from '../../../layouts/Base.astro';
+import PageHead from '../../../components/PageHead.astro';
+import JsonLd from '../../../components/JsonLd.astro';
+import VenueMap from '../../../components/VenueMap.astro';
+import { t, type Lang } from '../../../i18n/ui';
+import { schedule } from '../../../lib/club';
+import { bidi } from '../../../lib/club-check.mjs';
+import '../../../styles/landing.css';
+import '../../../styles/news.css';
+import '../../../styles/club.css';
+
+export function getStaticPaths() {
+  return i18n!.locales.map((lang) => ({ params: { lang } }));
+}
+
+const lang = Astro.params.lang as Lang;
+const s = {
+  he: {
+    desc: 'איך יוצרים קשר עם מועדון הג׳ודו יוניפייט חיפה: וואטסאפ, טלפונים, מייל, כתובות האולמות ומפה.',
+    msg: 'שלום! יש לי שאלה על האימונים ביוניפייט.',
+    phones: 'טלפונים',
+    email: 'מייל',
+    social: 'רשתות חברתיות',
+    first: 'פעם ראשונה אצלנו?',
+    firstText: 'מה להביא, מתי להגיע ואיך נראה האימון הראשון.',
+    firstLink: 'האימון הראשון',
+    days: 'ימי אימון',
+    links: ['Google Maps', 'Waze', 'תחבורה ציבורית'],
+    amuta: 'העמותה',
+  },
+  ru: {
+    desc: 'Как связаться с клубом дзюдо «Юнифайт Хайфа»: WhatsApp, телефоны, почта, адреса залов и карта.',
+    msg: 'Здравствуйте! У меня вопрос о тренировках в «Юнифайт».',
+    phones: 'Телефоны',
+    email: 'Почта',
+    social: 'Соцсети',
+    first: 'Впервые у нас?',
+    firstText: 'Что взять с собой, когда приходить и как проходит первая тренировка.',
+    firstLink: 'Первая тренировка',
+    days: 'Дни тренировок',
+    links: ['Google Maps', 'Waze', 'Общественный транспорт'],
+    amuta: 'Амута',
+  },
+  en: {
+    desc: 'How to reach the Unifight Haifa judo club: WhatsApp, phones, email, venue addresses and a map.',
+    msg: 'Hi! I have a question about training at Unifight.',
+    phones: 'Phones',
+    email: 'Email',
+    social: 'Social',
+    first: 'First time with us?',
+    firstText: 'What to bring, when to arrive and what the first training looks like.',
+    firstLink: 'Your first training',
+    days: 'Training days',
+    links: ['Google Maps', 'Waze', 'Public transport'],
+    amuta: 'The association',
+  },
+}[lang];
+
+const co = site.contact;
+const heading = site.nav.find((n) => n.id === 'contact')![lang];
+const title = `${heading} · ${t(lang, 'siteName')}`;
+const wa = `https://wa.me/972545664663?text=${encodeURIComponent(s.msg)}`;
+const social = co.social.filter((x) => !('placeholder' in x) && x.url);
+const PROVIDERS = ['google_maps', 'waze', 'transit'];
+const places = Object.entries(venues).map(([id, v]) => {
+  const q = encodeURIComponent(v.address.he);
+  const days = [...new Set(schedule.sessions.filter((x) => x.venue === id).map((x) => x.day))].sort();
+  return {
+    id,
+    name: v[lang],
+    address: v.address[lang],
+    days: days.map((d) => schedule.days[lang][d]).join(' · '),
+    links: [
+      `https://www.google.com/maps/search/?api=1&query=${q}`,
+      `https://waze.com/ul?q=${q}&navigate=yes`,
+      `https://www.google.com/maps/dir/?api=1&destination=${q}&travelmode=transit`,
+    ],
+  };
+});
+const abs = (p: string) => new URL(p, Astro.site).href;
+const ld = {
+  '@context': 'https://schema.org',
+  '@type': 'ContactPage',
+  url: abs(getRelativeLocaleUrl(lang, 'contact/')),
+  name: title,
+  mainEntity: {
+    '@type': ['SportsClub', 'SportsOrganization'],
+    '@id': abs(`${import.meta.env.BASE_URL}#club`),
+    name: site.club.name[lang],
+    email: co.email.value,
+    contactPoint: { '@type': 'ContactPoint', telephone: '+972-54-566-4663', email: co.email.value, contactType: 'customer service' },
+  },
+};
+---
+<Base lang={lang} title={title} description={s.desc}>
+  <Fragment slot="head">
+    <PageHead lang={lang} path="contact/" title={title} desc={s.desc} />
+    <JsonLd data={ld} />
+  </Fragment>
+  <div class="news club">
+    <h1 class="h2">{heading}</h1>
+    <p class="lead" set:html={bidi(lang, co.text[lang])} />
+    <section class="club-join" aria-label={co.whatsapp_cta.label[lang]}>
+      <div class="wa-row">
+        <a class="btn btn-wa" href={wa} target="_blank" rel="noopener" data-ga="whatsapp_click" data-ga-placement="contact_page">{co.whatsapp_cta.label[lang]}</a>
+        <a class="wa-num" href="tel:+972545664663" data-ga="phone_click" data-ga-placement="contact_page"><bdi dir="ltr">054-566-4663</bdi></a>
+      </div>
+      <dl class="club-facts">
+        <div>
+          <dt>{s.phones}</dt>
+          {co.phones.map((p) => (
+            <dd>{p.name[lang]}: <a href={`tel:${p.tel}`} data-ga="phone_click" data-ga-placement="contact_page"><bdi dir="ltr">{p.phone}</bdi></a></dd>
+          ))}
+        </div>
+        <div>
+          <dt>{s.email}</dt>
+          <dd><a href={`mailto:${co.email.value}`}><bdi dir="ltr">{co.email.value}</bdi></a></dd>
+        </div>
+        <div>
+          <dt>{s.social}</dt>
+          {social.map((x) => (
+            <dd><a href={x.url} target="_blank" rel="noopener" data-ga="social_click" data-ga-network={x.id}><bdi dir="ltr">{'handle' in x ? `${x.label} ${x.handle}` : x.label}</bdi></a></dd>
+          ))}
+        </div>
+      </dl>
+    </section>
+    <section aria-labelledby="first">
+      <h2 class="h3" id="first">{s.first}</h2>
+      <p class="club-empty">{s.firstText}</p>
+      <a class="news-back" href={`${getRelativeLocaleUrl(lang)}#first-class`}>{s.firstLink} <span class="arrow" aria-hidden="true">→</span></a>
+    </section>
+    <section aria-labelledby="venues">
+      <h2 class="h3" id="venues">{site.branches.title[lang]}</h2>
+      <ul class="club-slots">
+        {places.map((v) => (
+          <li>
+            <strong>{v.name}</strong>
+            <span set:html={bidi(lang, v.address)} />
+            <span>{s.days}: {v.days}</span>
+            <span class="club-links">
+              {v.links.map((href, i) => (
+                <a href={href} target="_blank" rel="noopener" data-ga="map_open" data-ga-venue={v.id} data-ga-provider={PROVIDERS[i]}>{s.links[i]}</a>
+              ))}
+            </span>
+          </li>
+        ))}
+      </ul>
+      <div class="club-map"><VenueMap lang={lang} /></div>
+    </section>
+    <section aria-labelledby="amuta">
+      <h2 class="h3" id="amuta">{s.amuta}</h2>
+      <p class="club-empty"><span set:html={bidi(lang, site.footer.legal[lang])} />, <span set:html={bidi(lang, site.footer.amuta_number[lang])} /></p>
+    </section>
+  </div>
+</Base>

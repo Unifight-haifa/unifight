@@ -10,7 +10,7 @@ const read = (p) => readFileSync(dist(p), 'utf8');
 const tourDir = new URL('../content/tournaments/', import.meta.url);
 const tours = readdirSync(tourDir).map((f) => ({ slug: f.replace(/\.json$/, ''), ...json(`../content/tournaments/${f}`) }));
 const fixture = json('./fixtures/tournament-unverified.json');
-const PAGES = ['history/', 'achievements/', 'tournaments/', 'nivheret/', ...published(tours).map((t) => `tournaments/${t.slug}/`)];
+const PAGES = ['history/', 'achievements/', 'tournaments/', 'nivheret/', 'contact/', ...published(tours).map((t) => `tournaments/${t.slug}/`)];
 
 test('the new pages exist in he, ru and en with the right lang and dir', () => {
   assert.ok(PAGES.length > 4);
@@ -117,8 +117,8 @@ test('sitemap, landing nav and "more" links reach the new pages', () => {
   const xml = read('sitemap.xml');
   for (const [l] of LANGS) for (const p of PAGES) assert.match(xml, new RegExp(`<loc>[^<]*/${l}/${p}</loc>`), `${l}/${p}`);
   const landing = read('he/index.html');
-  for (const p of ['history/', 'achievements/', 'tournaments/', 'nivheret/']) assert.ok(landing.includes(`href="${p}"`), p);
-  assert.equal(landing.match(/class="more-link"/g).length, 3);
+  for (const p of ['history/', 'achievements/', 'tournaments/', 'nivheret/', 'contact/']) assert.ok(landing.includes(`href="${p}"`), p);
+  assert.equal(landing.match(/class="more-link"/g).length, 4);
 });
 
 test('achievement cards show a photo only when its photo_source says why it matches', () => {
@@ -139,4 +139,43 @@ test('achievement filters are progressive: without JS every card shows', () => {
     assert.ok(!/<li class="club-card[^"]*"[^>]* hidden/.test(html), l);
     assert.ok(html.match(/<li class="club-card/g).length >= 10, l);
   }
+});
+
+test('first-training block: after the schedule, prefilled WhatsApp, open owner questions hidden', () => {
+  const fc = json('../content/site.json').kids.first_class;
+  assert.ok(fc.price.placeholder && fc.judogi.placeholder, 'price/judogi: update this test once the owner confirms them');
+  for (const [l] of LANGS) {
+    const html = read(`${l}/index.html`);
+    assert.equal(html.match(/id="first-class"/g).length, 1, l);
+    assert.ok(html.indexOf('id="schedule"') < html.indexOf('id="first-class"'), l);
+    const block = html.slice(html.indexOf('id="first-class"'), html.indexOf('id="branches"'));
+    assert.equal(block.match(/class="fs"/g).length, fc.steps.length, l);
+    const href = block.match(/href="(https:\/\/wa\.me\/972545664663\?text=[^"]+)"[^>]*data-ga="whatsapp_click" data-ga-placement="first_class"/)?.[1];
+    assert.equal(new URL(href).searchParams.get('text'), fc.cta.message[l], l);
+    for (const q of [fc.price, fc.judogi, ...fc.open_questions]) assert.ok(!html.includes(q[l]), `${l}: ${q.en}`);
+  }
+});
+
+test('contact page: WhatsApp, email, socials, venues with map, link to the first training', () => {
+  const site = json('../content/site.json');
+  const venues = json('../content/venues.json');
+  for (const [l] of LANGS) {
+    const html = read(`${l}/contact/index.html`);
+    assert.match(html, /href="https:\/\/wa\.me\/972545664663\?text=[^"]+"[^>]*data-ga="whatsapp_click" data-ga-placement="contact_page"/);
+    assert.ok(html.includes(`mailto:${site.contact.email.value}`), l);
+    assert.ok(html.includes('https://www.facebook.com/unifightjudoclub/'), l);
+    for (const s of site.contact.social.filter((x) => x.placeholder)) assert.ok(!html.includes(s[l]), `${l}: ${s.en}`);
+    for (const v of Object.values(venues)) assert.ok(html.includes(v[l]), `${l}: ${v.en}`);
+    // one transit link per venue in the list, one more in each map popup
+    assert.equal(html.match(/data-ga-provider="transit"/g).length, Object.keys(venues).length * 2, l);
+    assert.ok(html.includes('data-venue-map'), l);
+    assert.match(html, new RegExp(`href="[^"]*/${l}/#first-class"`), l);
+    const [ld] = [...html.matchAll(/<script type="application\/ld\+json">(.*?)<\/script>/gs)].map((m) => JSON.parse(m[1]));
+    assert.equal(ld['@type'], 'ContactPage');
+    assert.equal(ld.mainEntity.contactPoint.telephone, '+972-54-566-4663');
+  }
+});
+
+test('Russian landing and contact page say «тренера», never «тренеры»', () => {
+  for (const p of ['ru/index.html', 'ru/contact/index.html']) assert.ok(!/тренеры/i.test(read(p)), p);
 });
