@@ -30,7 +30,7 @@ const title = `${t(lang, 'newsTitle')} · ${t(lang, 'siteName')}`;
         const d = p.lang[lang].data;
         return (
           <li class="news-card">
-            <a href={postPath(lang, p.slug)}>
+            <a href={postPath(lang, p.slug)} data-vt={p.slug}>
               <Image src={d.cover} alt={d.cover_alt ?? ''} widths={[400, 800]} sizes="(min-width: 900px) 400px, 100vw" />
               <time datetime={d.date.toISOString().slice(0, 10)}>{fmtDate(d.date, lang)}</time>
               <h2 class="h3">{d.title}</h2>

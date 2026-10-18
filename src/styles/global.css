@@ -93,3 +93,13 @@ html[lang=he] :where(main, [data-404]) > :is(h1, h2) {
   text-transform: uppercase;
   color: var(--paper);
 }
+
+/* cross-document morph from a news card to its post; browsers without it just navigate */
+@media (prefers-reduced-motion: no-preference) {
+  @view-transition {
+    navigation: auto;
+  }
+  ::view-transition-group(*) {
+    animation-duration: 0.4s;
+  }
+}

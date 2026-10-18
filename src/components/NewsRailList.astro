@@ -5,69 +5,96 @@ import type { Lang } from '../i18n/ui';
 
 interface Props {
   lang: Lang;
-  label: string;
+  kinds: { news: string; sched: string };
   changes: { c: { id: string; show: string; to: string }; html: string; href: string }[];
-  posts: { href: string; title: string; lang?: Lang; date: Date }[];
-  /** the rail's second copy: makes the loop seamless, kept out of focus and the a11y tree */
-  dup?: boolean;
+  posts: { href: string; slug: string; title: string; lang?: Lang; date: Date }[];
 }
-const { lang, label, changes, posts, dup } = Astro.props;
+const { lang, kinds, changes, posts } = Astro.props;
+const go = lang === 'he' ? '←' : '→';
 ---
-<ul class="nr-list" inert={dup} aria-hidden={dup ? 'true' : undefined}>
+<ul class="nr-list">
   {changes.map(({ c, html, href }) => (
     <li class="nr-i nr-chg" data-from={c.show} data-to={c.to} hidden={c.show > TODAY}>
-      <a href={href}><b>{label}</b> <Fragment set:html={html} /></a>
+      <a href={href}>
+        <span class="nr-k">{kinds.sched}</span>
+        <span class="nr-t"><Fragment set:html={html} /></span>
+        <span class="nr-go" aria-hidden="true">{go}</span>
+      </a>
     </li>
   ))}
   {posts.map((p) => (
     <li class="nr-i">
-      <a href={p.href} lang={p.lang}><time datetime={p.date.toISOString().slice(0, 10)}>{fmtDate(p.date, lang)}</time> {p.title}</a>
+      <a href={p.href} data-vt={p.slug}>
+        <span class="nr-k">{kinds.news}</span>
+        <time datetime={p.date.toISOString().slice(0, 10)}>{fmtDate(p.date, lang)}</time>
+        <span class="nr-t" lang={p.lang}>{p.title}</span>
+        <span class="nr-go" aria-hidden="true">{go}</span>
+      </a>
     </li>
   ))}
 </ul>
 
 <style>
   .nr-list {
-    list-style: none;
+    display: grid;
+    gap: 8px;
     margin: 0;
-    padding: 0;
-  }
-  .nr-i {
-    display: block;
-    border-block-end: 1px solid var(--line);
+    padding: 0 0 8px;
+    list-style: none;
   }
   .nr-i[hidden] {
     display: none;
   }
   .nr-i a {
-    display: block;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: end;
+    gap: 2px 8px;
     padding: 10px 12px;
-    color: var(--paper-2);
-    font: 400 14px/1.4 var(--body);
-    text-decoration: none;
-  }
-  .nr-i a:hover {
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: var(--ink-3);
     color: var(--paper);
-    text-decoration: underline;
+    font: 400 14px/1.35 var(--body);
+    text-decoration: none;
+    transition: border-color 0.2s, background-color 0.2s;
   }
+  .nr-i a:hover,
+  .nr-i a:focus-visible {
+    border-color: var(--gold);
+    background: color-mix(in oklab, var(--ink-3) 85%, var(--gold));
+  }
+  .nr-k,
   .nr-i time {
-    display: block;
-    color: var(--gold);
-    font-size: 12px;
-    letter-spacing: 0.04em;
+    grid-column: 1 / -1;
+    font-size: 11px;
+    letter-spacing: 0.06em;
   }
-  .nr-chg {
-    background: rgb(194 35 46 / 0.22);
-    border-inline-start: 3px solid var(--red-3);
-  }
-  .nr-chg b {
-    display: block;
-    color: var(--gold-2);
-    font-size: 12px;
-    letter-spacing: 0.04em;
+  .nr-k {
+    color: var(--mute);
     text-transform: uppercase;
   }
+  .nr-i time {
+    color: var(--gold);
+  }
+  .nr-t {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    overflow: hidden;
+    margin-block-start: 2px;
+  }
+  .nr-go {
+    color: var(--gold);
+    transition: translate 0.2s;
+  }
+  .nr-i a:hover .nr-go {
+    translate: 3px;
+  }
+  :global([dir='rtl']) .nr-i a:hover .nr-go {
+    translate: -3px;
+  }
   .nr-chg a {
-    color: var(--paper);
+    border-inline-start: 3px solid var(--red-3);
   }
 </style>

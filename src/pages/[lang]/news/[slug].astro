@@ -79,7 +79,7 @@ const copy = [
   </Fragment>
   <article class="news post">
     <a class="news-back" href={getRelativeLocaleUrl(lang, 'news/')}>{t(lang, 'newsAll')}</a>
-    <h1 class="h2">{d.title}</h1>
+    <h1 class="h2" style={`view-transition-name: news-${post.slug}`}>{d.title}</h1>
     <p class="news-meta">
       <time datetime={d.date.toISOString().slice(0, 10)}>{fmtDate(d.date, lang)}</time>
       · {t(lang, 'newsBy')} <bdi>{authorName(d.author, lang)}</bdi>

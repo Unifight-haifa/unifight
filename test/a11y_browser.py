@@ -41,10 +41,31 @@ with sync_playwright() as p:
                     page.click(".film-pause")
                     assert page.evaluate("document.querySelector('.film-v').paused"), f"{lang}: film still playing after pause"
                 if path == "news/" and width == 1280:
-                    # the news rail has its own pause control (WCAG 2.2.2)
+                    # the rail loops only when its cards overflow; squeeze it until they do
+                    page.set_viewport_size({"width": 1280, "height": 120})
+                    page.wait_for_selector(".nr[data-loop] .nr-pause", state="visible")
+                    res = page.evaluate("t => axe.run(document, {runOnly: {type: 'tag', values: t}})", TAGS)
+                    bad += [f"{lang}/{path}@{width} rail loop: {v['id']}" for v in res["violations"] if v["impact"] in ("serious", "critical")]
+                    # the loop has its own pause control (WCAG 2.2.2)
                     page.click(".nr-pause")
                     assert page.evaluate("document.querySelector('.nr-track').getAnimations().every(a => a.playState === 'paused')"), f"{lang}: news rail still moving"
                     assert page.get_attribute(".nr-pause", "aria-pressed") == "true", lang
+                    page.set_viewport_size({"width": 1280, "height": 3000})
+                    page.wait_for_function("!document.querySelector('.nr[data-loop]')")
+                    assert page.is_hidden(".nr-pause") and page.locator(".nr-list").count() == 2, f"{lang}: loop left behind"
+                    # a news card names its title on click to match the post h1 (cross-document view transition)
+                    for card, title in ((".nr a[data-vt]", ".nr-t"), (".news-card a[data-vt]", "h2")):
+                        vt_page = browser.new_page(viewport={"width": 1280, "height": 800})
+                        vt_page.goto(f"{base}{lang}/news/", wait_until="networkidle")
+                        if vt_page.is_visible(".nr-pause"):
+                            vt_page.click(".nr-pause")
+                        vt_page.evaluate("s => addEventListener('click', e => sessionStorage.vt = e.target.closest('a').querySelector(s).style.viewTransitionName)", title)
+                        href = vt_page.get_attribute(card, "href")
+                        vt_page.click(card)
+                        vt_page.wait_for_url(f"**{href}")
+                        vt = vt_page.evaluate("[sessionStorage.vt, getComputedStyle(document.querySelector('h1')).viewTransitionName]")
+                        assert vt[0].startswith("news-") and vt[0] == vt[1], f"{lang} {card}: view-transition-name {vt}"
+                        vt_page.close()
                 if path == "news/" and width == 360:
                     # the mobile news pill is a disclosure; scan it open. It waits for the cookie banner
                     if page.is_visible("[data-consent]"):

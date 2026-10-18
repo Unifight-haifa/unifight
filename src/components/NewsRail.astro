@@ -12,37 +12,49 @@ interface Props {
 const { lang } = Astro.props;
 const UI = {
   pause: { he: 'עצירת רצועת החדשות', ru: 'Остановить ленту новостей', en: 'Pause the news ticker' },
-  sched: { he: 'לוח אימונים', ru: 'Расписание', en: 'Schedule' },
+  sched: { he: 'שינוי בלוח האימונים', ru: 'Изменение расписания', en: 'Schedule change' },
 };
 // a post missing this language links to the first translation it has
 const posts = (await getPosts()).slice(0, 8).map((p) => {
   const l = p.lang[lang] ? lang : LANGS.find((x) => p.lang[x])!;
-  return { href: postPath(l, p.slug), title: p.lang[l].data.title, lang: l === lang ? undefined : l, date: p.date };
+  return { href: postPath(l, p.slug), slug: p.slug, title: p.lang[l].data.title, lang: l === lang ? undefined : l, date: p.date };
 });
 const changes = CHANGES.map((c) => ({ c, html: summaryHtml(c, lang, venues), href: `${getRelativeLocaleUrl(lang)}#chg-${c.id}` }));
 const n = posts.length + changes.length;
 const shown = posts.length + CHANGES.filter((c) => c.show <= TODAY).length;
-const list = { posts, changes, lang, label: UI.sched[lang] };
+const list = { posts, changes, lang, kinds: { news: t(lang, 'newsTitle'), sched: UI.sched[lang] } };
+const all = getRelativeLocaleUrl(lang, 'news/');
+const go = lang === 'he' ? '←' : '→';
+// The loop starts only when the cards overflow the rail; its copy keeps clicks but leaves tab order and the a11y tree.
+// Clicked news titles get a view-transition-name matching the post's h1, so the card morphs into the header.
+const JS = `(()=>{const r=document.querySelector('.nr'),v=r.querySelector('.nr-view'),t=v.firstElementChild,l=t.firstElementChild,b=r.querySelector('.nr-pause'),m=matchMedia('(prefers-reduced-motion: reduce)');let c;
+const fit=()=>{const on=!m.matches&&l.offsetHeight>v.clientHeight+1;if(on===!!c)return;if(on){c=l.cloneNode(true);c.setAttribute('aria-hidden','true');c.querySelectorAll('a').forEach(a=>a.tabIndex=-1);t.append(c)}else{c.remove();c=null}r.toggleAttribute('data-loop',on);b.hidden=!on};
+const ro=new ResizeObserver(fit);ro.observe(v);ro.observe(l);m.addEventListener('change',fit);
+b.addEventListener('click',()=>{const p=b.getAttribute('aria-pressed')!=='true';b.setAttribute('aria-pressed',p);r.toggleAttribute('data-paused',p)});
+let named;document.addEventListener('click',e=>{const a=e.target.closest&&e.target.closest('a[data-vt]');if(!a)return;if(named)named.style.viewTransitionName='';named=a.querySelector('.nr-t,h2');named.style.viewTransitionName='news-'+a.dataset.vt})})();`;
 ---
 {n > 0 && (
   <Fragment>
     <aside class="nr" aria-labelledby="nr-h">
       <div class="nr-top">
-        <a id="nr-h" href={getRelativeLocaleUrl(lang, 'news/')}>{t(lang, 'newsTitle')}</a>
-        <button type="button" class="nr-pause" aria-pressed="false" aria-label={UI.pause[lang]}></button>
+        <span id="nr-h">{t(lang, 'newsTitle')}</span>
+        <button type="button" class="nr-pause" hidden aria-pressed="false" aria-label={UI.pause[lang]}></button>
       </div>
       <div class="nr-view">
         <div class="nr-track" style={`--n:${n}`}>
           <NewsRailList {...list} />
-          <NewsRailList {...list} dup />
         </div>
       </div>
+      <a class="nr-all" href={all}>{t(lang, 'newsAll')} <span aria-hidden="true">{go}</span></a>
     </aside>
     <details class="nr-m">
       <summary>{t(lang, 'newsTitle')} <span class="nr-n">{shown}</span></summary>
-      <NewsRailList {...list} />
+      <div class="nr-m-body">
+        <NewsRailList {...list} />
+        <a class="nr-all" href={all}>{t(lang, 'newsAll')} <span aria-hidden="true">{go}</span></a>
+      </div>
     </details>
-    <script is:inline set:html={GATE_JS + `document.querySelector('.nr-pause').addEventListener('click',e=>{const b=e.currentTarget,p=b.getAttribute('aria-pressed')!=='true';b.setAttribute('aria-pressed',p);b.closest('.nr').toggleAttribute('data-paused',p)});`} />
+    <script is:inline set:html={GATE_JS + JS} />
   </Fragment>
 )}
 
@@ -54,52 +66,58 @@ const list = { posts, changes, lang, label: UI.sched[lang] };
   .nr-m {
     display: none;
   }
+  .nr-all {
+    display: block;
+    padding: 8px 4px;
+    color: var(--gold-2);
+    font: 500 13px/1.3 var(--body);
+    text-decoration: none;
+  }
+  .nr-all:hover {
+    text-decoration: underline;
+  }
   @media (min-width: 1100px) {
     :global(html) {
-      --nr-w: 168px;
+      --nr-w: 196px;
     }
-    /* reserve the strip's width so it never covers page content */
+    /* reserve the column so the rail never covers page content */
     :global(body:has(.nr)) {
       padding-inline-end: var(--nr-w);
     }
     :global(body:has(.nr) .hd) {
       inset-inline-end: var(--nr-w);
     }
+    /* sized to its cards: one post is a small card, many fill the column and loop */
     .nr {
       display: flex;
       flex-direction: column;
       position: fixed;
-      inset-block: 0;
-      inset-inline-end: 0;
+      inset-block-start: 12px;
+      inset-inline-end: 12px;
       z-index: 70;
-      inline-size: var(--nr-w);
-      background: rgb(19 17 15 / 0.94);
-      border-inline-start: 1px solid var(--line);
+      inline-size: calc(var(--nr-w) - 24px);
+      max-block-size: calc(100dvh - 24px);
     }
     .nr-top {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      block-size: 56px;
-      padding-inline: 12px 0;
-      border-block-end: 1px solid var(--line);
-    }
-    .nr-top a {
+      min-block-size: 44px;
+      padding-inline-start: 4px;
       color: var(--gold-2);
-      font: 600 15px/1 var(--disp);
-      letter-spacing: 0.08em;
+      font: 600 14px/1 var(--disp);
+      letter-spacing: 0.1em;
       text-transform: uppercase;
-      text-decoration: none;
     }
     .nr-view {
-      flex: 1;
+      min-block-size: 0;
       overflow: hidden;
     }
-    .nr-track {
-      animation: nr-up calc(max(var(--n), 4) * 6s) linear infinite;
+    .nr[data-loop] .nr-view {
+      mask-image: linear-gradient(transparent, #000 16px, #000 calc(100% - 16px), transparent);
     }
-    .nr :global(.nr-list) {
-      min-block-size: calc(100dvh - 56px);
+    .nr[data-loop] .nr-track {
+      animation: nr-up calc(max(var(--n), 4) * 5s) linear infinite;
     }
     .nr:is(:hover, :focus-within, [data-paused]) .nr-track,
     :global(html.still) .nr-track {
@@ -117,8 +135,11 @@ const list = { posts, changes, lang, label: UI.sched[lang] };
     border: 0;
     background: none;
     color: var(--gold-2);
-    font: 600 14px/1 var(--body);
+    font: 600 13px/1 var(--body);
     cursor: pointer;
+  }
+  .nr-pause[hidden] {
+    display: none;
   }
   .nr-pause::before {
     content: '❚❚';
@@ -128,16 +149,24 @@ const list = { posts, changes, lang, label: UI.sched[lang] };
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .nr-track {
-      animation: none;
-    }
-    .nr :global(.nr-list[inert]),
-    .nr-pause {
-      display: none;
-    }
     .nr-view {
       overflow-y: auto;
     }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    :global(.chg:target) {
+      animation: nr-flash 3s ease-out;
+    }
+  }
+  /* holds the highlight while a long smooth scroll is still landing */
+  @keyframes nr-flash {
+    0%,
+    50% {
+      background: rgb(212 168 75 / 0.35);
+    }
+  }
+  :global(.chg) {
+    scroll-margin-block: 96px;
   }
 
   @media (max-width: 1099.98px) {
@@ -150,14 +179,14 @@ const list = { posts, changes, lang, label: UI.sched[lang] };
       inset-block-end: calc(12px + env(safe-area-inset-bottom, 0px));
       inset-inline-start: 12px;
       z-index: 65;
-      max-inline-size: min(22rem, calc(100vw - 24px));
       background: var(--ink-2);
-      border: 1px solid var(--gold);
+      border: 1px solid var(--line);
       border-radius: 22px;
       box-shadow: 0 0.25rem 1.25rem rgb(0 0 0 / 0.5);
     }
     .nr-m[open] {
-      border-radius: 12px;
+      inline-size: min(20rem, calc(100vw - 24px));
+      border-radius: 14px;
     }
     .nr-m summary {
       display: flex;
@@ -166,19 +195,22 @@ const list = { posts, changes, lang, label: UI.sched[lang] };
       min-block-size: 44px;
       padding-inline: 16px;
       color: var(--gold-2);
-      font: 600 14px/1 var(--body);
+      font: 600 13px/1 var(--disp);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
       cursor: pointer;
     }
     .nr-n {
-      padding: 0.2em 0.5em;
+      padding: 0.25em 0.55em;
       border-radius: 10px;
       background: var(--gold);
       color: var(--ink);
-      font-size: 12px;
+      font: 600 11px/1 var(--body);
     }
-    .nr-m :global(.nr-list) {
+    .nr-m-body {
       max-block-size: 60dvh;
       overflow-y: auto;
+      padding: 8px 8px 0;
       border-block-start: 1px solid var(--line);
     }
     /* the cookie banner owns the bottom of the screen until answered */
