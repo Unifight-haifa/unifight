@@ -1,0 +1,73 @@
+---
+import { fmtDate } from '../lib/news';
+import { TODAY } from '../lib/changes';
+import type { Lang } from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+  label: string;
+  changes: { c: { id: string; show: string; to: string }; html: string; href: string }[];
+  posts: { href: string; title: string; lang?: Lang; date: Date }[];
+  /** the rail's second copy: makes the loop seamless, kept out of focus and the a11y tree */
+  dup?: boolean;
+}
+const { lang, label, changes, posts, dup } = Astro.props;
+---
+<ul class="nr-list" inert={dup} aria-hidden={dup ? 'true' : undefined}>
+  {changes.map(({ c, html, href }) => (
+    <li class="nr-i nr-chg" data-from={c.show} data-to={c.to} hidden={c.show > TODAY}>
+      <a href={href}><b>{label}</b> <Fragment set:html={html} /></a>
+    </li>
+  ))}
+  {posts.map((p) => (
+    <li class="nr-i">
+      <a href={p.href} lang={p.lang}><time datetime={p.date.toISOString().slice(0, 10)}>{fmtDate(p.date, lang)}</time> {p.title}</a>
+    </li>
+  ))}
+</ul>
+
+<style>
+  .nr-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .nr-i {
+    display: block;
+    border-block-end: 1px solid var(--line);
+  }
+  .nr-i[hidden] {
+    display: none;
+  }
+  .nr-i a {
+    display: block;
+    padding: 10px 12px;
+    color: var(--paper-2);
+    font: 400 14px/1.4 var(--body);
+    text-decoration: none;
+  }
+  .nr-i a:hover {
+    color: var(--paper);
+    text-decoration: underline;
+  }
+  .nr-i time {
+    display: block;
+    color: var(--gold);
+    font-size: 12px;
+    letter-spacing: 0.04em;
+  }
+  .nr-chg {
+    background: rgb(194 35 46 / 0.22);
+    border-inline-start: 3px solid var(--red-3);
+  }
+  .nr-chg b {
+    display: block;
+    color: var(--gold-2);
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .nr-chg a {
+    color: var(--paper);
+  }
+</style>

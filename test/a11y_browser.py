@@ -40,6 +40,18 @@ with sync_playwright() as p:
                     page.wait_for_function("!document.querySelector('.film-v').paused")
                     page.click(".film-pause")
                     assert page.evaluate("document.querySelector('.film-v').paused"), f"{lang}: film still playing after pause"
+                if path == "news/" and width == 1280:
+                    # the news rail has its own pause control (WCAG 2.2.2)
+                    page.click(".nr-pause")
+                    assert page.evaluate("document.querySelector('.nr-track').getAnimations().every(a => a.playState === 'paused')"), f"{lang}: news rail still moving"
+                    assert page.get_attribute(".nr-pause", "aria-pressed") == "true", lang
+                if path == "news/" and width == 360:
+                    # the mobile news pill is a disclosure; scan it open
+                    page.focus(".nr-m summary")
+                    page.keyboard.press("Enter")
+                    assert page.evaluate("document.querySelector('.nr-m').open"), f"{lang}: news pill did not open"
+                    res = page.evaluate("t => axe.run(document, {runOnly: {type: 'tag', values: t}})", TAGS)
+                    bad += [f"{lang}/{path}@{width} news pill: {v['id']}" for v in res["violations"] if v["impact"] in ("serious", "critical")]
                 if lang == "he":
                     # kanji and the logo keep their drawn orientation in RTL, ancestors included
                     flipped = page.evaluate("""[...document.querySelectorAll('.kg, .plate img, .st-center img')].filter(e => {

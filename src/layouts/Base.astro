@@ -2,6 +2,7 @@
 import { getRelativeLocaleUrl } from 'astro:i18n';
 import Consent from '../components/Consent.astro';
 import Fonts from '../components/Fonts.astro';
+import NewsRail from '../components/NewsRail.astro';
 import { LANGS, NAMES, dir, t, type Lang } from '../i18n/ui';
 import { GA_ID } from '../lib/analytics';
 import '../styles/tokens.css';
@@ -55,6 +56,7 @@ const rest = Astro.url.pathname.slice(import.meta.env.BASE_URL.length).split('/'
       {GA_ID && <button type="button" class="consent-open" data-consent-open>{t(lang, 'cookieSettings')}</button>}
     </footer>
     </Fragment>}
+    <NewsRail lang={lang} />
     <Consent lang={lang} />
     <script is:inline>
       // only an explicit switch counts as a choice; page views never write
