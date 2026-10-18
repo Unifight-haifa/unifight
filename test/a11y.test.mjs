@@ -9,7 +9,7 @@ const dist = new URL('../dist/', import.meta.url).pathname;
 const hasPlaywright = spawnSync('python3', ['-c', 'import playwright'], { stdio: 'ignore' }).status === 0;
 const TYPES = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.woff2': 'font/woff2', '.jpg': 'image/jpeg', '.png': 'image/png', '.webp': 'image/webp', '.avif': 'image/avif' };
 
-test('axe finds no serious or critical WCAG 2.1 AA issues; menu and motion controls work', { skip: !hasPlaywright && 'needs Python Playwright' }, async () => {
+test('axe finds no serious or critical WCAG 2.1 AA issues; menu and motion controls work', { skip: !hasPlaywright && !process.env.CI && 'needs Python Playwright' }, async () => {
   const base = (process.env.BASE_PATH || '/unifight').replace(/\/?$/, '/');
   const srv = createServer((req, res) => {
     const path = decodeURIComponent(new URL(req.url, 'http://x').pathname);

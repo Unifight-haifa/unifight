@@ -4,6 +4,7 @@ name: Deploy to GitHub Pages
 "on":
   push:
     branches: [main]
+  pull_request:
   workflow_dispatch:
 
 permissions:
@@ -12,7 +13,8 @@ permissions:
   id-token: write
 
 concurrency:
-  group: pages
+  # PR runs must not queue behind or cancel a pending Pages deploy
+  group: ${{ github.event_name == 'pull_request' && github.ref || 'pages' }}
   cancel-in-progress: false
 
 env:
@@ -31,6 +33,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
+      # Playwright for the browser tests that npm test runs
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+          cache: pip
+          cache-dependency-path: test/requirements.txt
+      - uses: actions/cache@v6
+        with:
+          path: ~/.cache/ms-playwright
+          key: pw-${{ runner.os }}-${{ hashFiles('test/requirements.txt') }}
+      - run: pip install -r test/requirements.txt
+      - run: python -m playwright install --with-deps --only-shell chromium
       - uses: withastro/action@v6
         with:
           build-cmd: npm run build && npm test
@@ -50,6 +64,7 @@ jobs:
 
   deploy:
     needs: build
+    if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     environment:
       name: github-pages

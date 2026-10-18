@@ -122,7 +122,7 @@ test('each page language gets its own banner, and the tracked elements are tagge
 const hasPlaywright = spawnSync('python3', ['-c', 'import playwright'], { stdio: 'ignore' }).status === 0;
 const TYPES = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.woff2': 'font/woff2' };
 
-test('in a real browser gtag.js is requested only after Accept', { skip: !hasPlaywright && 'needs Python Playwright' }, async () => {
+test('in a real browser gtag.js is requested only after Accept', { skip: !hasPlaywright && !process.env.CI && 'needs Python Playwright' }, async () => {
   // astro preview is a single-instance daemon in Astro 7, so serve the build directly
   const base = (process.env.BASE_PATH || '/unifight').replace(/\/?$/, '/');
   const srv = createServer((req, res) => {
