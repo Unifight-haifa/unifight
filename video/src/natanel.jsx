@@ -1,12 +1,13 @@
 import {AbsoluteFill, Audio, Img, OffthreadVideo, Sequence, continueRender, delayRender, interpolate, staticFile, useCurrentFrame, useVideoConfig} from 'remotion';
 import {C, KANJI} from './fonts';
-import {EndCard, Grain, Kanji, Photo, Rise, Vignette, clamp, ease, inOut, photo, useLayout} from './common';
+import {EndCard, Flash, Grain, Kanji, Photo, Rise, Vignette, clamp, ease, inOut, photo, useLayout} from './common';
 import {NATANEL, SITE, TAGLINE, WHATSAPP} from './text';
 
-// Finding Movement sits near 67.75 BPM; cuts land on whole beats of ~26.57 frames.
-const BEAT = (60 / 67.75) * 30;
+// Mistake the Getaway measures 141 BPM and the cut starts on a beat, so beat n is frame n * BEAT.
+// The open sits in the track's quiet dip; the name lands where the band comes back in.
+const BEAT = (60 / 141) * 30;
 const b = (n) => Math.round(n * BEAT);
-const T = {intimate: 0, name: b(7), club: b(12), u23: b(18), europe: b(27), riga: b(32), coach: b(37), demo: b(40), end: 1260, total: 1410};
+const T = {intimate: 0, name: b(16), club: b(28), u23: b(40), europe: b(56), riga: b(64), coach: b(72), demo: b(82), end: b(92), hit: b(98), total: 1356};
 export const NATANEL_FRAMES = T.total;
 const OV = 12;
 const NAVY = '#1b2d6b';
@@ -159,17 +160,17 @@ const Name = ({lang}) => {
     <AbsoluteFill>
       <Fabric />
       <AbsoluteFill style={{alignItems: 'center', justifyContent: 'center', flexDirection: 'column'}}>
-        <Patch w={pw} h={L.v ? 300 : 320} start={10}>
+        <Patch w={pw} h={L.v ? 300 : 320} start={0}>
           <div style={{display: 'flex', fontFamily: 'Oswald', fontWeight: 700, fontSize: L.v ? 150 : 170, color: NAVY, letterSpacing: '0.04em'}}>
             {letters.map((ch, i) => (
-              <span key={i} style={{opacity: ease(f, 20 + i * 3, 30 + i * 3, 0, 1)}}>{ch}</span>
+              <span key={i} style={{opacity: ease(f, 6 + i * 2, 12 + i * 2, 0, 1)}}>{ch}</span>
             ))}
           </div>
           <div style={{position: 'absolute', bottom: 0, left: 0, right: 0, height: 52, background: NAVY, color: '#f7f5ef', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Oswald', fontWeight: 600, fontSize: 34, letterSpacing: '0.5em'}}>ISR</div>
         </Patch>
-        <Rise text={NATANEL.json.name[lang]} start={48} stagger={4} damping={22} rtl={L.rtl}
+        <Rise text={NATANEL.json.name[lang]} start={b(4)} stagger={4} damping={22} rtl={L.rtl}
           style={{fontFamily: L.display, fontWeight: 600, fontSize: L.v ? 84 : 76, color: C.paper, marginTop: 56, textTransform: L.upper, letterSpacing: L.rtl ? 0 : '0.06em', textAlign: 'center'}} />
-        <div style={{fontFamily: L.body, fontWeight: 500, fontSize: L.v ? 44 : 38, color: C.gold, marginTop: 14, opacity: ease(f, 66, 84, 0, 1), direction: L.rtl ? 'rtl' : 'ltr'}}>
+        <div style={{fontFamily: L.body, fontWeight: 500, fontSize: L.v ? 44 : 38, color: C.gold, marginTop: 14, opacity: ease(f, b(6), b(6) + 16, 0, 1), direction: L.rtl ? 'rtl' : 'ltr'}}>
           {NATANEL.json.role[lang]}
         </div>
       </AbsoluteFill>
@@ -200,7 +201,7 @@ const U23 = ({lang, dur}) => {
   const L = useLayout(lang);
   const f = useCurrentFrame();
   const tside = L.rtl ? 'left' : 'right';
-  const n = NATANEL.years.filter((_, i) => f >= 36 + i * b(1.5)).length;
+  const n = NATANEL.years.filter((_, i) => f >= OV + b(2 + 2 * i)).length;
   return (
     <AbsoluteFill style={{background: C.ink}}>
       <div style={{position: 'absolute', ...(L.v ? {left: 0, right: 0, top: 0, height: '56%'} : {top: 0, bottom: 0, [L.rtl ? 'right' : 'left']: 0, width: '40%'})}}>
@@ -214,14 +215,14 @@ const U23 = ({lang, dur}) => {
       >
         <div style={{display: 'flex', gap: 20, direction: 'ltr'}}>
           {NATANEL.years.map((y, i) => (
-            <Patch key={y} w={L.v ? 290 : 250} h={L.v ? 150 : 130} start={30 + i * b(1.5)}>
+            <Patch key={y} w={L.v ? 290 : 250} h={L.v ? 150 : 130} start={OV + b(2 + 2 * i) - 6}>
               <div style={{fontFamily: 'Oswald', fontWeight: 700, fontSize: L.v ? 104 : 92, color: NAVY}}>{y}</div>
             </Patch>
           ))}
         </div>
         <div style={{display: 'flex', alignItems: 'baseline', gap: 28, marginTop: 24, direction: L.rtl ? 'rtl' : 'ltr'}}>
           <div style={{fontFamily: 'Oswald', fontWeight: 700, fontSize: L.v ? 200 : 180, color: C.gold, lineHeight: 0.9, minWidth: L.v ? 150 : 140, opacity: n ? 1 : 0}}>{n}×</div>
-          <Rise text={NATANEL.u23[lang]} start={40 + b(3)} stagger={3} damping={22} rtl={L.rtl}
+          <Rise text={NATANEL.u23[lang]} start={OV + b(8)} stagger={3} damping={22} rtl={L.rtl}
             style={{fontFamily: L.display, fontWeight: 600, fontSize: L.v ? 64 : 58, color: C.paper, textTransform: L.upper, lineHeight: 1.05, maxWidth: L.v ? 620 : 520}} />
         </div>
       </div>
@@ -255,24 +256,22 @@ const Sarajevo = ({lang, dur}) => {
     <AbsoluteFill>
       <Photo src="natanel-sarajevo" focus={L.v ? '62% 30%' : '58% 30%'} dur={dur} zoom={[1.04, 1.14]} drift={-30} />
       <AbsoluteFill style={{background: 'linear-gradient(0deg, rgba(10,9,8,.85), transparent 55%)'}} />
-      <Caption lang={lang} tag={NATANEL.sarajevo[lang]} head={head} sub={sub} style={lower(L)} />
+      <Caption lang={lang} tag={NATANEL.sarajevo[lang]} head={head} sub={sub} start={4} style={lower(L)} />
     </AbsoluteFill>
   );
 };
 
 const Riga = ({lang, dur}) => {
   const L = useLayout(lang);
-  const f = useCurrentFrame();
-  const fade = ease(f, 0, 2 * OV, 0, 1);
   return (
-    <AbsoluteFill style={{opacity: fade}}>
+    <AbsoluteFill>
       <div style={{position: 'absolute', ...(L.v ? {left: 0, right: 0, top: 0, height: '62%'} : {top: 0, bottom: 0, [L.rtl ? 'right' : 'left']: 0, width: '64%'})}}>
         <Photo src="natanel-grip" focus={L.v ? "76% 8%" : "72% 25%"} dur={dur} zoom={[1.08, 1.2]} />
       </div>
       <div style={{position: 'absolute', ...(L.v ? {left: 0, right: 0, bottom: 0, height: '38%'} : {top: 0, bottom: 0, [L.rtl ? 'left' : 'right']: 0, width: '36%'})}}>
         <Photo src="natanel-riga" focus="50% 20%" card dur={dur} tilt={L.rtl ? -2 : 2} />
       </div>
-      <Caption lang={lang} tag={NATANEL.riga[lang]} head={NATANEL.ec[lang][1]} sub={NATANEL.gp[lang]} start={18}
+      <Caption lang={lang} tag={NATANEL.riga[lang]} head={NATANEL.ec[lang][1]} sub={NATANEL.gp[lang]} start={4}
         style={L.v ? {left: 70, right: 70, top: '44%'} : {[L.rtl ? 'right' : 'left']: 120, bottom: '17%', width: '55%'}} />
     </AbsoluteFill>
   );
@@ -286,7 +285,7 @@ const Coach = ({lang, dur}) => {
       <OffthreadVideo src={staticFile('clips/natanel-coach.mp4')} muted playbackRate={0.7}
         style={{width: '100%', height: '100%', objectFit: 'cover', objectPosition: L.v ? `${interpolate(f, [0, dur], [30, 18], clamp)}% 50%` : '50% 50%', transform: `scale(${1.08 + 0.06 * f / dur})`, transformOrigin: '30% 50%'}} />
       <AbsoluteFill style={{background: 'linear-gradient(0deg, rgba(10,9,8,.8), transparent 45%)'}} />
-      <Caption lang={lang} head={NATANEL.today[lang]} start={30} style={lower(L)} />
+      <Caption lang={lang} head={NATANEL.today[lang]} start={OV + b(1)} style={lower(L)} />
     </AbsoluteFill>
   );
 };
@@ -306,11 +305,11 @@ const Demo = ({lang, dur}) => {
 export const Natanel = ({lang}) => {
   const scenes = [
     [T.intimate, T.name, Intimate, null],
-    [T.name, T.club, Name, 'fade'],
+    [T.name, T.club, Name, 'cut'],
     [T.club, T.u23, Club, 'ink'],
     [T.u23, T.europe, U23, 'tatami'],
-    [T.europe, T.riga, Sarajevo, 'ink'],
-    [T.riga, T.coach, Riga, null],
+    [T.europe, T.riga, Sarajevo, 'cut'],
+    [T.riga, T.coach, Riga, 'cut'],
     [T.coach, T.demo, Coach, 'tatami'],
     [T.demo, T.end, Demo, 'ink'],
   ];
@@ -319,12 +318,12 @@ export const Natanel = ({lang}) => {
     <AbsoluteFill style={{background: C.ink}}>
       <Audio src={staticFile('audio/natanel.m4a')} volume={(f) => interpolate(f, [0, 10], [0, 1], clamp)} />
       {scenes.map(([from, to, Scene, kind], i) => {
-        const start = i === 0 ? 0 : from - OV;
+        const start = i === 0 || kind === 'cut' ? from : from - OV;
         const dur = to + OV - start;
         const el = <Scene lang={lang} dur={dur} />;
         return (
           <Sequence key={i} from={start} durationInFrames={dur}>
-            {kind === 'fade' ? <FadeIn>{el}</FadeIn> : wrap(kind, el)}
+            {wrap(kind, el)}
           </Sequence>
         );
       })}
@@ -333,14 +332,13 @@ export const Natanel = ({lang}) => {
           <EndCard lang={lang} dur={T.total - T.end + OV} tagline={TAGLINE[lang]} site={SITE} whatsapp={WHATSAPP} kanji="師" />
         </InkIn>
       </Sequence>
+      {scenes.filter((s) => s[3] === 'cut').map(([at]) => (
+        <Flash key={at} at={at} len={at === T.name ? 9 : 5} max={at === T.name ? 0.85 : 0.45} />
+      ))}
+      <Flash at={T.hit} len={8} max={0.3} />
       <Letterbox lang={lang} />
       <Vignette strength={0.6} />
       <Grain opacity={0.14} />
     </AbsoluteFill>
   );
-};
-
-const FadeIn = ({children}) => {
-  const f = useCurrentFrame();
-  return <AbsoluteFill style={{opacity: ease(f, 0, 2 * OV, 0, 1)}}>{children}</AbsoluteFill>;
 };

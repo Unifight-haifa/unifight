@@ -3,9 +3,12 @@ import {C, KANJI} from './fonts';
 import {EndCard, Flash, Grain, Photo, Rise, Vignette, clamp, ease, inOut, photo, useLayout} from './common';
 import {ILANA, SITE, TAGLINE, WHATSAPP} from './text';
 
-// Mountain Emperor runs at 120 BPM: one beat is exactly 15 frames at 30 fps.
-const BEAT = 15;
-const T = {open: 0, title: 90, journey: 240, station: 120, today: 960, end: 1110, total: 1283};
+// Heroic Age measures 130.01 BPM and the cut starts on a downbeat, so beat n is frame n * BEAT.
+// Title lands on the full-band entrance; station arrivals (+2 beats) fall on downbeats.
+const BEAT = (60 / 130.01) * 30;
+const b = (n) => Math.round(n * BEAT);
+const T = {open: 0, title: b(8), journey: b(22), today: b(70), end: b(80), hit: b(86), total: 1300};
+const stAt = (i) => b(22 + 8 * i);
 export const ILANA_FRAMES = T.total;
 
 // Must match the projection in scripts/prep_media.py.
@@ -23,10 +26,13 @@ const OPEN = [
   ['ilana-bout-57', '45% 40%'],
 ];
 
+// Shots speed up with the drum build.
+const OPEN_AT = [0, 2, 4, 5, 6, 7].map(b);
+
 const Open = () => {
   const f = useCurrentFrame();
-  const i = Math.min(OPEN.length - 1, Math.floor(f / BEAT));
-  const k = f - i * BEAT;
+  const i = OPEN_AT.findLastIndex((a) => a <= f);
+  const k = f - OPEN_AT[i];
   const [src, focus] = OPEN[i];
   const punch = ease(k, 0, 7, 1.14, 1.0);
   const shake = k < 4 ? (random(`s${f}`) - 0.5) * 18 : 0;
@@ -40,7 +46,7 @@ const Open = () => {
           filter: 'contrast(1.12) saturate(1.1)',
         }}
       />
-      <Flash at={i * BEAT} len={4} max={0.55} />
+      <Flash at={OPEN_AT[i]} len={4} max={0.55} />
       <AbsoluteFill style={{background: 'linear-gradient(90deg, rgba(194,35,46,.28), transparent 40%)', mixBlendMode: 'multiply'}} />
     </AbsoluteFill>
   );
@@ -65,7 +71,7 @@ const Title = ({lang}) => {
           clipPath: L.v ? `inset(0 0 ${100 - 100 * panel}% 0)` : `polygon(${L.rtl ? `0 0, ${88 * panel}% 0, ${100 * panel}% 100%, 0 100%` : `${100 - 100 * panel + 12}% 0, 100% 0, 100% 100%, ${100 - 100 * panel}% 100%`})`,
         }}
       >
-        <Photo src="ilana-bw" focus="50% 22%" dur={150} zoom={[1.15, 1.04]} />
+        <Photo src="ilana-bw" focus="50% 22%" dur={T.journey - T.title} zoom={[1.15, 1.04]} />
       </div>
       <div
         style={{
@@ -86,7 +92,7 @@ const Title = ({lang}) => {
         </div>
         <div style={{display: 'flex', gap: 26, marginTop: 40, flexWrap: 'wrap'}}>
           {words.map((w, i) => {
-            const at = 2 * BEAT + i * BEAT * 2;
+            const at = b(4 + 2 * i);
             const s = spring({frame: f - at, fps, config: {damping: 11, stiffness: 200}});
             return (
               <div key={i} style={{fontFamily: L.display, fontWeight: 700, fontSize: L.v ? 64 : 58, letterSpacing: L.rtl ? 0 : '0.06em', color: i === words.length - 1 ? C.gold : C.paper, opacity: Math.min(1, s * 2), transform: `scale(${1.7 - 0.7 * s})`, WebkitTextStroke: i === 1 ? `2px ${C.paper}` : 'none', WebkitTextFillColor: i === 1 ? 'transparent' : undefined}}>
@@ -96,7 +102,7 @@ const Title = ({lang}) => {
           })}
         </div>
       </div>
-      {words.map((_, i) => <Flash key={i} at={2 * BEAT + i * BEAT * 2} len={4} color={C.red} max={0.25} />)}
+      {words.map((_, i) => <Flash key={i} at={b(4 + 2 * i)} len={4} color={C.red} max={0.25} />)}
     </AbsoluteFill>
   );
 };
@@ -110,17 +116,18 @@ const arc = (a, b) => {
 
 const camera = (f, L) => {
   // Where we are: station index + move progress, or a wide view for "today".
-  const local = f - T.journey;
-  const idx = Math.max(0, Math.min(ST.length - 1, Math.floor(local / T.station)));
-  const k = local - idx * T.station;
-  const t = idx === 0 ? 1 : interpolate(k, [0, 22], [0, 1], {...clamp, easing: inOut});
-  const a = ST[Math.max(0, idx - 1)];
-  const b = ST[idx];
-  const lon = a.lon + (b.lon - a.lon) * t;
-  const lat = a.lat + (b.lat - a.lat) * t;
-  const far = Math.hypot(b.lon - a.lon, b.lat - a.lat);
+  const idx = Math.max(0, ST.findLastIndex((_, i) => stAt(i) <= f));
+  const k = f - stAt(idx);
+  const t = idx === 0 ? 1 : interpolate(k, [0, b(2)], [0, 1], {...clamp, easing: inOut});
+  const p = ST[Math.max(0, idx - 1)];
+  const q = ST[idx];
+  const lon = p.lon + (q.lon - p.lon) * t;
+  const lat = p.lat + (q.lat - p.lat) * t;
+  const far = Math.hypot(q.lon - p.lon, q.lat - p.lat);
   const base = L.v ? 0.62 : 0.78;
-  let z = base * (1 - Math.min(0.45, far / 260) * Math.sin(Math.PI * t));
+  // Beat kick on the map, harder at every station.
+  const kick = f < T.today ? (1 - (((f - T.journey) / BEAT) % 1)) ** 4 * 0.01 * (1 + idx * 0.6) : 0;
+  let z = base * (1 - Math.min(0.45, far / 260) * Math.sin(Math.PI * t)) * (1 + kick);
   let ax = L.v ? 0.5 : L.rtl ? 0.7 : 0.3;
   let ay = L.v ? 0.3 : 0.4;
   let cx = mx(lon), cy = my(lat);
@@ -140,7 +147,7 @@ const MapLayer = ({lang}) => {
   const f = useCurrentFrame();
   const cam = camera(f, L);
   const done = f >= T.today ? ST.length : cam.idx;
-  const pulse = (f % 30) / 30;
+  const pulse = (((f - T.journey) % BEAT) + BEAT) % BEAT / BEAT;
   return (
     <AbsoluteFill style={{background: C.ink, overflow: 'hidden'}}>
       <div style={{position: 'absolute', left: 0, top: 0, width: MAP.w, height: MAP.h, transformOrigin: '0 0', transform: `translate(${cam.x}px, ${cam.y}px) scale(${cam.z})`}}>
@@ -223,7 +230,7 @@ const Cards = ({s, lang, dur}) => {
   return (
     <AbsoluteFill style={{transform: `translateX(${(L.rtl ? 1 : -1) * exit * 160}px)`, opacity: 1 - exit, filter: `blur(${exit * 10}px)`}}>
       {s.cards.map((c, i) => {
-        const at = 22 + i * 5;
+        const at = b(2 + i / 2);
         const sp = spring({frame: f - at, fps, config: {damping: 12, stiffness: 190, mass: 0.8}});
         const shake = f - at > 0 && f - at < 5 ? (random(`c${f}${i}`) - 0.5) * 10 : 0;
         const x = L.v ? 0.5 - c.w * 0.85 + (c.x - 0.6) * 1.2 : L.rtl ? 1 - c.x - c.w : c.x;
@@ -249,7 +256,7 @@ const Credential = ({s, lang, dur}) => {
   const L = useLayout(lang);
   const f = useCurrentFrame();
   const {fps} = useVideoConfig();
-  const sp = spring({frame: f - 30, fps, config: {damping: 12, stiffness: 160}});
+  const sp = spring({frame: f - b(2), fps, config: {damping: 12, stiffness: 160}});
   const exit = ease(f, dur - 8, dur, 0, 1, inOut);
   const big = s.big[lang];
   const size = big.length > 4 ? (L.v ? 150 : 170) : L.v ? 230 : 250;
@@ -264,13 +271,13 @@ const Credential = ({s, lang, dur}) => {
         <div dir="auto" style={{fontFamily: L.display, fontWeight: 700, fontSize: size, lineHeight: 0.9, color: C.gold, textShadow: `8px 8px 0 ${C.red}`, transform: `scale(${1.5 - 0.5 * sp})`, transformOrigin: L.rtl ? 'right bottom' : 'left bottom', opacity: Math.min(1, sp * 2), whiteSpace: 'nowrap', textTransform: L.upper}}>
           {big}
         </div>
-        <div style={{fontFamily: KANJI, fontSize: 58, lineHeight: 1.02, color: C.paper, background: C.red, padding: '8px 8px 10px', writingMode: 'vertical-rl', opacity: ease(f, 34, 40, 0, 1), transform: `scale(${ease(f, 34, 42, 1.6, 1)})`, marginBottom: 6}}>
+        <div style={{fontFamily: KANJI, fontSize: 58, lineHeight: 1.02, color: C.paper, background: C.red, padding: '8px 8px 10px', writingMode: 'vertical-rl', opacity: ease(f, b(2.5), b(2.5) + 6, 0, 1), transform: `scale(${ease(f, b(2.5), b(2.5) + 8, 1.6, 1)})`, marginBottom: 6}}>
           {s.kanji}
         </div>
       </div>
-      <Rise text={s.line[lang]} start={36} rtl={L.rtl} style={{fontFamily: L.display, fontWeight: 600, fontSize: L.v ? 64 : 56, lineHeight: 1.08, textTransform: L.upper, marginTop: 26}} />
+      <Rise text={s.line[lang]} start={b(2.5)} rtl={L.rtl} style={{fontFamily: L.display, fontWeight: 600, fontSize: L.v ? 64 : 56, lineHeight: 1.08, textTransform: L.upper, marginTop: 26}} />
       {s.sub && (
-        <div dir="auto" style={{fontFamily: L.body, fontWeight: 500, fontSize: L.v ? 40 : 34, lineHeight: 1.3, marginTop: 14, textAlign: L.rtl ? 'right' : 'left', opacity: 0.85 * ease(f, 44, 56, 0, 1), textWrap: 'balance'}}>
+        <div dir="auto" style={{fontFamily: L.body, fontWeight: 500, fontSize: L.v ? 40 : 34, lineHeight: 1.3, marginTop: 14, textAlign: L.rtl ? 'right' : 'left', opacity: 0.85 * ease(f, b(3), b(4), 0, 1), textWrap: 'balance'}}>
           {s.sub[lang]}
         </div>
       )}
@@ -283,8 +290,8 @@ const Today = ({lang, dur}) => {
   const f = useCurrentFrame();
   const {fps} = useVideoConfig();
   const side = L.rtl ? 'left' : 'right';
-  const open = ease(f, 30, 52, 0, 1, inOut);
-  const sp = spring({frame: f - 44, fps, config: {damping: 13, stiffness: 150}});
+  const open = ease(f, 6, b(2), 0, 1, inOut);
+  const sp = spring({frame: f - b(2) + 2, fps, config: {damping: 13, stiffness: 150}});
   return (
     <AbsoluteFill>
       <div style={{position: 'absolute', top: 0, bottom: L.v ? '48%' : 0, [side]: 0, width: L.v ? '100%' : '40%', clipPath: L.v ? `inset(0 0 ${100 - open * 100}% 0)` : `inset(0 ${L.rtl ? 100 - open * 100 : 0}% 0 ${L.rtl ? 0 : 100 - open * 100}%)`}}>
@@ -295,14 +302,13 @@ const Today = ({lang, dur}) => {
         <div style={{fontFamily: L.display, fontWeight: 700, fontSize: L.v ? 170 : 190, lineHeight: 0.9, color: C.gold, textShadow: `8px 8px 0 ${C.red}`, textTransform: L.upper, transform: `scale(${1.4 - 0.4 * sp})`, transformOrigin: L.rtl ? 'right bottom' : 'left bottom', opacity: Math.min(1, sp * 2)}}>
           {ILANA.today[lang]}
         </div>
-        <Rise text={ILANA.todayLine[lang]} start={54} rtl={L.rtl} style={{fontFamily: L.display, fontWeight: 600, fontSize: L.v ? 64 : 58, lineHeight: 1.1, textTransform: L.upper, marginTop: 30}} />
+        <Rise text={ILANA.todayLine[lang]} start={b(3)} rtl={L.rtl} style={{fontFamily: L.display, fontWeight: 600, fontSize: L.v ? 64 : 58, lineHeight: 1.1, textTransform: L.upper, marginTop: 30}} />
       </div>
     </AbsoluteFill>
   );
 };
 
 export const Ilana = ({lang}) => {
-  const st = (i) => T.journey + i * T.station;
   return (
     <AbsoluteFill style={{background: C.ink}}>
       <Audio
@@ -321,9 +327,9 @@ export const Ilana = ({lang}) => {
         <Title lang={lang} />
       </Sequence>
       {ST.map((s, i) => (
-        <Sequence key={i} from={st(i)} durationInFrames={T.station}>
-          <Cards s={s} lang={lang} dur={T.station} />
-          <Credential s={s} lang={lang} dur={T.station} />
+        <Sequence key={i} from={stAt(i)} durationInFrames={b(8)}>
+          <Cards s={s} lang={lang} dur={b(8)} />
+          <Credential s={s} lang={lang} dur={b(8)} />
         </Sequence>
       ))}
       <Sequence from={T.journey} durationInFrames={T.today + 12 - T.journey}>
@@ -337,9 +343,11 @@ export const Ilana = ({lang}) => {
       <Sequence from={T.end} durationInFrames={T.total - T.end}>
         <EndCard lang={lang} dur={T.total - T.end} tagline={TAGLINE[lang]} site={SITE} whatsapp={WHATSAPP} />
       </Sequence>
-      {[T.title, T.journey, ...ST.map((_, i) => st(i) + 22), T.today, T.end].map((a, i) => (
+      {[T.journey, ...ST.map((_, i) => stAt(i) + b(2)), T.today, T.end].map((a, i) => (
         <Flash key={i} at={a} len={5} max={0.5} />
       ))}
+      <Flash at={T.title} len={9} max={0.85} />
+      <Flash at={T.hit} len={8} max={0.3} />
       <Vignette />
       <Grain opacity={0.2} />
     </AbsoluteFill>
