@@ -69,7 +69,7 @@ const PhotoShot = ({shot, dur, L, dir}) => {
     <AbsoluteFill style={{perspective: 1400, background: C.ink}}>
       <Img src={src} style={{...cover('center'), filter: 'blur(30px) brightness(0.42)', transform: `scale(1.3) translateX(${-dir * (p - 0.5) * 60}px)`}} />
       {card ? (
-        <div style={{position: 'absolute', inset: L.v ? '22% 6% 30%' : '8% 14% 10%', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+        <div style={{position: 'absolute', inset: shot.inset ?? (L.v ? '22% 6% 30%' : '8% 14% 10%'), display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
           <Img
             src={src}
             style={{
@@ -151,12 +151,14 @@ const Line = ({line, lang, L, dur}) => {
   }
   const size = L.v ? 74 : 70;
   const bar = ease(f, 2, 14, 0, 1);
+  // for photos whose faces fill the lower third
+  const top = line.zone === 'top';
   return (
     <AbsoluteFill style={{opacity: out}}>
-      <AbsoluteFill style={{background: `linear-gradient(0deg, rgba(10,9,8,.72), transparent ${L.v ? 42 : 38}%)`, opacity: ease(f, 0, 10, 0, 1)}} />
+      <AbsoluteFill style={{background: `linear-gradient(${top ? 180 : 0}deg, rgba(10,9,8,.72), transparent ${L.v ? 42 : 38}%)`, opacity: ease(f, 0, 10, 0, 1)}} />
       <div
         dir={L.rtl ? 'rtl' : 'ltr'}
-        style={{position: 'absolute', left: L.v ? 70 : 140, right: L.v ? 70 : 140, bottom: L.v ? 470 : 150, display: 'flex', flexDirection: 'column', alignItems: 'flex-start'}}
+        style={{position: 'absolute', left: L.v ? 70 : 140, right: L.v ? 70 : 140, [top ? 'top' : 'bottom']: top ? 150 : L.v ? 470 : 150, display: 'flex', flexDirection: 'column', alignItems: 'flex-start'}}
       >
         <div style={{height: 6, width: 110 * bar, background: line.big ? C.gold : C.red, marginBottom: 22}} />
         <Rise text={text} rtl={L.rtl} start={2} stagger={2} style={{...display, fontSize: size, lineHeight: 1.12, maxWidth: L.v ? 940 : 1500}} />
