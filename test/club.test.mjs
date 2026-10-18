@@ -10,7 +10,7 @@ const read = (p) => readFileSync(dist(p), 'utf8');
 const tourDir = new URL('../content/tournaments/', import.meta.url);
 const tours = readdirSync(tourDir).map((f) => ({ slug: f.replace(/\.json$/, ''), ...json(`../content/tournaments/${f}`) }));
 const fixture = json('./fixtures/tournament-unverified.json');
-const PAGES = ['history/', 'achievements/', 'tournaments/', 'nivheret/', 'contact/', ...published(tours).map((t) => `tournaments/${t.slug}/`)];
+const PAGES = ['history/', 'achievements/', 'tournaments/', 'nivheret/', 'contact/', 'belts/', ...published(tours).map((t) => `tournaments/${t.slug}/`)];
 
 test('the new pages exist in he, ru and en with the right lang and dir', () => {
   assert.ok(PAGES.length > 4);
@@ -117,7 +117,7 @@ test('sitemap, landing nav and "more" links reach the new pages', () => {
   const xml = read('sitemap.xml');
   for (const [l] of LANGS) for (const p of PAGES) assert.match(xml, new RegExp(`<loc>[^<]*/${l}/${p}</loc>`), `${l}/${p}`);
   const landing = read('he/index.html');
-  for (const p of ['history/', 'achievements/', 'tournaments/', 'nivheret/', 'contact/']) assert.ok(landing.includes(`href="${p}"`), p);
+  for (const p of ['history/', 'achievements/', 'tournaments/', 'nivheret/', 'contact/', 'belts/']) assert.ok(landing.includes(`href="${p}"`), p);
   assert.equal(landing.match(/class="more-link"/g).length, 4);
 });
 
@@ -176,6 +176,31 @@ test('contact page: WhatsApp, email, socials, venues with map, link to the first
   }
 });
 
-test('Russian landing and contact page say «тренера», never «тренеры»', () => {
-  for (const p of ['ru/index.html', 'ru/contact/index.html']) assert.ok(!/тренеры/i.test(read(p)), p);
+test('Russian landing, contact and belts pages say «тренера», never «тренеры»', () => {
+  for (const p of ['ru/index.html', 'ru/contact/index.html', 'ru/belts/index.html']) assert.ok(!/тренеры/i.test(read(p)), p);
+});
+
+test('belts page: every belt labelled in he/ru/en, drawn in a known colour, cited, and linked from both footers', () => {
+  const b = json('../content/belts.json');
+  const ids = new Set(b.sources.map((s) => s.id));
+  for (const x of b.ladder.steps) {
+    for (const [l] of LANGS) assert.ok(x.name[l]?.trim(), `${x.id}.${l}`);
+    for (const c of x.colours) assert.match(b.colours[c] ?? '', /^#[0-9a-f]{6}$/, `${x.id}: ${c}`);
+    assert.ok(x.sources.length && x.sources.every((s) => ids.has(s)), x.id);
+    assert.ok(Number.isInteger(x.kyu ?? x.dan), x.id);
+  }
+  // the six official kyu belts must cite the association's regulations, not club or wiki pages
+  const official = b.ladder.steps.filter((x) => x.official && x.kyu);
+  assert.deepEqual(official.map((x) => x.kyu), [6, 5, 4, 3, 2, 1]);
+  assert.ok(official.every((x) => x.sources.includes('S1')));
+  for (const [l] of LANGS) {
+    const html = read(`${l}/belts/index.html`);
+    assert.equal(html.match(/<li class="bl-step/g).length, b.ladder.steps.length, l);
+    for (const x of b.ladder.steps) assert.ok(html.includes(x.name[l]), `${l}: ${x.id}`);
+    assert.equal(html.match(/<details class="bl-card"/g).length, b.exams.cards.length, l);
+    for (const s of b.sources) assert.ok(html.includes(`href="${s.url.replaceAll('&', '&amp;')}"`), `${l}: ${s.id}`);
+    assert.ok(html.includes(b.disclaimer[l].replaceAll("'", '&#39;')), l);
+    assert.match(html, new RegExp(`<footer class="site-footer">[\\s\\S]*href="[^"]*/${l}/belts/"`), l);
+    assert.match(read(`${l}/index.html`), new RegExp(`href="[^"]*/${l}/belts/"`), l);
+  }
 });

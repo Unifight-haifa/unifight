@@ -1,0 +1,135 @@
+---
+import { i18n } from 'astro:config/client';
+import Base from '../../../layouts/Base.astro';
+import Belt from '../../../components/Belt.astro';
+import JsonLd from '../../../components/JsonLd.astro';
+import PageHead from '../../../components/PageHead.astro';
+import { t, type Lang } from '../../../i18n/ui';
+import { belts as b } from '../../../lib/club';
+import { bidi } from '../../../lib/club-check.mjs';
+import '../../../styles/landing.css';
+import '../../../styles/news.css';
+import '../../../styles/club.css';
+
+export function getStaticPaths() {
+  return i18n!.locales.map((lang) => ({ params: { lang } }));
+}
+
+const lang = Astro.params.lang as Lang;
+const s = {
+  he: { kyu: (n: number) => `קיו ${n}`, dan: (n: number) => `דאן ${n}` },
+  ru: { kyu: (n: number) => `${n} кю`, dan: (n: number) => `${n} дан` },
+  en: { kyu: (n: number) => `kyu ${n}`, dan: (n: number) => `${n}${['st', 'nd', 'rd'][n - 1] ?? 'th'} dan` },
+}[lang];
+const fill = (colours: string[]) => colours.map((c) => b.colours[c as keyof typeof b.colours]);
+const title = `${b.title[lang]} · ${t(lang, 'siteName')}`;
+const desc = b.desc[lang];
+const head = b.exams.cards.find((c) => c.table)!.table!.head;
+const ld = {
+  '@context': 'https://schema.org',
+  '@type': 'WebPage',
+  name: b.title[lang],
+  description: desc,
+  inLanguage: lang,
+  citation: b.sources.map((x) => x.url),
+};
+const hebrew = (x: string) => (/[֐-׿]/.test(x) ? 'he' : 'en');
+---
+<Base lang={lang} title={title} description={desc}>
+  <Fragment slot="head">
+    <PageHead lang={lang} path="belts/" title={title} desc={desc} />
+    <JsonLd data={ld} />
+  </Fragment>
+  <div class="news club belts">
+    <h1 class="h2">{b.title[lang]}</h1>
+    <p class="lead" set:html={bidi(lang, b.intro[lang])} />
+
+    <section aria-labelledby="ladder">
+      <h2 class="h3" id="ladder">{b.ladder.title[lang]}</h2>
+      <p class="bl-text" set:html={bidi(lang, b.ladder.text[lang])} />
+      <ul class="bl-legend">
+        <li><span class="bl-key" aria-hidden="true"></span>{b.ladder.legend_official[lang]}</li>
+        <li><span class="bl-key is-club" aria-hidden="true"></span>{b.ladder.legend_club[lang]}</li>
+      </ul>
+      <ol class="bl-ladder">
+        {b.ladder.steps.map((x, i) => (
+          <li class:list={['bl-step', { 'is-club': !x.official }]}>
+            <span class="bl-n" aria-hidden="true">{i + 1}</span>
+            <Belt fill={fill(x.colours)} id={x.id} />
+            <span class="bl-name">{x.name[lang]}</span>
+            <span class="bl-grade" set:html={bidi(lang, `${x.dan ? s.dan(x.dan) : s.kyu(x.kyu!)}${x.official ? '' : ` · ${b.ladder.legend_club[lang]}`}`)} />
+            {x.note && <span class="bl-note" set:html={bidi(lang, x.note[lang])} />}
+          </li>
+        ))}
+      </ol>
+      <p class="bl-small">{b.ladder.drawing_note[lang]}</p>
+    </section>
+
+    <section aria-labelledby="road">
+      <h2 class="h3" id="road">{b.road.title[lang]}</h2>
+      <ol class="tl club-tl">
+        {b.road.items.map((x) => (
+          <li class="tl-i">
+            <span class="tl-y" set:html={bidi(lang, x.when[lang])} />
+            <h3 class="h3 tl-t" set:html={bidi(lang, x.title[lang])} />
+            <p set:html={bidi(lang, x.text[lang])} />
+          </li>
+        ))}
+      </ol>
+    </section>
+
+    <section aria-labelledby="exams">
+      <h2 class="h3" id="exams">{b.exams.title[lang]}</h2>
+      <div class="bl-cards">
+        {b.exams.cards.map((c) => (
+          <details class="bl-card">
+            <summary>
+              <span class="bl-belts">{c.belts.map((x) => <Belt fill={fill(x.split('-'))} id={`${c.id}-${x}`} />)}</span>
+              <h3 class="h4" set:html={bidi(lang, c.title[lang])} />
+            </summary>
+            <ul>{c.items.map((i) => <li set:html={bidi(lang, i[lang])} />)}</ul>
+            {c.table && (
+              <table class="bl-table">
+                <thead><tr><th scope="col">{head.grade[lang]}</th><th scope="col">{head.age[lang]}</th><th scope="col">{head.years[lang]}</th><th scope="col">{head.kata[lang]}</th><th scope="col">{head.pass[lang]}</th></tr></thead>
+                <tbody>
+                  {c.table.rows.map((r) => (
+                    <tr><th scope="row" set:html={bidi(lang, s.dan(r.grade))} /><td><bdi dir="ltr">{r.age}</bdi></td><td><bdi dir="ltr">{r.years}</bdi></td><td set:html={bidi(lang, r.kata[lang])} /><td><bdi dir="ltr">{r.pass}</bdi></td></tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </details>
+        ))}
+      </div>
+    </section>
+
+    <section aria-labelledby="ages">
+      <h2 class="h3" id="ages">{b.ages.title[lang]}</h2>
+      <div class="bl-vs">
+        {[b.ages.grade, b.ages.category].map((x) => (
+          <div><h3 class="h4">{x.title[lang]}</h3><p set:html={bidi(lang, x.text[lang])} /></div>
+        ))}
+      </div>
+      <h3 class="h4 bl-sub">{b.ages.rows_title[lang]}</h3>
+      <dl class="club-facts bl-ages">
+        {b.ages.rows.map((r) => <div><dt>{r.label[lang]}</dt><dd><bdi dir="ltr">{r.ages}</bdi></dd></div>)}
+      </dl>
+      {b.ages.notes.map((n) => <p class="bl-text" set:html={bidi(lang, n[lang])} />)}
+    </section>
+
+    <section class="club-join" aria-labelledby="ijf">
+      <h2 class="h3" id="ijf">{b.ijf.title[lang]}</h2>
+      <p set:html={bidi(lang, b.ijf.text[lang])} />
+    </section>
+
+    <section class="club-sources" aria-labelledby="sources">
+      <h2 class="h3" id="sources">{b.sources_title[lang]}</h2>
+      <ol>
+        {b.sources.map((x) => (
+          <li><a href={x.url} rel="noopener"><bdi lang={hebrew(x.title)}>{x.title}</bdi></a> · <bdi dir="ltr">{x.date}</bdi></li>
+        ))}
+      </ol>
+      <p>{b.disclaimer[lang]}</p>
+    </section>
+  </div>
+</Base>

@@ -2,6 +2,7 @@ import type { ImageMetadata } from 'astro';
 import { getRelativeLocaleUrl } from 'astro:i18n';
 import site from '../../content/site.json';
 import achievementsData from '../../content/achievements.json';
+import beltsData from '../../content/belts.json';
 import historyData from '../../content/history.json';
 import nivheret from '../../content/nivheret.json';
 import schedule from '../../content/schedule/natanel-zhurovel.json';
@@ -78,6 +79,21 @@ export const about = { ...historyData.about, facts: published(historyData.about.
 if (BANNED.test(JSON.stringify(nivheret))) throw new Error('nivheret.json: the nivheret is the club team, not a national team');
 export const nivheretSlots = schedule.sessions.filter((s) => s.kind === 'nivheret');
 export { nivheret, schedule };
+
+// a belt drawn in an unknown colour or citing a missing source must fail the build
+type Cited = { colours?: string[]; belts?: string[]; sources: string[] };
+const beltIds = new Set(beltsData.sources.map((s) => s.id));
+const beltLists: [string, Cited[], string[]][] = [
+  ['belts.ladder', beltsData.ladder.steps, ['name']],
+  ['belts.exams', beltsData.exams.cards, ['title']],
+  ['belts.road', beltsData.road.items, ['title', 'text']],
+];
+for (const [at, list, required] of beltLists) checkEntries(list, at, required);
+for (const e of [...beltLists.flatMap(([, list]) => list), beltsData.ages, beltsData.ijf]) {
+  for (const s of e.sources) if (!beltIds.has(s)) throw new Error(`belts: unknown source ${s}`);
+  for (const c of e.colours ?? e.belts?.flatMap((b) => b.split('-')) ?? []) if (!(c in beltsData.colours)) throw new Error(`belts: unknown colour ${c}`);
+}
+export const belts = beltsData;
 
 export const tournamentPath = (lang: Lang, slug: string) => getRelativeLocaleUrl(lang, `tournaments/${slug}/`);
 export const tr = (o: T | string, lang: Lang) => (typeof o === 'string' ? o : o[lang]);

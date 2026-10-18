@@ -35,6 +35,7 @@ export const ui = {
     privacyPolicy: 'מדיניות פרטיות',
     skipToContent: 'דילוג לתוכן',
     contact: 'צרו קשר',
+    belts: 'חגורות',
   },
   ru: {
     siteName: 'Юнифайт Хайфа',
@@ -65,6 +66,7 @@ export const ui = {
     privacyPolicy: 'Политика конфиденциальности',
     skipToContent: 'Перейти к содержанию',
     contact: 'Контакты',
+    belts: 'Пояса',
   },
   en: {
     siteName: 'Unifight Haifa',
@@ -95,6 +97,7 @@ export const ui = {
     privacyPolicy: 'Privacy policy',
     skipToContent: 'Skip to content',
     contact: 'Contact',
+    belts: 'Belts',
   },
 };
 

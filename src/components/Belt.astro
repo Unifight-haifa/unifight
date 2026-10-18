@@ -1,0 +1,26 @@
+---
+interface Props {
+  /** hex fills; two colours = the belt split lengthwise */
+  fill: string[];
+  id: string;
+}
+
+const { fill, id } = Astro.props;
+const [a, b = a] = fill;
+const paint = a === b ? a : `url(#belt-${id})`;
+---
+<svg class="belt" viewBox="0 0 160 44" aria-hidden="true" focusable="false">
+  {a !== b && (
+    <defs>
+      <linearGradient id={`belt-${id}`} x1="0" y1="0" x2="0" y2="1">
+        <stop offset="50%" stop-color={a} /><stop offset="50%" stop-color={b} />
+      </linearGradient>
+    </defs>
+  )}
+  <g fill={paint} stroke="rgba(243,234,216,.6)" stroke-width="1">
+    <rect x="1" y="9" width="158" height="14" rx="2" />
+    <rect x="58" y="22" width="14" height="21" rx="1.5" transform="rotate(14 65 22)" />
+    <rect x="88" y="22" width="14" height="21" rx="1.5" transform="rotate(-14 95 22)" />
+    <rect x="66" y="5" width="28" height="22" rx="3" />
+  </g>
+</svg>

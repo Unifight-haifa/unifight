@@ -88,6 +88,13 @@
    "en": "Selected team"
   },
   {
+   "id": "belts",
+   "href": "belts/",
+   "he": "חגורות",
+   "ru": "Пояса",
+   "en": "Belts"
+  },
+  {
    "id": "camps",
    "he": "מחנות אימונים",
    "ru": "Лагеря и сборы",

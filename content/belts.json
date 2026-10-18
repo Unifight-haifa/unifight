@@ -1,0 +1,222 @@
+{
+  "title": { "he": "חגורות בג׳ודו: הדרך מלבנה לשחורה", "ru": "Пояса в дзюдо: путь от белого до чёрного", "en": "Judo belts: the road from white to black" },
+  "desc": {
+    "he": "סדר החגורות בג׳ודו בישראל: דרגות קיו ודאן, חגורות ביניים, מה כולל כל מבחן, חגורה חומה ושחורה, ומה ההבדל בין דרגה לקטגוריית גיל.",
+    "ru": "Порядок поясов в дзюдо в Израиле: кю и даны, промежуточные пояса, что входит в экзамены, коричневый и чёрный пояс и чем разряд отличается от возрастной категории.",
+    "en": "How judo belts work in Israel: kyu and dan grades, the in-between club belts, what each exam covers, brown and black belt, and how a grade differs from an age category."
+  },
+  "intro": {
+    "he": "בג׳ודו החגורה מראה את הדרגה. בישראל הדרגות נקבעות לפי תקנון הדרגות של איגוד הג׳ודו: 6 דרגות קיו לתלמידים, מלבנה ועד חומה, ואחריהן דרגות הדאן של החגורה השחורה. בדף הזה ריכזנו את הסדר, את התנאים ואת מה שבודקים בכל שלב, עם מקור לכל פרט.",
+    "ru": "Пояс в дзюдо показывает разряд спортсмена. В Израиле разряды определяет положение о степенях Израильской федерации дзюдо: шесть ученических степеней кю, от белого пояса до коричневого, а за ними даны, то есть чёрный пояс. Здесь собрано, в каком порядке идут пояса, какие нужны условия и что проверяют на каждом этапе. У каждого факта есть источник.",
+    "en": "In judo your belt shows your grade. In Israel grades follow the Israel Judo Association's grading regulations: six student kyu grades from white to brown, then the dan grades of the black belt. This page sets out the order, the conditions and what is tested at each step, with a source for every detail."
+  },
+  "ladder": {
+    "title": { "he": "סולם החגורות", "ru": "Лестница поясов", "en": "The belt ladder" },
+    "text": {
+      "he": "שש החגורות של האיגוד הן לבנה, צהובה, כתומה, ירוקה, כחולה וחומה. ביניהן מועדונים רבים נותנים חגורות ביניים דו־צבעיות, כדי שילדים יקבלו חגורה חדשה לעיתים קרובות יותר. האיגוד לא מגדיר אותן: מבחינתו מי שעונד חגורת ביניים עדיין נמצא בדרגת הקיו של החגורה המלאה שלפניה. השרשרת כאן היא הנפוצה, עם שלבי הסגול לקטנים; יש מועדונים שמדלגים על הסגול ונותנים לבנה־צהובה. המאמן אומר באיזה שלב אתם.",
+      "ru": "У федерации шесть поясов: белый, жёлтый, оранжевый, зелёный, синий и коричневый. Между ними многие клубы дают промежуточные двухцветные пояса, чтобы ребёнок получал новый пояс чаще. Федерация их не устанавливает: для неё обладатель промежуточного пояса всё ещё имеет кю предыдущего полного пояса. Здесь показана самая распространённая цепочка, с фиолетовыми ступенями для малышей; в некоторых клубах фиолетовых нет, а после белого идёт бело-жёлтый. На какой вы ступени, скажут тренера.",
+      "en": "The association has six belts: white, yellow, orange, green, blue and brown. Between them many clubs award two-colour in-between belts so that children earn a new belt more often. The association does not define them: to it, someone wearing an in-between belt still holds the kyu of the last full belt. The chain below is the common one, with purple steps for young children; some clubs skip purple and use white-yellow instead. Your coach will tell you which step you are on."
+    },
+    "legend_official": { "he": "דרגה רשמית של האיגוד", "ru": "официальная степень федерации", "en": "official association grade" },
+    "legend_club": { "he": "חגורת ביניים של המועדון", "ru": "промежуточный клубный пояс", "en": "in-between club belt" },
+    "drawing_note": {
+      "he": "בציור חגורת ביניים מחולקת לאורכה לשני הצבעים. בפועל הדגם תלוי ביצרן.",
+      "ru": "На рисунке промежуточный пояс разделён по длине на два цвета. Как он выглядит на деле, зависит от производителя.",
+      "en": "The drawings split an in-between belt lengthwise into its two colours. The real pattern depends on the maker."
+    },
+    "steps": [
+      { "id": "white", "colours": ["white"], "kyu": 6, "official": true,
+        "name": { "he": "לבנה", "ru": "Белый", "en": "White" },
+        "note": { "he": "כאן מתחילים כולם", "ru": "с него начинают все", "en": "where everyone starts" },
+        "sources": ["S1"], "confidence": "confirmed" },
+      { "id": "white-purple", "colours": ["white", "purple"], "kyu": 6, "official": false,
+        "name": { "he": "לבנה־סגולה", "ru": "Бело-фиолетовый", "en": "White-purple" },
+        "sources": ["S8"], "confidence": "confirmed" },
+      { "id": "purple", "colours": ["purple"], "kyu": 6, "official": false,
+        "name": { "he": "סגולה", "ru": "Фиолетовый", "en": "Purple" },
+        "sources": ["S8", "S9"], "confidence": "confirmed" },
+      { "id": "purple-yellow", "colours": ["purple", "yellow"], "kyu": 6, "official": false,
+        "name": { "he": "סגולה־צהובה", "ru": "Фиолетово-жёлтый", "en": "Purple-yellow" },
+        "sources": ["S8"], "confidence": "confirmed" },
+      { "id": "yellow", "colours": ["yellow"], "kyu": 5, "official": true,
+        "name": { "he": "צהובה", "ru": "Жёлтый", "en": "Yellow" },
+        "sources": ["S1"], "confidence": "confirmed" },
+      { "id": "yellow-orange", "colours": ["yellow", "orange"], "kyu": 5, "official": false,
+        "name": { "he": "צהובה־כתומה", "ru": "Жёлто-оранжевый", "en": "Yellow-orange" },
+        "sources": ["S7", "S8"], "confidence": "confirmed" },
+      { "id": "orange", "colours": ["orange"], "kyu": 4, "official": true,
+        "name": { "he": "כתומה", "ru": "Оранжевый", "en": "Orange" },
+        "sources": ["S1"], "confidence": "confirmed" },
+      { "id": "orange-green", "colours": ["orange", "green"], "kyu": 4, "official": false,
+        "name": { "he": "כתומה־ירוקה", "ru": "Оранжево-зелёный", "en": "Orange-green" },
+        "sources": ["S7", "S8"], "confidence": "confirmed" },
+      { "id": "green", "colours": ["green"], "kyu": 3, "official": true,
+        "name": { "he": "ירוקה", "ru": "Зелёный", "en": "Green" },
+        "sources": ["S1"], "confidence": "confirmed" },
+      { "id": "green-blue", "colours": ["green", "blue"], "kyu": 3, "official": false,
+        "name": { "he": "ירוקה־כחולה", "ru": "Зелёно-синий", "en": "Green-blue" },
+        "sources": ["S7", "S8"], "confidence": "confirmed" },
+      { "id": "blue", "colours": ["blue"], "kyu": 2, "official": true,
+        "name": { "he": "כחולה", "ru": "Синий", "en": "Blue" },
+        "note": { "he": "מגיל 13", "ru": "с 13 лет", "en": "from age 13" },
+        "sources": ["S1"], "confidence": "confirmed" },
+      { "id": "brown", "colours": ["brown"], "kyu": 1, "official": true,
+        "name": { "he": "חומה", "ru": "Коричневый", "en": "Brown" },
+        "note": { "he": "מגיל 15, מבחן מצולם", "ru": "с 15 лет, экзамен на видео", "en": "from age 15, filmed exam" },
+        "sources": ["S1"], "confidence": "confirmed" },
+      { "id": "black", "colours": ["black"], "dan": 1, "official": true,
+        "name": { "he": "שחורה", "ru": "Чёрный", "en": "Black" },
+        "note": { "he": "מגיל 17, שנה לפחות בחומה", "ru": "с 17 лет, минимум год на коричневом", "en": "from age 17, at least a year at brown" },
+        "sources": ["S1"], "confidence": "confirmed" }
+    ]
+  },
+  "colours": {
+    "white": "#f4f1ea", "purple": "#7d4cc2", "yellow": "#f2c53d", "orange": "#ec7a2a", "green": "#2e9d4f",
+    "blue": "#2f6fd0", "brown": "#7a4a26", "black": "#111111", "red": "#c2232e"
+  },
+  "exams": {
+    "title": { "he": "מה בודקים בכל מבחן", "ru": "Что проверяют на экзаменах", "en": "What each exam covers" },
+    "cards": [
+      { "id": "kyu", "belts": ["white", "yellow", "orange", "green", "blue"],
+        "title": { "he": "לבנה עד כחולה (קיו 6 עד 2)", "ru": "От белого до синего (6–2 кю)", "en": "White to blue (kyu 6 to 2)" },
+        "items": [
+          { "he": "את הדרגות האלה מעניק \"בוחן רגיל\": בעל דרגת דאן של האיגוד שסיים קורס מדריכים או מאמנים מוכר. בפועל זה המאמן במועדון.", "ru": "Эти степени присуждает «обычный экзаменатор»: обладатель дана федерации с признанным курсом инструкторов или тренеров. На практике это тренер клуба.", "en": "These grades are awarded by a \"regular examiner\": an association dan holder who has completed a recognised instructor or coach course. In practice, the club coach." },
+          { "he": "לאיגוד אין סילבוס מחייב לדרגות האלה, ואין גיל או זמן מינימלי, חוץ מכלל אחד: חגורה כחולה (קיו 2) לא ניתנת לפני גיל 13.", "ru": "Обязательной программы для этих степеней у федерации нет, как нет и минимального возраста или срока, за одним исключением: синий пояс (2 кю) не дают раньше 13 лет.", "en": "The association sets no compulsory syllabus for these grades and no minimum age or time, with one exception: blue (kyu 2) is never awarded before age 13." },
+          { "he": "התקנון ממליץ על רשימת טכניקות עד הכחולה, ביניהן o-soto-gari (קצירה חיצונית גדולה), o-goshi (הטלת מותן), seoi-nage (הטלת כתף), kesa-gatame (ריתוק צד), ו־juji-gatame (בריח מרפק).", "ru": "Положение рекомендует список техник до синего пояса, в том числе o-soto-gari (большая внешняя подсечка), o-goshi (бросок через бедро), seoi-nage (бросок через спину), kesa-gatame (удержание сбоку) и juji-gatame (рычаг локтя).", "en": "The regulations recommend a technique list up to blue, including o-soto-gari (major outer reap), o-goshi (hip throw), seoi-nage (shoulder throw), kesa-gatame (side hold-down) and juji-gatame (cross armlock)." },
+          { "he": "מבעל חגורה צהובה מצפים להשתתף ברנדורי (קרב אימון) בלי היסוס, ובחגורה ירוקה לכל המאוחר להתנסות קצת בשיאי (תחרות).", "ru": "От жёлтого пояса ждут уверенного участия в рандори (учебной схватке), а к зелёному, самое позднее, хотя бы небольшого опыта сиай (соревнований).", "en": "A yellow belt is expected to join randori (practice sparring) without hesitation, and by green at the latest to have some shiai (competition) experience." },
+          { "he": "דוגמה ממועדון בירושלים: במבחן ללבנה־צהובה בודקים נפילות (ukemi), ריתוקים, יציאה מריתוק ומונחים כמו rei (קידה) ו־matte (לעצור). לצהובה: הטלות רגל, מותן ויד, תרגיל נגד ושני שילובים.", "ru": "Пример одного клуба в Иерусалиме: на бело-жёлтый проверяют страховки (ukemi), удержания, уходы от удержаний и термины вроде rei (поклон) и matte (стоп). На жёлтый — броски ногой, бедром и рукой, контрприём и две комбинации.", "en": "One Jerusalem club's example: for white-yellow they test breakfalls (ukemi), hold-downs, escapes and terms such as rei (bow) and matte (stop). For yellow: leg, hip and hand throws, one counter and two combinations." }
+        ],
+        "sources": ["S1", "S7"], "confidence": "confirmed" },
+      { "id": "brown", "belts": ["brown"],
+        "title": { "he": "חגורה חומה (קיו 1)", "ru": "Коричневый пояс (1 кю)", "en": "Brown belt (kyu 1)" },
+        "items": [
+          { "he": "תנאים: גיל 15 לפחות, ו־6 נקודות זכות שנצברו בחגורה כחולה. נקודות מקבלים על השתתפות בתחרות (נקודה לתחרות, עד 4), על ניצחון על כחולה ומעלה (נקודה), ועל השתלמויות של האיגוד (נקודה ליום).", "ru": "Условия: не младше 15 лет и 6 зачётных очков, набранных на синем поясе. Очки дают за участие в соревновании (одно за турнир, до четырёх), за победу над синим поясом и выше (одно) и за семинары федерации (одно за день).", "en": "Conditions: at least 15 years old, and 6 merit points earned while at blue. Points come from competing (one per event, up to four), from a win against a blue belt or higher (one), and from association seminars (one per day)." },
+          { "he": "בוחן מוסמך או בכיר (לא המאמן הרגיל) בוחן במועדון או בכינוס מועדונים. המבחן כולו מצולם, והסרט נשלח לוועדת הדרגות. טופס בלי סרט לא נבדק.", "ru": "Экзамен принимает аттестованный или старший экзаменатор (не обычный) в клубе или на сборе нескольких клубов. Весь экзамен снимают на видео и отправляют в комиссию по степеням; протокол без видео не рассматривают.", "en": "A certified or senior examiner (not a regular one) runs it at the club or a club grouping. The whole exam is filmed and the film goes to the grading committee; a form without the film is not reviewed." },
+          { "he": "בעמידה: 5 הטלות, שילוב אחד לאותו כיוון, שילוב אחד לכיוון ההפוך ו־2 תרגילי נגד.", "ru": "В стойке: 5 бросков, одна комбинация в том же направлении, одна в обратном и 2 контрприёма.", "en": "Standing: 5 throws, one combination in the same direction, one in the opposite direction, and 2 counters." },
+          { "he": "בקרקע: 5 תרגילים, התקפה אחת נגד יריב במצב קיפוד והתקפה אחת כשאחד מהשניים שוכב על הגב.", "ru": "В партере: 5 приёмов, одна атака против соперника в «черепахе» и одна, когда один из двоих лежит на спине.", "en": "On the ground: 5 techniques, one attack against an opponent in the turtle, and one with either of you on your back." },
+          { "he": "קאטה: 2 הפרקים הראשונים של Nage-no-kata (צורות ההטלה), גם כ־tori (המטיל) וגם כ־uke (המוטל).", "ru": "Ката: первые две группы Nage-no-kata (формы бросков), и за tori (выполняющего), и за uke (принимающего).", "en": "Kata: the first two sets of Nage-no-kata (forms of throwing), as both tori (thrower) and uke (receiver)." },
+          { "he": "הטכניקות נבחרות מרשימה של 16 הטלות ו־12 תרגילי קרקע. ג׳ודוגי לבן ונקי. ציון עובר 75%. את הדרגה מעניקה הנהלת האיגוד.", "ru": "Приёмы берут из списка: 16 бросков и 12 приёмов в партере. Кимоно только белое и чистое. Проходной балл 75%. Степень присуждает правление федерации.", "en": "Techniques come from a list of 16 throws and 12 ground techniques. Clean white judogi only. Pass mark 75%. The grade is awarded by the association's board." }
+        ],
+        "sources": ["S1"], "confidence": "confirmed" },
+      { "id": "dan1", "belts": ["black"],
+        "title": { "he": "חגורה שחורה, דאן 1", "ru": "Чёрный пояс, 1 дан", "en": "Black belt, 1st dan" },
+        "items": [
+          { "he": "תנאים: חגורה חומה, גיל 17 לפחות, ונקודות זכות לפי הוותק בחומה: 10 אחרי שנה, 9 אחרי שנתיים, 8 אחרי שלוש, 7 אחרי ארבע ומעלה. לפחות 2 מהנקודות מהשתלמויות ועדת הדרגות בשנת המבחן.", "ru": "Условия: коричневый пояс, не младше 17 лет и зачётные очки в зависимости от стажа на коричневом: 10 после года, 9 после двух, 8 после трёх, 7 после четырёх и больше. Минимум 2 очка — с семинаров комиссии по степеням в год экзамена.", "en": "Conditions: brown belt, at least 17, and merit points by time at brown: 10 after one year, 9 after two, 8 after three, 7 after four or more. At least 2 of them from grading-committee seminars in the exam year." },
+          { "he": "חריג גיל: מי שזכה במדליה בתחרות קדטים בחו״ל יכול לקבל אישור להיבחן לפני גיל 17.", "ru": "Исключение по возрасту: призёр кадетского турнира за границей может получить разрешение сдавать раньше 17 лет.", "en": "Age exception: a medallist at a cadet competition abroad can be cleared to test before 17." },
+          { "he": "שלושה חלקים. טכניקה: 6 הטלות, 3 שילובים, 3 תרגילי נגד, ובקרקע 6 תרגילים ו־3 התקפות. קאטה: 3 הפרקים הראשונים של Nage-no-kata. ידע: 10 מונחים מעברית ליפנית ו־10 מיפנית לעברית.", "ru": "Три части. Техника: 6 бросков, 3 комбинации, 3 контрприёма, в партере 6 приёмов и 3 атаки. Ката: первые три группы Nage-no-kata. Теория: 10 терминов с иврита на японский и 10 с японского на иврит.", "en": "Three parts. Technique: 6 throws, 3 combinations, 3 counters, and on the ground 6 techniques and 3 attacks. Kata: the first three sets of Nage-no-kata. Theory: 10 terms from Hebrew to Japanese and 10 from Japanese to Hebrew." },
+          { "he": "בוחן אחד, ביום מבחנים מרוכז או בכינוס מועדונים. צריך 75 בכל חלק. את הדאן מאשרת הנהלת האיגוד.", "ru": "Один экзаменатор, на централизованном экзамене или на сборе клубов. Нужно 75 баллов в каждой части. Дан утверждает правление федерации.", "en": "One examiner, at a central exam day or a club grouping. 75 needed in each part. The board of the association confirms the dan." },
+          { "he": "התחרויות לא מחליפות את המבחן, אבל נותנות נקודות. רק הישג גדול, כמו זהב בגרנד סלאם, מזכה בדאן כבוד בלי מבחן.", "ru": "Соревнования не заменяют экзамен, но дают очки. Без экзамена, почётно, дан дают только за большой результат, например золото турнира Большого шлема.", "en": "Competing does not replace the exam, but it earns points. Only a major result, such as Grand Slam gold, brings an honorary dan without an exam." }
+        ],
+        "sources": ["S1"], "confidence": "confirmed" },
+      { "id": "dan2-5", "belts": ["black"],
+        "title": { "he": "דאן 2 עד 5", "ru": "Со 2 по 5 дан", "en": "2nd to 5th dan" },
+        "items": [
+          { "he": "רק בימי מבחנים מרוכזים של האיגוד: 2 בוחנים לדאן 2–3 ו־3 בוחנים לדאן 4–5, אף אחד מהם לא מהמועדון של הנבחן.", "ru": "Только на централизованных экзаменах федерации: 2 экзаменатора на 2–3 дан и 3 на 4–5 дан, и ни один не из клуба экзаменуемого.", "en": "Only at the association's central exam days: 2 examiners for 2nd–3rd dan and 3 for 4th–5th, none from the candidate's own club." },
+          { "he": "כל רמה מוסיפה הטלות, שילובים ותרגילי נגד. מדאן 3 רשימת התרגילים כבר לא משתנה, רק הרמה הנדרשת עולה.", "ru": "С каждым даном растёт число бросков, комбинаций и контрприёмов. С 3 дана список приёмов уже не меняется, растут только требования к уровню.", "en": "Each grade adds throws, combinations and counters. From 3rd dan the technique list stays the same; only the expected level rises." }
+        ],
+        "table": {
+          "head": {
+            "grade": { "he": "דרגה", "ru": "Степень", "en": "Grade" },
+            "age": { "he": "גיל מינימלי", "ru": "Мин. возраст", "en": "Min. age" },
+            "years": { "he": "שנים בדרגה הקודמת", "ru": "Лет на прошлой степени", "en": "Years in previous grade" },
+            "kata": { "he": "קאטה", "ru": "Ката", "en": "Kata" },
+            "pass": { "he": "ציון עובר", "ru": "Проходной балл", "en": "Pass mark" }
+          },
+          "rows": [
+            { "grade": 2, "age": 19, "years": 1, "pass": 75, "kata": { "he": "Nage-no-kata במלואה", "ru": "Nage-no-kata целиком", "en": "Complete Nage-no-kata" } },
+            { "grade": 3, "age": 24, "years": 2, "pass": 75, "kata": { "he": "Nage-no-kata ו־Katame-no-kata", "ru": "Nage-no-kata и Katame-no-kata", "en": "Nage-no-kata and Katame-no-kata" } },
+            { "grade": 4, "age": 27, "years": 3, "pass": 80, "kata": { "he": "2 קאטות, אף אחת לא נבחנה כבר פעמיים", "ru": "2 ката, ни одну не сдавали уже дважды", "en": "2 kata, neither already examined twice" } },
+            { "grade": 5, "age": 31, "years": 4, "pass": 85, "kata": { "he": "2 קאטות, באותו כלל", "ru": "2 ката, по тому же правилу", "en": "2 kata, same rule" } }
+          ]
+        },
+        "sources": ["S1"], "confidence": "confirmed" },
+      { "id": "high", "belts": ["red-white", "red"],
+        "title": { "he": "דאן 6 עד 10: אדום־לבן ואדום", "ru": "С 6 по 10 дан: красно-белый и красный", "en": "6th to 10th dan: red-white and red" },
+        "items": [
+          { "he": "בעלי דאן 6–8 רשאים לענוד חגורת kohaku אדומה־לבנה, ובעלי דאן 9–10 חגורה אדומה.", "ru": "Обладатели 6–8 дана вправе носить красно-белый пояс kohaku, 9–10 дана — красный.", "en": "Holders of 6th–8th dan may wear the red-white kohaku belt; 9th–10th dan may wear a red belt." },
+          { "he": "דאן 6 ניתן לפי תקנון נפרד של האיגוד. זו הדרגה הגבוהה ביותר שהפדרציה הבינלאומית מרשה לאיגוד לאומי להעניק לפי קריטריונים משלו. מדאן 7 הולכים לפי תקנון הפדרציה הבינלאומית.", "ru": "6 дан присуждают по отдельному положению федерации; это высшая степень, которую Международная федерация разрешает национальным федерациям давать по своим критериям. С 7 дана действуют правила Международной федерации.", "en": "6th dan follows a separate association regulation; it is the highest grade the International Judo Federation lets national federations award on their own criteria. From 7th dan the International Judo Federation's rules apply." }
+        ],
+        "sources": ["S1"], "confidence": "confirmed" }
+    ]
+  },
+  "road": {
+    "title": { "he": "הדרך לדאן הראשון", "ru": "Путь к первому дану", "en": "The road to 1st dan" },
+    "items": [
+      { "when": { "he": "התחלה", "ru": "Старт", "en": "Start" },
+        "title": { "he": "חגורה לבנה, קיו 6", "ru": "Белый пояс, 6 кю", "en": "White belt, kyu 6" },
+        "text": { "he": "הדרגה הראשונה. מכאן ועד הכחולה הקצב והדרישות נקבעים במועדון.", "ru": "Первая степень. Отсюда и до синего пояса темп и требования определяет клуб.", "en": "The first grade. From here to blue, the club sets the pace and the requirements." },
+        "sources": ["S1"], "confidence": "confirmed" },
+      { "when": { "he": "במועדון", "ru": "В клубе", "en": "At the club" },
+        "title": { "he": "צהובה, כתומה, ירוקה וחגורות הביניים", "ru": "Жёлтый, оранжевый, зелёный и промежуточные", "en": "Yellow, orange, green and the in-between belts" },
+        "text": { "he": "המאמן בוחן ומעניק. בדרך מתרגלים רנדורי ומתנסים בתחרויות ראשונות.", "ru": "Экзамен принимает и пояс вручает тренер. По дороге появляются рандори и первые соревнования.", "en": "The coach tests and awards. Along the way come randori and first competitions." },
+        "sources": ["S1", "S8"], "confidence": "confirmed" },
+      { "when": { "he": "13+", "ru": "13+", "en": "13+" },
+        "title": { "he": "חגורה כחולה, קיו 2", "ru": "Синий пояс, 2 кю", "en": "Blue belt, kyu 2" },
+        "text": { "he": "לא לפני גיל 13. בחגורה הזאת צוברים 6 נקודות זכות לקראת החומה.", "ru": "Не раньше 13 лет. На этом поясе набирают 6 зачётных очков к коричневому.", "en": "Not before 13. At this belt you collect the 6 merit points needed for brown." },
+        "sources": ["S1"], "confidence": "confirmed" },
+      { "when": { "he": "15+", "ru": "15+", "en": "15+" },
+        "title": { "he": "חגורה חומה, קיו 1", "ru": "Коричневый пояс, 1 кю", "en": "Brown belt, kyu 1" },
+        "text": { "he": "מבחן מצולם מול בוחן מוסמך, והדרגה ניתנת מהאיגוד ולא מהמועדון.", "ru": "Экзамен на видео у аттестованного экзаменатора; степень присуждает уже федерация, а не клуб.", "en": "A filmed exam before a certified examiner; the grade now comes from the association, not the club." },
+        "sources": ["S1"], "confidence": "confirmed" },
+      { "when": { "he": "שנה ומעלה", "ru": "Год и больше", "en": "1+ year" },
+        "title": { "he": "ותק ונקודות", "ru": "Стаж и очки", "en": "Time and points" },
+        "text": { "he": "לפחות שנה בחומה ו־10 נקודות, או פחות נקודות עם יותר ותק: תחרויות, ניצחונות והשתלמויות.", "ru": "Минимум год на коричневом и 10 очков, а при большем стаже меньше: соревнования, победы, семинары.", "en": "At least a year at brown and 10 points, or fewer points with more time: competitions, wins and seminars." },
+        "sources": ["S1"], "confidence": "confirmed" },
+      { "when": { "he": "17+", "ru": "17+", "en": "17+" },
+        "title": { "he": "מבחן לדאן 1", "ru": "Экзамен на 1 дан", "en": "1st dan exam" },
+        "text": { "he": "טכניקה, 3 פרקים של Nage-no-kata ומבחן מונחים. 75 בכל חלק, והחגורה השחורה שלכם.", "ru": "Техника, три группы Nage-no-kata и термины. 75 баллов в каждой части, и чёрный пояс ваш.", "en": "Technique, three sets of Nage-no-kata and a terms test. 75 in each part, and the black belt is yours." },
+        "sources": ["S1"], "confidence": "confirmed" }
+    ]
+  },
+  "ages": {
+    "title": { "he": "דרגה או קטגוריית גיל?", "ru": "Пояс или возрастная категория?", "en": "Grade or age category?" },
+    "grade": {
+      "title": { "he": "דרגה (קיו, דאן)", "ru": "Степень (кю, дан)", "en": "Grade (kyu, dan)" },
+      "text": { "he": "מה אתם יודעים בג׳ודו. רואים אותה בצבע החגורה ומקבלים אותה במבחן.", "ru": "Что вы умеете в дзюдо. Её видно по цвету пояса, получают её на экзамене.", "en": "What you can do in judo. It shows in your belt colour and you earn it in an exam." }
+    },
+    "category": {
+      "title": { "he": "קטגוריית גיל", "ru": "Возрастная категория", "en": "Age category" },
+      "text": { "he": "נגד מי מתחרים. היא נקבעת רק לפי שנת הלידה ומשתנה מעצמה, בלי קשר לחגורה. \"לעלות לקדטים\" פירושו להגיע לשנתון של קדטים.", "ru": "С кем вы соревнуетесь. Её определяет только год рождения, и меняется она сама, без связи с поясом. «Перейти в кадеты» значит дорасти до кадетского года рождения.", "en": "Who you compete against. It depends only on your year of birth and changes by itself, whatever your belt. \"Moving up to cadets\" means reaching the cadet birth years." }
+    },
+    "rows_title": { "he": "קטגוריות של הפדרציה הבינלאומית (גיל בשנה הקלנדרית)", "ru": "Категории Международной федерации (возраст в календарном году)", "en": "International Judo Federation categories (age in the calendar year)" },
+    "rows": [
+      { "label": { "he": "קדטים, עד 18", "ru": "Кадеты, U18", "en": "Cadets, U18" }, "ages": "15–17" },
+      { "label": { "he": "ג׳וניורים, עד 21", "ru": "Юниоры, U21", "en": "Juniors, U21" }, "ages": "15–20" },
+      { "label": { "he": "בוגרים", "ru": "Взрослые", "en": "Seniors" }, "ages": "15+" }
+    ],
+    "notes": [
+      { "he": "בישראל יש גם קטגוריות ילדים לפי שנתון. לדוגמה, בגביע של האיגוד במרץ 2024: ילדים טרום א׳ (2014), ילדים א׳ (2012–2013), ילדים ב׳ (2010–2011), קדטים (2007–2009) ובוגרים (2006 ומטה).", "ru": "В Израиле есть ещё детские категории по году рождения. Например, на кубке федерации в марте 2024 года: дети «пре-алеф» (2014), «алеф» (2012–2013), «бет» (2010–2011), кадеты (2007–2009) и взрослые (2006 и старше).", "en": "Israel also has children's categories by birth year. At an association cup in March 2024, for example: children pre-A (2014), A (2012–2013), B (2010–2011), cadets (2007–2009) and adults (2006 and earlier)." },
+      { "he": "דוגמה: נער בן 16 עם חגורה כחולה מתחרה כקדט. מגיל 15 הוא יכול גם להיבחן לחגורה חומה.", "ru": "Пример: 16-летний спортсмен с синим поясом выступает как кадет. С 15 лет он может и сдавать на коричневый пояс.", "en": "Example: a 16-year-old blue belt competes as a cadet. From 15 they can also test for brown." },
+      { "he": "במסמכי האיגוד לא מצאנו חגורה מינימלית לתחרויות. בהזמנות כתוב שצריך להיות רשומים באיגוד ועם בדיקה רפואית בתוקף.", "ru": "Минимального пояса для соревнований в документах федерации мы не нашли. В положениях о турнирах требуются регистрация в федерации и действующая медицинская справка.", "en": "We found no minimum belt for competing in the association's documents. Entry rules ask for association registration and a valid medical check." }
+    ],
+    "sources": ["S3", "S4", "S15"], "confidence": "confirmed"
+  },
+  "ijf": {
+    "title": { "he": "מה השתנה ב־2026", "ru": "Что изменилось в 2026 году", "en": "What changed in 2026" },
+    "text": {
+      "he": "מינואר 2026 הפדרציה הבינלאומית מאשרת בעצמה כל דרגת דאן שאיגוד לאומי מעניק. בכללים שלה הגילאים המינימליים נמוכים יותר (15 לדאן 1) ולדאן 1 נדרשת Nage-no-kata במלואה. איגוד הג׳ודו עדיין מפרסם את התקנון של 2022, ועליו מבוסס הדף. אם משהו משתנה, ועדת הדרגות והמאמנים יעדכנו.",
+      "ru": "С января 2026 года Международная федерация дзюдо сама подтверждает каждый дан, присвоенный национальной федерацией. По её правилам минимальный возраст ниже (15 лет на 1 дан), а на 1 дан нужна вся Nage-no-kata. Израильская федерация пока публикует положение 2022 года, по нему и составлена страница. Если что-то изменится, об этом скажут комиссия по степеням и тренера.",
+      "en": "Since January 2026 the International Judo Federation validates every dan a national federation awards. Its own minimum ages are lower (15 for 1st dan) and its 1st dan asks for the complete Nage-no-kata. The Israel Judo Association still publishes its 2022 regulations, which this page follows. If anything changes, the grading committee and the coaches will say so."
+    },
+    "sources": ["S11", "S12", "S13", "S2"], "confidence": "confirmed"
+  },
+  "sources_title": { "he": "מקורות", "ru": "Источники", "en": "Sources" },
+  "disclaimer": {
+    "he": "ההחלטה על כל דרגה מתקבלת לפי התקנון העדכני של איגוד הג׳ודו ובידי המאמנים של המועדון.",
+    "ru": "Решение о каждой степени принимается по действующему положению федерации дзюдо и тренерами клуба.",
+    "en": "Every grading decision follows the Israel Judo Association's current regulations and the club's coaches."
+  },
+  "sources": [
+    { "id": "S1", "title": "איגוד הג׳ודו בישראל — תקנון דרגות", "date": "2022-05", "url": "https://www.ija.org.il/html5/web/11009/38828ImageFile3.pdf" },
+    { "id": "S2", "title": "איגוד הג׳ודו בישראל — דרגות", "date": "2026-10", "url": "https://www.ija.org.il/html5/?_id=10584&did=11009&G=10557&SM=10584" },
+    { "id": "S3", "title": "איגוד הג׳ודו בישראל — נהלי האיגוד, פרק 6", "date": "2019-07", "url": "https://www.ija.org.il/html5/web/11009/37129ImageFile3.pdf" },
+    { "id": "S4", "title": "איגוד הג׳ודו בישראל — הזמנה לגביע איגוד ירושלים", "date": "2024-02-28", "url": "https://www.ija.org.il/html5/web/11009/41354ImageFile3.pdf" },
+    { "id": "S7", "title": "מרכז הג׳ודו יואל ליבסטר — תרגילים לחגורות", "date": "2021-09", "url": "https://meitav-jerusalem-judo.co.il/%D7%AA%D7%A8%D7%92%D7%99%D7%9C%D7%99%D7%9D/" },
+    { "id": "S8", "title": "ויקיפדיה — ג׳ודו, שיטת הדרגות", "date": "2026-05-29", "url": "https://he.wikipedia.org/wiki/%D7%92%27%D7%95%D7%93%D7%95" },
+    { "id": "S9", "title": "ויקיפדיה — ג׳ודוקא", "date": "2026-10", "url": "https://he.wikipedia.org/wiki/%D7%92%27%D7%95%D7%93%D7%95%D7%A7%D7%90" },
+    { "id": "S11", "title": "IJF — Towards a universal reference for judo grades", "date": "2026-01-23", "url": "https://www.ijf.org/news/show/towards-a-universal-reference-for-judo-grades" },
+    { "id": "S12", "title": "IJF — Grades and Dan Regulations", "date": "2026-01", "url": "https://78884ca60822a34fb0e6-082b8fd5551e97bc65e327988b444396.ssl.cf3.rackcdn.com/up/2026/06/IJF_grades_and_dan_regulations-1780395735.pdf" },
+    { "id": "S13", "title": "IJF — Rules for the awarding of IJF official judo dan grades", "date": "2026-01", "url": "https://78884ca60822a34fb0e6-082b8fd5551e97bc65e327988b444396.ssl.cf3.rackcdn.com/up/2026/01/Rules_for_the_awarding_of_IJF_-1768917846.pdf" },
+    { "id": "S15", "title": "IJF — Sport and Organisation Rules", "date": "2026-08-14", "url": "https://78884ca60822a34fb0e6-082b8fd5551e97bc65e327988b444396.ssl.cf3.rackcdn.com/up/2026/08/IJF_Sport_and_Organisation_Rul-1787430903.pdf" }
+  ]
+}
