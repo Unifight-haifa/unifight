@@ -9,7 +9,7 @@ Text, coaches, schedule and venues live in `content/`:
 - `content/venues.json`: training venues and addresses, shared by all schedules
 - `content/videos.json`: the /video/ page. One entry per YouTube upload: `id` (11 chars from the youtu.be link), `kind` `video` | `short`, `date` (YYYY-MM-DD), `playlist` `promo` | `competitions` | `camps` | `training` | `events`, `title` and `description` in he/ru/en, optional `duration` in seconds, and `thumb`, a JPEG in `public/videos/` (1280 px wide at most, under 200 KB). The build checks every field
 
-Images go in `public/` (strip GPS first: `exiftool -all= photo.jpg`).
+Images go in `public/` (strip GPS first: `exiftool -all= photo.jpg`). `npm test` fails on any file over 1.5 MB under `public/` or `src/assets/`, and on any JPEG/PNG there that still has GPS.
 
 After editing:
 
