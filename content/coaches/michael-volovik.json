@@ -8,10 +8,57 @@
   "en": "Michael Volovik"
  },
  "photo": {
-  "src": "coaches/michael.jpg",
-  "source": "owner 2026-10-17"
+  "src": "coaches/michael-2.jpg",
+  "w": 800,
+  "h": 1067,
+  "source": "owner 2026-10-19 (replaces first portrait)",
+  "alt": {
+   "he": "מייקל וולוביק בחליפת ג׳ודו כחולה וחגורה שחורה",
+   "ru": "Майкл Воловик в синем кимоно с чёрным поясом",
+   "en": "Michael Volovik in a blue judogi with a black belt"
+  }
  },
+ "bio": {
+  "he": "בג׳ודו מגיל 5, מדליסט בתחרויות ארציות ובינלאומיות, ייצג את ישראל באליפויות אירופה והעולם בסמבו. מאמן ג׳ודו מאז 2020 ושופט מוסמך.",
+  "ru": "В дзюдо с 5 лет, призёр национальных и международных турниров, представлял Израиль на чемпионатах Европы и мира по самбо. Тренирует с 2020 года, недавно получил квалификацию судьи.",
+  "en": "In judo since age 5, medallist at national and international events, represented Israel at the European and World Sambo Championships. Coaching judo since 2020 and a newly certified referee."
+ },
+ "about": [
+  {
+   "he": "מייקל וולוביק החל את דרכו בעולם הג׳ודו בגיל 5, ומאז הפך הספורט לחלק בלתי נפרד מחייו. לאורך השנים השקיע, התמיד והגיע להישגים מרשימים, בהם זכייה במדליות בתחרויות ארציות ובינלאומיות וייצוג מדינת ישראל באליפויות אירופה והעולם בענף הסמבו.",
+   "ru": "Майкл Воловик начал заниматься дзюдо в 5 лет, и с тех пор спорт стал неотъемлемой частью его жизни. Благодаря труду и упорству он добился ярких результатов: медали национальных и международных турниров, выступления за Израиль на чемпионатах Европы и мира по самбо.",
+   "en": "Michael Volovik started judo at 5, and the sport has been part of his life ever since. Through hard work and persistence he achieved impressive results, including medals at national and international competitions and representing Israel at the European and World Sambo Championships."
+  },
+  {
+   "he": "משנת 2020 משמש מייקל כמאמן ג׳ודו, ומקדיש את עשייתו לפיתוח ולקידום הדור הצעיר. לצד ניסיונו כספורטאי וכמאמן, צבר ניסיון בניהול תחרויות ולאחרונה הוסמך גם כשופט.",
+   "ru": "С 2020 года Майкл работает тренером по дзюдо и посвящает себя развитию молодого поколения. Помимо опыта спортсмена и тренера, у него есть опыт организации соревнований, а недавно он получил и квалификацию судьи.",
+   "en": "Since 2020 Michael has worked as a judo coach, devoting himself to developing the next generation. Alongside his experience as an athlete and coach, he has experience running competitions and was recently certified as a referee."
+  },
+  {
+   "he": "מייקל מביא עמו לאימונים אנרגיה חיובית, מקצועיות, מסירות ואהבה גדולה לספורט, תוך יצירת קשר אישי ומשמעותי עם הילדים.",
+   "ru": "Майкл приносит на тренировки позитивную энергию, профессионализм, преданность делу и большую любовь к спорту, выстраивая с детьми личный и значимый контакт.",
+   "en": "Michael brings positive energy, professionalism, dedication and a great love of sport to every session, and builds a personal, meaningful connection with the children."
+  }
+ ],
+ "approach": [
+  {
+   "he": "מייקל מאמין כי הדרך להצלחה מתחילה בהנאה מהספורט, באמונה עצמית ובנכונות לעבוד קשה.",
+   "ru": "Майкл верит, что путь к успеху начинается с удовольствия от спорта, веры в себя и готовности много работать.",
+   "en": "Michael believes the road to success starts with enjoying the sport, believing in yourself and being willing to work hard."
+  },
+  {
+   "he": "גישתו משלבת אימונים מקצועיים ומאתגרים לצד אווירה חיובית, עידוד, גיבוש ושמחת חיים. הוא שואף להעניק לכל ילד וילדה תחושת מסוגלות, ביטחון עצמי ומוטיבציה להתקדם.",
+   "ru": "Его подход сочетает профессиональные и непростые тренировки с позитивной атмосферой, поддержкой, сплочённостью и радостью. Он стремится дать каждому ребёнку ощущение «я могу», уверенность в себе и мотивацию двигаться вперёд.",
+   "en": "His approach combines professional, challenging training with a positive atmosphere, encouragement, team spirit and joy. He aims to give every child a sense of capability, self-confidence and the motivation to keep improving."
+  },
+  {
+   "he": "עבורו, מאמן טוב הוא לא רק מי שמלמד טכניקות ומוביל לניצחונות, אלא מי שגורם לילדים לאהוב את הדרך, להאמין בעצמם ולהגיע לכל אימון עם חיוך ורצון להשתפר.",
+   "ru": "Для него хороший тренер — это не только тот, кто учит технике и ведёт к победам, но и тот, благодаря кому дети любят свой путь, верят в себя и приходят на каждую тренировку с улыбкой и желанием стать лучше.",
+   "en": "For him, a good coach isn't just someone who teaches technique and leads to wins, but someone who makes children love the journey, believe in themselves and come to every session with a smile and the will to get better."
+  }
+ ],
  "sources": [
-  "Lazar Kaplun, Facebook post, text supplied by owner 2026-10-17; he/en spellings are transliterations, unverified; he names = owner's official list 2026-10-17 (Kozlov, Drozhina not on it, removed); owner 2026-10-17: Irina = אירנה ליוהקי, Igor (not Egor) Bitulyaev, Ori Keshet-Halevi confirmed"
+  "Lazar Kaplun, Facebook post, text supplied by owner 2026-10-17; he/en spellings are transliterations, unverified; he names = owner's official list 2026-10-17 (Kozlov, Drozhina not on it, removed); owner 2026-10-17: Irina = אירנה ליוהקי, Igor (not Egor) Bitulyaev, Ori Keshet-Halevi confirmed",
+  "owner 2026-10-19, official Hebrew bio; ru/en translated"
  ]
 }

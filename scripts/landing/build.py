@@ -295,21 +295,27 @@ def rail_card(n, grp, grp_label):
             f'<span class="mono" aria-hidden="true">{t(initials(n["name"]))}</span>')
     bio = f'<p class="rc-bio">{t(n["bio"])}</p>' if n.get("bio") else ""
     return (f'<li class="rc" data-grp="{grp}"><div class="rc-ph{" has-img" if ph else ""}">{face}</div>'
-            f'<span class="rc-tag">{t(grp_label)}</span><h4 class="rc-n">{t(n["name"])}</h4>{bio}{coach_more(n)}{coach_video(n)}</li>')
+            f'<span class="rc-tag">{t(grp_label)}</span><h4 class="rc-n">{t(n["name"])}</h4>{bio}{coach_more(n, grp_label)}{coach_video(n)}</li>')
 
 
-def coach_more(c):
+def coach_more(c, tag):
     if not c.get("about"):
         return ""
     pid = f'bio-{c["id"]}'
     paras = "".join(f"<p>{t(p)}</p>" for p in c["about"])
     appr = "".join(f"<p>{t(p)}</p>" for p in c.get("approach", []))
     if appr:
-        tag = "blockquote" if c.get("approach_own") else "div"
-        appr = f'<h5 class="bio-h">{t(RAIL_UI["approach"])}</h5><{tag} class="bio-appr">{appr}</{tag}>'
+        q = "blockquote" if c.get("approach_own") else "div"
+        appr = f'<h5 class="bio-h">{t(RAIL_UI["approach"])}</h5><{q} class="bio-appr">{appr}</{q}>'
+    ph = c.get("photo")
+    face = f'<figure class="dos-ph">{img(ph["src"], "portrait", alt=ph.get("alt", c["name"]))}</figure>' if ph else ""
+    dan = c.get("dan_rank")
+    dan = f'<span class="dos-dan">{t(dan)}</span>' if dan and not dan.get("placeholder") else ""
     return (f'<button type="button" class="bio-more" popovertarget="{pid}">{t(RAIL_UI["more"])}</button>'
             f'<div class="bio-pop" id="{pid}" popover><button type="button" class="bio-x" popovertarget="{pid}" popovertargetaction="hide" {attr("aria-label", RAIL_UI["close"])}>×</button>'
-            f'<h4 class="bio-n">{t(c["name"])}</h4>{paras}{appr}</div>')
+            f'<div class="dos">{face}<div class="dos-b"><span class="kj dos-kj" aria-hidden="true">師</span>'
+            f'<span class="rc-tag">{t(tag)}</span><h4 class="bio-n">{t(c["name"])}</h4>{dan}'
+            f'<p class="dos-lead">{t(c["bio"])}</p>{paras}{appr}</div></div></div>')
 
 
 def coach_video(c):
@@ -332,7 +338,7 @@ def coaches():
    <article class="coach rv"><span class="coach-bg kj" aria-hidden="true">{k}</span>
     {photo(c, k)}
     <div class="coach-b"><h3 class="h3 coach-n">{t(c["name"])}</h3><p class="role">{t(c["role"])}</p>{coach_video(c)}
-    <p class="bio">{t(c["bio"])}</p>{coach_more(c)}<p class="dan">{t(c["dan_rank"])}</p></div></article>'''
+    <p class="bio">{t(c["bio"])}</p>{coach_more(c, c["role"])}<p class="dan">{t(c["dan_rank"])}</p></div></article>'''
                     for c, k in zip(grp("main"), ks))
     groups = [("lead", RAIL_UI["lead"], grp("lead"))] + [(r["group"], r["title"], grp(r["group"])) for r in co["roster"]]
     rail = "".join(rail_card(n, k, lab) for k, lab, ns in groups for n in ns)
