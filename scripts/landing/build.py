@@ -191,7 +191,6 @@ def header():
  <div class="hd-in">
   <a class="brand" href="#top"><span class="plate"><img src="{PFX}{LOGO}" width="256" height="256" alt=""></span>
    <span class="brand-t">{t(club["name"])}</span></a>
-  <nav class="hd-nav" {attr("aria-label", A11Y["sections"])}>{links}</nav>
   <div class="hd-r">
    <div class="lang" role="group" {attr("aria-label", A11Y["language"])}>{langs}</div>
    <a class="btn btn-wa btn-join" href="{cta["href"]}">{join}</a>

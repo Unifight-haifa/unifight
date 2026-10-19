@@ -58,7 +58,6 @@ a:hover .arrow{translate:4px}
 .plate{overflow:hidden}
 .plate img{inline-size:100%;block-size:100%;object-fit:contain;border-radius:50%}
 .brand-t{position:absolute;clip-path:inset(50%);inline-size:1px;block-size:1px;overflow:hidden;font:600 17px/1 var(--disp);letter-spacing:.06em;text-transform:uppercase;white-space:nowrap}
-.hd-nav{display:none}
 .hd-r{display:flex;align-items:center;gap:6px}
 .lang{display:flex;border:1px solid rgba(243,234,216,.28);border-radius:2px}
 .lang :is(button,a){display:inline-grid;place-items:center;text-decoration:none;min-inline-size:30px;min-block-size:44px;padding:0 6px;background:transparent;color:var(--paper-2);border:0;font:600 12.5px/1 var(--body);letter-spacing:.06em;cursor:pointer}
@@ -83,12 +82,6 @@ bdi[dir=ltr]{white-space:nowrap}
 @media (min-width:420px){html:not([lang=ru]) .brand-t{position:static;clip-path:none;inline-size:auto;block-size:auto;overflow:visible}}
 @media (min-width:580px){html[lang=ru] .brand-t{position:static;clip-path:none;inline-size:auto;block-size:auto;overflow:visible}}
 @media (min-width:760px){.t-long{display:inline}.btn-join{font-size:14.5px;padding:.55em 1.1em}.lang :is(button,a){min-inline-size:40px}}
-@media (min-width:1320px){
-  .hd-nav{display:flex;gap:2px 16px;flex-wrap:wrap;justify-content:center;font:500 13px/1 var(--body);letter-spacing:.06em;text-transform:uppercase}
-  .hd-nav a{text-decoration:none;color:var(--paper-2);padding:6px 0}
-  .hd-nav a:hover{color:var(--gold-2)}
-  .menu{display:none}
-}
 
 /* hero */
 .hero{position:relative;min-block-size:100svh;display:grid;align-items:end;overflow:hidden;isolation:isolate}
