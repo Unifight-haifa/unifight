@@ -560,7 +560,7 @@ def schedule():
         ses = [(cid, i, x) for cid, sd in SCHEDS.items() for i, x in enumerate(sd["sessions"]) if x["day"] == d]
         for cid, i, s in sorted(ses, key=lambda r: (r[2]["start"], order.index(r[0]))):
             groups.setdefault(s["venue"], []).append(row(cid, i, s))
-        vgs = "".join(f'<section class="vg"><h5 class="vg-h">{t({l: VENUES[k][l] for l in LANGS})}<span class="vg-city">{t(city(VENUES[k]))}</span></h5>'
+        vgs = "".join(f'<section class="vg"><h5 class="vg-h">{t({l: VENUES[k][l] for l in LANGS})}<span class="vg-city">{t(city(VENUES[k]))}</span><a class="vg-go" href="#v-{k}">{t(BR_UI["route"])}</a></h5>'
                       f'<ul class="ses-list">{"".join(rows)}</ul></section>' for k, rows in groups.items())
         name = {l: SC["days"][l][d] for l in LANGS}
         days += (f'<section class="day" data-day="{d}"><h4 class="day-h">{t(name)}<span class="day-today">{t(U["today"])}</span></h4>'
@@ -634,7 +634,8 @@ def first_class():
 
 
 BR_UI = {"days": {"he": "ימי אימון", "ru": "Дни тренировок", "en": "Training days"},
-         "bus": {"he": "איך מגיעים באוטובוס", "ru": "Как доехать на автобусе", "en": "Bus directions"}}
+         "bus": {"he": "איך מגיעים באוטובוס", "ru": "Как доехать на автобусе", "en": "Bus directions"},
+         "route": {"he": "איך מגיעים ←", "ru": "Как добраться →", "en": "Directions →"}}
 
 
 def branches():
@@ -647,7 +648,7 @@ def branches():
             q = urllib.parse.quote(vn["address"]["he"])
             ds = sorted({s["day"] for sc in SCHEDS.values() for s in sc["sessions"] if s["venue"] == k})
             days = "".join(f'<span data-l="{l}">{" · ".join(DAY_SHORT[l][d] for d in ds)}</span>' for l in LANGS)
-            v += (f'<article class="venue rv" style="--vc:{VENUE_COLOR[k]}"><span class="v-i" aria-hidden="true">{i:02}</span>'
+            v += (f'<article class="venue rv" id="v-{k}" style="--vc:{VENUE_COLOR[k]}"><span class="v-i" aria-hidden="true">{i:02}</span>'
                   f'<h4 class="h3">{t({l: vn[l] for l in LANGS})}</h4><p class="v-addr">{t(vn["address"])}</p><p class="v-note">{t(BR_UI["days"])}: {days}</p>'
                   f'<div class="v-links"><a href="https://www.google.com/maps/search/?api=1&amp;query={q}" target="_blank" rel="noopener" {ga("map_open", venue=k, provider="google_maps")}>Google Maps</a>'
                   f'<a href="https://waze.com/ul?q={q}&amp;navigate=yes" target="_blank" rel="noopener" {ga("map_open", venue=k, provider="waze")}>Waze</a>'
