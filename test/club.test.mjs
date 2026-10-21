@@ -152,7 +152,7 @@ test('first-training block: after the schedule, prefilled WhatsApp, open owner q
     assert.ok(html.indexOf('id="schedule"') < html.indexOf('id="first-class"'), l);
     const block = html.slice(html.indexOf('id="first-class"'), html.indexOf('id="branches"'));
     assert.equal(block.match(/class="fs"/g).length, fc.steps.length, l);
-    const href = block.match(/href="(https:\/\/wa\.me\/972545664663\?text=[^"]+)"[^>]*data-ga="whatsapp_click" data-ga-placement="first_class"/)?.[1];
+    const href = block.match(/href="(https:\/\/wa\.me\/972547632054\?text=[^"]+)"[^>]*data-ga="whatsapp_click" data-ga-placement="first_class"/)?.[1];
     assert.equal(new URL(href).searchParams.get('text'), fc.cta.message[l], l);
     for (const q of [fc.price, fc.judogi, ...fc.open_questions]) assert.ok(!html.includes(q[l]), `${l}: ${q.en}`);
   }
@@ -164,7 +164,7 @@ test('contact page: WhatsApp, email, socials, venues with map, link to the first
   const geo = json('../content/venues-geo.json');
   for (const [l] of LANGS) {
     const html = read(`${l}/contact/index.html`);
-    assert.match(html, /href="https:\/\/wa\.me\/972545664663\?text=[^"]+"[^>]*data-ga="whatsapp_click" data-ga-placement="contact_page"/);
+    assert.match(html, /href="https:\/\/wa\.me\/972547632054\?text=[^"]+"[^>]*data-ga="whatsapp_click" data-ga-placement="contact_page"/);
     assert.ok(html.includes(`mailto:${site.contact.email.value}`), l);
     assert.ok(html.includes('https://www.facebook.com/unifightjudoclub/'), l);
     for (const s of site.contact.social.filter((x) => x.placeholder)) assert.ok(!html.includes(s[l]), `${l}: ${s.en}`);
@@ -175,7 +175,7 @@ test('contact page: WhatsApp, email, socials, venues with map, link to the first
     assert.match(html, new RegExp(`href="[^"]*/${l}/#first-class"`), l);
     const [ld] = [...html.matchAll(/<script type="application\/ld\+json">(.*?)<\/script>/gs)].map((m) => JSON.parse(m[1]));
     assert.equal(ld['@type'], 'ContactPage');
-    assert.equal(ld.mainEntity.contactPoint.telephone, '+972-54-566-4663');
+    assert.equal(ld.mainEntity.contactPoint.telephone, '+972-54-763-2054');
   }
 });
 

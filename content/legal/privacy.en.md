@@ -9,7 +9,7 @@ This policy explains what information the Unifight Haifa website handles and why
 
 ## Who is responsible
 
-The site is run by Unifight Haifa, a registered non-profit association (amuta no. 580472751), which is responsible for the information described here. You can reach us on WhatsApp: <a href="https://wa.me/972545664663" dir="ltr">054-566-4663</a>, or by email: <bdi dir="ltr">[unifight.haifa@outlook.com](mailto:unifight.haifa@outlook.com)</bdi>.
+The site is run by Unifight Haifa, a registered non-profit association (amuta no. 580472751), which is responsible for the information described here. You can reach us on WhatsApp: <a href="https://wa.me/972547632054" dir="ltr">054-763-2054</a>, or by email: <bdi dir="ltr">[unifight.haifa@outlook.com](mailto:unifight.haifa@outlook.com)</bdi>.
 
 ## What we collect
 

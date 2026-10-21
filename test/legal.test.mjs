@@ -12,7 +12,7 @@ for (const p of ['privacy', 'accessibility']) {
       const html = readFileSync(page(l, p), 'utf8');
       assert.ok(html.includes(`<html lang="${l}" dir="${d}"`));
       assert.ok(html.includes(updated[l]));
-      assert.ok(html.includes('href="https://wa.me/972545664663" dir="ltr"'));
+      assert.ok(html.includes('href="https://wa.me/972547632054" dir="ltr"'));
       assert.ok(!/TODO|placeholder/i.test(html));
     });
   }

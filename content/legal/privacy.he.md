@@ -9,7 +9,7 @@ description: איזה מידע האתר של יוניפייט חיפה מטפל 
 
 ## מי אחראי על האתר
 
-את האתר מפעילה יוניפייט חיפה, עמותה רשומה (ע״ר <bdi dir="ltr">580472751</bdi>), והיא האחראית על המידע המתואר כאן. אפשר לפנות אלינו בוואטסאפ: <a href="https://wa.me/972545664663" dir="ltr">054-566-4663</a>, או במייל: <bdi dir="ltr">[unifight.haifa@outlook.com](mailto:unifight.haifa@outlook.com)</bdi>.
+את האתר מפעילה יוניפייט חיפה, עמותה רשומה (ע״ר <bdi dir="ltr">580472751</bdi>), והיא האחראית על המידע המתואר כאן. אפשר לפנות אלינו בוואטסאפ: <a href="https://wa.me/972547632054" dir="ltr">054-763-2054</a>, או במייל: <bdi dir="ltr">[unifight.haifa@outlook.com](mailto:unifight.haifa@outlook.com)</bdi>.
 
 ## איזה מידע אנחנו אוספים
 

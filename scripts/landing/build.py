@@ -24,8 +24,8 @@ SC = load("schedule/natanel-zhurovel.json")  # days, grade letters, slogan and v
 SCHEDS = {c["id"]: load(f"schedule/{c['id']}.json") for c in COACHES if (R / f"content/schedule/{c['id']}.json").exists()}
 VIDEOS = {v["id"]: v for v in load("videos.json")}
 LANGS = ("he", "ru", "en")
-WA = "https://wa.me/972545664663"
-WA_NUM = "054-566-4663"
+WA = "https://wa.me/972547632054"
+WA_NUM = "054-763-2054"
 USED = []  # local asset paths, in order of first use
 PHOTO_ALT = C["photos"]["alt"]
 SITE, PFX = True, "%BASE%"
@@ -128,7 +128,7 @@ def wa(label, placement, extra="", msg=None):
     """msg: {he, ru, en} text prefilled in the chat, in the page language."""
     href = attr("href", {l: f"{WA}?text={urllib.parse.quote(msg[l])}" for l in LANGS}) if msg else f'href="{WA}"'
     return (f'<div class="wa-row {extra}"><a class="btn btn-wa" {href} target="_blank" rel="noopener" {ga("whatsapp_click", placement=placement)}>{WA_SVG}{t(label)}</a>'
-            f'<a class="wa-num" href="tel:+972545664663" {ga("phone_click", placement=placement)}>{ltr(WA_NUM)}</a></div>')
+            f'<a class="wa-num" href="tel:+972547632054" {ga("phone_click", placement=placement)}>{ltr(WA_NUM)}</a></div>')
 
 
 def head(nav_id, kanji, title, intro=None):

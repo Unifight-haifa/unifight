@@ -1885,7 +1885,7 @@
     "ru": "[Какой номер получает заявки с сайта — выбор владельца]",
     "en": "[Which number receives site enquiries — owner to choose]"
    },
-   "mockup_default": "054-566-4663",
+   "mockup_default": "054-763-2054",
    "mockup_default_note": "Ilana's public number (confirmed). Use for mockups only; real WhatsApp link pending owner choice."
   },
   "phones": [
@@ -1898,28 +1898,6 @@
     "phone": "054-763-2054",
     "tel": "+972547632054",
     "source": "https://www.israeldojo.co.il/מורה-אומנויות-לחימה/unifight/",
-    "confidence": "confirmed"
-   },
-   {
-    "name": {
-     "he": "נתנאל",
-     "ru": "Натанель",
-     "en": "Natanel"
-    },
-    "phone": "054-566-4663",
-    "tel": "+972545664663",
-    "source": "https://smoothcomp.com/en/club/58191/contact",
-    "confidence": "confirmed"
-   },
-   {
-    "name": {
-     "he": "אלכסנדר",
-     "ru": "Александр",
-     "en": "Alexander"
-    },
-    "phone": "052-237-7054",
-    "tel": "+972522377054",
-    "source": "https://www.facebook.com/unifighthaifa/posts/pfbid07PRTVLJ5g3rAM49fh1D8hayRqMJkAtYRwap9jiRr3XMiPdPeNqj7o3stpCEfiskel ; old club flyer from owner 2026-10-17 (content/old-flyer-alexander-source.png)",
     "confidence": "confirmed"
    }
   ],

@@ -31,7 +31,7 @@ const desc = n.desc[lang];
 const venue = (id: string) => venues[id as keyof typeof venues];
 const slots = nivheretSlots.map((x) => ({ ...x, day: schedule.days[lang][x.day], venue: venue(x.venue) }));
 const brief = `${slots.map((x) => x.day).join(' / ')} ${slots[0].start}, ${slots[0].venue[lang]}`;
-const wa = `https://wa.me/972545664663?text=${encodeURIComponent(n.join.message[lang].replace('{slots}', brief))}`;
+const wa = `https://wa.me/972547632054?text=${encodeURIComponent(n.join.message[lang].replace('{slots}', brief))}`;
 // adults only: cards that name a person, recent first
 const results = achievements.filter((c) => !('minor' in c) && 'person' in c && c.person && Math.max(...c.years) >= 2022).slice(0, 4);
 ---

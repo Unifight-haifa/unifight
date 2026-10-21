@@ -75,7 +75,7 @@ for (const l of LANGS) {
     const [club] = jsonLd(read(`${l}/index.html`));
     assert.deepEqual(club['@type'], ['SportsClub', 'SportsOrganization']);
     assert.equal(club.sport, 'Judo');
-    assert.equal(club.telephone, '+972-54-566-4663');
+    assert.equal(club.telephone, '+972-54-763-2054');
     assert.equal(club.email, 'unifight.haifa@outlook.com');
     assert.deepEqual(club.sameAs, ['https://www.facebook.com/unifightjudoclub/']);
     assert.equal(new URL(club.url).pathname, `${base}${l}/`);
