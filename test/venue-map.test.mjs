@@ -4,6 +4,7 @@ import { readFileSync } from 'node:fs';
 import vm from 'node:vm';
 
 const base = (process.env.BASE_PATH || '/unifight').replace(/\/?$/, '/');
+const geo = JSON.parse(readFileSync(new URL('../content/venues-geo.json', import.meta.url), 'utf8'));
 const page = (l) => readFileSync(new URL(`../dist/${l}/map/index.html`, import.meta.url), 'utf8');
 
 test('map page is noindex and loads nothing third-party at rest', () => {
@@ -42,8 +43,8 @@ test('Leaflet and tiles are requested only after the click', () => {
 test('popups carry Google Maps, Waze and transit links for every venue', () => {
   const html = page('en');
   const popups = html.match(/<template data-popup=/g) || [];
-  assert.equal(popups.length, 4);
+  assert.equal(popups.length, Object.keys(geo).length);
   for (const host of ['www.google.com/maps/search/', 'waze.com/ul', 'travelmode=transit']) {
-    assert.equal(html.split(host).length - 1, 4, host);
+    assert.equal(html.split(host).length - 1, Object.keys(geo).length, host);
   }
 });

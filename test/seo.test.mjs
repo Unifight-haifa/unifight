@@ -79,10 +79,14 @@ for (const l of LANGS) {
     assert.equal(club.email, 'unifight.haifa@outlook.com');
     assert.deepEqual(club.sameAs, ['https://www.facebook.com/unifightjudoclub/']);
     assert.equal(new URL(club.url).pathname, `${base}${l}/`);
-    assert.equal(club.location.length, 4);
+    const venues = JSON.parse(readFileSync(new URL('../content/venues.json', import.meta.url), 'utf8'));
+    const geo = JSON.parse(readFileSync(new URL('../content/venues-geo.json', import.meta.url), 'utf8'));
+    assert.equal(club.location.length, Object.keys(venues).length);
+    // venues without a reliable geocode carry no geo; Atlit is ~12 km south of Haifa
+    assert.equal(club.location.filter((p) => p.geo).length, Object.keys(geo).length);
     for (const p of club.location) {
       assert.ok(p.name && p.address.streetAddress && p.address.addressLocality, JSON.stringify(p));
-      assert.ok(Math.abs(p.geo.latitude - 32.8) < 0.1 && Math.abs(p.geo.longitude - 35) < 0.1);
+      if (p.geo) assert.ok(Math.abs(p.geo.latitude - 32.8) < 0.15 && Math.abs(p.geo.longitude - 35) < 0.1);
     }
   });
 }

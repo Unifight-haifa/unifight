@@ -28,7 +28,9 @@
   document.documentElement.classList.add('js');
   const days = [...sec.querySelectorAll('.day')], tabs = [...sec.querySelectorAll('.tab')];
   const store = (k, v) => { try { v === undefined ? (v = localStorage.getItem(k)) : localStorage.setItem(k, v); } catch (e) {} return v; };
-  let grade = +(store('uf-grade') ?? -1), venue = store('uf-venue') || '';
+  let grade = +(store('uf-grade') ?? -1), venue = store('uf-venue') || '', coach = store('uf-coach') || '';
+  const sel = sec.querySelector('[data-venue-sel]');
+  if (![...sel.options].some(o => o.value === venue)) venue = '';
   // Saturday has no classes, so the week view opens on Sunday
   const wd = new Date().getDay(), today = wd === 6 ? 0 : wd;
   let shown = today;
@@ -38,8 +40,8 @@
     days.forEach((d, i) => {
       let n = 0;
       d.querySelectorAll('.ses:not([hidden])').forEach(s => {
-        const [a, b] = s.dataset.g.split('-').map(Number);
-        const ok = (grade < 0 || (a <= grade && grade <= b)) && (!venue || s.dataset.v === venue);
+        const [a, b] = s.dataset.g ? s.dataset.g.split('-').map(Number) : [NaN, NaN];
+        const ok = (grade < 0 || (a <= grade && grade <= b)) && (!venue || s.dataset.v === venue) && (!coach || s.dataset.c === coach);
         s.classList.toggle('off', !ok); n += ok;
       });
       d.classList.toggle('empty', !n); d.classList.toggle('shown', i === shown); total += n;
@@ -47,7 +49,8 @@
     });
     tabs.forEach((t, i) => t.setAttribute('aria-pressed', i === shown));
     press('[data-grade]', b => +b.dataset.grade === grade);
-    press('[data-venue]', b => b.dataset.venue === venue);
+    press('[data-coach]', b => b.dataset.coach === coach);
+    sel.value = venue;
     sec.querySelector('.sc-none').classList.toggle('on', !total);
     sec.querySelector('.sc-count b').textContent = total;
   };
@@ -56,18 +59,19 @@
     const b = e.target.closest('button, .ses-wa');
     if (!b) return;
     if (b.dataset.grade !== undefined) store('uf-grade', grade = +b.dataset.grade);
-    else if (b.dataset.venue !== undefined) store('uf-venue', venue = b.dataset.venue);
+    else if (b.dataset.coach !== undefined) store('uf-coach', coach = b.dataset.coach);
     else if (b.dataset.tab !== undefined) shown = +b.dataset.tab;
     else if (b.classList.contains('ses-wa')) {
       // prefill the class details in the visitor's language
       const s = b.closest('.ses'), L = document.documentElement.lang;
-      const txt = [...s.querySelectorAll(`.ses-time, :is(.ses-grade, .ses-venue, .ses-kind) [data-l=${L}]`)].map(x => x.textContent.trim());
+      const txt = [...s.querySelectorAll(`.ses-time, :is(.ses-grade, .ses-venue, .ses-coach, .ses-kind) [data-l=${L}]`)].map(x => x.textContent.trim());
       const day = b.closest('.day').querySelector(`.day-h [data-l=${L}]`).textContent;
       b.href = b.href.split('?')[0] + '?text=' + encodeURIComponent(sec.querySelector(`.wa-msg[data-l=${L}]`).textContent + day + ', ' + txt.join(', '));
       return;
     }
     apply();
   });
+  sel.addEventListener('change', () => { store('uf-venue', venue = sel.value); apply(); });
   apply();
 })();
 

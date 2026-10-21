@@ -31,7 +31,7 @@ for (const l of LANGS) {
 body = body.replace('<!--COOKIES-->', GA_ID ? ` · <button type="button" class="consent-open" data-consent-open>${t(lang, 'cookieSettings')}</button>` : '');
 body = body.replace(/([a-z-]+)-he="([^"]*)" \1-ru="([^"]*)" \1-en="([^"]*)"/g, (_, a, he, ru, en) => `${a}="${{ he, ru, en }[lang]}"`);
 // dated schedule changes go into the markers build.py leaves in the schedule
-const colors = Object.fromEntries([...body.matchAll(/data-venue="([a-z-]+)"[^>]*--vc:(#\w+)/g)].map((m) => [m[1], m[2]]));
+const colors = Object.fromEntries([...body.matchAll(/data-v="([a-z-]+)"[^>]*--vc:(#\w+)/g)].map((m) => [m[1], m[2]]));
 body = fillSchedule(body, renderSchedule(CHANGES, lang, TODAY, schedules, venues, colors));
 // share scrapers need absolute URLs
 const abs = (path: string) => new URL(path, Astro.site).href;
@@ -60,7 +60,8 @@ const club = {
       '@type': 'Place',
       name: v[lang],
       address: { '@type': 'PostalAddress', streetAddress, addressLocality, addressCountry: 'IL' },
-      geo: { '@type': 'GeoCoordinates', latitude: g.lat, longitude: g.lng },
+      // venues without a reliable geocode stay off the map (content/venues-geo.json)
+      ...(g ? { geo: { '@type': 'GeoCoordinates', latitude: g.lat, longitude: g.lng } } : {}),
     };
   }),
 };

@@ -161,6 +161,7 @@ test('first-training block: after the schedule, prefilled WhatsApp, open owner q
 test('contact page: WhatsApp, email, socials, venues with map, link to the first training', () => {
   const site = json('../content/site.json');
   const venues = json('../content/venues.json');
+  const geo = json('../content/venues-geo.json');
   for (const [l] of LANGS) {
     const html = read(`${l}/contact/index.html`);
     assert.match(html, /href="https:\/\/wa\.me\/972545664663\?text=[^"]+"[^>]*data-ga="whatsapp_click" data-ga-placement="contact_page"/);
@@ -168,8 +169,8 @@ test('contact page: WhatsApp, email, socials, venues with map, link to the first
     assert.ok(html.includes('https://www.facebook.com/unifightjudoclub/'), l);
     for (const s of site.contact.social.filter((x) => x.placeholder)) assert.ok(!html.includes(s[l]), `${l}: ${s.en}`);
     for (const v of Object.values(venues)) assert.ok(html.includes(v[l]), `${l}: ${v.en}`);
-    // one transit link per venue in the list, one more in each map popup
-    assert.equal(html.match(/data-ga-provider="transit"/g).length, Object.keys(venues).length * 2, l);
+    // one transit link per venue in the list, one more in each map popup (geocoded venues only)
+    assert.equal(html.match(/data-ga-provider="transit"/g).length, Object.keys(venues).length + Object.keys(geo).length, l);
     assert.ok(html.includes('data-venue-map'), l);
     assert.match(html, new RegExp(`href="[^"]*/${l}/#first-class"`), l);
     const [ld] = [...html.matchAll(/<script type="application\/ld\+json">(.*?)<\/script>/gs)].map((m) => JSON.parse(m[1]));

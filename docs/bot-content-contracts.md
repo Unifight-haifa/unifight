@@ -29,7 +29,7 @@ One file per change, `content/schedule-changes/<id>.json`:
 | `schedule` | yes | a file name in `content/schedule/` without `.json` |
 | `type` | yes | `cancel`, `move`, `extra` or `note` |
 | `from`, `to` | yes | `YYYY-MM-DD`, inclusive, Israel dates; `to` ≥ `from` |
-| `session` | `cancel`, `move`; optional for `extra` | the regular class: `day` (0 = Sunday … 5 = Friday) and `start` (`HH:MM`) as in the schedule file. `group` is optional and only needed if two classes share a day and start time; it matches the class `kind` (`regular`, `nivheret`, …). For `extra` it only lends its grades to the new card |
+| `session` | `cancel`, `move`; optional for `extra` | the regular class: `day` (0 = Sunday … 5 = Friday) and `start` (`HH:MM`) as in the schedule file. `group` is optional and only needed if two classes share a day and start time; it matches the class `kind` (`regular`, `nivheret`, …) or its `audience` (`girls`, `boys`). For `extra` it only lends its grades to the new card |
 | `new` | `move`, `extra` | `date` (not a Saturday), `start`, `end`, `venue` (a key of `content/venues.json`). For `move`, missing `start`/`end`/`venue` default to the original class |
 | `note` | yes | he/ru/en text shown next to the change |
 | `author` | yes | publisher id |

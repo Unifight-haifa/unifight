@@ -19,7 +19,9 @@ def load(name):
 
 C, CO, VENUES = load("site.json"), load("coaches/_section.json"), load("venues.json")
 COACHES = sorted((load(f"coaches/{p.name}") for p in (R / "content/coaches").glob("[!_]*.json")), key=lambda c: c["order"])
-SC = load("schedule/natanel-zhurovel.json")
+SC = load("schedule/natanel-zhurovel.json")  # days, grade letters, slogan and values are shared
+# schedule id = coach id; coaches' order on the site
+SCHEDS = {c["id"]: load(f"schedule/{c['id']}.json") for c in COACHES if (R / f"content/schedule/{c['id']}.json").exists()}
 VIDEOS = {v["id"]: v for v in load("videos.json")}
 LANGS = ("he", "ru", "en")
 WA = "https://wa.me/972545664663"
@@ -461,8 +463,9 @@ def camps():
 
 
 SCHED_UI = {
-    "heading": {"he": "הקבוצות של נתנאל ז׳ורובל", "ru": "Группы Натанеля Журовеля", "en": "Natanel Zhurovel's groups"},
-    "season": {"he": "עונת 2026/27", "ru": "Сезон 2026/27", "en": "Season 2026/27"},
+    "heading": {"he": "עונת 2026/27", "ru": "Сезон 2026/27", "en": "Season 2026/27"},
+    "coach_q": {"he": "עם מי?", "ru": "Тренер", "en": "Coach"},
+    "adults": {"he": "מבוגרים", "ru": "Взрослые", "en": "Adults"},
     "grade_q": {"he": "באיזו כיתה הילד/ה?", "ru": "В каком классе ребёнок?", "en": "Your child's grade?"},
     "venue_q": {"he": "איפה נוח לכם?", "ru": "Где удобнее?", "en": "Which venue?"},
     "all": {"he": "הכול", "ru": "Все", "en": "All"},
@@ -476,12 +479,37 @@ SCHED_UI = {
     "wa_msg": {"he": "שלום! אשמח להצטרף לאימון: ", "ru": "Здравствуйте! Хотим записаться на тренировку: ", "en": "Hi! We'd like to join this class: "},
 }
 DAY_SHORT = {"he": ["א׳", "ב׳", "ג׳", "ד׳", "ה׳", "ו׳"], "ru": ["Вс", "Пн", "Вт", "Ср", "Чт", "Пт"], "en": ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri"]}
-VENUE_COLOR = {"ein-hayam": "#5aa9e6", "ironi-alef": "#e0414a", "leo-baeck-hadar": "#4fbf7f", "dror-school": "#a47be0"}
+VENUE_COLOR = {"ein-hayam": "#5aa9e6", "ironi-alef": "#e0414a", "leo-baeck-hadar": "#4fbf7f", "dror-school": "#a47be0",
+               "ben-gurion-haifa": "#e6a23c", "reali-ahuza": "#3cc8c8", "ramot-haifa": "#d65db1", "barkai": "#8bc34a",
+               "leo-baeck-center": "#f06f3c", "carmel-netiv-eliezer": "#c9b458", "yizreelia": "#6d8cff", "tchernichovsky-haifa": "#5fd3a0",
+               "beit-yehoshua-nesher": "#ff8fa3", "rabin-nesher": "#b388ff", "misholim-atlit": "#ffd166"}
+
+
+def city(v):
+    return {l: v["address"][l].rsplit(", ", 1)[-1] for l in LANGS}
+
+
+def by_city():
+    """[(city, [(key, venue)])] in content/venues.json order."""
+    out = {}
+    for k, v in VENUES.items():
+        out.setdefault(v["address"]["en"].rsplit(", ", 1)[-1], (city(v), []))[1].append((k, v))
+    return list(out.values())
+
+
+def grade_range(s):
+    # mirrors gradeRange() in src/lib/schedule-changes.mjs
+    if s.get("audience") == "adults":
+        return "18-18"
+    g = s["grades"]
+    return f'{g[0]}-{g[1] if g[1] is not None else 12}' if g else ""
 
 
 def grade_label(g):
     a, b = g
     L = SC["grade_letters_he"]
+    if a == 0 and b == 1:
+        return {"he": "גנים + כיתה א׳", "ru": "Детский сад и 1 класс", "en": "Kindergarten + grade 1"}
     if a == 0 and b == 0:
         return {"he": "גן", "ru": "Детский сад", "en": "Kindergarten"}
     if b is None:
@@ -491,34 +519,44 @@ def grade_label(g):
 
 def schedule():
     sc, U = C["schedule"], SCHED_UI
-    nat = next(c for c in COACHES if c["id"] == "natanel-zhurovel")
+    coaches = {c["id"]: c for c in COACHES if c["id"] in SCHEDS}
+    first = {cid: {l: c["name"][l].split()[0] for l in LANGS} for cid, c in coaches.items()}
+    order = list(SCHEDS)
     days = ""
     for d in range(6):
         cards = ""
-        for s in sorted((x for x in SC["sessions"] if x["day"] == d), key=lambda x: x["start"]):
-            hi, lo = s["grades"][0], (s["grades"][1] if s["grades"][1] is not None else 99)
-            kind = SC["kinds"][s["kind"]]
+        ses = [(cid, i, x) for cid, sd in SCHEDS.items() for i, x in enumerate(sd["sessions"]) if x["day"] == d]
+        for cid, i, s in sorted(ses, key=lambda r: (r[2]["start"], order.index(r[0]))):
+            sd = SCHEDS[cid]
+            kind = sd["kinds"][s["kind"]]
             badge = f'<span class="ses-kind k-{s["kind"]}">{t(kind)}</span>' if kind["en"] else ""
             if s.get("subgroup"):
                 badge += f'<span class="ses-kind">{t({l: {"he": "קבוצה", "ru": "Группа", "en": "Group"}[l] + " " + str(s["subgroup"]) for l in LANGS})}</span>'
+            if s.get("audience"):
+                badge += f'<span class="ses-kind k-aud">{t(sd["audiences"][s["audience"]])}</span>'
             note = f'<span class="ses-note">{t(s["note"])}</span>' if s.get("note") else ""
+            grade = f'<span class="ses-grade">{t(grade_label(s["grades"]))}</span>' if s["grades"] else ""
             v = VENUES[s["venue"]]
-            # markers: the landing page slots dated changes (content/schedule-changes) in at build
-            cards += (f'<li class="ses" data-v="{s["venue"]}" data-g="{hi}-{lo}" style="--vc:{VENUE_COLOR[s["venue"]]}"><!--SES {d}-{s["start"]}-->'
-                      f'<span class="ses-time">{ltr(s["start"] + "–" + s["end"])}</span>'
-                      f'<span class="ses-grade">{t(grade_label(s["grades"]))}</span>'
-                      f'<span class="ses-venue"><i aria-hidden="true"></i>{t({l: v[l] for l in LANGS})}</span>{badge}{note}'
+            # markers: the landing page slots dated changes (content/schedule-changes) in at build; key = sessionKey()
+            cards += (f'<li class="ses" data-v="{s["venue"]}" data-g="{grade_range(s)}" data-c="{cid}" style="--vc:{VENUE_COLOR[s["venue"]]}"><!--SES {cid}#{i}-->'
+                      f'<span class="ses-time">{ltr(s["start"] + "–" + s["end"])}</span>{grade}'
+                      f'<span class="ses-venue"><i aria-hidden="true"></i>{t({l: v[l] for l in LANGS})}</span>'
+                      f'<span class="ses-coach">{t(first[cid])}</span>{badge}{note}'
                       f'<a class="ses-wa" href="{WA}" target="_blank" rel="noopener" {ga("whatsapp_click", placement="schedule", venue=s["venue"])}>{WA_SVG}{t(U["join"])}</a></li>')
         name = {l: SC["days"][l][d] for l in LANGS}
         days += (f'<section class="day" data-day="{d}"><h4 class="day-h">{t(name)}<span class="day-today">{t(U["today"])}</span></h4>'
                  f'<ul class="ses-list"><!--SES_X {d}-->{cards}</ul><p class="day-none">{t(U["none_day"])}</p></section>')
     tabs = "".join(f'<button type="button" class="tab" data-tab="{d}" aria-pressed="false">{t({l: DAY_SHORT[l][d] for l in LANGS})}<b class="tab-n"></b></button>' for d in range(6))
     grades = [(-1, U["all"])] + [(0, {"he": "גן", "ru": "Сад", "en": "KG"})] + [
-        (g, {"he": SC["grade_letters_he"][g] + ("+" if g == 8 else ""), "ru": f"{g}{'+' if g == 8 else ''}", "en": f"{g}{'+' if g == 8 else ''}"}) for g in range(1, 9)]
+        (g, {"he": SC["grade_letters_he"][g] + ("+" if g == 8 else ""), "ru": f"{g}{'+' if g == 8 else ''}", "en": f"{g}{'+' if g == 8 else ''}"}) for g in range(1, 9)] + [
+        (18, U["adults"])]
     gchips = "".join(f'<button type="button" class="chip" data-grade="{g}" {ga("schedule_filter", grade=g)} aria-pressed="{str(g == -1).lower()}">{t(lab)}</button>' for g, lab in grades)
-    vchips = f'<button type="button" class="chip" data-venue="" {ga("schedule_filter", venue="all")} aria-pressed="true">{t(U["all"])}</button>' + "".join(
-        f'<button type="button" class="chip" data-venue="{k}" {ga("schedule_filter", venue=k)} aria-pressed="false" style="--vc:{VENUE_COLOR[k]}"><i aria-hidden="true"></i>{t({l: v[l] for l in LANGS})}</button>'
-        for k, v in VENUES.items())
+    cchips = f'<button type="button" class="chip" data-coach="" {ga("schedule_filter", coach="all")} aria-pressed="true">{t(U["all"])}</button>' + "".join(
+        f'<button type="button" class="chip" data-coach="{cid}" {ga("schedule_filter", coach=cid)} aria-pressed="false">{t(first[cid])}</button>' for cid in order)
+    # 15 venues don't fit a chip row on a phone; a native select grouped by city does
+    vopts = f'<option value="" {attr("label", U["all"])}>{U["all"]["en"]}</option>' + "".join(
+        f'<optgroup {attr("label", c)}>' + "".join(f'<option value="{k}" {attr("label", {l: v[l] for l in LANGS})}>{esc(v["en"])}</option>' for k, v in vs) + '</optgroup>'
+        for c, vs in by_city())
     vals = "".join(f'<span data-l="{l}">{" · ".join(SC["values"][l])}</span>' for l in LANGS)
     msg = "".join(f'<span data-l="{l}" class="wa-msg" hidden>{esc(U["wa_msg"][l])}</span>' for l in LANGS)
     return f'''
@@ -526,12 +564,13 @@ def schedule():
  <div class="sched-bg">{img("train-georgia-randori.jpg")}</div>
  <div class="wrap">
   {head("schedule", "稽古", sc["title"])}
-  <div class="sc-coach rv">{img(nat["photo"]["src"], "sc-ava", alt="")}
-   <div><p class="sc-season">{t(U["season"])}</p><h3 class="h3 grp">{t(U["heading"])}</h3>
+  <div class="sc-coach rv"><div class="sc-avas">{"".join(img(c["photo"]["src"], "sc-ava", alt="") for c in coaches.values())}</div>
+   <div><h3 class="h3 grp">{t(U["heading"])}</h3>
    <p class="sc-slogan">{t(SC["slogan"])}</p></div></div>
   <div class="sc-filters">
    <div class="fl"><p class="fl-q" id="fl-grade">{t(U["grade_q"])}</p><div class="chips" role="group" aria-labelledby="fl-grade">{gchips}</div></div>
-   <div class="fl"><p class="fl-q" id="fl-venue">{t(U["venue_q"])}</p><div class="chips" role="group" aria-labelledby="fl-venue">{vchips}</div></div>
+   <div class="fl"><p class="fl-q" id="fl-coach">{t(U["coach_q"])}</p><div class="chips" role="group" aria-labelledby="fl-coach">{cchips}</div></div>
+   <div class="fl"><p class="fl-q" id="fl-venue">{t(U["venue_q"])}</p><select class="fl-sel" data-venue-sel aria-labelledby="fl-venue">{vopts}</select></div>
   </div>
   <p class="sc-count vh" aria-live="polite">{t(U["count"])}<b></b></p>
   <!--SCHED_CHANGES-->
@@ -583,22 +622,26 @@ BR_UI = {"days": {"he": "ימי אימון", "ru": "Дни тренировок"
 
 def branches():
     b = C["branches"]
-    v = ""
-    for i, (k, vn) in enumerate(VENUES.items()):
-        q = urllib.parse.quote(vn["address"]["he"])
-        ds = sorted({s["day"] for s in SC["sessions"] if s["venue"] == k})
-        days = "".join(f'<span data-l="{l}">{" · ".join(DAY_SHORT[l][d] for d in ds)}</span>' for l in LANGS)
-        v += (f'<article class="venue rv" style="--vc:{VENUE_COLOR[k]}"><span class="v-i" aria-hidden="true">0{i+1}</span>'
-              f'<h3 class="h3">{t({l: vn[l] for l in LANGS})}</h3><p class="v-addr">{t(vn["address"])}</p><p class="v-note">{t(BR_UI["days"])}: {days}</p>'
-              f'<div class="v-links"><a href="https://www.google.com/maps/search/?api=1&amp;query={q}" target="_blank" rel="noopener" {ga("map_open", venue=k, provider="google_maps")}>Google Maps</a>'
-              f'<a href="https://waze.com/ul?q={q}&amp;navigate=yes" target="_blank" rel="noopener" {ga("map_open", venue=k, provider="waze")}>Waze</a>'
-              f'<a href="https://www.google.com/maps/dir/?api=1&amp;destination={q}&amp;travelmode=transit" target="_blank" rel="noopener" {ga("map_open", venue=k, provider="transit")}>{t(BR_UI["bus"])}</a></div></article>')
+    v, i = "", 0
+    for c, vs in by_city():
+        v += f'<h3 class="v-city">{t(c)}</h3><div class="venues v4">'
+        for k, vn in vs:
+            i += 1
+            q = urllib.parse.quote(vn["address"]["he"])
+            ds = sorted({s["day"] for sc in SCHEDS.values() for s in sc["sessions"] if s["venue"] == k})
+            days = "".join(f'<span data-l="{l}">{" · ".join(DAY_SHORT[l][d] for d in ds)}</span>' for l in LANGS)
+            v += (f'<article class="venue rv" style="--vc:{VENUE_COLOR[k]}"><span class="v-i" aria-hidden="true">{i:02}</span>'
+                  f'<h4 class="h3">{t({l: vn[l] for l in LANGS})}</h4><p class="v-addr">{t(vn["address"])}</p><p class="v-note">{t(BR_UI["days"])}: {days}</p>'
+                  f'<div class="v-links"><a href="https://www.google.com/maps/search/?api=1&amp;query={q}" target="_blank" rel="noopener" {ga("map_open", venue=k, provider="google_maps")}>Google Maps</a>'
+                  f'<a href="https://waze.com/ul?q={q}&amp;navigate=yes" target="_blank" rel="noopener" {ga("map_open", venue=k, provider="waze")}>Waze</a>'
+                  f'<a href="https://www.google.com/maps/dir/?api=1&amp;destination={q}&amp;travelmode=transit" target="_blank" rel="noopener" {ga("map_open", venue=k, provider="transit")}>{t(BR_UI["bus"])}</a></div></article>')
+        v += '</div>'
     nb = "".join(f'<li>{t(n["name"])}</li>' for n in b["neighbourhoods"])
     return f'''
 <section class="sec tatami" id="branches">
  <div class="wrap">
   {head("branches", "道場", b["title"], b["intro"])}
-  <div class="venues v4">{v}</div>
+  {v}
   <!--VENUE_MAP-->
   <ul class="hoods rv">{nb}</ul>
  </div>

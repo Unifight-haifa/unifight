@@ -18,7 +18,8 @@ export const GATE_JS = `(()=>{const d=new Intl.DateTimeFormat('en-CA',{timeZone:
 
 function findSession(sc, s, at) {
   if (!Number.isInteger(s?.day) || s.day < 0 || s.day > 6 || !is(s.start, TIME) || (s.group !== undefined && typeof s.group !== 'string')) throw new Error(`${at}: session needs day (0-6) and start (HH:MM)`);
-  const hits = sc.sessions.filter((x) => x.day === s.day && x.start === s.start && (!s.group || x.kind === s.group));
+  // group tells apart classes that share a day and start: their kind, or their audience (Barkai girls/boys)
+  const hits = sc.sessions.filter((x) => x.day === s.day && x.start === s.start && (!s.group || x.kind === s.group || x.audience === s.group));
   if (hits.length !== 1) throw new Error(`${at}: ${hits.length ? 'several sessions match' : 'no session matches'} day ${s.day} ${s.start}${s.group ? ` group ${JSON.stringify(s.group)}` : ''}`);
   return hits[0];
 }
@@ -47,7 +48,7 @@ export function checkChanges(entries, schedules, venues) {
     const r = { id: c.id, schedule: c.schedule, type: c.type, from: c.from, to: c.to, note: Object.fromEntries(LANGS.map((l) => [l, c.note[l]])), author: c.author, created: c.created };
     if (c.session !== undefined) {
       r.ses = findSession(sc, c.session, at);
-      r.session = { day: c.session.day, start: c.session.start, ...(c.session.group ? { group: r.ses.kind } : {}) };
+      r.session = { day: c.session.day, start: c.session.start, ...(c.session.group ? { group: c.session.group } : {}) };
       const span = Math.min(6, (Date.parse(c.to) - Date.parse(c.from)) / 864e5);
       if (c.type !== 'extra' && !Array.from({ length: span + 1 }, (_, i) => weekday(addDays(c.from, i))).includes(c.session.day))
         throw new Error(`${at}: no day between ${c.from} and ${c.to} falls on weekday ${c.session.day}`);
@@ -86,6 +87,7 @@ const gate = (c, today) => `data-from="${esc(c.show)}" data-to="${esc(c.to)}"${c
 
 // mirrors grade_label() in scripts/landing/build.py
 function gradeLabel([a, b], letters, lang) {
+  if (a === 0 && b === 1) return { he: 'גנים + כיתה א׳', ru: 'Детский сад и 1 класс', en: 'Kindergarten + grade 1' }[lang];
   if (a === 0 && b === 0) return { he: 'גן', ru: 'Детский сад', en: 'Kindergarten' }[lang];
   if (b === null) return { he: `כיתות ${letters[a]} ומעלה`, ru: `${a} класс и старше`, en: `Grade ${a}+` }[lang];
   return { he: `כיתות ${letters[a]}–${letters[b]}`, ru: `${a}–${b} класс`, en: `Grades ${a}–${b}` }[lang];
@@ -102,9 +104,15 @@ export function summary(c, lang, venues, t = (x) => x, e = (x) => x) {
 
 export const summaryHtml = (c, lang, venues) => summary(c, lang, venues, ltr, esc);
 
+/** data-g of a card, as build.py writes it: "and up" stops at grade 12, adults are 18, no grades matches no grade. */
+export const gradeRange = (g, audience) => (audience === 'adults' ? '18-18' : g ? `${g[0]}-${g[1] ?? 12}` : '');
+
+/** The <!--SES …--> marker key build.py writes into each regular session: "<schedule>#<index in sessions>". */
+export const sessionKey = (schedules, id, ses) => `${id}#${schedules[id].sessions.indexOf(ses)}`;
+
 /**
  * HTML for the landing schedule: a notice list, badges inside the affected regular sessions
- * (keyed "<day>-<start>", the <!--SES …--> markers build.py writes) and extra cards per weekday.
+ * (keyed by sessionKey()) and extra cards per weekday.
  */
 export function renderSchedule(changes, lang, today, schedules, venues, venueColor) {
   const sessions = {}, extras = {};
@@ -113,15 +121,15 @@ export function renderSchedule(changes, lang, today, schedules, venues, venueCol
     const note = esc(c.note[lang]);
     if (c.ses && c.type !== 'extra') {
       const label = c.type === 'cancel' ? `${UI.cancel[lang]} · ${esc(range(c, lang))}` : `${UI.move[lang]} → ${esc(fmtDay(c.new.date, lang))} ${ltr(c.new.start)}`;
-      add(sessions, `${c.ses.day}-${c.ses.start}`, `<span class="ses-chg chg-${esc(c.type)}" ${gate(c, today)}><b>${label}</b> ${note}</span>`);
+      add(sessions, sessionKey(schedules, c.schedule, c.ses), `<span class="ses-chg chg-${esc(c.type)}" ${gate(c, today)}><b>${label}</b> ${note}</span>`);
     }
     if (c.new) {
-      const s = c.ses, sc = schedules[c.schedule], [lo, hi] = s ? s.grades : [0, null];
+      const s = c.ses, sc = schedules[c.schedule];
       const badge = `${UI[c.type][lang]} · ${esc(fmtDay(c.new.date, lang))}`;
       add(extras, weekday(c.new.date),
-        `<li class="ses ses-x" data-v="${esc(c.new.venue)}" data-g="${esc(`${lo}-${hi ?? 99}`)}" style="--vc:${esc(venueColor[c.new.venue] ?? 'var(--gold)')}" ${gate(c, today)}>` +
+        `<li class="ses ses-x" data-v="${esc(c.new.venue)}" data-g="${esc(s ? gradeRange(s.grades, s.audience) : '0-18')}" data-c="${esc(c.schedule)}" style="--vc:${esc(venueColor[c.new.venue] ?? 'var(--gold)')}" ${gate(c, today)}>` +
           `<span class="ses-time">${ltr(`${c.new.start}–${c.new.end}`)}</span><span class="ses-chg chg-new"><b>${badge}</b> ${note}</span>` +
-          (s ? `<span class="ses-grade">${esc(gradeLabel(s.grades, sc.grade_letters_he, lang))}</span>` : '') +
+          (s?.grades ? `<span class="ses-grade">${esc(gradeLabel(s.grades, sc.grade_letters_he, lang))}</span>` : '') +
           `<span class="ses-venue"><i aria-hidden="true"></i>${esc(venues[c.new.venue][lang])}</span></li>`);
     }
     return `<li id="chg-${esc(c.id)}" class="chg chg-${esc(c.type)}" ${gate(c, today)}><b>${summaryHtml(c, lang, venues)}</b> ${note}</li>`;
@@ -135,4 +143,4 @@ export const fillSchedule = (body, { notice, sessions, extras }) =>
   body
     .replace('<!--SCHED_CHANGES-->', () => notice)
     .replace(/<!--SES_X (\d)-->/g, (_, d) => extras[d] ?? '')
-    .replace(/<!--SES (\d-[\d:]+)-->/g, (_, k) => sessions[k] ?? '');
+    .replace(/<!--SES ([a-z0-9-]+#\d+)-->/g, (_, k) => sessions[k] ?? '');

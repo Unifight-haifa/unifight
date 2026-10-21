@@ -9,6 +9,7 @@ import JsonLd from '../../../components/JsonLd.astro';
 import VenueMap from '../../../components/VenueMap.astro';
 import { t, type Lang } from '../../../i18n/ui';
 import { schedule } from '../../../lib/club';
+import { schedules } from '../../../lib/changes';
 import { bidi } from '../../../lib/club-check.mjs';
 import '../../../styles/landing.css';
 import '../../../styles/news.css';
@@ -69,7 +70,7 @@ const social = co.social.filter((x) => !('placeholder' in x) && x.url);
 const PROVIDERS = ['google_maps', 'waze', 'transit'];
 const places = Object.entries(venues).map(([id, v]) => {
   const q = encodeURIComponent(v.address.he);
-  const days = [...new Set(schedule.sessions.filter((x) => x.venue === id).map((x) => x.day))].sort();
+  const days = [...new Set(Object.values(schedules).flatMap((sc) => sc.sessions).filter((x) => x.venue === id).map((x) => x.day))].sort();
   return {
     id,
     name: v[lang],

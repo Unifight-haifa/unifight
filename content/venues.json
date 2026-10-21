@@ -54,5 +54,137 @@
   "address_source": "https://www.d.co.il/6933580/8780/",
   "address_note": "Ironi Alef school (directories d.co.il, allschool)",
   "address_checked": "2026-10-17"
+ },
+ "ben-gurion-haifa": {
+  "he": "בן גוריון",
+  "ru": "Бен-Гурион",
+  "en": "Ben-Gurion",
+  "address": {
+   "he": "קרן היסוד 33, חיפה",
+   "ru": "ул. Керен ха-Йесод, 33, Хайфа",
+   "en": "33 Keren HaYesod St, Haifa"
+  },
+  "address_source": "owner docx 2026-10-21",
+  "address_checked": "2026-10-21"
+ },
+ "reali-ahuza": {
+  "he": "ריאלי אחוזה",
+  "ru": "Реали Ахуза",
+  "en": "Reali Ahuza",
+  "address": {
+   "he": "קריית הספר 25, חיפה",
+   "ru": "ул. Кирьят ха-Сефер, 25, Хайфа",
+   "en": "25 Kiryat HaSefer St, Haifa"
+  },
+  "address_source": "owner docx 2026-10-21",
+  "address_checked": "2026-10-21"
+ },
+ "ramot-haifa": {
+  "he": "רמות",
+  "ru": "Рамот",
+  "en": "Ramot",
+  "address": {
+   "he": "דרך צרפת 85, חיפה",
+   "ru": "дорога Царфат, 85, Хайфа",
+   "en": "85 Derech Tsarfat, Haifa"
+  },
+  "address_source": "owner docx 2026-10-21",
+  "address_checked": "2026-10-21"
+ },
+ "barkai": {
+  "he": "ברקאי",
+  "ru": "Баркай",
+  "en": "Barkai",
+  "address": {
+   "he": "מרדכי אנילביץ׳ 26, חיפה",
+   "ru": "ул. Мордехай Анилевич, 26, Хайфа",
+   "en": "26 Mordechai Anielewicz St, Haifa"
+  },
+  "address_source": "owner docx 2026-10-21",
+  "address_checked": "2026-10-21"
+ },
+ "leo-baeck-center": {
+  "he": "מרכז הספורט ליאו באק",
+  "ru": "Спортивный центр Лео Бек",
+  "en": "Leo Baeck Sports Center",
+  "address": {
+   "he": "דרך צרפת 90, חיפה",
+   "ru": "дорога Царфат, 90, Хайфа",
+   "en": "90 Derech Tsarfat, Haifa"
+  },
+  "address_source": "owner docx 2026-10-21",
+  "address_checked": "2026-10-21"
+ },
+ "carmel-netiv-eliezer": {
+  "he": "כרמל ונתיב אליעזר",
+  "ru": "Кармель и Нетив Элиэзер",
+  "en": "Carmel and Netiv Eliezer",
+  "address": {
+   "he": "בנימין ד׳ישראלי 54א׳, חיפה",
+   "ru": "ул. Биньямин Дизраэли, 54А, Хайфа",
+   "en": "54A Benjamin Disraeli St, Haifa"
+  },
+  "address_source": "owner docx 2026-10-21",
+  "address_checked": "2026-10-21"
+ },
+ "yizreelia": {
+  "he": "יזרעאליה",
+  "ru": "Изреэлия",
+  "en": "Yizreelia",
+  "address": {
+   "he": "טשרניחובסקי 20, נווה שאנן, חיפה",
+   "ru": "ул. Черниховски, 20, Неве-Шаанан, Хайфа",
+   "en": "20 Tchernichovsky St, Neve Sha'anan, Haifa"
+  },
+  "address_source": "owner docx 2026-10-21",
+  "address_checked": "2026-10-21"
+ },
+ "tchernichovsky-haifa": {
+  "he": "טשרניחובסקי",
+  "ru": "Черниховски",
+  "en": "Tchernichovsky",
+  "address": {
+   "he": "טשרניחובסקי 34, חיפה",
+   "ru": "ул. Черниховски, 34, Хайфа",
+   "en": "34 Tchernichovsky St, Haifa"
+  },
+  "address_source": "owner docx 2026-10-21",
+  "address_checked": "2026-10-21"
+ },
+ "beit-yehoshua-nesher": {
+  "he": "בית יהושע – נשר",
+  "ru": "Бейт-Йехошуа (Нешер)",
+  "en": "Beit Yehoshua (Nesher)",
+  "address": {
+   "he": "התשבי 300, נשר",
+   "ru": "ул. ха-Тишби, 300, Нешер",
+   "en": "300 HaTishbi St, Nesher"
+  },
+  "address_source": "owner docx 2026-10-21",
+  "address_checked": "2026-10-21"
+ },
+ "rabin-nesher": {
+  "he": "רבין – נשר",
+  "ru": "Рабин (Нешер)",
+  "en": "Rabin (Nesher)",
+  "address": {
+   "he": "השיטה 15, נשר",
+   "ru": "ул. ха-Шита, 15, Нешер",
+   "en": "15 HaShita St, Nesher"
+  },
+  "address_source": "owner docx 2026-10-21",
+  "address_checked": "2026-10-21"
+ },
+ "misholim-atlit": {
+  "he": "משעולים – עתלית",
+  "ru": "Мишолим (Атлит)",
+  "en": "Misholim (Atlit)",
+  "address": {
+   "he": "תמירון 1, עתלית",
+   "ru": "ул. Тамирон, 1, Атлит",
+   "en": "1 Tamiron St, Atlit"
+  },
+  "address_source": "owner docx 2026-10-21",
+  "address_checked": "2026-10-21"
  }
 }

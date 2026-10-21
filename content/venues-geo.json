@@ -26,5 +26,53 @@
   "source": "https://nominatim.openstreetmap.org/search?amenity=school (bounded box around דרור, חיפה)",
   "osm_display_name": "דרור, החותרים, קריית אליעזר, רובע מערב חיפה, חיפה, נפת חיפה, מחוז חיפה, 3551319, ישראל",
   "date": "2026-10-17"
+ },
+ "leo-baeck-center": {
+  "lat": 32.8231242,
+  "lng": 34.9685371,
+  "source": "https://nominatim.openstreetmap.org/search?q=מרכז ליאו בק",
+  "osm_display_name": "מרכז חינוך ליאו באק, 90, צרפת, רמת שאול, רובע הכרמל, חיפה, נפת חיפה, מחוז חיפה, 3570503, ישראל",
+  "date": "2026-10-21",
+  "note": "OSM school POI, address matches the owner's"
+ },
+ "carmel-netiv-eliezer": {
+  "lat": 32.7888111,
+  "lng": 34.9905703,
+  "source": "https://nominatim.openstreetmap.org/search?q=נתיב אליעזר חיפה",
+  "osm_display_name": "כרמל נתיב אליעזר, ד'ישראלי, אחוזת שמואל, אחוזה, רובע רמות הכרמל, חיפה, נפת חיפה, מחוז חיפה, 3434120, ישראל",
+  "date": "2026-10-21",
+  "note": "OSM educational_institution POI on the owner's street"
+ },
+ "tchernichovsky-haifa": {
+  "lat": 32.8209593,
+  "lng": 34.9756515,
+  "source": "https://overpass-api.de/api/interpreter (amenity=school, bbox 32.74,34.95,32.84,35.07), way 1068488104",
+  "osm_display_name": "בית ספר יסודי טשרניחובסקי",
+  "date": "2026-10-21",
+  "note": "OSM school POI on Tchernichovsky St"
+ },
+ "rabin-nesher": {
+  "lat": 32.7671314,
+  "lng": 35.0398827,
+  "source": "https://overpass-api.de/api/interpreter (amenity=school, bbox 32.74,34.95,32.84,35.07), way 1551805278",
+  "osm_display_name": "בי\"ס יצחק רבין",
+  "date": "2026-10-21",
+  "note": "OSM school POI ~200 m from HaShita St (Nominatim street hit 32.7678,35.0378)"
+ },
+ "beit-yehoshua-nesher": {
+  "lat": 32.7631665,
+  "lng": 35.050946,
+  "source": "https://nominatim.openstreetmap.org/search?q=בית יהושע נשר",
+  "osm_display_name": "בית ספר בית יהושע, הכלניות, שכונת נשר, נשר, נפת חיפה, מחוז חיפה, 3682216, ישראל",
+  "date": "2026-10-21",
+  "note": "OSM school POI; OSM puts it on HaKalaniyot, owner gives HaTishbi 300 (street ~270 m away)"
+ },
+ "misholim-atlit": {
+  "lat": 32.6967445,
+  "lng": 34.9449274,
+  "source": "https://nominatim.openstreetmap.org/search?q=משעולים עתלית",
+  "osm_display_name": "בי\"ס משעולים, יפה נוף, עתלית, מועצה אזורית חוף הכרמל, נפת חדרה, מחוז חיפה, ישראל",
+  "date": "2026-10-21",
+  "note": "OSM school POI; OSM street Yafe Nof, owner gives Tamiron 1"
  }
 }

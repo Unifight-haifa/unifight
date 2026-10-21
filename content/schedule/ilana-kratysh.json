@@ -1,0 +1,567 @@
+{
+ "season": "2026/27",
+ "coach": "ilana",
+ "source": "owner docx 2026-10-21 (assets/source/schedule/ilana-2026-27.docx): «מערכת שעות אימוני ג׳ודו | יוניפייט חיפה», «עונת 2026–2027»",
+ "confidence": "confirmed",
+ "title_source_he": "מערכת שעות אימוני ג׳ודו | יוניפייט חיפה · עונת 2026–2027",
+ "days": {
+  "he": [
+   "ראשון",
+   "שני",
+   "שלישי",
+   "רביעי",
+   "חמישי",
+   "שישי"
+  ],
+  "ru": [
+   "Воскресенье",
+   "Понедельник",
+   "Вторник",
+   "Среда",
+   "Четверг",
+   "Пятница"
+  ],
+  "en": [
+   "Sunday",
+   "Monday",
+   "Tuesday",
+   "Wednesday",
+   "Thursday",
+   "Friday"
+  ]
+ },
+ "kinds": {
+  "regular": {
+   "he": "",
+   "ru": "",
+   "en": ""
+  },
+  "olympic-class": {
+   "he": "הכיתה האולימפית",
+   "ru": "Олимпийский класс",
+   "en": "Olympic class"
+  }
+ },
+ "audiences": {
+  "girls": {
+   "he": "בנות",
+   "ru": "Девочки",
+   "en": "Girls"
+  },
+  "boys": {
+   "he": "בנים",
+   "ru": "Мальчики",
+   "en": "Boys"
+  },
+  "adults": {
+   "he": "מבוגרים 18+",
+   "ru": "Взрослые 18+",
+   "en": "Adults 18+"
+  }
+ },
+ "grade_letters_he": [
+  "גן",
+  "א׳",
+  "ב׳",
+  "ג׳",
+  "ד׳",
+  "ה׳",
+  "ו׳",
+  "ז׳",
+  "ח׳"
+ ],
+ "sessions": [
+  {
+   "day": 0,
+   "venue": "misholim-atlit",
+   "start": "13:20",
+   "end": "14:20",
+   "grades": [
+    1,
+    2
+   ],
+   "kind": "regular"
+  },
+  {
+   "day": 0,
+   "venue": "misholim-atlit",
+   "start": "14:20",
+   "end": "15:20",
+   "grades": [
+    3,
+    6
+   ],
+   "kind": "regular"
+  },
+  {
+   "day": 0,
+   "venue": "misholim-atlit",
+   "start": "16:30",
+   "end": "17:30",
+   "grades": [
+    0,
+    1
+   ],
+   "kind": "regular"
+  },
+  {
+   "day": 0,
+   "venue": "misholim-atlit",
+   "start": "17:30",
+   "end": "18:30",
+   "grades": [
+    2,
+    6
+   ],
+   "kind": "regular"
+  },
+  {
+   "day": 0,
+   "venue": "ben-gurion-haifa",
+   "start": "13:00",
+   "end": "14:00",
+   "grades": [
+    1,
+    2
+   ],
+   "kind": "regular"
+  },
+  {
+   "day": 0,
+   "venue": "ben-gurion-haifa",
+   "start": "14:00",
+   "end": "15:00",
+   "grades": [
+    3,
+    6
+   ],
+   "kind": "regular"
+  },
+  {
+   "day": 0,
+   "venue": "reali-ahuza",
+   "start": "14:30",
+   "end": "15:15",
+   "grades": [
+    1,
+    2
+   ],
+   "kind": "regular"
+  },
+  {
+   "day": 0,
+   "venue": "reali-ahuza",
+   "start": "15:15",
+   "end": "16:00",
+   "grades": [
+    3,
+    4
+   ],
+   "kind": "regular"
+  },
+  {
+   "day": 0,
+   "venue": "reali-ahuza",
+   "start": "17:15",
+   "end": "18:00",
+   "grades": [
+    0,
+    1
+   ],
+   "kind": "regular"
+  },
+  {
+   "day": 0,
+   "venue": "reali-ahuza",
+   "start": "18:00",
+   "end": "19:00",
+   "grades": [
+    2,
+    4
+   ],
+   "kind": "regular"
+  },
+  {
+   "day": 0,
+   "venue": "reali-ahuza",
+   "start": "19:00",
+   "end": "20:00",
+   "grades": [
+    5,
+    null
+   ],
+   "kind": "regular"
+  },
+  {
+   "day": 1,
+   "venue": "ramot-haifa",
+   "start": "12:40",
+   "end": "13:40",
+   "grades": [
+    1,
+    2
+   ],
+   "kind": "regular"
+  },
+  {
+   "day": 1,
+   "venue": "ramot-haifa",
+   "start": "13:40",
+   "end": "14:40",
+   "grades": [
+    3,
+    6
+   ],
+   "kind": "regular"
+  },
+  {
+   "day": 1,
+   "venue": "ramot-haifa",
+   "start": "14:45",
+   "end": "15:30",
+   "grades": [
+    0,
+    0
+   ],
+   "kind": "regular"
+  },
+  {
+   "day": 1,
+   "venue": "barkai",
+   "start": "14:00",
+   "end": "14:45",
+   "grades": [
+    1,
+    2
+   ],
+   "kind": "regular",
+   "audience": "girls"
+  },
+  {
+   "day": 1,
+   "venue": "barkai",
+   "start": "15:00",
+   "end": "15:45",
+   "grades": [
+    3,
+    6
+   ],
+   "kind": "regular",
+   "audience": "girls"
+  },
+  {
+   "day": 1,
+   "venue": "barkai",
+   "start": "14:00",
+   "end": "14:45",
+   "grades": [
+    1,
+    2
+   ],
+   "kind": "regular",
+   "audience": "boys"
+  },
+  {
+   "day": 1,
+   "venue": "barkai",
+   "start": "15:00",
+   "end": "15:45",
+   "grades": [
+    3,
+    6
+   ],
+   "kind": "regular",
+   "audience": "boys"
+  },
+  {
+   "day": 1,
+   "venue": "leo-baeck-center",
+   "start": "16:30",
+   "end": "17:30",
+   "grades": [
+    1,
+    3
+   ],
+   "kind": "regular"
+  },
+  {
+   "day": 1,
+   "venue": "leo-baeck-center",
+   "start": "17:30",
+   "end": "18:15",
+   "grades": [
+    0,
+    1
+   ],
+   "kind": "regular"
+  },
+  {
+   "day": 1,
+   "venue": "leo-baeck-center",
+   "start": "18:15",
+   "end": "19:30",
+   "grades": [
+    4,
+    null
+   ],
+   "kind": "regular"
+  },
+  {
+   "day": 1,
+   "venue": "leo-baeck-center",
+   "start": "19:30",
+   "end": "20:30",
+   "grades": null,
+   "kind": "regular",
+   "audience": "adults"
+  },
+  {
+   "day": 2,
+   "venue": "misholim-atlit",
+   "start": "13:20",
+   "end": "14:20",
+   "grades": [
+    1,
+    2
+   ],
+   "kind": "regular"
+  },
+  {
+   "day": 2,
+   "venue": "misholim-atlit",
+   "start": "14:20",
+   "end": "15:20",
+   "grades": [
+    3,
+    6
+   ],
+   "kind": "regular"
+  },
+  {
+   "day": 2,
+   "venue": "beit-yehoshua-nesher",
+   "start": "17:00",
+   "end": "18:00",
+   "grades": [
+    0,
+    1
+   ],
+   "kind": "regular"
+  },
+  {
+   "day": 2,
+   "venue": "beit-yehoshua-nesher",
+   "start": "18:00",
+   "end": "19:00",
+   "grades": [
+    2,
+    6
+   ],
+   "kind": "regular"
+  },
+  {
+   "day": 3,
+   "venue": "carmel-netiv-eliezer",
+   "start": "13:30",
+   "end": "14:30",
+   "grades": [
+    1,
+    2
+   ],
+   "kind": "regular"
+  },
+  {
+   "day": 3,
+   "venue": "carmel-netiv-eliezer",
+   "start": "14:30",
+   "end": "15:20",
+   "grades": [
+    3,
+    6
+   ],
+   "kind": "regular"
+  },
+  {
+   "day": 3,
+   "venue": "yizreelia",
+   "start": "12:50",
+   "end": "13:50",
+   "grades": [
+    1,
+    2
+   ],
+   "kind": "regular"
+  },
+  {
+   "day": 3,
+   "venue": "yizreelia",
+   "start": "13:50",
+   "end": "14:50",
+   "grades": [
+    3,
+    4
+   ],
+   "kind": "regular"
+  },
+  {
+   "day": 3,
+   "venue": "yizreelia",
+   "start": "14:50",
+   "end": "15:50",
+   "grades": [
+    5,
+    6
+   ],
+   "kind": "regular"
+  },
+  {
+   "day": 3,
+   "venue": "reali-ahuza",
+   "start": "17:15",
+   "end": "18:00",
+   "grades": [
+    0,
+    1
+   ],
+   "kind": "regular"
+  },
+  {
+   "day": 3,
+   "venue": "reali-ahuza",
+   "start": "18:00",
+   "end": "19:00",
+   "grades": [
+    2,
+    4
+   ],
+   "kind": "regular"
+  },
+  {
+   "day": 3,
+   "venue": "reali-ahuza",
+   "start": "19:00",
+   "end": "20:00",
+   "grades": [
+    5,
+    6
+   ],
+   "kind": "regular"
+  },
+  {
+   "day": 4,
+   "venue": "tchernichovsky-haifa",
+   "start": "12:40",
+   "end": "13:40",
+   "grades": [
+    1,
+    2
+   ],
+   "kind": "regular"
+  },
+  {
+   "day": 4,
+   "venue": "tchernichovsky-haifa",
+   "start": "13:40",
+   "end": "14:40",
+   "grades": [
+    3,
+    6
+   ],
+   "kind": "regular"
+  },
+  {
+   "day": 4,
+   "venue": "leo-baeck-center",
+   "start": "16:30",
+   "end": "17:30",
+   "grades": [
+    1,
+    3
+   ],
+   "kind": "regular"
+  },
+  {
+   "day": 4,
+   "venue": "leo-baeck-center",
+   "start": "17:30",
+   "end": "18:15",
+   "grades": [
+    0,
+    1
+   ],
+   "kind": "regular"
+  },
+  {
+   "day": 4,
+   "venue": "leo-baeck-center",
+   "start": "18:15",
+   "end": "19:30",
+   "grades": [
+    4,
+    null
+   ],
+   "kind": "regular"
+  },
+  {
+   "day": 4,
+   "venue": "leo-baeck-center",
+   "start": "19:30",
+   "end": "20:30",
+   "grades": null,
+   "kind": "regular",
+   "audience": "adults"
+  },
+  {
+   "day": 5,
+   "venue": "rabin-nesher",
+   "start": "08:00",
+   "end": "09:30",
+   "grades": null,
+   "kind": "olympic-class",
+   "subgroup": 1
+  },
+  {
+   "day": 5,
+   "venue": "rabin-nesher",
+   "start": "10:15",
+   "end": "11:35",
+   "grades": null,
+   "kind": "olympic-class",
+   "subgroup": 2
+  },
+  {
+   "day": 5,
+   "venue": "rabin-nesher",
+   "start": "11:45",
+   "end": "13:15",
+   "grades": null,
+   "kind": "olympic-class",
+   "subgroup": 3
+  },
+  {
+   "day": 5,
+   "venue": "beit-yehoshua-nesher",
+   "start": "13:00",
+   "end": "14:00",
+   "grades": [
+    0,
+    1
+   ],
+   "kind": "regular"
+  },
+  {
+   "day": 5,
+   "venue": "beit-yehoshua-nesher",
+   "start": "14:00",
+   "end": "15:00",
+   "grades": [
+    2,
+    null
+   ],
+   "kind": "regular"
+  }
+ ],
+ "open_questions": [
+  "Rabin (Nesher) Olympic class: the docx gives no grades for groups 1-3; it's an in-school programme."
+ ]
+}
