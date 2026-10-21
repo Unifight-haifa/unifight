@@ -66,6 +66,8 @@
       const s = b.closest('.ses'), L = document.documentElement.lang;
       const txt = [...s.querySelectorAll(`.ses-time, :is(.ses-grade, .ses-venue, .ses-coach, .ses-kind) [data-l=${L}]`)].map(x => x.textContent.trim());
       const day = b.closest('.day').querySelector(`.day-h [data-l=${L}]`).textContent;
+      const vg = b.closest('.vg')?.querySelector(`.vg-h > [data-l=${L}]`);
+      if (vg) txt.push(vg.textContent);
       b.href = b.href.split('?')[0] + '?text=' + encodeURIComponent(sec.querySelector(`.wa-msg[data-l=${L}]`).textContent + day + ', ' + txt.join(', '));
       return;
     }

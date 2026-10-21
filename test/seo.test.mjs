@@ -8,7 +8,7 @@ const LANGS = ['he', 'ru', 'en'];
 const read = (p) => readFileSync(new URL(p, dist), 'utf8');
 
 // backgrounds behind text, logos next to the visible club name, the avatar beside its coach's heading
-const DECORATIVE = ['brand/logo.png', 'img-night/groundwork.jpg', 'img-night/medals-team.jpg', 'img-night/train-georgia-randori.jpg', 'img-night/kids-belts-throw.jpg', 'class="sc-ava"'];
+const DECORATIVE = ['brand/logo.png', 'img-night/groundwork.jpg', 'img-night/medals-team.jpg', 'img-night/train-georgia-randori.jpg', 'img-night/kids-belts-throw.jpg', 'class="ava-i"'];
 
 for (const l of LANGS) {
   test(`${l} landing: every non-decorative img has an alt in the page language`, () => {

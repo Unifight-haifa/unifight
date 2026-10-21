@@ -93,7 +93,7 @@ test('the built landing lists every class of both coaches, with coach, audience 
     for (const c of ['', 'ilana-kratysh', 'natanel-zhurovel']) assert.ok(html.includes(`data-coach="${c}"`), `${l}: coach chip ${c}`);
     assert.ok(html.includes('data-grade="18"'), `${l}: adults chip`);
     assert.equal(html.match(/data-g="18-18"/g).length, 2, `${l}: adults classes`);
-    assert.equal(html.match(/class="ses-kind k-aud"/g).length, 6, `${l}: girls, boys, adults badges`);
+    assert.equal(html.match(/class="ses-kind k-aud"/g).length, 4, `${l}: girls and boys badges`);
     assert.equal(html.match(/class="ses-kind k-olympic-class"/g).length, 3, `${l}: Rabin olympic class`);
     for (const v of Object.keys(venues)) assert.ok(html.includes(`<option value="${v}"`), `${l}: venue option ${v}`);
   }

@@ -478,6 +478,7 @@ SCHED_UI = {
     "count": {"he": "אימונים מתאימים: ", "ru": "Подходящих тренировок: ", "en": "Matching classes: "},
     "wa_msg": {"he": "שלום! אשמח להצטרף לאימון: ", "ru": "Здравствуйте! Хотим записаться на тренировку: ", "en": "Hi! We'd like to join this class: "},
 }
+AVA_ZOOM = 2.0  # keep in step with .ava img scale() in night.css
 DAY_SHORT = {"he": ["א׳", "ב׳", "ג׳", "ד׳", "ה׳", "ו׳"], "ru": ["Вс", "Пн", "Вт", "Ср", "Чт", "Пт"], "en": ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri"]}
 VENUE_COLOR = {"ein-hayam": "#5aa9e6", "ironi-alef": "#e0414a", "leo-baeck-hadar": "#4fbf7f", "dror-school": "#a47be0",
                "ben-gurion-haifa": "#e6a23c", "reali-ahuza": "#3cc8c8", "ramot-haifa": "#d65db1", "barkai": "#8bc34a",
@@ -522,37 +523,55 @@ def schedule():
     coaches = {c["id"]: c for c in COACHES if c["id"] in SCHEDS}
     first = {cid: {l: c["name"][l].split()[0] for l in LANGS} for cid, c in coaches.items()}
     order = list(SCHEDS)
+
+    def ava(c):
+        # zoom origin that lands photo.face (centre of the face, as fractions of the portrait) in the circle's centre
+        ph, z = c["photo"], AVA_ZOOM
+        fx, fy = ph.get("face", (0.5, 0.2))
+        w, h = Image.open(PUB / ph["src"]).size
+        # where the face sits in the square before zooming: cover fits the shorter side, top-aligned and centred
+        fx, fy = (fx, fy * h / w) if h >= w else (0.5 + (fx - 0.5) * w / h, fy)
+        ox, oy = (min(max((0.5 - z * f) / (1 - z), 0), 1) * 100 for f in (fx, fy))
+        return f'<span class="ava" style="--cc:{c["color"]};--fo:{ox:.1f}% {oy:.1f}%" aria-hidden="true">{img(ph["src"], "ava-i", alt="")}</span>'
+
+    def row(cid, i, s):
+        sd, c = SCHEDS[cid], coaches[cid]
+        kind = sd["kinds"][s["kind"]]
+        meta = f'<span class="ses-kind k-{s["kind"]}">{t(kind)}</span>' if kind["en"] else ""
+        # Natanel's school-project subgroups differ only by time, so only the Olympic class shows its number
+        if s.get("subgroup") and s["kind"] == "olympic-class":
+            meta += f'<span class="ses-kind">{t({l: {"he": "קבוצה", "ru": "Группа", "en": "Group"}[l] + " " + str(s["subgroup"]) for l in LANGS})}</span>'
+        aud = s.get("audience")
+        if aud and aud != "adults":
+            meta += f'<span class="ses-kind k-aud">{t(sd["audiences"][aud])}</span>'
+        if s.get("note"):
+            meta += f'<span class="ses-note">{t(s["note"])}</span>'
+        grade = t(sd["audiences"]["adults"]) if aud == "adults" else t(grade_label(s["grades"])) if s["grades"] else ""
+        # markers: the landing page slots dated changes (content/schedule-changes) in at build; key = sessionKey()
+        return (f'<li class="ses" data-v="{s["venue"]}" data-g="{grade_range(s)}" data-c="{cid}" style="--cc:{c["color"]}"><!--SES {cid}#{i}-->'
+                f'{ava(c)}<span class="ses-time">{ltr(s["start"] + "–" + s["end"])}</span><span class="ses-grade">{grade}</span>'
+                + (f'<span class="ses-meta">{meta}</span>' if meta else "") +
+                f'<span class="ses-coach vh">{t(c["name"])}</span>'
+                f'<a class="ses-wa" href="{WA}" target="_blank" rel="noopener" {attr("aria-label", U["join"])} {ga("whatsapp_click", placement="schedule", venue=s["venue"])}>{WA_SVG}</a></li>')
+
     days = ""
     for d in range(6):
-        cards = ""
+        groups = {}
         ses = [(cid, i, x) for cid, sd in SCHEDS.items() for i, x in enumerate(sd["sessions"]) if x["day"] == d]
         for cid, i, s in sorted(ses, key=lambda r: (r[2]["start"], order.index(r[0]))):
-            sd = SCHEDS[cid]
-            kind = sd["kinds"][s["kind"]]
-            badge = f'<span class="ses-kind k-{s["kind"]}">{t(kind)}</span>' if kind["en"] else ""
-            if s.get("subgroup"):
-                badge += f'<span class="ses-kind">{t({l: {"he": "קבוצה", "ru": "Группа", "en": "Group"}[l] + " " + str(s["subgroup"]) for l in LANGS})}</span>'
-            if s.get("audience"):
-                badge += f'<span class="ses-kind k-aud">{t(sd["audiences"][s["audience"]])}</span>'
-            note = f'<span class="ses-note">{t(s["note"])}</span>' if s.get("note") else ""
-            grade = f'<span class="ses-grade">{t(grade_label(s["grades"]))}</span>' if s["grades"] else ""
-            v = VENUES[s["venue"]]
-            # markers: the landing page slots dated changes (content/schedule-changes) in at build; key = sessionKey()
-            cards += (f'<li class="ses" data-v="{s["venue"]}" data-g="{grade_range(s)}" data-c="{cid}" style="--vc:{VENUE_COLOR[s["venue"]]}"><!--SES {cid}#{i}-->'
-                      f'<span class="ses-time">{ltr(s["start"] + "–" + s["end"])}</span>{grade}'
-                      f'<span class="ses-venue"><i aria-hidden="true"></i>{t({l: v[l] for l in LANGS})}</span>'
-                      f'<span class="ses-coach">{t(first[cid])}</span>{badge}{note}'
-                      f'<a class="ses-wa" href="{WA}" target="_blank" rel="noopener" {ga("whatsapp_click", placement="schedule", venue=s["venue"])}>{WA_SVG}{t(U["join"])}</a></li>')
+            groups.setdefault(s["venue"], []).append(row(cid, i, s))
+        vgs = "".join(f'<section class="vg"><h5 class="vg-h">{t({l: VENUES[k][l] for l in LANGS})}<span class="vg-city">{t(city(VENUES[k]))}</span></h5>'
+                      f'<ul class="ses-list">{"".join(rows)}</ul></section>' for k, rows in groups.items())
         name = {l: SC["days"][l][d] for l in LANGS}
         days += (f'<section class="day" data-day="{d}"><h4 class="day-h">{t(name)}<span class="day-today">{t(U["today"])}</span></h4>'
-                 f'<ul class="ses-list"><!--SES_X {d}-->{cards}</ul><p class="day-none">{t(U["none_day"])}</p></section>')
+                 f'<ul class="ses-list ses-xl"><!--SES_X {d}--></ul><div class="vgs">{vgs}</div><p class="day-none">{t(U["none_day"])}</p></section>')
     tabs = "".join(f'<button type="button" class="tab" data-tab="{d}" aria-pressed="false">{t({l: DAY_SHORT[l][d] for l in LANGS})}<b class="tab-n"></b></button>' for d in range(6))
     grades = [(-1, U["all"])] + [(0, {"he": "גן", "ru": "Сад", "en": "KG"})] + [
         (g, {"he": SC["grade_letters_he"][g] + ("+" if g == 8 else ""), "ru": f"{g}{'+' if g == 8 else ''}", "en": f"{g}{'+' if g == 8 else ''}"}) for g in range(1, 9)] + [
         (18, U["adults"])]
     gchips = "".join(f'<button type="button" class="chip" data-grade="{g}" {ga("schedule_filter", grade=g)} aria-pressed="{str(g == -1).lower()}">{t(lab)}</button>' for g, lab in grades)
     cchips = f'<button type="button" class="chip" data-coach="" {ga("schedule_filter", coach="all")} aria-pressed="true">{t(U["all"])}</button>' + "".join(
-        f'<button type="button" class="chip" data-coach="{cid}" {ga("schedule_filter", coach=cid)} aria-pressed="false">{t(first[cid])}</button>' for cid in order)
+        f'<button type="button" class="chip cchip" data-coach="{cid}" {ga("schedule_filter", coach=cid)} aria-pressed="false">{ava(coaches[cid])}{t(first[cid])}</button>' for cid in order)
     # 15 venues don't fit a chip row on a phone; a native select grouped by city does
     vopts = f'<option value="" {attr("label", U["all"])}>{U["all"]["en"]}</option>' + "".join(
         f'<optgroup {attr("label", c)}>' + "".join(f'<option value="{k}" {attr("label", {l: v[l] for l in LANGS})}>{esc(v["en"])}</option>' for k, v in vs) + '</optgroup>'
@@ -564,9 +583,7 @@ def schedule():
  <div class="sched-bg">{img("train-georgia-randori.jpg")}</div>
  <div class="wrap">
   {head("schedule", "稽古", sc["title"])}
-  <div class="sc-coach rv"><div class="sc-avas">{"".join(img(c["photo"]["src"], "sc-ava", alt="") for c in coaches.values())}</div>
-   <div><h3 class="h3 grp">{t(U["heading"])}</h3>
-   <p class="sc-slogan">{t(SC["slogan"])}</p></div></div>
+  <div class="sc-head rv"><h3 class="h3 grp">{t(U["heading"])}</h3><p class="sc-slogan">{t(SC["slogan"])}</p></div>
   <div class="sc-filters">
    <div class="fl"><p class="fl-q" id="fl-grade">{t(U["grade_q"])}</p><div class="chips" role="group" aria-labelledby="fl-grade">{gchips}</div></div>
    <div class="fl"><p class="fl-q" id="fl-coach">{t(U["coach_q"])}</p><div class="chips" role="group" aria-labelledby="fl-coach">{cchips}</div></div>

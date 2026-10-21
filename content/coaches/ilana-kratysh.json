@@ -1,5 +1,6 @@
 {
  "id": "ilana-kratysh",
+ "color": "#d4a84b",
  "order": 1,
  "group": "main",
  "name": {
@@ -24,6 +25,7 @@
  },
  "photo": {
   "src": "coaches/ilana.jpg",
+  "face": [0.55, 0.21],
   "w": 800,
   "h": 1200,
   "source": "owner 2026-10-17",

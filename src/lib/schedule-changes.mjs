@@ -114,7 +114,7 @@ export const sessionKey = (schedules, id, ses) => `${id}#${schedules[id].session
  * HTML for the landing schedule: a notice list, badges inside the affected regular sessions
  * (keyed by sessionKey()) and extra cards per weekday.
  */
-export function renderSchedule(changes, lang, today, schedules, venues, venueColor) {
+export function renderSchedule(changes, lang, today, schedules, venues, coachColor) {
   const sessions = {}, extras = {};
   const add = (o, k, h) => (o[k] = (o[k] ?? '') + h);
   const items = changes.map((c) => {
@@ -127,10 +127,10 @@ export function renderSchedule(changes, lang, today, schedules, venues, venueCol
       const s = c.ses, sc = schedules[c.schedule];
       const badge = `${UI[c.type][lang]} · ${esc(fmtDay(c.new.date, lang))}`;
       add(extras, weekday(c.new.date),
-        `<li class="ses ses-x" data-v="${esc(c.new.venue)}" data-g="${esc(s ? gradeRange(s.grades, s.audience) : '0-18')}" data-c="${esc(c.schedule)}" style="--vc:${esc(venueColor[c.new.venue] ?? 'var(--gold)')}" ${gate(c, today)}>` +
+        `<li class="ses ses-x" data-v="${esc(c.new.venue)}" data-g="${esc(s ? gradeRange(s.grades, s.audience) : '0-18')}" data-c="${esc(c.schedule)}" style="--cc:${esc(coachColor[c.schedule] ?? 'var(--gold)')}" ${gate(c, today)}>` +
           `<span class="ses-time">${ltr(`${c.new.start}–${c.new.end}`)}</span><span class="ses-chg chg-new"><b>${badge}</b> ${note}</span>` +
           (s?.grades ? `<span class="ses-grade">${esc(gradeLabel(s.grades, sc.grade_letters_he, lang))}</span>` : '') +
-          `<span class="ses-venue"><i aria-hidden="true"></i>${esc(venues[c.new.venue][lang])}</span></li>`);
+          `<span class="ses-venue">${esc(venues[c.new.venue][lang])}</span></li>`);
     }
     return `<li id="chg-${esc(c.id)}" class="chg chg-${esc(c.type)}" ${gate(c, today)}><b>${summaryHtml(c, lang, venues)}</b> ${note}</li>`;
   });
