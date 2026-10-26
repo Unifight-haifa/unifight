@@ -4,7 +4,7 @@ import natanelJson from '../../content/coaches/natanel-zhurovel.json';
 // Every line restates a fact from content/coaches/*.json (bio or sources) or a quoted article
 // in .planning/research/PHOTOS-2026-10-18.md. A coach's video names only that coach.
 
-export const SITE = 'unifight-haifa.github.io/unifight';
+export const SITE = 'unifight-haifa.com';
 export const WHATSAPP = 'WhatsApp 054-566-4663';
 export const TAGLINE = {
   ru: 'У нас дзюдо — это больше, чем кружок.',

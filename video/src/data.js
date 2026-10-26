@@ -130,7 +130,7 @@ export const UI = {
   en: {today: 'Today', tagline: 'Here, judo is much more than an after-school class.'},
 };
 
-export const SITE = 'unifight-haifa.github.io/unifight';
+export const SITE = 'unifight-haifa.com';
 export const WHATSAPP = 'WhatsApp 054-566-4663';
 
 // Cuts land on the music grid: 76 BPM, so one beat is ~23.7 frames at 30 fps.

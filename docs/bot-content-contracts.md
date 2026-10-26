@@ -1,6 +1,6 @@
 # Bot content contracts
 
-What the n8n workflows commit (schedule changes to `main` here, photos to a private staging repo), and the JSON they poll afterwards to confirm it is live. News posts are in [news-format.md](news-format.md). `<base>` below is `https://unifight-haifa.github.io/unifight/`.
+What the n8n workflows commit (schedule changes to `main` here, photos to a private staging repo), and the JSON they poll afterwards to confirm it is live. News posts are in [news-format.md](news-format.md). `<base>` below is `https://unifight-haifa.com/`.
 
 ## Schedule changes
 

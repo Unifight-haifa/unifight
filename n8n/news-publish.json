@@ -190,7 +190,7 @@
         300
       ],
       "parameters": {
-        "jsCode": "\n// Owner-editable settings. Items pass through unchanged.\nconst cfg = {\n  repo: 'Unifight-haifa/unifight',\n  branch: 'main',\n  news_dir: 'src/content/news',\n  site: 'https://unifight-haifa.github.io/unifight',\n  news_json: 'https://unifight-haifa.github.io/unifight/news.json',\n  fb_page_id: 'REPLACE_PAGE_ID',\n  ig_user_id: 'REPLACE_IG_USER_ID',\n  // Club Telegram channel: '@name' or '-100…' id; empty = skip. The bot must be a channel admin.\n  tg_channel_id: '',\n  social_langs: ['he', 'ru'],\n  max_posts_per_day: 5,\n  max_revisions: 3,\n  deploy_checks: 16,\n};\nreturn $input.all().map(it => ({ json: { ...it.json, cfg }, binary: it.binary }));\n"
+        "jsCode": "\n// Owner-editable settings. Items pass through unchanged.\nconst cfg = {\n  repo: 'Unifight-haifa/unifight',\n  branch: 'main',\n  news_dir: 'src/content/news',\n  site: 'https://unifight-haifa.com',\n  news_json: 'https://unifight-haifa.com/news.json',\n  fb_page_id: 'REPLACE_PAGE_ID',\n  ig_user_id: 'REPLACE_IG_USER_ID',\n  // Club Telegram channel: '@name' or '-100…' id; empty = skip. The bot must be a channel admin.\n  tg_channel_id: '',\n  social_langs: ['he', 'ru'],\n  max_posts_per_day: 5,\n  max_revisions: 3,\n  deploy_checks: 16,\n};\nreturn $input.all().map(it => ({ json: { ...it.json, cfg }, binary: it.binary }));\n"
       }
     },
     {

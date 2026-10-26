@@ -67,7 +67,7 @@
 
 ## 6. Search Console
 
-- [ ] Открыть https://search.google.com/search-console → **Добавить ресурс** → **Ресурс с префиксом в URL** → `https://unifight-haifa.github.io/unifight/`.
+- [ ] Открыть https://search.google.com/search-console → **Добавить ресурс** → **Ресурс с префиксом в URL** → `https://unifight-haifa.com/`.
 - [ ] Способ подтверждения: **HTML-тег**. Google покажет `<meta name="google-site-verification" content="…">`. Скопировать только значение `content`.
 - [ ] GitHub → Variables → **New repository variable**: Name `PUBLIC_GSC_VERIFICATION`, Value — скопированное значение. Перезапустить деплой.
 - [ ] Когда деплой закончится, нажать в Search Console **Подтвердить**. Тег стоит на главной странице ресурса (`/unifight/`), именно её Google и проверяет. Переменную после подтверждения не удаляйте: без тега подтверждение со временем слетает.
