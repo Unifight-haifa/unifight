@@ -19,7 +19,7 @@ const useL = () => {
 const cover = (focus) => ({position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: focus});
 
 // A short sideways smear into each cut instead of a plain hard cut.
-const Whip = ({dir, children}) => {
+export const Whip = ({dir, children}) => {
   const f = useCurrentFrame();
   const p = ease(f, 0, 6, 1, 0);
   return (
@@ -171,7 +171,7 @@ const exitStyle = (f, dur) => {
   return {opacity: 1 - q, transform: `translateY(${q * 40}px)`, filter: q > 0.01 ? `blur(${q * 8}px)` : 'none'};
 };
 
-const Line = ({line, L, dur}) => {
+export const Line = ({line, L, dur}) => {
   const f = useCurrentFrame();
   const {fps} = useVideoConfig();
   const {big} = line;
@@ -193,7 +193,7 @@ const Line = ({line, L, dur}) => {
         {!top && rule}
         {LANGS.map((lang, k) => (
           <Wipe key={lang} lang={lang} at={k * (big ? 3 : 4)} style={{...lineStyle(lang, size), ...(hit && {color: `color-mix(in srgb, ${C.gold} ${hit * 100}%, ${C.paper})`, textShadow: `0 0 ${30 * hit}px ${C.gold}, ${SHADOW}`})}}>
-            {COPY[line.key][lang]}
+            {(line.text ?? COPY[line.key])[lang]}
           </Wipe>
         ))}
         {top && rule}
@@ -227,13 +227,13 @@ const Cta = ({rows, L, dur}) => {
   );
 };
 
-const LogoBug = ({L}) => (
+export const LogoBug = ({L}) => (
   <div style={{position: 'absolute', top: L.v ? 90 : 46, right: L.v ? 60 : 56, width: 60, height: 60, borderRadius: '50%', overflow: 'hidden', background: '#fff', opacity: 0.75}}>
     <Img src={staticFile('logo.png')} style={{width: '100%', height: '100%', objectFit: 'contain'}} />
   </div>
 );
 
-const EndCard = ({L, dur}) => {
+export const EndCard = ({L, dur}) => {
   const f = useCurrentFrame();
   const {fps} = useVideoConfig();
   const s = spring({frame: f, fps, config: {damping: 12, stiffness: 140}});

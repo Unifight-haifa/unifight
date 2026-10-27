@@ -82,3 +82,25 @@ are shown framed and small rather than blown up.
   Cuts follow its 132 BPM grid; the throw lands on the slam after the break (beat 272).
 - SFX, all CC0 from OpenGameArt: "Wind, hit, time morph" (qubodup), "75 CC0 breaking / falling / hit sfx"
   (rubberduck), "Heartbeat sounds" (bart), "Breathing Tired" (mikeask).
+
+## Club reels
+
+`Reel` (`src/Reel.jsx`, shot lists and captions in `src/reelData.js`) renders three 16:9 club videos:
+`sumo` (sumo practice, 2023), `sukkot` (Sukkot camp randori, 2023) and `camps` (camps and trips 2022–2024).
+`ReelThumb` renders the matching 1280×720 thumbnail.
+
+```sh
+python3 -I scripts/prep_reels.py /path/to/unifight-archive/Videos   # clips + music into public/reel/ (gitignored)
+scripts/render_reel.sh camps out/reel-camps.mp4                     # -14 LUFS; needs public/promo/sfx too
+npx remotion still src/index.jsx ReelThumb out/thumb-camps.png --props='{"reel":"camps"}'
+```
+
+Cuts sit on each track's beat grid and the end card lands on the track's final hit.
+
+**Sukkot: re-rendering from this prep alone is not safe.** `prep_reels.py` blurs judogi back patches it can
+detect, but one athlete's full name still shows in some frames. The published cut also blurred that athlete's
+upper back along hand-picked person tracks (YOLO + ByteTrack ids that change between runs), which is not in
+the script. Redo that step and check every frame for a readable name before any re-upload.
+
+- Music, CC BY 4.0, credit in each video description: Volatile Reaction (sumo), Hitman (sukkot),
+  Five Armies (camps), all Kevin MacLeod (incompetech.com).

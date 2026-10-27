@@ -3,6 +3,8 @@ import './fonts';
 import {Ilana, ILANA_FRAMES} from './ilana';
 import {Natanel, NATANEL_FRAMES} from './natanel';
 import {Promo, promoLength} from './Promo';
+import {Reel, ReelThumb} from './Reel';
+import {reelLength} from './reelData';
 
 const SIZES = {'16x9': [1920, 1080], '9x16': [1080, 1920]};
 const COACHES = {
@@ -43,6 +45,17 @@ const Root = () => (
       return {width, height, durationInFrames: promoLength(props.format)};
     }}
   />
+  <Composition
+    id="Reel"
+    component={Reel}
+    fps={30}
+    width={1920}
+    height={1080}
+    durationInFrames={1}
+    defaultProps={{reel: 'sumo'}}
+    calculateMetadata={({props}) => ({durationInFrames: reelLength(props.reel)})}
+  />
+  <Composition id="ReelThumb" component={ReelThumb} fps={30} width={1280} height={720} durationInFrames={1} defaultProps={{reel: 'sumo'}} />
   </>
 );
 

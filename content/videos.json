@@ -1,5 +1,59 @@
 [
  {
+  "id": "U6_j5c7fmKk",
+  "kind": "video",
+  "date": "2026-10-27",
+  "playlist": "camps",
+  "duration": 95,
+  "title": {
+   "he": "מחנות אימונים וטיולים 2022–2024 | יוניפייט חיפה",
+   "ru": "Сборы и выезды 2022–2024 | «Юнифайт Хайфа»",
+   "en": "Camps and trips 2022–2024 | Unifight Haifa"
+  },
+  "description": {
+   "he": "מחנה אימונים בגאורגיה (פברואר 2024): ריצות בחוץ, טיפוס בחבל וטיול לגודאורי. גרמניה (מאי 2023): פארק מים ופארק חבלים. ערב על חוף הכנרת (אוגוסט 2022). ובסוף עונת התחרויות 2023: אליפות הצפון, הטורניר הבינלאומי בראשון לציון ומדליה בארפורט. מועדון הג׳ודו יוניפייט חיפה.",
+   "ru": "Сборы в Грузии (февраль 2024): бег на улице, канат и поездка в Гудаури. Германия (май 2023): аквапарк и верёвочный парк. Вечер на берегу Кинерета (август 2022). И сезон турниров 2023: чемпионат Севера, международный турнир в Ришон-ле-Ционе и медаль в Эрфурте. Клуб дзюдо «Юнифайт Хайфа».",
+   "en": "Training camp in Georgia (February 2024): outdoor runs, rope climbs and a trip to Gudauri. Germany (May 2023): a water park and a rope park. An evening on the Kinneret shore (August 2022). Then the 2023 tournament season: the North championship, the Rishon LeZion international and a medal in Erfurt. Unifight Haifa judo club."
+  },
+  "thumb": "U6_j5c7fmKk.jpg"
+ },
+ {
+  "id": "ubWtcdkMVo8",
+  "kind": "video",
+  "date": "2026-10-27",
+  "playlist": "camps",
+  "duration": 50,
+  "title": {
+   "he": "מחנה אימונים סוכות 2023: רנדורי | יוניפייט חיפה",
+   "ru": "Сборы на Суккот 2023: рандори | «Юнифайт Хайфа»",
+   "en": "Sukkot training camp 2023: randori | Unifight Haifa"
+  },
+  "description": {
+   "he": "רנדורי במחנה האימונים של סוכות, אוקטובר 2023: זוגות בג׳ודוגי לבן וכחול בקרבות אימון. מועדון הג׳ודו יוניפייט חיפה.",
+   "ru": "Рандори на сборах в Суккот, октябрь 2023: пары в белых и синих кимоно в тренировочных схватках. Клуб дзюдо «Юнифайт Хайфа».",
+   "en": "Randori at the Sukkot training camp, October 2023: pairs in white and blue judogi in practice bouts. Unifight Haifa judo club."
+  },
+  "thumb": "ubWtcdkMVo8.jpg"
+ },
+ {
+  "id": "gTa26aEgvZE",
+  "kind": "video",
+  "date": "2026-10-27",
+  "playlist": "promo",
+  "duration": 69,
+  "title": {
+   "he": "סומו באימון, 2023 | מועדון ג׳ודו יוניפייט חיפה",
+   "ru": "Сумо на тренировке, 2023 | клуб дзюдо «Юнифайт Хайфа»",
+   "en": "Sumo practice, 2023 | Unifight Haifa judo club"
+  },
+  "description": {
+   "he": "סומו באימון, יוני 2023: עמידה נמוכה, אחיזה ודחיפה. מי שיוצא מהעיגול או נוגע במזרן במשהו חוץ מכפות הרגליים — מפסיד. מועדון הג׳ודו יוניפייט חיפה.",
+   "ru": "Сумо на тренировке, июнь 2023: низкая стойка, захват и толчок. Вышел из круга или коснулся татами чем-то кроме стоп — проиграл. Клуб дзюдо «Юнифайт Хайфа».",
+   "en": "Sumo at practice, June 2023: low stance, grip and push. Step out of the ring or touch the mat with anything but your feet and you lose. Unifight Haifa judo club."
+  },
+  "thumb": "gTa26aEgvZE.jpg"
+ },
+ {
   "id": "Wrnbu04Lq1o",
   "kind": "video",
   "date": "2026-10-18",

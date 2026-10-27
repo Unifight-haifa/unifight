@@ -131,7 +131,7 @@ export const UI = {
 };
 
 export const SITE = 'unifight-haifa.com';
-export const WHATSAPP = 'WhatsApp 054-566-4663';
+export const WHATSAPP = 'WhatsApp 054-763-2054';
 
 // Cuts land on the music grid: 76 BPM, so one beat is ~23.7 frames at 30 fps.
 export const FPS = 30;
