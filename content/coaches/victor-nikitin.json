@@ -1,0 +1,24 @@
+{
+ "id": "victor-nikitin",
+ "order": 15,
+ "group": "club",
+ "name": {
+  "he": "ויקטור ניקיטין",
+  "ru": "Виктор Никитин",
+  "en": "Victor Nikitin"
+ },
+ "photo": {
+  "src": "coaches/victor-nikitin.jpg",
+  "w": 800,
+  "h": 1030,
+  "source": "owner 2026-10-27",
+  "alt": {
+   "he": "ויקטור ניקיטין בחליפת ג׳ודו כחולה וחגורה שחורה",
+   "ru": "Виктор Никитин в синем кимоно с чёрным поясом",
+   "en": "Victor Nikitin in a blue judogi with a black belt"
+  }
+ },
+ "sources": [
+  "owner 2026-10-27, photo + name only; bio pending"
+ ]
+}
