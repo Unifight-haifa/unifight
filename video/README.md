@@ -90,17 +90,15 @@ are shown framed and small rather than blown up.
 `ReelThumb` renders the matching 1280×720 thumbnail.
 
 ```sh
-python3 -I scripts/prep_reels.py /path/to/unifight-archive/Videos   # clips + music into public/reel/ (gitignored)
+python3 -I scripts/prep_reels.py /path/to/unifight-archive          # clips, photos, music into public/reel/ (gitignored)
 scripts/render_reel.sh camps out/reel-camps.mp4                     # -14 LUFS; needs public/promo/sfx too
 npx remotion still src/index.jsx ReelThumb out/thumb-camps.png --props='{"reel":"camps"}'
 ```
 
 Cuts sit on each track's beat grid and the end card lands on the track's final hit.
 
-**Sukkot: re-rendering from this prep alone is not safe.** `prep_reels.py` blurs judogi back patches it can
-detect, but one athlete's full name still shows in some frames. The published cut also blurred that athlete's
-upper back along hand-picked person tracks (YOLO + ByteTrack ids that change between runs), which is not in
-the script. Redo that step and check every frame for a readable name before any re-upload.
+The Sukkot reel uses no masking: only the start of the wide clip, one cropped randori window and photos with
+no readable name on any judogi. After changing its shots, OCR every 0.2 s of the render for names.
 
 - Music, CC BY 4.0, credit in each video description: Volatile Reaction (sumo), Hitman (sukkot),
   Five Armies (camps), all Kevin MacLeod (incompetech.com).

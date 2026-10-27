@@ -42,20 +42,21 @@ const REELS = {
     lines: [[0.5, 15, 'sumo', {big: true}], [56, 70, 'ring'], [116, 130, 'lower'], [146, 160, 'start']],
   },
   sukkot: {
-    // the patch blur misses frame 0 and 36.3-40.2 s of suk-randori, so the cut skips both
+    // no masking: only footage with no readable name patch (wide clip, one reframed window, checked photos)
     music: 'hitman', bpm: 150, beat0: 0.317, hit: 93.917, endBeats: 12, fade: true,
     shots: [
-      [8, 'suk-wide', 0.2, {vol: 0.3}],
-      [16, 'suk-randori', 0.3, {vol: 0.3}],
-      [16, 'suk-randori', 6.7, {vol: 0.3}],
-      [16, 'suk-randori', 13.1, {vol: 0.3}],
-      [16, 'suk-randori', 19.5, {vol: 0.3}],
-      [8, 'suk-randori', 22.4, {rate: 0.5, flash: true}],
-      [16, 'suk-randori', 25.9, {vol: 0.3}],
-      [10, 'suk-randori', 32.3, {vol: 0.3}],
-      [8, 'suk-randori', 40.2, {vol: 0.3}],
+      // a back patch turns readable from 2.0 s of suk-wide; slowed so 0.2-1.8 s fills the shot
+      [8, 'suk-wide', 0.2, {rate: 0.5, vol: 0.3}],
+      [12, 'sp-kids', 0],
+      [4, 'suk-rf', 0, {rate: 0.8, vol: 0.3, flash: true}],
+      [12, 'sp-throw', 0],
+      [12, 'sp-ground', 0],
+      [12, 'sp-mat', 0],
+      [12, 'sp-young', 0, {flash: true}],
+      [12, 'sp-team', 0],
+      [12, 'sp-all', 0],
     ],
-    lines: [[0.5, 14, 'sukkot', {big: true}], [16, 30, 'randori'], [72, 86, 'lesson'], [102, 114, 'start']],
+    lines: [[0.5, 14, 'sukkot', {big: true}], [20, 32, 'randori'], [56, 68, 'lesson'], [84, 96, 'start']],
   },
   camps: {
     music: 'five-armies', bpm: 114, beat0: 0.022, hit: 147.91, endBeats: 12,
@@ -107,7 +108,7 @@ const build = ({music, bpm, beat0, hit, endBeats, fade, shots, lines}) => {
 // Thumbnails: frame from a prepped clip + headline (white line, red-bar line) and a he/ru/year row.
 export const THUMBS = {
   sumo: {clip: 'sumo', at: 11.0, top: 'Sumo', bar: 'Practice', sub: ['סומו באימון', 'Сумо на тренировке'], year: '2023'},
-  sukkot: {clip: 'suk-randori', at: 23.3, top: 'Sukkot', bar: 'Camp', sub: ['מחנה אימונים סוכות', 'Сборы на Суккот'], year: '2023 · Randori'},
+  sukkot: {clip: 'sp-throw', at: 0, top: 'Sukkot', bar: 'Camp', sub: ['מחנה אימונים סוכות', 'Сборы на Суккот'], year: '2023'},
   camps: {clip: 'g-run', at: 4.2, top: 'Camps', bar: '& Trips', sub: ['מחנות וטיולים', 'Сборы и выезды'], year: '2022–2024'},
 };
 
