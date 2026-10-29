@@ -49,18 +49,20 @@
 
 Чтобы видеть, например, с какой кнопки и для какого зала написали в WhatsApp, параметры надо зарегистрировать.
 
-- [ ] Администратор → Показ данных → **Специальные определения** → **Создать специальный параметр**, область действия **Событие**. По одному на каждый параметр: `placement`, `venue`, `language`, `network`, `provider`, `channel`, `grade`, `to`. Название параметра в отчёте можно дать любое, «Параметр события» должен совпадать точно.
+- [ ] Администратор → Показ данных → **Специальные определения** → **Создать специальный параметр**, область действия **Событие**. По одному на каждый параметр: `placement`, `venue`, `language`, `network`, `provider`, `channel`, `grade`, `to`, `method`. Название параметра в отчёте можно дать любое, «Параметр события» должен совпадать точно.
 
 Какие события отправляет сайт:
 
 | Событие | Когда | Параметры |
 |---|---|---|
-| `whatsapp_click` (ключевое) | кнопка WhatsApp | `placement`: `first_class`, `contact`, `schedule`, `schedule_none`; `venue` — зал, если кнопка в карточке расписания |
+| `whatsapp_click` (ключевое) | кнопка WhatsApp | `placement`: `first_class`, `contact`, `schedule`, `schedule_none`, `lead_done` (после формы заявки), `venue_group` (группа зала); `venue` — зал, если кнопка в карточке расписания или зала |
 | `phone_click` | номер телефона | `placement` |
 | `social_click` | Facebook, Instagram | `network` |
 | `schedule_filter` | фильтр расписания | `grade` (`-1` = все, `0` = сад) или `venue` (`all` = все) |
 | `map_open` | кнопка карты, Google Maps, Waze, транспорт | `provider`: `osm`, `google_maps`, `waze`, `transit`; `venue` |
 | `language_switch` | переключатель языка | `to` — язык, на который переключили |
+| `schedule_view` | расписание показалось на экране, или выбрали другой зал | `venue` (`all` = все залы) |
+| `lead_submit` | отправлена форма заявки | `venue` (`none` = не выбран), `method`: `form` (в таблицу) или `whatsapp` (адрес формы не задан) |
 | `news_share` | кнопки «Поделиться» в новости | `channel`: `whatsapp`, `facebook`, `telegram`, `copy`; готовый текст — `text_instagram`, `text_youtube`, `text_whatsapp` |
 
 У каждого события есть ещё `language` — язык страницы.

@@ -23,6 +23,21 @@ with sync_playwright() as p:
         page.click('[data-consent-choice="granted"]')
         page.wait_for_timeout(500)
         assert seen == [f"https://www.googletagmanager.com/gtag/js?id={ga_id}"], f"{lang}: {seen}"
+        # landing events reach gtag once accepted: schedule view by venue, then a lead sent without an endpoint
+        page.evaluate("window.open = () => null")
+        page.locator("#schedule .week").scroll_into_view_if_needed()
+        page.select_option("[data-venue-sel]", "ein-hayam")
+        form = page.locator("#lead-f")
+        form.locator("[name=name]").fill("Test")
+        form.locator("[name=phone]").fill("054-763-2054")
+        form.locator("[name=who][value=child]").check()
+        form.locator("[name=age]").fill("8")
+        form.locator("[name=hall]").select_option("dror-school")
+        form.locator("[name=consent]").check()
+        form.locator("button[type=submit]").click()
+        events = page.evaluate("dataLayer.filter(a => a[0] === 'event').map(a => [a[1], a[2].venue, a[2].method || ''])")
+        assert ["schedule_view", "ein-hayam", ""] in events, f"{lang}: {events}"
+        assert ["lead_submit", "dror-school", "whatsapp"] in events, f"{lang}: {events}"
         page.close()
     browser.close()
 print("ok")

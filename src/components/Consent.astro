@@ -52,6 +52,13 @@ document.addEventListener('click', function (e) {
   for (var k in el.dataset) if (k.length > 2 && k.indexOf('ga') === 0) p[k.charAt(2).toLowerCase() + k.slice(3)] = el.dataset[k];
   gtag('event', el.dataset.ga, p);
 });
+// events that aren't clicks (schedule views, sign-ups) come from the landing script
+document.addEventListener('ga', function (e) {
+  if (!window.gtag) return;
+  var p = { language: document.documentElement.lang };
+  for (var k in e.detail.params) p[k] = e.detail.params[k];
+  gtag('event', e.detail.name, p);
+});
 // Esc dismisses for this page only; no choice is stored, so nothing loads
 document.addEventListener('keydown', function (e) {
   if (e.key === 'Escape' && !box.hidden) box.hidden = true;

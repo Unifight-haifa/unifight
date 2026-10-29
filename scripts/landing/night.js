@@ -87,7 +87,13 @@
     }
     apply();
   });
-  sel.addEventListener('change', () => { store('uf-venue', venue = sel.value); apply(); });
+  // Consent.astro forwards 'ga' events to GA4, and only after the visitor accepts
+  const viewed = () => document.dispatchEvent(new CustomEvent('ga', { detail: { name: 'schedule_view', params: { venue: venue || 'all' } } }));
+  if ('IntersectionObserver' in window) {
+    const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) { viewed(); io.disconnect(); } });
+    io.observe(sec.querySelector('.week'));
+  }
+  sel.addEventListener('change', () => { store('uf-venue', venue = sel.value); apply(); viewed(); });
   apply();
 })();
 
@@ -160,6 +166,7 @@
     };
     // honeypot filled: a bot, so it gets the thank-you and nothing is sent
     if (el.website.value) return show(false);
+    document.dispatchEvent(new CustomEvent('ga', { detail: { name: 'lead_submit', params: { venue: el.hall.value || 'none', method: f.dataset.endpoint ? 'form' : 'whatsapp' } } }));
     if (!f.dataset.endpoint) { open(wa(fill(f.dataset.tpl, v)), '_blank', 'noopener'); return show(true); }
     const body = new URLSearchParams(new FormData(f));
     body.set('phone', tel()); body.set('lang', L); body.set('hall_name', v.hall);

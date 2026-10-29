@@ -50,12 +50,12 @@ test('gtag.js is only injected from inside load(), and load() only runs on "gran
 function run(stored) {
   const added = [];
   const box = { hidden: true, querySelector: () => ({ focus() {} }) };
-  let onClick;
+  let onClick, onGa;
   const store = new Map(stored ? [['consent', stored]] : []);
   const ctx = {
     document: {
       querySelector: () => box,
-      addEventListener: (type, fn) => type === 'click' && (onClick = fn),
+      addEventListener: (type, fn) => (type === 'click' ? (onClick = fn) : type === 'ga' && (onGa = fn)),
       createElement: (tag) => ({ tag }),
       head: { appendChild: (el) => added.push(el) },
       documentElement: { lang: 'he' },
@@ -68,7 +68,8 @@ function run(stored) {
   const js = consentScript(readFileSync(join(ga, 'he/index.html'), 'utf8'));
   vm.runInNewContext(js, ctx);
   const click = (dataset) => onClick({ target: { closest: () => ({ dataset, hasAttribute: () => false }) } });
-  return { ctx, box, added, store, click };
+  const send = (name, params) => onGa({ detail: { name, params } });
+  return { ctx, box, added, store, click, send };
 }
 
 test('first visit: banner shows, nothing loads until Accept', () => {
@@ -85,6 +86,20 @@ test('first visit: banner shows, nothing loads until Accept', () => {
   r.click({ ga: 'whatsapp_click', gaPlacement: 'contact', gaVenue: 'dror-school' });
   const ev = r.ctx.dataLayer.filter((a) => a[0] === 'event');
   assert.deepEqual(JSON.parse(JSON.stringify(ev)), [{ 0: 'event', 1: 'whatsapp_click', 2: { language: 'he', placement: 'contact', venue: 'dror-school' } }]);
+});
+
+test('landing events (schedule view, sign-up) reach GA only after Accept', () => {
+  const r = run(null);
+  r.send('schedule_view', { venue: 'all' });
+  assert.equal(r.ctx.gtag, undefined);
+  r.click({ consentChoice: 'granted' });
+  r.send('schedule_view', { venue: 'ein-hayam' });
+  r.send('lead_submit', { venue: 'dror-school', method: 'whatsapp' });
+  const ev = JSON.parse(JSON.stringify(r.ctx.dataLayer.filter((a) => a[0] === 'event')));
+  assert.deepEqual(ev, [
+    { 0: 'event', 1: 'schedule_view', 2: { language: 'he', venue: 'ein-hayam' } },
+    { 0: 'event', 1: 'lead_submit', 2: { language: 'he', venue: 'dror-school', method: 'whatsapp' } },
+  ]);
 });
 
 test('Decline stores the choice and loads nothing', () => {
