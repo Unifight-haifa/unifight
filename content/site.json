@@ -678,6 +678,34 @@
     "note": "athlete was a minor — do not name"
    },
    {
+    "id": "kloda-raz-maribor-2026",
+    "year": "2026",
+    "person": "Raz Kloda",
+    "minor": true,
+    "consents": [
+     "c-2026-001"
+    ],
+    "kind": "international",
+    "title": {
+     "he": "רז קלודה — כסף בגביע אירופה לקדטים, מאריבור",
+     "ru": "Раз Клода — серебро Кубка Европы среди кадетов, Марибор",
+     "en": "Raz Kloda — Cadet European Cup silver, Maribor"
+    },
+    "detail": {
+     "he": "אוקטובר 2026, -66 ק״ג; 6 ניצחונות בדרך לגמר.",
+     "ru": "Октябрь 2026, -66 кг; шесть побед на пути в финал.",
+     "en": "October 2026, -66 kg; six wins on the way to the final."
+    },
+    "weight": "-66 kg",
+    "sources": [
+     "owner FB post 2026-10-29",
+     "https://www.eju.net/calendar/6803",
+     "https://eju.net/storage/calendar-documents/MqqICTG4lDyQH4sNGQqzgeE4hARXzchfaVMZQBuE.pdf"
+    ],
+    "confidence": "confirmed",
+    "note": "cadet named with owner-confirmed parental consent (c-2026-001), Maribor post only; placing from the owner, -66 kg from the EJU draw"
+   },
+   {
     "id": "kratysh-sumo",
     "year": "2023",
     "person": "Ilana Kratysh",
@@ -762,6 +790,22 @@
    }
   ],
   "more_results": [
+   {
+    "id": "maribor-cadets-2026",
+    "year": "2026",
+    "text": {
+     "he": "גביע אירופה לקדטים, מאריבור 2026: ליאם טבצניק במקום החמישי, ניב מזרחי ומיכאל בונדרצוק במקום השביעי.",
+     "ru": "Кубок Европы среди кадетов, Марибор 2026: Лиам Табачник — пятый, Нив Мизрахи и Михаэль Бондарчук — седьмые.",
+     "en": "Cadet European Cup, Maribor 2026: Liam Tabachnik 5th, Niv Mizrahi and Michael Bondarchuk 7th."
+    },
+    "sources": [
+     "owner FB post 2026-10-29",
+     "https://www.eju.net/calendar/6803",
+     "https://eju.net/storage/calendar-documents/MqqICTG4lDyQH4sNGQqzgeE4hARXzchfaVMZQBuE.pdf"
+    ],
+    "confidence": "confirmed",
+    "note": "cadets named with owner-confirmed parental consent (c-2026-001), Maribor post only"
+   },
    {
     "id": "youth-2026",
     "year": "2026",

@@ -1,5 +1,38 @@
 {
  "_doc": "INTG-03 consent ledger, checked at build by src/lib/integrity.mjs. Never write a child's name here: `ref` points to the signed form kept outside the repo (paper file or the Google Form response). consents: {id: c-YYYY-NNN, ref, given: YYYY-MM-DD, revoked?: YYYY-MM-DD, scopes: [site, youtube, social, first_name, full_name, results]}. media: {\"<path as in npm run review>\": {minors: true|false, consents?: [id]}}. Empty until the owner records signed forms; npm run review lists what is still unclassified.",
- "consents": [],
- "media": {}
+ "consents": [
+  {
+   "id": "c-2026-001",
+   "ref": "owner confirmed 2026-10-29, names + photos, Maribor post",
+   "given": "2026-10-29",
+   "scopes": [
+    "site",
+    "youtube",
+    "social",
+    "first_name",
+    "full_name",
+    "results"
+   ]
+  }
+ ],
+ "media": {
+  "src/content/news/2026-10-29-maribor-cadet-cup/cover.jpg": {
+   "minors": true,
+   "consents": [
+    "c-2026-001"
+   ]
+  },
+  "src/content/news/2026-10-29-maribor-cadet-cup/medal.jpg": {
+   "minors": true,
+   "consents": [
+    "c-2026-001"
+   ]
+  },
+  "src/content/news/2026-10-29-maribor-cadet-cup/throw.jpg": {
+   "minors": true,
+   "consents": [
+    "c-2026-001"
+   ]
+  }
+ }
 }

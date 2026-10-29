@@ -110,6 +110,8 @@ export const THUMBS = {
   sumo: {clip: 'sumo', at: 11.0, top: 'Sumo', bar: 'Practice', sub: ['סומו באימון', 'Сумо на тренировке'], year: '2023'},
   sukkot: {clip: 'sp-throw', at: 0, top: 'Sukkot', bar: 'Camp', sub: ['מחנה אימונים סוכות', 'Сборы на Суккот'], year: '2023'},
   camps: {clip: 'g-run', at: 4.2, top: 'Camps', bar: '& Trips', sub: ['מחנות וטיולים', 'Сборы и выезды'], year: '2022–2024'},
+  // a 1 s clip of the medal photo, made by ffmpeg -loop 1 into public/reel/
+  maribor: {clip: 'maribor-medal', at: 0, top: 'Maribor', bar: 'Silver', sub: ['גביע אירופה', 'Кубок Европы'], year: '2026'},
 };
 
 export const REEL = Object.fromEntries(Object.entries(REELS).map(([k, r]) => [k, build(r)]));
