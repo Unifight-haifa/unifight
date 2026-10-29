@@ -20,6 +20,8 @@ Mattan Zamansky, Eytan Betker, Omer Keltch and David Guja also represented the c
 
 ![Mattan Zamansky (in blue) throwing an opponent at the Cadet European Cup in Maribor](throw.jpg)
 
+[Watch the video from the tournament on YouTube](https://youtu.be/LVJtDS4MCVM)
+
 Proud of all our athletes for their fighting spirit, determination and hard work on the mat! This is only the start of the season, and we keep working hard, improving and aiming as high as we can.
 
 Unifight Haifa – onwards!
