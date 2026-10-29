@@ -45,7 +45,7 @@ After the Pages deploy, `<base>/news.json` lists every published post, newest fi
    "cover": "https://…/_astro/cover.….jpeg" }]
 ```
 
-Poll it until the slug appears, then share the `url`. The `cover` URL is the same JPEG the page uses as `og:image`. Per-language RSS lives at `/<lang>/news/rss.xml`.
+Poll it until the slug appears, then share the `url`. The `cover` URL is the same JPEG the page uses as `og:image`. Per-language RSS lives at `/<lang>/rss.xml` (the older `/<lang>/news/rss.xml` serves the same feed), and `<base>/feed.json` is a JSON Feed 1.1 with one item per post and language: the 1200×630 cover, the author coach id and the WhatsApp share text in `_unifight`.
 
 Drafts are never built. In `npm run dev` they show only with `SHOW_DRAFTS=1`.
 
