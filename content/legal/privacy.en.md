@@ -3,7 +3,7 @@ title: Privacy policy
 description: What information the Unifight Haifa website handles, why, and what your rights are.
 ---
 
-Last updated: 18 October 2026
+Last updated: 29 October 2026
 
 This policy explains what information the Unifight Haifa website handles and why. It is written in line with the Israeli Protection of Privacy Law, 5741-1981, including Amendment 13, which came into force on 14 August 2025.
 
@@ -13,7 +13,7 @@ The site is run by Unifight Haifa, a registered non-profit association (amuta no
 
 ## What we collect
 
-Nothing that you enter. The site is static: it has no forms, no user accounts and no payments, and it does not ask for your name, phone number or any other personal details. We do not use advertising trackers. Analytics runs only if you agree to it, as described below.
+Only what you choose to send us through the sign-up form, described below. The site has no user accounts and no payments. We do not use advertising trackers. Analytics runs only if you agree to it, as described below.
 
 ## What is saved in your browser
 
@@ -53,6 +53,12 @@ You can change your choice at any time with the "Cookie settings" link at the bo
 ## Photos
 
 The site shows photos from training sessions and competitions, and club members, including children, may appear in them. If you or your child appear in a photo and you would like it removed, contact us and we will take it down.
+
+## The sign-up form
+
+The sign-up form asks for your name, phone number, whether the training is for a child or an adult, their age, the venue, and an optional message. With them it sends the site language and the time you sent the form. We use these details only to call you back and help you choose a group.
+
+The form sends them to a Google Sheets spreadsheet in the club's Google account, and the club gets them by email. If sending isn't available, the form opens WhatsApp with your details filled in instead, and you decide whether to send that message. Only the people in the club who handle sign-ups see them.
 
 ## If you contact us
 

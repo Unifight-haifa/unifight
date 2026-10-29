@@ -326,6 +326,28 @@ html[lang=he] .r-day{font-weight:400}
 .soc:hover{border-color:var(--gold);color:var(--gold-2)}
 .ct-pic .pic{aspect-ratio:3/4;max-block-size:620px}
 
+/* lead form */
+.lf{margin-block-start:28px;padding:clamp(22px,4vw,40px);border:1px solid var(--gold);background:rgba(10,9,8,.82);backdrop-filter:blur(6px)}
+.lf .lead{margin-block:8px 22px}
+.lf-f{display:grid;gap:16px}
+.lf-f label,.lf-who legend{display:grid;gap:6px;font-size:14.5px;font-weight:600;color:var(--gold-2)}
+.lf-f :is(input:not([type=radio],[type=checkbox]),select,textarea){box-sizing:border-box;inline-size:100%;min-block-size:48px;padding:10px 14px;border:1px solid rgba(243,234,216,.28);border-radius:2px;background:rgba(19,17,15,.9);color:var(--paper);font:400 16px/1.4 var(--body)}
+.lf-f :is(input,select,textarea):focus-visible{border-color:var(--gold)}
+.lf-f textarea{resize:vertical}
+.lf-who{display:flex;flex-wrap:wrap;gap:4px 22px;margin:0;padding:0;border:0}
+.lf-who legend{padding:0;margin-block-end:4px}
+.lf-f .lf-r,.lf-f .lf-ok{display:flex;align-items:center;gap:10px;min-block-size:44px;font-weight:500;color:var(--paper)}
+.lf-f .lf-ok{align-items:flex-start;color:var(--paper-2)}
+.lf-ok a{color:var(--gold-2)}
+.lf-f :is([type=radio],[type=checkbox]){inline-size:22px;block-size:22px;margin:0;accent-color:var(--red);flex:none}
+.lf-f .btn{justify-self:start}
+/* .lf-f and .soc set display, which would beat [hidden] */
+.lf [hidden]{display:none}
+.lf-done:focus{outline:0}
+.lf-done p{color:var(--paper);font-size:18px}
+.lf-done .wa-row{margin-block-start:16px}
+@media (min-width:760px){.lf-f{grid-template-columns:1fr 1fr}.lf-wide,.lf-f .lf-ok,.lf-f .btn{grid-column:1/-1}}
+
 /* footer */
 .ft{border-block-start:1px solid var(--line);background:var(--ink);padding-block:48px max(36px,env(safe-area-inset-bottom,0px))}
 .ft-in{display:flex;flex-wrap:wrap;gap:28px;justify-content:space-between;align-items:center}

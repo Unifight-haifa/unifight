@@ -126,3 +126,44 @@
     rail.scrollTo({ left: 0 });
   });
 })();
+
+(() => {
+  const f = document.getElementById('lead-f');
+  if (!f) return;
+  const L = document.documentElement.lang, el = f.elements, done = document.getElementById('lead-done');
+  const tel = () => el.phone.value.replace(/[\s().-]/g, '');
+  // Israeli mobile, landline or 07x number, written 0…, 972… or +972…
+  const check = () => el.phone.setCustomValidity(/^(?:\+?9720?|0)(?:[57]\d{8}|[2-489]\d{7})$/.test(tel()) ? '' : f.dataset.badPhone);
+  el.phone.addEventListener('input', check);
+  // a venue card or a schedule venue opens the form with its hall chosen
+  document.addEventListener('click', e => {
+    const a = e.target.closest('a[data-hall]');
+    if (a) el.hall.value = a.dataset.hall;
+  });
+  const fill = (tpl, v) => tpl.replace(/\{(\w+)\}/g, (_, k) => v[k]).trim();
+  const wa = text => f.dataset.wa + '?text=' + encodeURIComponent(text);
+  f.addEventListener('submit', e => {
+    e.preventDefault();
+    check();
+    if (!f.reportValidity()) return;
+    const opt = el.hall.selectedOptions[0], who = f.querySelector('[name=who]:checked').parentNode;
+    const v = { name: el.name.value.trim(), phone: el.phone.value.trim(), age: el.age.value, hall: opt.label,
+      who: who.querySelector(`[data-l=${L}]`).textContent, message: el.message.value.trim() };
+    const show = viaWa => {
+      done.querySelector('.lf-ok-msg').hidden = viaWa;
+      done.querySelector('.lf-wa-msg').hidden = !viaWa;
+      // if the POST failed the details still reach the club through this button
+      done.querySelector('[data-after-wa]').href = wa(viaWa ? fill(f.dataset.tpl, v) : fill(f.dataset.after, v));
+      const g = done.querySelector('[data-after-group]');
+      if (opt.dataset.group) { g.href = opt.dataset.group; g.hidden = false; }
+      f.hidden = true; done.hidden = false; done.focus();
+    };
+    // honeypot filled: a bot, so it gets the thank-you and nothing is sent
+    if (el.website.value) return show(false);
+    if (!f.dataset.endpoint) { open(wa(fill(f.dataset.tpl, v)), '_blank', 'noopener'); return show(true); }
+    const body = new URLSearchParams(new FormData(f));
+    body.set('phone', tel()); body.set('lang', L); body.set('hall_name', v.hall);
+    // Apps Script sends no CORS headers, so the response is opaque; reaching it is the success signal
+    fetch(f.dataset.endpoint, { method: 'POST', mode: 'no-cors', body }).then(() => show(false), () => show(true));
+  });
+})();

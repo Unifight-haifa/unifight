@@ -547,12 +547,14 @@ def schedule():
         if s.get("note"):
             meta += f'<span class="ses-note">{t(s["note"])}</span>'
         grade = t(sd["audiences"]["adults"]) if aud == "adults" else t(grade_label(s["grades"])) if s["grades"] else ""
+        # night.js adds the day and time on click; the hall is there even without JS
+        href = attr("href", {l: f"{WA}?text={urllib.parse.quote(U['wa_msg'][l] + VENUES[s['venue']][l])}" for l in LANGS})
         # markers: the landing page slots dated changes (content/schedule-changes) in at build; key = sessionKey()
         return (f'<li class="ses" data-v="{s["venue"]}" data-g="{grade_range(s)}" data-c="{cid}" style="--cc:{c["color"]}"><!--SES {cid}#{i}-->'
                 f'{ava(c)}<span class="ses-time">{ltr(s["start"] + "–" + s["end"])}</span><span class="ses-grade">{grade}</span>'
                 + (f'<span class="ses-meta">{meta}</span>' if meta else "") +
                 f'<span class="ses-coach vh">{t(c["name"])}</span>'
-                f'<a class="ses-wa" href="{WA}" target="_blank" rel="noopener" {attr("aria-label", U["join"])} {ga("whatsapp_click", placement="schedule", venue=s["venue"])}>{WA_SVG}</a></li>')
+                f'<a class="ses-wa" {href} target="_blank" rel="noopener" {attr("aria-label", U["join"])} {ga("whatsapp_click", placement="schedule", venue=s["venue"])}>{WA_SVG}</a></li>')
 
     days = ""
     for d in range(6):
@@ -560,7 +562,7 @@ def schedule():
         ses = [(cid, i, x) for cid, sd in SCHEDS.items() for i, x in enumerate(sd["sessions"]) if x["day"] == d]
         for cid, i, s in sorted(ses, key=lambda r: (r[2]["start"], order.index(r[0]))):
             groups.setdefault(s["venue"], []).append(row(cid, i, s))
-        vgs = "".join(f'<section class="vg"><h5 class="vg-h">{t({l: VENUES[k][l] for l in LANGS})}<span class="vg-city">{t(city(VENUES[k]))}</span><a class="vg-go" href="#v-{k}">{t(BR_UI["route"])}</a></h5>'
+        vgs = "".join(f'<section class="vg"><h5 class="vg-h">{t({l: VENUES[k][l] for l in LANGS})}<span class="vg-city">{t(city(VENUES[k]))}</span><a class="vg-go" href="#lead" data-hall="{k}">{t(BR_UI["form"])}</a><a class="vg-go" href="#v-{k}">{t(BR_UI["route"])}</a></h5>'
                       f'<ul class="ses-list">{"".join(rows)}</ul></section>' for k, rows in groups.items())
         name = {l: SC["days"][l][d] for l in LANGS}
         days += (f'<section class="day" data-day="{d}"><h4 class="day-h">{t(name)}<span class="day-today">{t(U["today"])}</span></h4>'
@@ -635,7 +637,74 @@ def first_class():
 
 BR_UI = {"days": {"he": "ימי אימון", "ru": "Дни тренировок", "en": "Training days"},
          "bus": {"he": "איך מגיעים באוטובוס", "ru": "Как доехать на автобусе", "en": "Bus directions"},
-         "route": {"he": "איך מגיעים ←", "ru": "Как добраться →", "en": "Directions →"}}
+         "route": {"he": "איך מגיעים ←", "ru": "Как добраться →", "en": "Directions →"},
+         "form": {"he": "השארת פרטים", "ru": "Оставить заявку", "en": "Sign up"},
+         "group": {"he": "קבוצת הוואטסאפ של האולם", "ru": "Группа зала в WhatsApp", "en": "Venue WhatsApp group"}}
+
+LEAD_UI = {
+    "title": {"he": "השאירו פרטים ונחזור אליכם", "ru": "Оставьте заявку — мы перезвоним", "en": "Leave your details and we'll call you back"},
+    "intro": {"he": "נחזור אליכם ונעזור לבחור קבוצה מתאימה.", "ru": "Перезвоним и поможем подобрать группу.", "en": "We'll call you back and help you pick a group."},
+    "name": {"he": "שם", "ru": "Имя", "en": "Name"},
+    "phone": {"he": "טלפון", "ru": "Телефон", "en": "Phone"},
+    "who": {"he": "למי האימון?", "ru": "Для кого тренировки?", "en": "Who is it for?"},
+    "child": {"he": "ילד/ה", "ru": "Ребёнок", "en": "Child"},
+    "adult": {"he": "מבוגר/ת", "ru": "Взрослый", "en": "Adult"},
+    "age": {"he": "גיל", "ru": "Возраст", "en": "Age"},
+    "hall": {"he": "אולם", "ru": "Зал", "en": "Venue"},
+    "any": {"he": "עוד לא החלטנו", "ru": "Пока не знаем", "en": "Not sure yet"},
+    "message": {"he": "הודעה (לא חובה)", "ru": "Сообщение (необязательно)", "en": "Message (optional)"},
+    "consent": {"he": "אני מסכים/ה שהמועדון ישמור את הפרטים כדי לחזור אליי.", "ru": "Согласен(на), что клуб сохранит эти данные, чтобы связаться со мной.",
+                "en": "I agree the club may keep these details to contact me."},
+    "privacy": {"he": "מדיניות פרטיות", "ru": "Политика конфиденциальности", "en": "Privacy policy"},
+    "send": {"he": "שליחה", "ru": "Отправить", "en": "Send"},
+    "send_wa": {"he": "שליחה בוואטסאפ", "ru": "Отправить в WhatsApp", "en": "Send via WhatsApp"},
+    "done": {"he": "תודה! קיבלנו את הפרטים ונחזור אליכם בקרוב.", "ru": "Спасибо! Заявка получена, мы скоро перезвоним.", "en": "Thanks! We've got your details and will call you back soon."},
+    "done_wa": {"he": "תודה! שלחו את ההודעה בוואטסאפ ונחזור אליכם.", "ru": "Спасибо! Отправьте сообщение в WhatsApp, и мы вам ответим.", "en": "Thanks! Send the message in WhatsApp and we'll get back to you."},
+    "bad_phone": {"he": "מספר טלפון ישראלי, למשל 050-1234567", "ru": "Израильский номер, например 050-123-4567", "en": "An Israeli number, e.g. 050-123-4567"},
+    "tpl": {"he": "שלום! פנייה מהאתר.\nשם: {name}\nטלפון: {phone}\nעבור: {who}, גיל {age}\nאולם: {hall}\n{message}",
+            "ru": "Здравствуйте! Заявка с сайта.\nИмя: {name}\nТелефон: {phone}\nДля кого: {who}, возраст {age}\nЗал: {hall}\n{message}",
+            "en": "Hi! A sign-up from the website.\nName: {name}\nPhone: {phone}\nFor: {who}, age {age}\nVenue: {hall}\n{message}"},
+    "after": {"he": "שלום! השארתי פרטים באתר. אולם: {hall}", "ru": "Здравствуйте! Оставили заявку на сайте. Зал: {hall}", "en": "Hi! I've just left my details on the website. Venue: {hall}"},
+}
+
+
+def lead_form():
+    U, ep = LEAD_UI, C["contact"]["lead_endpoint"]
+    opts = f'<option value="" {attr("label", U["any"])}>{esc(U["any"]["en"])}</option>' + "".join(
+        f'<optgroup {attr("label", c)}>' + "".join(
+            f'<option value="{k}" {attr("label", {l: v[l] for l in LANGS})}' + (f' data-group="{html.escape(v["whatsapp_group"])}"' if v.get("whatsapp_group") else "") + f'>{esc(v["en"])}</option>'
+            for k, v in vs) + '</optgroup>'
+        for c, vs in by_city())
+    ok = "".join(f'<span data-l="{l}">{one(l, U["consent"][l])} <a href="%BASE%{l}/privacy/">{U["privacy"][l]}</a></span>' for l in LANGS)
+    send, icon = (U["send"], "") if ep else (U["send_wa"], WA_SVG)
+    radio = lambda v: f'<label class="lf-r"><input type="radio" name="who" value="{v}" required>{t(U[v])}</label>'
+    # without an endpoint the form hands everything to WhatsApp, so it works with no backend
+    return f'''
+  <div class="lf rv" id="lead">
+   <h3 class="h3">{t(U["title"])}</h3><p class="lead">{t(U["intro"])}</p>
+   <form class="lf-f" id="lead-f" data-endpoint="{html.escape(ep)}" data-wa="{WA}" {attr("data-tpl", U["tpl"])} {attr("data-after", U["after"])} {attr("data-bad-phone", U["bad_phone"])}>
+    <label>{t(U["name"])}<input name="name" required maxlength="80" autocomplete="name"></label>
+    <label>{t(U["phone"])}<input name="phone" type="tel" required maxlength="20" autocomplete="tel" dir="ltr"></label>
+    <fieldset class="lf-who"><legend>{t(U["who"])}</legend>{radio("child")}{radio("adult")}</fieldset>
+    <label>{t(U["age"])}<input name="age" type="number" required min="3" max="99" inputmode="numeric"></label>
+    <label class="lf-wide">{t(U["hall"])}<select name="hall">{opts}</select></label>
+    <label class="lf-wide">{t(U["message"])}<textarea name="message" rows="3" maxlength="1000"></textarea></label>
+    <label class="vh" aria-hidden="true">Website<input name="website" tabindex="-1" autocomplete="off"></label>
+    <label class="lf-ok"><input type="checkbox" name="consent" value="yes" required>{ok}</label>
+    <button class="btn btn-wa btn-lg" type="submit">{icon}{t(send)}</button>
+   </form>
+   <div class="lf-done" id="lead-done" tabindex="-1" hidden>
+    <p class="lf-ok-msg">{t(U["done"])}</p><p class="lf-wa-msg">{t(U["done_wa"])}</p>
+    <div class="wa-row"><a class="btn btn-wa" href="{WA}" target="_blank" rel="noopener" data-after-wa {ga("whatsapp_click", placement="lead_done")}>{WA_SVG}{t(C["contact"]["whatsapp_cta"]["label"])}</a>
+    <a class="soc" href="" target="_blank" rel="noopener" data-after-group hidden {ga("whatsapp_click", placement="lead_group")}>{t(BR_UI["group"])}</a></div>
+   </div>
+  </div>'''
+
+
+def hall_group(k, v):
+    # the owner adds whatsapp_group to a venue once its group exists
+    g = v.get("whatsapp_group")
+    return f'<a href="{html.escape(g)}" target="_blank" rel="noopener" {ga("whatsapp_click", placement="venue_group", venue=k)}>{t(BR_UI["group"])}</a>' if g else ""
 
 
 def branches():
@@ -652,7 +721,8 @@ def branches():
                   f'<h4 class="h3">{t({l: vn[l] for l in LANGS})}</h4><p class="v-addr">{t(vn["address"])}</p><p class="v-note">{t(BR_UI["days"])}: {days}</p>'
                   f'<div class="v-links"><a href="https://www.google.com/maps/search/?api=1&amp;query={q}" target="_blank" rel="noopener" {ga("map_open", venue=k, provider="google_maps")}>Google Maps</a>'
                   f'<a href="https://waze.com/ul?q={q}&amp;navigate=yes" target="_blank" rel="noopener" {ga("map_open", venue=k, provider="waze")}>Waze</a>'
-                  f'<a href="https://www.google.com/maps/dir/?api=1&amp;destination={q}&amp;travelmode=transit" target="_blank" rel="noopener" {ga("map_open", venue=k, provider="transit")}>{t(BR_UI["bus"])}</a></div></article>')
+                  f'<a href="https://www.google.com/maps/dir/?api=1&amp;destination={q}&amp;travelmode=transit" target="_blank" rel="noopener" {ga("map_open", venue=k, provider="transit")}>{t(BR_UI["bus"])}</a>'
+                  f'<a href="#lead" data-hall="{k}">{t(BR_UI["form"])}</a>{hall_group(k, vn)}</div></article>')
         v += '</div>'
     nb = "".join(f'<li>{t(n["name"])}</li>' for n in b["neighbourhoods"])
     return f'''
@@ -691,6 +761,7 @@ def contact():
    </div>
    <div class="ct-pic rv">{img("belts-air.jpg", "pic")}</div>
   </div>
+  {lead_form()}
   {more_link(co, "contact/")}
  </div>
 </section>'''
