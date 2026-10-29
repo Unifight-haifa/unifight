@@ -1,0 +1,20 @@
+---
+import type videos from '../../content/videos.json';
+
+interface Props {
+  v: (typeof videos)[number] & { duration?: number };
+  title: string;
+}
+
+const { v, title } = Astro.props;
+const dur = (sec: number) => `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, '0')}`;
+---
+{/* plain link without JS; VideoModal swaps it for the in-page player */}
+<a href={`https://youtu.be/${v.id}`} data-video={v.id} data-kind={v.kind} data-title={title} data-ga="video_play" data-ga-video_id={v.id} data-ga-playlist={v.playlist}>
+  <span class="video-thumb">
+    <img src={`${import.meta.env.BASE_URL}videos/${v.thumb}`} alt="" loading="lazy" decoding="async" />
+    <span class="video-play" aria-hidden="true"></span>
+    {v.duration && <span class="video-dur" dir="ltr">{dur(v.duration)}</span>}
+  </span>
+  <slot />
+</a>

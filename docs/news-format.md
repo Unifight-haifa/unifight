@@ -25,6 +25,7 @@ date: 2026-10-17                    # required, ISO date
 author: ilana-kratysh               # required, a file name in content/coaches/ without .json
 cover: cover.jpg                    # required, file in the same folder
 cover_alt: What the photo shows     # optional
+video: LVJtDS4MCVM                  # optional; a YouTube id from content/videos.json, shown under the cover
 tags: [tournament]                  # optional
 draft: false                        # optional; true keeps the post out of the build
 ---

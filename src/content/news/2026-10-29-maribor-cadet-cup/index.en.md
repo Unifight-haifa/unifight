@@ -5,6 +5,7 @@ date: 2026-10-29
 author: ilana-kratysh
 cover: cover.jpg
 cover_alt: Raz Kloda (left) with his silver medal on the podium of the Cadet European Cup, Maribor 2026
+video: LVJtDS4MCVM
 ---
 
 A great start to the season for our athletes at the Cadet European Cup in Maribor, Slovenia!
@@ -19,8 +20,6 @@ Mattan Zamansky, Eytan Betker, Omer Keltch and David Guja also represented the c
 ![Raz Kloda with his silver medal next to coach Natanel Zhurovel](medal.jpg)
 
 ![Mattan Zamansky (in blue) throwing an opponent at the Cadet European Cup in Maribor](throw.jpg)
-
-[Watch the video from the tournament on YouTube](https://youtu.be/LVJtDS4MCVM)
 
 Proud of all our athletes for their fighting spirit, determination and hard work on the mat! This is only the start of the season, and we keep working hard, improving and aiming as high as we can.
 

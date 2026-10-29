@@ -281,3 +281,22 @@ test('the n8n Translate prompt embeds the current glossary', () => {
   const { rules, terms } = glossary;
   assert.ok(t.parameters.options.system.includes(`GLOSSARY: ${JSON.stringify({ rules, terms })}\n`), 'out of sync: re-embed with the command in docs/n8n-news-design.md §5');
 });
+
+test('a post with video: shows the click-to-play player, posts without it do not', () => {
+  const id = (p) => readFileSync(new URL(`${p.dir}/index.he.md`, src), 'utf8').match(/^video:\s*(\S+)\s*$/m)?.[1];
+  const withVideo = published.filter(id);
+  assert.ok(withVideo.length > 0, 'expected at least one post with video:');
+  for (const p of published) {
+    for (const l of Object.keys(LANGS)) {
+      const html = page(l, p.slug);
+      if (!id(p)) {
+        assert.ok(!html.includes('data-video-modal'), `${l}/${p.slug}`);
+        continue;
+      }
+      assert.match(html, new RegExp(`<div class="news-video">\\s*<a href="https://youtu\\.be/${id(p)}" data-video="${id(p)}"`), `${l}/${p.slug}`);
+      assert.ok(html.includes('data-video-modal') && html.includes('youtube-nocookie.com/embed/'), `${l}/${p.slug}`);
+      // YouTube is only contacted after the click
+      assert.ok(!/<iframe/i.test(html), `${l}/${p.slug}`);
+    }
+  }
+});

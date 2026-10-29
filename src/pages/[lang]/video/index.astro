@@ -4,6 +4,7 @@ import { getRelativeLocaleUrl } from 'astro:i18n';
 import videos from '../../../../content/videos.json';
 import Base from '../../../layouts/Base.astro';
 import JsonLd from '../../../components/JsonLd.astro';
+import VideoLink from '../../../components/VideoLink.astro';
 import VideoModal from '../../../components/VideoModal.astro';
 import { LANGS, t, type Lang } from '../../../i18n/ui';
 import { fmtDate } from '../../../lib/news';
@@ -50,7 +51,6 @@ const list = ([...videos] as Video[]).sort((a, b) => b.date.localeCompare(a.date
 const groups = [list.filter((v) => v.kind !== 'short'), list.filter((v) => v.kind === 'short')];
 const present = PLAYLISTS.filter((p) => list.some((v) => v.playlist === p)) as (keyof typeof s.playlists)[];
 const thumb = (v: Video) => `${base}videos/${v.thumb}`;
-const dur = (sec: number) => `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, '0')}`;
 const ld = {
   '@context': 'https://schema.org',
   '@graph': list.map((v) => ({
@@ -93,16 +93,10 @@ const ld = {
         <ul class:list={['video-list', { shorts: i === 1 }]}>
           {g.map((v) => (
             <li class="video-card" data-playlist={v.playlist}>
-              {/* plain link without JS; the script swaps it for the in-page player */}
-              <a href={`https://youtu.be/${v.id}`} data-video={v.id} data-kind={v.kind} data-title={v.title[lang]} data-ga="video_play" data-ga-video_id={v.id} data-ga-playlist={v.playlist}>
-                <span class="video-thumb">
-                  <img src={thumb(v)} alt="" loading="lazy" decoding="async" />
-                  <span class="video-play" aria-hidden="true"></span>
-                  {v.duration && <span class="video-dur" dir="ltr">{dur(v.duration)}</span>}
-                </span>
+              <VideoLink v={v} title={v.title[lang]}>
                 <time datetime={v.date}>{fmtDate(new Date(v.date), lang)}</time>
                 {i === 1 ? <h3 class="video-title">{v.title[lang]}</h3> : <h2 class="video-title">{v.title[lang]}</h2>}
-              </a>
+              </VideoLink>
             </li>
           ))}
         </ul>

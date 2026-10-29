@@ -38,6 +38,7 @@ const news = defineCollection({
       author: z.string(),
       cover: image(),
       cover_alt: z.string().optional(),
+      video: z.string().regex(/^[A-Za-z0-9_-]{11}$/).optional(),
       tags: z.array(z.string()).default([]),
       draft: z.boolean().default(false),
     }),

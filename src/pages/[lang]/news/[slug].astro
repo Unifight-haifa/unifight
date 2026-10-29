@@ -4,10 +4,13 @@ import { render } from 'astro:content';
 import { getRelativeLocaleUrl } from 'astro:i18n';
 import Base from '../../../layouts/Base.astro';
 import JsonLd from '../../../components/JsonLd.astro';
+import VideoLink from '../../../components/VideoLink.astro';
+import VideoModal from '../../../components/VideoModal.astro';
 import { LANGS, t, type Lang } from '../../../i18n/ui';
 import { authorName, fmtDate, getPosts, ogCover, postPath, type Post } from '../../../lib/news';
 import { socialTexts } from '../../../lib/social.mjs';
 import social from '../../../../content/social.json';
+import videos from '../../../../content/videos.json';
 import '../../../styles/landing.css';
 import '../../../styles/news.css';
 
@@ -24,6 +27,8 @@ const { Content } = await render(entry);
 const abs = (path: string) => new URL(path, Astro.site).href;
 const url = abs(postPath(lang, post.slug));
 const og = await ogCover(entry);
+const video = d.video && videos.find((v) => v.id === d.video);
+if (d.video && !video) throw new Error(`news/${post.slug}/${lang}: video ${d.video} is not in content/videos.json`);
 const LOCALE = { he: 'he_IL', ru: 'ru_RU', en: 'en_US' };
 const e = encodeURIComponent;
 const article = {
@@ -85,6 +90,7 @@ const copy = [
       · {t(lang, 'newsBy')} <bdi>{authorName(d.author, lang)}</bdi>
     </p>
     <Image class="news-cover" src={d.cover} alt={d.cover_alt ?? ''} widths={[600, 1200]} sizes="(min-width: 800px) 760px, 100vw" />
+    {video && <div class="news-video"><VideoLink v={video} title={video.title[lang]} /></div>}
     <div class="news-body"><Content /></div>
     <nav class="news-share" aria-label={t(lang, 'newsShare')}>
       {share.map(([name, href]) => <a class="btn btn-ghost" href={href} target="_blank" rel="noopener" data-ga="news_share" data-ga-channel={name.toLowerCase()}>{name}</a>)}
@@ -104,6 +110,7 @@ const copy = [
       <p class="news-social-status" role="status" aria-live="polite" data-done={t(lang, 'newsTextCopied')} data-select={t(lang, 'newsSelectHint')}></p>
     </section>
   </article>
+  {video && <VideoModal lang={lang} />}
   <script is:inline>
     document.addEventListener('click', function (e) {
       var a = e.target.closest && e.target.closest('[data-copy]');
