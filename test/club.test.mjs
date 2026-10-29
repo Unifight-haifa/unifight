@@ -11,7 +11,7 @@ const read = (p) => readFileSync(dist(p), 'utf8');
 const tourDir = new URL('../content/tournaments/', import.meta.url);
 const tours = readdirSync(tourDir).map((f) => ({ slug: f.replace(/\.json$/, ''), ...json(`../content/tournaments/${f}`) }));
 const fixture = json('./fixtures/tournament-unverified.json');
-const PAGES = ['history/', 'achievements/', 'tournaments/', 'nivheret/', 'contact/', 'belts/', 'techniques/', ...published(tours).map((t) => `tournaments/${t.slug}/`)];
+const PAGES = ['about/', 'history/', 'achievements/', 'tournaments/', 'nivheret/', 'contact/', 'belts/', 'techniques/', ...published(tours).map((t) => `tournaments/${t.slug}/`)];
 
 test('the new pages exist in he, ru and en with the right lang and dir', () => {
   assert.ok(PAGES.length > 4);
