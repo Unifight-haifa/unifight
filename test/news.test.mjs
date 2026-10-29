@@ -184,7 +184,7 @@ test('rendered post bodies contain only safe tags and links', () => {
     for (const d of readdirSync(new URL(`${l}/news/`, dist), { withFileTypes: true })) {
       if (!d.isDirectory()) continue;
       const html = readFileSync(new URL(`${l}/news/${d.name}/index.html`, dist), 'utf8');
-      const body = html.split('class="news-body">')[1]?.split('</article>')[0];
+      const body = html.split('class="news-body">')[1]?.split('<footer class="news-end">')[0];
       assert.ok(body, `${l}/${d.name} has a body`);
       assert.doesNotThrow(() => checkRenderedBody(body), `${l}/${d.name}`);
     }
@@ -213,7 +213,6 @@ test('rendered-body gate rejects unsafe output', () => {
 
 const json = (p) => JSON.parse(readFileSync(new URL(`../${p}`, import.meta.url), 'utf8'));
 const social = json('content/social.json');
-const unescape = (s) => s.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&amp;/g, '&');
 
 test('social text: markdown becomes plain text, long posts are trimmed cleanly', () => {
   assert.equal(
@@ -240,17 +239,17 @@ test('social hashtags are 3-6 real hashtags per language', () => {
 
 for (const { slug } of published) {
   for (const l of Object.keys(LANGS)) {
-    test(`${l}/news/${slug}/ has copy-for-social buttons with escaped text and a no-JS fallback`, () => {
+    test(`${l}/news/${slug}/ ends with a labelled icon share row and no staff social-text kit`, () => {
       const html = page(l, slug);
-      const url = meta(html, 'og:url');
-      const items = [...html.matchAll(/<button [^>]*hidden data-copy-text data-ga="news_share" data-ga-channel="text_(\w+)">[^<]+<\/button> <details> <summary>[\s\S]*?<\/summary> <textarea readonly[^>]*>([^<]*)<\/textarea> <\/details>/g)];
-      assert.deepEqual(items.map((m) => m[1]), ['instagram', 'youtube', 'whatsapp']);
-      const text = Object.fromEntries(items.map((m) => [m[1], unescape(m[2])]));
-      assert.ok(!text.instagram.includes('http') && text.instagram.includes(social.link_in_bio[l]));
-      assert.ok(text.instagram.length <= LIMITS.instagram);
-      for (const k of ['youtube', 'whatsapp']) assert.ok(text[k].includes(url), k);
-      for (const k of Object.keys(text)) assert.ok(text[k].endsWith(social.hashtags[l].join(' ')), k);
-      assert.match(html, /<p class="news-social-status" role="status" aria-live="polite"/);
+      const nav = html.match(/<nav class="news-share"[\s\S]*?<\/nav>/)?.[0];
+      assert.ok(nav, 'share row');
+      const icons = [...nav.matchAll(/<(?:a|button) [^>]*class="share-ico"[^>]*>/g)].map((m) => m[0]);
+      assert.equal(icons.length, 5);
+      for (const tag of icons) assert.match(tag, /aria-label="[^"]+"/, tag);
+      assert.match(nav, /<button type="button" class="share-ico" hidden data-share/);
+      assert.match(nav, /class="share-status" role="status" aria-live="polite"/);
+      // owner rejected the public copy-for-Instagram/YouTube block (2026-10-29); feed.json still carries the share text
+      assert.ok(!/news-social|<textarea/.test(html), `${l}/${slug}`);
     });
   }
 }

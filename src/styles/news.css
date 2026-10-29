@@ -21,14 +21,15 @@
 .news-body { max-inline-size: 68ch; font-size: 18px; color: var(--paper-2); }
 .news-body :where(p, ul, ol) { margin-block-end: 1em; }
 .news-body a { color: var(--gold-2); }
-.news-share { display: flex; flex-wrap: wrap; gap: 10px; margin-block-start: 36px; padding-block-start: 24px; border-block-start: 1px solid var(--line); }
-.news-share .btn { min-block-size: 44px; font-size: 15px; padding: .6em 1.1em; }
-.news-social { display: grid; gap: 12px; margin-block-start: 28px; }
-.news-social .h3 { font-size: 20px; color: var(--paper); }
-.news-social-item { display: grid; gap: 8px; justify-items: start; }
-.news-social .btn { min-block-size: 44px; font-size: 15px; padding: .6em 1.1em; }
-.news-social summary { cursor: pointer; color: var(--paper-2); font-size: 15px; min-block-size: 32px; }
-.news-social details { inline-size: 100%; }
-.news-social textarea { inline-size: 100%; max-inline-size: 68ch; margin-block-start: 8px; padding: 10px; background: var(--ink-2); color: var(--paper); border: 1px solid var(--line); border-radius: 2px; font: 15px/1.45 var(--body); resize: vertical; }
-.news-social-status { min-block-size: 1.4em; color: var(--gold-2); font-size: 15px; }
-.news-social .btn[hidden] { display: none; }
+.news-end { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px 24px; margin-block-start: 40px; padding-block-start: 20px; border-block-start: 1px solid var(--line); }
+.news-share { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.news-share-h { margin-inline-end: 6px; color: var(--mute); font-size: 13px; letter-spacing: .14em; text-transform: uppercase; }
+/* tracked capitals suit Latin/Cyrillic only; spaced Hebrew letters read as separate letters */
+:lang(he) .news-share-h { letter-spacing: 0; font-size: 15px; }
+.share-ico { display: grid; place-items: center; inline-size: 44px; block-size: 44px; padding: 0; border-radius: 50%; border: 1px solid var(--line); background: var(--ink-2); color: var(--gold-2); cursor: pointer; transition: border-color .2s, color .2s, background .2s; }
+.share-ico svg { inline-size: 20px; block-size: 20px; }
+.share-ico:hover { border-color: var(--gold); color: var(--paper); }
+.share-ico:focus-visible { outline: 3px solid var(--gold-2); outline-offset: 2px; }
+.share-ico.is-done { border-color: var(--gold); background: var(--gold); color: var(--ink); }
+.share-ico[hidden], .news-share.is-native a.share-ico { display: none; }
+.share-status { color: var(--gold-2); font-size: 14px; }

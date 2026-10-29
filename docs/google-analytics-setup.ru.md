@@ -63,7 +63,7 @@
 | `language_switch` | переключатель языка | `to` — язык, на который переключили |
 | `schedule_view` | расписание показалось на экране, или выбрали другой зал | `venue` (`all` = все залы) |
 | `lead_submit` | отправлена форма заявки | `venue` (`none` = не выбран), `method`: `form` (в таблицу) или `whatsapp` (адрес формы не задан) |
-| `news_share` | кнопки «Поделиться» в новости | `channel`: `whatsapp`, `facebook`, `telegram`, `copy`; готовый текст — `text_instagram`, `text_youtube`, `text_whatsapp` |
+| `news_share` | кнопки «Поделиться» в новости | `channel`: `whatsapp`, `facebook`, `telegram`, `copy`, `native` (системное меню «Поделиться» на телефоне) |
 
 У каждого события есть ещё `language` — язык страницы.
 

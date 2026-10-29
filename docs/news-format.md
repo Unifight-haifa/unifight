@@ -52,7 +52,7 @@ Drafts are never built. In `npm run dev` they show only with `SHOW_DRAFTS=1`.
 
 ## Ready-to-paste social text
 
-Every post page has "Copy for Instagram / YouTube / WhatsApp" buttons (and the same text in a collapsible block when JavaScript is off). The text is the title, the body as plain text and the hashtags; WhatsApp and YouTube get the post URL, Instagram gets a "link in bio" line and is trimmed to 2200 characters. Hashtags and that line are in `content/social.json`, the builder is `src/lib/social.mjs`.
+Post pages only carry the share row (WhatsApp, Facebook, Telegram, copy link; the system share sheet on phones). The owner rejected the public "Copy for Instagram / YouTube / WhatsApp" block on 2026-10-29, so the ready-to-paste text is only in `feed.json` (`_unifight.share_text`, the WhatsApp variant). It is the title, the body as plain text and the hashtags; WhatsApp and YouTube get the post URL, Instagram gets a "link in bio" line and is trimmed to 2200 characters. Hashtags and that line are in `content/social.json`, the builder is `src/lib/social.mjs`.
 
 ## Schedule changes and gallery photos from the bot
 

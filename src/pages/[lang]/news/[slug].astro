@@ -8,8 +8,6 @@ import VideoLink from '../../../components/VideoLink.astro';
 import VideoModal from '../../../components/VideoModal.astro';
 import { LANGS, t, type Lang } from '../../../i18n/ui';
 import { authorName, fmtDate, getPosts, ogCover, postPath, type Post } from '../../../lib/news';
-import { socialTexts } from '../../../lib/social.mjs';
-import social from '../../../../content/social.json';
 import videos from '../../../../content/videos.json';
 import '../../../styles/landing.css';
 import '../../../styles/news.css';
@@ -49,18 +47,13 @@ const article = {
     logo: abs(`${import.meta.env.BASE_URL}brand/logo.png`),
   },
 };
+// WhatsApp glyph is the landing's WA_SVG (scripts/landing/build.py)
 const share = [
-  ['WhatsApp', `https://wa.me/?text=${e(`${d.title} ${url}`)}`],
+  ['WhatsApp', `https://wa.me/?text=${e(`${d.title} ${url}`)}`, 'M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm5.6 14.2c-.2.7-1.4 1.3-2 1.3-.5.1-1.2.1-1.9-.1a17 17 0 0 1-1.7-.6 13.3 13.3 0 0 1-5-4.5c-.4-.5-1-1.5-1-2.8 0-1.4.7-2 1-2.3.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.9 2.1c.1.2.1.4 0 .5l-.3.5-.4.5c-.1.1-.3.3-.1.6.2.3.7 1.2 1.6 2 1.1 1 2 1.3 2.3 1.4.3.1.5.1.6-.1l.9-1c.2-.3.4-.2.6-.1l2 1c.3.1.5.2.5.3.1.1.1.7-.1 1.4Z'],
   // sharer.php is undocumented by Facebook but stable and widely used
-  ['Facebook', `https://www.facebook.com/sharer/sharer.php?u=${e(url)}`],
-  ['Telegram', `https://t.me/share/url?url=${e(url)}&text=${e(d.title)}`],
+  ['Facebook', `https://www.facebook.com/sharer/sharer.php?u=${e(url)}`, 'M13.5 22v-8h2.7l.4-3.2h-3.1V8.8c0-.9.3-1.5 1.6-1.5h1.7V4.4a22 22 0 0 0-2.5-.1c-2.4 0-4.1 1.5-4.1 4.2v2.3H7.5V14h2.7v8h3.3Z'],
+  ['Telegram', `https://t.me/share/url?url=${e(url)}&text=${e(d.title)}`, 'M21.6 4.2 2.9 11.4c-1.3.5-1.3 1.2-.2 1.6l4.8 1.5 1.8 5.6c.2.6.4.8.9.8.4 0 .6-.2.9-.4l2.3-2.2 4.7 3.5c.9.5 1.5.2 1.7-.8l3.1-14.6c.3-1.3-.5-1.8-1.3-1.5ZM9.5 14.2l9-5.7c.4-.3.8-.1.5.2l-7.6 6.9-.3 3.2-1.6-4.6Z'],
 ];
-const texts = socialTexts({ title: d.title, body: entry.body ?? '', url, hashtags: social.hashtags[lang], linkInBio: social.link_in_bio[lang] });
-const copy = [
-  ['instagram', 'Instagram', t(lang, 'newsCopyIg')],
-  ['youtube', 'YouTube', t(lang, 'newsCopyYt')],
-  ['whatsapp', 'WhatsApp', t(lang, 'newsCopyWa')],
-] as const;
 ---
 <Base lang={lang} title={`${d.title} · ${t(lang, 'siteName')}`}>
   <Fragment slot="head">
@@ -92,53 +85,52 @@ const copy = [
     <Image class="news-cover" src={d.cover} alt={d.cover_alt ?? ''} widths={[600, 1200]} sizes="(min-width: 800px) 760px, 100vw" />
     {video && <div class="news-video"><VideoLink v={video} title={video.title[lang]} /></div>}
     <div class="news-body"><Content /></div>
-    <nav class="news-share" aria-label={t(lang, 'newsShare')}>
-      {share.map(([name, href]) => <a class="btn btn-ghost" href={href} target="_blank" rel="noopener" data-ga="news_share" data-ga-channel={name.toLowerCase()}>{name}</a>)}
-      <a class="btn btn-ghost" href={url} data-copy data-ga="news_share" data-ga-channel="copy" data-done={t(lang, 'newsCopied')}>{t(lang, 'newsCopy')}</a>
-    </nav>
-    <section class="news-social" aria-labelledby="news-social-h">
-      <h2 id="news-social-h" class="h3">{t(lang, 'newsSocial')}</h2>
-      {copy.map(([id, name, label]) => (
-        <div class="news-social-item">
-          <button type="button" class="btn btn-ghost" hidden data-copy-text data-ga="news_share" data-ga-channel={`text_${id}`}>{label}</button>
-          <details>
-            <summary><bdi>{name}</bdi>: {t(lang, 'newsShowText')}</summary>
-            <textarea readonly rows="8" aria-label={label}>{texts[id]}</textarea>
-          </details>
-        </div>
-      ))}
-      <p class="news-social-status" role="status" aria-live="polite" data-done={t(lang, 'newsTextCopied')} data-select={t(lang, 'newsSelectHint')}></p>
-    </section>
+    <footer class="news-end">
+      <nav class="news-share" aria-labelledby="news-share-h">
+        <span class="news-share-h" id="news-share-h">{t(lang, 'newsShare')}</span>
+        <button type="button" class="share-ico" hidden data-share data-title={d.title} data-url={url} aria-label={t(lang, 'newsShare')} data-ga="news_share" data-ga-channel="native">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M12 3v12M7 8l5-5 5 5M5 14v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5" /></svg>
+        </button>
+        {share.map(([name, href, icon]) => (
+          <a class="share-ico" href={href} target="_blank" rel="noopener" aria-label={name} data-ga="news_share" data-ga-channel={name.toLowerCase()}>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d={icon} /></svg>
+          </a>
+        ))}
+        <a class="share-ico" href={url} data-copy aria-label={t(lang, 'newsCopy')} data-done={t(lang, 'newsCopied')} data-ga="news_share" data-ga-channel="copy">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M10 14a4.5 4.5 0 0 0 6.4 0l3.2-3.2a4.5 4.5 0 0 0-6.4-6.4L12 5.6M14 10a4.5 4.5 0 0 0-6.4 0l-3.2 3.2a4.5 4.5 0 0 0 6.4 6.4l1.2-1.2" /></svg>
+        </a>
+        <span class="share-status" role="status" aria-live="polite"></span>
+      </nav>
+      <a class="news-back" href={getRelativeLocaleUrl(lang, 'news/')}>{t(lang, 'newsAll')}</a>
+    </footer>
   </article>
   {video && <VideoModal lang={lang} />}
   <script is:inline>
-    document.addEventListener('click', function (e) {
-      var a = e.target.closest && e.target.closest('[data-copy]');
-      if (!a) return;
-      e.preventDefault();
-      var done = function () { a.textContent = a.dataset.done; };
-      // clipboard API needs a secure context; prompt lets the user copy by hand
-      var manual = function () { window.prompt('', a.href); };
-      if (navigator.clipboard) navigator.clipboard.writeText(a.href).then(done, manual);
-      else manual();
-    });
-    document.querySelectorAll('[data-copy-text]').forEach(function (b) { b.hidden = false; });
-    document.addEventListener('click', function (e) {
-      var b = e.target.closest && e.target.closest('[data-copy-text]');
-      if (!b) return;
-      var box = b.parentNode;
-      var ta = box.querySelector('textarea');
-      var status = document.querySelector('.news-social-status');
-      // clear first so a repeated click is announced again
-      var say = function (s) { status.textContent = ''; setTimeout(function () { status.textContent = s; }, 50); };
-      var manual = function () {
-        box.querySelector('details').open = true;
-        ta.focus();
-        ta.select();
-        say(status.dataset.select);
-      };
-      if (navigator.clipboard) navigator.clipboard.writeText(ta.value).then(function () { say(status.dataset.done); }, manual);
-      else manual();
-    });
+    (function () {
+      var nav = document.querySelector('.news-share'), status = nav.querySelector('.share-status');
+      var say = function (s) { status.textContent = s; setTimeout(function () { status.textContent = ''; }, 2500); };
+      var native = nav.querySelector('[data-share]');
+      // phones get the system sheet; desktops keep the icons, where it is often a thin Windows/macOS dialog
+      if (navigator.share && matchMedia('(pointer: coarse)').matches) {
+        native.hidden = false;
+        nav.classList.add('is-native');
+      }
+      nav.addEventListener('click', function (e) {
+        if (e.target.closest('[data-share]')) {
+          navigator.share({ title: native.dataset.title, url: native.dataset.url }).catch(function (err) {
+            if (err.name !== 'AbortError') nav.classList.remove('is-native');
+          });
+          return;
+        }
+        var a = e.target.closest('[data-copy]');
+        if (!a) return;
+        e.preventDefault();
+        var done = function () { a.classList.add('is-done'); say(a.dataset.done); setTimeout(function () { a.classList.remove('is-done'); }, 2500); };
+        // clipboard API needs a secure context; prompt lets the user copy by hand
+        var manual = function () { window.prompt('', a.href); };
+        if (navigator.clipboard) navigator.clipboard.writeText(a.href).then(done, manual);
+        else manual();
+      });
+    })();
   </script>
 </Base>
