@@ -33,10 +33,12 @@ export async function getPosts(): Promise<Post[]> {
     .sort((a, b) => b.date.getTime() - a.date.getTime() || a.slug.localeCompare(b.slug));
 }
 
-// one rendition for og:image and news.json; capped at source width since the encoder never
-// upscales and og:image:width must match the file
-export const ogCover = ({ data: { cover } }: Entry) =>
-  getImage({ src: cover, width: Math.min(1200, cover.width), format: 'jpeg', quality: 80 });
+// one 1200×630 rendition (the Facebook/WhatsApp preview ratio) for og:image and the feeds; capped at
+// source width since the encoder never upscales and og:image:width must match the file
+export const ogCover = ({ data: { cover } }: Entry) => {
+  const width = Math.min(1200, cover.width);
+  return getImage({ src: cover, width, height: Math.round((width * 630) / 1200), fit: 'cover', format: 'jpeg', quality: 80 });
+};
 
 export const postPath = (lang: Lang, slug: string) => getRelativeLocaleUrl(lang, `news/${slug}/`);
 

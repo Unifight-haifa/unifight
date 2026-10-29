@@ -32,6 +32,8 @@ const rest = Astro.url.pathname.slice(import.meta.env.BASE_URL.length).split('/'
     <link rel="apple-touch-icon" href={`${import.meta.env.BASE_URL}apple-touch-icon.png`} />
     {description && <meta name="description" content={description} />}
     {noindex && <meta name="robots" content="noindex" />}
+    <link rel="alternate" type="application/rss+xml" title={`${t(lang, 'newsTitle')} · ${t(lang, 'siteName')}`} href={`${getRelativeLocaleUrl(lang)}rss.xml`} />
+    <link rel="alternate" type="application/feed+json" title={t(lang, 'siteName')} href={`${import.meta.env.BASE_URL}feed.json`} />
     <Fonts lang={lang} />
     <slot name="head" />
   </head>

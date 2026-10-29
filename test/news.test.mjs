@@ -73,6 +73,63 @@ test('news.json is valid and lists every published post in all languages', () =>
   }
 });
 
+// [width, height] from a baseline or progressive JPEG's SOF marker
+const jpegSize = (b) => {
+  for (let i = 2; i < b.length; i += 2 + b.readUInt16BE(i + 2)) {
+    const m = b[i + 1];
+    if (m >= 0xc0 && m <= 0xcf && ![0xc4, 0xc8, 0xcc].includes(m)) return [b.readUInt16BE(i + 7), b.readUInt16BE(i + 5)];
+  }
+};
+const distFile = (url) => new URL(new URL(url).pathname.slice(base.length), dist);
+
+test('post covers for og:image and the feeds are exactly 1200×630', () => {
+  for (const { slug } of published) {
+    for (const l of Object.keys(LANGS)) {
+      const html = page(l, slug);
+      assert.deepEqual([meta(html, 'og:image:width'), meta(html, 'og:image:height')], ['1200', '630'], `${l}/${slug}`);
+      assert.deepEqual(jpegSize(readFileSync(distFile(meta(html, 'og:image')))), [1200, 630], `${l}/${slug}`);
+    }
+  }
+});
+
+test('/<lang>/rss.xml lists every published post in that language', () => {
+  for (const l of Object.keys(LANGS)) {
+    const xml = readFileSync(new URL(`${l}/rss.xml`, dist), 'utf8');
+    assert.equal(xml, readFileSync(new URL(`${l}/news/rss.xml`, dist), 'utf8'));
+    assert.match(xml, new RegExp(`^<\\?xml version="1.0" encoding="UTF-8"\\?><rss version="2.0"><channel><title>[^<]+</title><link>[^<]+</link><description>[^<]+</description><language>${l}</language>`));
+    assert.ok(xml.endsWith('</channel></rss>'));
+    const links = [...xml.matchAll(/<item><title>[^<]+<\/title><link>([^<]+)<\/link><guid>\1<\/guid><pubDate>[^<]+<\/pubDate><description>[^<]*<\/description><\/item>/g)].map((m) => m[1]);
+    assert.equal(xml.split('<item>').length - 1, links.length, `${l}: every item well-formed`);
+    assert.deepEqual(links.map((u) => new URL(u).pathname).sort(), published.map((p) => `${base}${l}/news/${p.slug}/`).sort());
+  }
+});
+
+test('feed.json is a JSON Feed 1.1 with cover, coach and share text per post and language', () => {
+  const f = JSON.parse(readFileSync(new URL('feed.json', dist), 'utf8'));
+  assert.equal(f.version, 'https://jsonfeed.org/version/1.1');
+  assert.ok(f.title && f.home_page_url && f.feed_url.endsWith(`${base}feed.json`));
+  assert.equal(f.items.length, published.length * 3);
+  assert.equal(new Set(f.items.map((i) => i.id)).size, f.items.length);
+  for (const i of f.items) {
+    assert.ok(i.id === i.url && i.title && i.content_text && i.authors[0].name, i.id);
+    assert.equal(new URL(i.url).pathname, `${base}${i.language}/news/${i._unifight.slug}/`);
+    assert.ok(!Number.isNaN(Date.parse(i.date_published)));
+    assert.deepEqual(jpegSize(readFileSync(distFile(i.image))), [1200, 630]);
+    assert.ok(existsSync(new URL(`../content/coaches/${i._unifight.coach}.json`, import.meta.url)), i._unifight.coach);
+    assert.ok(i._unifight.share_text.includes(i.url), i.id);
+  }
+});
+
+test('every page advertises its language feed and feed.json', () => {
+  for (const l of Object.keys(LANGS)) {
+    for (const p of [`${l}/index.html`, `${l}/news/index.html`, `${l}/contact/index.html`]) {
+      const html = readFileSync(new URL(p, dist), 'utf8');
+      assert.ok(html.includes(`<link rel="alternate" type="application/rss+xml"`) && html.includes(`href="${base}${l}/rss.xml"`), p);
+      assert.ok(html.includes(`<link rel="alternate" type="application/feed+json"`) && html.includes(`href="${base}feed.json"`), p);
+    }
+  }
+});
+
 test('draft posts are absent from dist', () => {
   for (const { slug } of drafts) {
     for (const l of Object.keys(LANGS)) assert.ok(!existsSync(new URL(`${l}/news/${slug}/`, dist)), `${l}/${slug}`);
