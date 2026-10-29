@@ -8,6 +8,7 @@
   "scripts": {
     "gen": "python3 scripts/landing/build.py",
     "dev": "astro dev",
+    "review": "node scripts/content-review.mjs",
     "build": "astro build",
     "preview": "astro preview",
     "test": "node --test",
