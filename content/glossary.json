@@ -2,7 +2,7 @@
  "_doc": "Fixed he/ru/en terms for the news translator. Every entry is copied from site content (coaches/*.json name, venues.json, schedule/*.json, site.json, nivheret.json, gallery.json). n8n/news-publish.json embeds rules + terms in the Translate prompt; test/news.test.mjs fails when they drift (fix: see docs/n8n-news-design.md §5).",
  "rules": [
   "Russian plural of «тренер» is «тренера» (Наши тренера, Тренера клуба), never «тренеры».",
-  "נבחרת / nivheret is the club's own selected team: «сборная клуба (нивхерет)», \"selected team (nivheret)\". Never \"national team\", «сборная Израиля» or «национальная сборная»; only נבחרת ישראל is Israel's national team.",
+  "נבחרת / nivheret is the club's own selected team: «сборная клуба», \"selected team\". Never \"national team\", «сборная Израиля» or «национальная сборная»; only נבחרת ישראל is Israel's national team.",
   "Use the forms below exactly; coach, venue and place names are never re-transliterated. In Russian prose the club name goes in «»."
  ],
  "terms": {
@@ -36,7 +36,7 @@
    { "he": "משעולים – עתלית", "ru": "Мишолим (Атлит)", "en": "Misholim (Atlit)" }
   ],
   "groups": [
-   { "he": "נבחרת המועדון", "ru": "Сборная клуба (нивхерет)", "en": "Selected team (nivheret)" },
+   { "he": "נבחרת המועדון", "ru": "Сборная клуба", "en": "Selected team" },
    { "he": "קבוצת הבוגרים", "ru": "Старшая группа", "en": "Older group" },
    { "he": "קבוצות הילדים", "ru": "Детские группы", "en": "Kids' groups" },
    { "he": "פרויקט בית ספרי", "ru": "Школьный проект", "en": "School project" },

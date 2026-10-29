@@ -2,13 +2,13 @@
  "_doc": "/nivheret/. Training slots come from content/schedule/natanel-zhurovel.json (kind \"nivheret\"). Nivheret is the club's own selected team; the build fails on national-team wording (BANNED in src/lib/club-check.mjs).",
  "title": {
   "he": "נבחרת המועדון",
-  "ru": "Сборная клуба (нивхерет)",
-  "en": "Selected team (nivheret)"
+  "ru": "Сборная клуба",
+  "en": "Selected team"
  },
  "desc": {
   "he": "נבחרת המועדון של יוניפייט חיפה: מי אנחנו, מתי ואיפה מתאמנים ואיך ג׳ודוקאים ממועדונים אחרים בצפון מצטרפים.",
-  "ru": "Сборная клуба «Юнифайт Хайфа» (нивхерет): кто мы, когда и где тренируемся и как присоединиться дзюдоистам из других клубов севера.",
-  "en": "Unifight Haifa's selected team (nivheret): who we are, when and where we train, and how judoka from other northern clubs can join."
+  "ru": "Сборная клуба «Юнифайт Хайфа»: кто мы, когда и где тренируемся и как присоединиться дзюдоистам из других клубов севера.",
+  "en": "Unifight Haifa's selected team: who we are, when and where we train, and how judoka from other northern clubs can join."
  },
  "join": {
   "title": {

@@ -1598,8 +1598,8 @@
       },
       "training": {
        "he": "אימון נבחרת המועדון",
-       "ru": "Тренировка сборной клуба (нивхерет)",
-       "en": "Selected team (nivheret)"
+       "ru": "Тренировка сборной клуба",
+       "en": "Selected team training"
       },
       "place": {
        "he": "עירוני א׳",
@@ -1693,8 +1693,8 @@
   ],
   "nivheret_note": {
    "he": "נבחרת המועדון — קבוצה תחרותית לספורטאים שמתכוננים לאליפויות.",
-   "ru": "Сборная клуба (нивхерет) — соревновательная группа для спортсменов, которые готовятся к турнирам.",
-   "en": "The selected team (nivheret) is the club's competitive squad for athletes preparing for championships."
+   "ru": "Сборная клуба — соревновательная группа для спортсменов, которые готовятся к турнирам.",
+   "en": "The selected team is the club's competitive squad for athletes preparing for championships."
   },
   "nivheret_details": {
    "placeholder": true,

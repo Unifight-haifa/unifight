@@ -43,7 +43,7 @@ flowchart TD
   subgraph PUB [news-publish]
     IMG[Read Orientation → Resize → Pack Images<br/>≤1600 px, JPEG, без EXIF/GPS] --> RATE[Check Author → Rate Check<br/>тренер есть в content/coaches, лимит]
     RATE --> TR[Translate]
-    TR --> PARSE[Parse Translation<br/>проверка чисел и «нивхерет»]
+    TR --> PARSE[Parse Translation<br/>проверка чисел и «сборной клуба»]
     PARSE --> ASK{Предпросмотр<br/>Telegram или почта}
     ASK -->|Исправить| TR
     ASK -->|Отменить / нет ответа 48 ч| CANCEL[Cancelled]
@@ -179,7 +179,7 @@ You translate news posts for Unifight Haifa, a judo club in Haifa, Israel. Langu
 Rules:
 1. Translate faithfully. Do not add, drop, soften or embellish facts. Tone: a club announcement for parents and athletes.
 2. Copy exactly, character for character where the script allows: people's names (transliterate consistently; in the source language keep the author's spelling), places, club names, dates, times, all numbers, scores, ages, places taken (1st, 2nd...), belt grades and weight categories such as -60 kg or +100 kg. Never convert units, round or reformat numbers.
-3. Mandatory glossary: נבחרת המועדון = «сборная клуба (нивхерет)» = "selected team (nivheret)". At this club the word נבחרת on its own means this club squad. Never translate it as "national team", «сборная Израиля» or «национальная сборная». Only נבחרת ישראל (explicitly Israel) is the national team.
+3. Mandatory glossary: נבחרת המועדון = «сборная клуба» = "selected team". At this club the word נבחרת on its own means this club squad. Never translate it as "national team", «сборная Израиля» or «национальная сборная». Only נבחרת ישראל (explicitly Israel) is the national team.
 4. Keep the Markdown structure of the source: paragraphs, lists, bold. No headings unless the source has them.
 5. For every language return: title (max 90 characters), summary (one sentence, max 160 characters, no emoji), body (Markdown), cover_alt (one short phrase describing the cover photo from context; never name children).
 6. In the source language keep title and body exactly as given, unless corrections ask to change them.
@@ -204,7 +204,7 @@ node -e "const fs=require('fs'),f='n8n/news-publish.json',w=JSON.parse(fs.readFi
 - summary длиннее 160 символов обрезается по слову;
 - заголовок и текст на языке автора подставляются из оригинала, модель их не трогает (кроме правок по просьбе автора);
 - **числа**: все числа исходника (`3`, `-60`, `12.10`, `1:0`) должны встретиться в каждом переводе, иначе в предпросмотре будет «RU: нет чисел …»;
-- **нивхерет**: если в исходнике есть נבחרת без «Израиль», переводы обязаны содержать «нивхерет» / "nivheret"; «national team», «сборная Израиля», «национальная сборная» дают предупреждение «Нивхерет переведена как национальная сборная — исправьте».
+- **נבחרת**: если в исходнике есть נבחרת без «Израиль», переводы обязаны содержать «сборная клуба» / "selected team"; «national team», «сборная Израиля», «национальная сборная» дают предупреждение «Нивхерет переведена как национальная сборная — исправьте».
 
 Имена кодом не проверить. Это остаётся на автора, и сообщение с кнопкой прямо просит проверить текст.
 
