@@ -114,6 +114,40 @@ export function ics({ uid, name, date, end, location, url, stamp }) {
   return lines.map(fold).join('\r\n') + '\r\n';
 }
 
+// Israel's DST rules as tzdata publishes them: from the Friday before the last Sunday of March to the last Sunday of October
+const JERUSALEM = [
+  'BEGIN:VTIMEZONE', 'TZID:Asia/Jerusalem',
+  'BEGIN:DAYLIGHT', 'TZOFFSETFROM:+0200', 'TZOFFSETTO:+0300', 'TZNAME:IDT', 'DTSTART:19700327T020000', 'RRULE:FREQ=YEARLY;BYMONTH=3;BYMONTHDAY=23,24,25,26,27,28,29;BYDAY=FR', 'END:DAYLIGHT',
+  'BEGIN:STANDARD', 'TZOFFSETFROM:+0300', 'TZOFFSETTO:+0200', 'TZNAME:IST', 'DTSTART:19701025T020000', 'RRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU', 'END:STANDARD',
+  'END:VTIMEZONE',
+];
+const BYDAY = ['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'];
+
+/** Weekly classes in Israel time; each starts on its first weekday on or after `today` (YYYY-MM-DD). */
+export function weeklyIcs({ name, events, location, url, today, stamp }) {
+  const t0 = Date.parse(`${today}T00:00:00Z`);
+  const first = (d) => day(new Date(t0 + ((d - new Date(t0).getUTCDay() + 7) % 7) * 864e5).toISOString().slice(0, 10));
+  const at = (d, hm) => `${first(d)}T${hm.replace(':', '')}00`;
+  const lines = [
+    'BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Unifight Haifa//Schedule//EN', 'CALSCALE:GREGORIAN', 'METHOD:PUBLISH',
+    `X-WR-CALNAME:${icsText(name)}`, 'X-WR-TIMEZONE:Asia/Jerusalem', ...JERUSALEM,
+    ...events.flatMap((e) => [
+      'BEGIN:VEVENT',
+      `UID:${e.uid}`,
+      `DTSTAMP:${stamp.toISOString().replace(/[-:]/g, '').replace(/\.\d+/, '')}`,
+      `DTSTART;TZID=Asia/Jerusalem:${at(e.day, e.start)}`,
+      `DTEND;TZID=Asia/Jerusalem:${at(e.day, e.end)}`,
+      `RRULE:FREQ=WEEKLY;BYDAY=${BYDAY[e.day]}`,
+      `SUMMARY:${icsText(e.summary)}`,
+      `LOCATION:${icsText(location)}`,
+      `URL:${url}`,
+      'END:VEVENT',
+    ]),
+    'END:VCALENDAR',
+  ];
+  return lines.map(fold).join('\r\n') + '\r\n';
+}
+
 // Hebrew pages: isolate numbers and Latin runs so bidi can't reorder them (same rule as scripts/landing/build.py)
 const BIDI = /([A-Za-z][A-Za-z0-9'’-]*(?:[ .][A-Za-z0-9][A-Za-z0-9'’-]*)*)|((?<!\w)[-+~]?\d+(?:[.,:/]\d+)*(?:(?:\s?[–-]\s?|,\s)\d+(?:[.,:/]\d+)*)*\+?)/g;
 const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');

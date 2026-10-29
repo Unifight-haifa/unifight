@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
-import { BANNED, NIVHERET, checkTournament, ics, isUpcoming, published, splitEvents } from '../src/lib/club-check.mjs';
+import { BANNED, NIVHERET, checkTournament, ics, isUpcoming, published, splitEvents, weeklyIcs } from '../src/lib/club-check.mjs';
 import { checkTechniques, norm, polivanov } from '../src/lib/techniques-check.mjs';
 
 const LANGS = [['he', 'rtl'], ['ru', 'ltr'], ['en', 'ltr']];
@@ -77,10 +77,46 @@ test('the .ics file is a valid all-day VEVENT', () => {
   assert.match(body, /\r\nDTSTAMP:20300101T100000Z\r\n/);
   assert.ok(body.includes('SUMMARY:Северный турнир\\, дети\\; взрослые'));
   for (const line of body.split('\r\n')) assert.ok(Buffer.byteLength(line) <= 75, line);
-  // any calendar file the build produced must be well-formed too
-  for (const f of readdirSync(dist(''), { recursive: true }).filter((x) => x.endsWith('.ics'))) {
+  // any tournament calendar the build produced must be well-formed too
+  for (const f of readdirSync(dist(''), { recursive: true }).filter((x) => x.endsWith('.ics') && x.includes('/tournaments/'))) {
     const out = read(f);
     assert.match(out, /^BEGIN:VCALENDAR\r\n[\s\S]*DTSTART;VALUE=DATE:\d{8}\r\n[\s\S]*END:VCALENDAR\r\n$/, f);
+  }
+});
+
+test('weekly .ics: Israel time zone, first class on or after today, folded lines', () => {
+  const body = weeklyIcs({
+    name: 'Юнифайт Хайфа · Эйн-ха-Ям',
+    events: [{ uid: 'a@u', day: 0, start: '17:00', end: '18:00', summary: 'Дети, 1–2 класс' }, { uid: 'b@u', day: 4, start: '19:30', end: '21:00', summary: 'x' }],
+    location: 'Эйн-ха-Ям, ул. Йециат Эйропа, 17, Хайфа',
+    url: 'https://example.com/ru/#v-ein-hayam',
+    today: '2026-10-29',
+    stamp: new Date('2026-10-29T08:00:00Z'),
+  });
+  assert.match(body, /^BEGIN:VCALENDAR\r\nVERSION:2\.0\r\n[\s\S]*\r\nBEGIN:VTIMEZONE\r\nTZID:Asia\/Jerusalem\r\n[\s\S]*\r\nEND:VTIMEZONE\r\n/);
+  // 2026-10-29 is a Thursday: Sunday's class starts 1 Nov, Thursday's the same day
+  assert.match(body, /\r\nDTSTART;TZID=Asia\/Jerusalem:20261101T170000\r\nDTEND;TZID=Asia\/Jerusalem:20261101T180000\r\nRRULE:FREQ=WEEKLY;BYDAY=SU\r\n/);
+  assert.match(body, /\r\nDTSTART;TZID=Asia\/Jerusalem:20261029T193000\r\nDTEND;TZID=Asia\/Jerusalem:20261029T210000\r\nRRULE:FREQ=WEEKLY;BYDAY=TH\r\n/);
+  assert.equal(body.match(/\r\nBEGIN:VEVENT\r\n/g).length, 2);
+  for (const line of body.split('\r\n')) assert.ok(Buffer.byteLength(line) <= 75, line);
+  assert.ok(body.replace(/\r\n /g, '').includes('LOCATION:Эйн-ха-Ям\\, ул. Йециат Эйропа\\, 17\\, Хайфа'));
+});
+
+test('every venue with classes has a weekly .ics per language, linked from its card', () => {
+  const sessions = readdirSync(new URL('../content/schedule/', import.meta.url)).flatMap((f) => json(`../content/schedule/${f}`).sessions);
+  const used = [...new Set(sessions.map((s) => s.venue))];
+  assert.ok(used.length > 5);
+  for (const [l] of LANGS) {
+    const landing = read(`${l}/index.html`);
+    for (const v of used) {
+      const out = read(`${l}/schedule/${v}.ics`);
+      assert.match(out, /^BEGIN:VCALENDAR\r\n[\s\S]*END:VCALENDAR\r\n$/, v);
+      assert.equal(out.match(/\r\nBEGIN:VEVENT\r\n/g).length, sessions.filter((s) => s.venue === v).length, `${l}/${v}`);
+      assert.equal(out.match(/\r\nRRULE:FREQ=WEEKLY;BYDAY=(SU|MO|TU|WE|TH|FR)\r\n/g).length, out.match(/\r\nBEGIN:VEVENT\r\n/g).length, `${l}/${v}`);
+      assert.ok(!/DTSTART(?!;TZID=Asia\/Jerusalem:\d{8}T\d{6}\r\n)[;:]/.test(out.replace(/BEGIN:VTIMEZONE[\s\S]*END:VTIMEZONE/, '')), `${l}/${v}`);
+      const card = landing.match(new RegExp(`<article class="venue rv" id="v-${v}"[\\s\\S]*?</article>`))[0];
+      assert.match(card, new RegExp(`<a href="/[^"]*${l}/schedule/${v}\\.ics">`), `${l}/${v}`);
+    }
   }
 });
 

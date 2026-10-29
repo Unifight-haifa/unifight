@@ -639,6 +639,7 @@ BR_UI = {"days": {"he": "ימי אימון", "ru": "Дни тренировок"
          "bus": {"he": "איך מגיעים באוטובוס", "ru": "Как доехать на автобусе", "en": "Bus directions"},
          "route": {"he": "איך מגיעים ←", "ru": "Как добраться →", "en": "Directions →"},
          "form": {"he": "השארת פרטים", "ru": "Оставить заявку", "en": "Sign up"},
+         "cal": {"he": "הוספה ליומן", "ru": "В календарь", "en": "Add to calendar"},
          "group": {"he": "קבוצת הוואטסאפ של האולם", "ru": "Группа зала в WhatsApp", "en": "Venue WhatsApp group"}}
 
 LEAD_UI = {
@@ -707,6 +708,11 @@ def hall_group(k, v):
     return f'<a href="{html.escape(g)}" target="_blank" rel="noopener" {ga("whatsapp_click", placement="venue_group", venue=k)}>{t(BR_UI["group"])}</a>' if g else ""
 
 
+def cal(k):
+    # src/pages/[lang]/schedule/[venue].ics.ts: the venue's weekly classes
+    return f'<a {attr("href", {l: f"{PFX}{l}/schedule/{k}.ics" for l in LANGS})}>{t(BR_UI["cal"])}</a>'
+
+
 def branches():
     b = C["branches"]
     v, i = "", 0
@@ -722,7 +728,7 @@ def branches():
                   f'<div class="v-links"><a href="https://www.google.com/maps/search/?api=1&amp;query={q}" target="_blank" rel="noopener" {ga("map_open", venue=k, provider="google_maps")}>Google Maps</a>'
                   f'<a href="https://waze.com/ul?q={q}&amp;navigate=yes" target="_blank" rel="noopener" {ga("map_open", venue=k, provider="waze")}>Waze</a>'
                   f'<a href="https://www.google.com/maps/dir/?api=1&amp;destination={q}&amp;travelmode=transit" target="_blank" rel="noopener" {ga("map_open", venue=k, provider="transit")}>{t(BR_UI["bus"])}</a>'
-                  f'<a href="#lead" data-hall="{k}">{t(BR_UI["form"])}</a>{hall_group(k, vn)}</div></article>')
+                  f'<a href="#lead" data-hall="{k}">{t(BR_UI["form"])}</a>{cal(k) if ds else ""}{hall_group(k, vn)}</div></article>')
         v += '</div>'
     nb = "".join(f'<li>{t(n["name"])}</li>' for n in b["neighbourhoods"])
     return f'''

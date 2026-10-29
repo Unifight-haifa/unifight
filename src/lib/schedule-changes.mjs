@@ -86,7 +86,7 @@ const range = (c, lang) => (c.from === c.to ? fmtDay(c.from, lang) : `${fmtDay(c
 const gate = (c, today) => `data-from="${esc(c.show)}" data-to="${esc(c.to)}"${c.show <= today ? '' : ' hidden'}`;
 
 // mirrors grade_label() in scripts/landing/build.py
-function gradeLabel([a, b], letters, lang) {
+export function gradeLabel([a, b], letters, lang) {
   if (a === 0 && b === 1) return { he: 'גנים + כיתה א׳', ru: 'Детский сад и 1 класс', en: 'Kindergarten + grade 1' }[lang];
   if (a === 0 && b === 0) return { he: 'גן', ru: 'Детский сад', en: 'Kindergarten' }[lang];
   if (b === null) return { he: `כיתות ${letters[a]} ומעלה`, ru: `${a} класс и старше`, en: `Grade ${a}+` }[lang];
