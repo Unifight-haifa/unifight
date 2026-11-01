@@ -90,7 +90,7 @@ are shown framed and small rather than blown up.
 `ReelThumb` renders the matching 1280×720 thumbnail.
 
 ```sh
-python3 -I scripts/prep_reels.py /path/to/unifight-archive          # clips, photos, music into public/reel/ (gitignored)
+python3 -I scripts/prep_reels.py ../private/archive          # clips, photos, music into public/reel/ (gitignored)
 scripts/render_reel.sh camps out/reel-camps.mp4                     # -14 LUFS; needs public/promo/sfx too
 npx remotion still src/index.jsx ReelThumb out/thumb-camps.png --props='{"reel":"camps"}'
 ```

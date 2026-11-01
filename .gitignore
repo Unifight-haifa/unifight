@@ -10,3 +10,7 @@ dist/
 # raw bot photos belong in the private staging repo, never here
 incoming/
 .inbox/
+
+# secrets, archive, source media: local only
+private/
+unifight-secrets/

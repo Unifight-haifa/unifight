@@ -2,7 +2,7 @@
 
 Панель живёт по адресу https://unifight-haifa.com/admin/. Тренера входят в неё через Google или открывают из Telegram и сами правят свою карточку, фото и расписание, на трёх языках. Шаги 1–6 владелец делает один раз, дальше только добавляет тренеров (шаг 7).
 
-Ключи и пароли никогда не пишите в чат, в репозиторий или в описание коммита. Каждый секрет сохраните отдельным файлом в папку `~/unifight-secrets/` на компьютере, где работает ассистент, и просто напишите в чат, что файл на месте.
+Ключи и пароли никогда не пишите в чат, в репозиторий или в описание коммита. Каждый секрет сохраните отдельным файлом в папку `private/secrets/` в папке проекта на компьютере, где работает ассистент, и просто напишите в чат, что файл на месте.
 
 ## 1. Cloudflare
 
@@ -15,7 +15,7 @@
 
 База D1 и сам сервис ассистент создаст и запустит сам.
 
-**Что передать ассистенту:** файлы `~/unifight-secrets/cloudflare-token` и `~/unifight-secrets/cloudflare-account-id`.
+**Что передать ассистенту:** файлы `private/secrets/cloudflare-token` и `private/secrets/cloudflare-account-id`.
 
 ## 2. GitHub App
 
@@ -30,7 +30,7 @@
 7. Ниже **Generate a private key**: скачается файл `.pem`.
 8. Слева **Install App** → **Install** → **Only select repositories** → `unifight` → **Install**. В адресе страницы в конце будет число: это Installation ID.
 
-**Что передать ассистенту:** файл `.pem` положить в `~/unifight-secrets/github-app.pem`; App ID и Installation ID можно прислать в чат.
+**Что передать ассистенту:** файл `.pem` положить в `private/secrets/github-app.pem`; App ID и Installation ID можно прислать в чат.
 
 ## 3. Ключ для перевода (Anthropic)
 
@@ -38,7 +38,7 @@
 2. **Settings** → **Limits**: поставить месячный лимит расходов, например $10. Перевод одной биографии стоит доли цента.
 3. **Settings** → **API Keys** → **Create Key**, имя `unifight-panel` → скопировать ключ.
 
-**Что передать ассистенту:** файл `~/unifight-secrets/anthropic-key`.
+**Что передать ассистенту:** файл `private/secrets/anthropic-key`.
 
 ## 4. Вход через Google
 
@@ -56,10 +56,10 @@
 
 Только эти аккаунты видят в панели раздел «Доступ» и могут добавлять тренеров. Выдать это право из самой панели нельзя.
 
-1. Создать файл `~/unifight-secrets/owner-emails`.
+1. Создать файл `private/secrets/owner-emails`.
 2. Вписать свою почту gmail (если несколько, через запятую, без пробелов).
 
-**Что передать ассистенту:** файл `~/unifight-secrets/owner-emails`.
+**Что передать ассистенту:** файл `private/secrets/owner-emails`.
 
 ## 6. Бот панели в Telegram
 
@@ -71,7 +71,7 @@
 4. `/mybots` → выбрать бота → **Bot Settings** → **Configure Mini App** (Main Mini App) → **Enable Mini App**.
 5. Адрес: `https://unifight-haifa.com/admin/?tg=1`.
 
-**Что передать ассистенту:** файл `~/unifight-secrets/tg-panel-bot-token`.
+**Что передать ассистенту:** файл `private/secrets/tg-panel-bot-token`.
 
 ## 7. Добавить тренера
 

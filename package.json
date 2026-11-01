@@ -11,7 +11,7 @@
     "review": "node scripts/content-review.mjs",
     "build": "astro build",
     "preview": "astro preview",
-    "test": "node --test",
+    "test": "node --test \"test/*.test.mjs\"",
     "build:linkcheck": "rm -rf .linkcheck && BASE_PATH=/unifight astro build --outDir .linkcheck/project/unifight && BASE_PATH=/ astro build --outDir .linkcheck/domain",
     "check:links": "npm run build:linkcheck && lychee --offline --no-progress --index-files index.html --root-dir \"$PWD/.linkcheck/project\" .linkcheck/project && lychee --offline --no-progress --index-files index.html --root-dir \"$PWD/.linkcheck/domain\" .linkcheck/domain"
   },
