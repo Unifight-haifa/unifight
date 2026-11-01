@@ -37,7 +37,7 @@ env:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04  # playwright has no ubuntu-26.04 build yet
     steps:
       - uses: actions/checkout@v7
       # Playwright for the browser tests that npm test runs
