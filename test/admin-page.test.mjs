@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
-import { T, CODES, LANGS } from '../src/admin/i18n.js';
+import { T, CODES, LANGS, FIELD } from '../src/admin/i18n.js';
 import { fitSize, isWebpBlob, toBase64 } from '../src/admin/photo.js';
 import { changeBody, sessionRef } from '../src/admin/schedule.js';
 import { siteFields, getAt, setAt } from '../src/admin/site.js';
@@ -116,5 +116,14 @@ test('siteFields covers every text and link of content/site, skips provenance, r
       assert.ok(!paths.includes('social.2.url'));
     }
     if (id === 'hero') assert.ok(paths.includes('cta_primary.href'));
+  }
+});
+
+test('every key in a Site card field path has a label in he, ru and en', () => {
+  const used = new Set(['contact', 'hero', 'footer', 'ui', 'pages']
+    .flatMap((id) => siteFields(content(`site/${id}.json`)).flatMap((f) => f.path.filter((k) => !/^\d+$/.test(k)))));
+  for (const k of used) {
+    assert.equal(FIELD[k]?.length, LANGS.length, k);
+    assert.ok(FIELD[k].every((s) => s.trim()), k);
   }
 });

@@ -1,6 +1,6 @@
 // Site-wide content (content/site/*.json) for the owner and editors. No DOM access at import time (tested in Node).
 import { api, errText } from './api.js';
-import { LANGS, t, uiLang } from './i18n.js';
+import { LANGS, t, uiLang, fieldLabel } from './i18n.js';
 import { toWebp, toBase64 } from './photo.js';
 import { IMAGE_SLOTS } from '../lib/site-check.mjs';
 
@@ -38,7 +38,7 @@ const imgSrc = (src) => `${import.meta.env.BASE_URL}${src.includes('/') ? src : 
 // list items are named by their own label or name, not by index; LRI..PDI keeps the path order on an RTL page
 function title(path) {
   return '\u2066' + path.map((k, i) => {
-    if (!/^\d+$/.test(k)) return k;
+    if (!/^\d+$/.test(k)) return fieldLabel(k);
     const item = getAt(F.data, path.slice(0, i + 1));
     return item?.label || item?.name?.[uiLang()] || item?.name?.ru || String(Number(k) + 1);
   }).join(' › ') + '\u2069';
