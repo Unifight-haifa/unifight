@@ -107,3 +107,26 @@ test('pages: titles and descriptions stay unique per language', () => {
   assert.throws(() => save('pages', (p) => { p.map.desc.he = p.about.desc.he; }), /pages\.json: two pages share the he desc/);
   assert.equal(save('pages', (p) => { p.video.title.en = 'Videos'; }).video.title.en, 'Videos');
 });
+
+test('every link field in every file is empty, #anchor or https, at any depth', () => {
+  const bad = 'javascript:alert(1)';
+  const cases = {
+    contact: [(c) => { c.social[0].url = bad; }, /social\[0\]\.url/],
+    hero: [(h) => { h.cta_secondary.href = bad; }, /cta_secondary\.href/],
+    footer: [(f) => { f.accessibility_link.href = bad; }, /accessibility_link\.href/],
+    ui: [(u) => { u.lead.name.link = bad; }, /lead\.name\.link/],
+    pages: [(p) => { p.map.og = { image_url: bad }; }, /map\.og\.image_url/],
+  };
+  assert.deepEqual(Object.keys(cases), SITE_FILES);
+  for (const [id, [edit, re]] of Object.entries(cases)) {
+    const cur = read(id);
+    const m = structuredClone(cur);
+    edit(m);
+    // checkSite directly: a field the real file lacks can't get past mergeSite, but a future one could
+    assert.throws(() => checkSite(id, m, cur), re, id);
+  }
+  const f = read('footer');
+  for (const ok of ['', '#contact', 'https://example.org/a11y']) {
+    checkSite('footer', { ...f, accessibility_link: { ...f.accessibility_link, href: ok } }, f);
+  }
+});

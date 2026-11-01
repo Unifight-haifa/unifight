@@ -36,9 +36,15 @@ function walk(m, cur, at) {
       if (!m[l].trim() && cur?.[l]?.trim()) throw new Error(`${at}.${l}: is empty, write it in every language`);
     }
   }
-  for (const [k, v] of Object.entries(m)) walk(v, cur?.[k], Array.isArray(m) ? `${at}[${k}]` : `${at}.${k}`);
+  for (const [k, v] of Object.entries(m)) {
+    const a = Array.isArray(m) ? `${at}[${k}]` : `${at}.${k}`;
+    if (typeof v === 'string' && LINK_KEY.test(k)) need(v === '' || ANCHOR.test(v) || URL_OK.test(v), a, 'must be empty, #section or an https:// link');
+    walk(v, cur?.[k], a);
+  }
 }
 
+// Any link field in any file, so a new one can't slip in as javascript: without its own rule.
+const LINK_KEY = /^(href|url|link)$|_(url|endpoint)$/;
 const URL_OK = /^https:\/\/[^\s"'<>]+$/;
 const TEL = /^\+972[2-9]\d{7,8}$/;
 const EMAIL = /^[^\s@<>"]+@[^\s@<>"]+\.[a-z]{2,}$/i;
