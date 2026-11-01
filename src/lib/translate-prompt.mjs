@@ -6,6 +6,7 @@ export const detectLang = (s) => (/[֐-׿]/.test(s) ? 'he' : /[Ѐ-ӿ]/.test(s) ?
 const CONTEXTS = {
   'coach-bio': 'a coach bio on the club website',
   'schedule-note': 'a short schedule notice for parents',
+  site: 'text on the club website for parents and visitors',
 };
 
 export function buildPrompt({ glossary, source_lang, fields, context = 'coach-bio', coach }) {

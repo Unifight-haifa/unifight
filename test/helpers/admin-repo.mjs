@@ -28,7 +28,7 @@ export const json = (p) => JSON.parse(disk(p));
 
 export function fakeRepo({ failPulls = false } = {}) {
   const main = new Map();
-  for (const d of ['content/coaches', 'content/schedule']) {
+  for (const d of ['content/coaches', 'content/schedule', 'content/site']) {
     for (const n of readdirSync(new URL(`../../${d}`, import.meta.url))) main.set(`${d}/${n}`, disk(`${d}/${n}`));
   }
   for (const f of ['content/venues.json', 'content/glossary.json', 'content/videos.json']) main.set(f, disk(f));

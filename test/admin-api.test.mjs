@@ -477,6 +477,102 @@ test('change.delete trusts the file schedule, not the id the coach sends', async
   assert.equal(last.message.split('\n')[0], 'Schedule: Natanel Zhurovel, removed cancel 2026-11-03');
 });
 
+// ---- site-wide content ----
+const HERO = 'content/site/hero.json';
+const IMG = 'content/site/images.json';
+const siteSave = (t, id, fields) => ({ op: 'site.text', id, base_sha: t.repo.sha(`content/site/${id}.json`, at(t, 'site.text', id)), fields });
+const siteImage = (t, id, fields) => ({ op: 'site.image', id, base_sha: t.repo.sha(IMG, at(t, 'site.image', id)), fields });
+
+test('GET /content/site: owner and editors read the open branch; coaches 403; unknown files 404', async () => {
+  const t = setup();
+  assert.equal((await t.call('GET', '/content/site/hero')).status, 403);
+  assert.deepEqual((await t.call('GET', '/content/site/hero', null, EDITOR)).body, { data: json(HERO), sha: t.repo.sha(HERO) });
+  assert.equal((await t.call('GET', '/content/site/images', null, OWNER)).body.sha, t.repo.sha(IMG));
+  for (const id of ['site', 'nope', '..%2Fsite']) assert.equal((await t.call('GET', `/content/site/${id}`, null, OWNER)).status, 404, id);
+  const d = json(HERO);
+  d.subline.en = 'Judo for everyone in Haifa.';
+  assert.equal((await t.call('POST', '/save', siteSave(t, 'hero', d), EDITOR)).status, 200);
+  assert.equal((await t.call('GET', '/content/site/hero', null, OWNER)).body.data.subline.en, 'Judo for everyone in Haifa.');
+});
+
+test('site.text: an editor changes one value through a PR; coaches, unknown ids and broken values write nothing', async () => {
+  const t = setup();
+  const d = json(HERO);
+  d.subline.ru = 'Дзюдо для всех.';
+  const r = await t.call('POST', '/save', siteSave(t, 'hero', d), EDITOR);
+  assert.equal(r.status, 200, JSON.stringify(r.body));
+  assert.deepEqual([r.body.pr, r.body.branch], [1, 'panel-1']);
+  assert.deepEqual(toMain(t), []);
+  const before = json(HERO);
+  assert.deepEqual(JSON.parse(t.repo.file(HERO, 'panel-1')), { ...before, subline: { ...before.subline, ru: 'Дзюдо для всех.' } });
+  assert.equal(t.repo.commits.get(r.body.sha).message, 'Site: hero texts\n\nFrom the coach panel (editor).');
+  assert.equal(prRow(t, 'site:hero').number, 1);
+  assert.equal(t.env.DB.db.prepare('SELECT coach_id FROM edits').get().coach_id, null);
+
+  const u = setup();
+  assert.equal((await u.call('POST', '/save', siteSave(u, 'hero', d))).status, 403);
+  const x = await u.call('POST', '/save', { op: 'site.text', id: 'site', base_sha: 'x', fields: {} }, OWNER);
+  assert.deepEqual([x.status, x.body.detail], [400, 'unknown id']);
+  for (const [id, edit, re] of [
+    ['hero', (h) => { h.headline.en = 'Strong on the mat'; }, /headline\.en: must contain/],
+    ['hero', (h) => { h.extra = 1; }, /extra: unknown field/],
+    ['contact', (c) => { c.phones[0].tel = '+972547632055'; }, /phone and tel/],
+    ['contact', (c) => { c.social[0].url = 'javascript:alert(1)'; }, /social\[0\]\.url/],
+    ['ui', (ui) => { ui.lead.after.en = 'Hi!'; }, /keep \{hall\}/],
+    ['footer', (f) => { f.tagline.he = ''; }, /tagline/],
+    ['pages', (p) => { p.video.title.he = p.gallery.title.he; }, /two pages share/],
+  ]) {
+    const f = json(`content/site/${id}.json`);
+    edit(f);
+    const y = await u.call('POST', '/save', siteSave(u, id, f), OWNER);
+    assert.deepEqual([y.status, y.body.error], [400, 'invalid'], id);
+    assert.match(y.body.detail, re);
+  }
+  assert.equal(u.writes().length, 0);
+});
+
+test('site.image: WebP and images.json in one commit under a new name; bad images, slots and coaches write nothing', async () => {
+  const t = setup();
+  const alt = { he: 'אימון', ru: 'Тренировка', en: 'Training' };
+  const b64 = webp(1600, 900);
+  const r = await t.call('POST', '/save', siteImage(t, 'hero', { webp: b64, alt: { ...alt, placeholder: true } }), EDITOR);
+  assert.equal(r.status, 200, JSON.stringify(r.body));
+  assert.equal(t.s.calls.filter((c) => c.method === 'POST' && c.url.endsWith('/git/commits')).length, 1);
+  const hero = JSON.parse(t.repo.file(IMG, 'panel-1')).hero;
+  assert.match(hero.src, /^img-site\/hero-[a-z0-9]+\.webp$/);
+  assert.deepEqual(hero, { src: hero.src, alt });
+  assert.equal(t.repo.file(`public/${hero.src}`, 'panel-1'), b64);
+  assert.deepEqual({ ...JSON.parse(t.repo.file(IMG, 'panel-1')), hero: json(IMG).hero }, json(IMG));
+  assert.equal(t.repo.commits.get(r.body.sha).message.split('\n')[0], 'Site: hero image');
+
+  await new Promise((ok) => setTimeout(ok, 2));
+  const r2 = await t.call('POST', '/save', siteImage(t, 'logo', { webp: webp(512, 512) }), OWNER);
+  assert.equal(r2.status, 200, JSON.stringify(r2.body));
+  const after = JSON.parse(t.repo.file(IMG, 'panel-1'));
+  assert.deepEqual([r2.body.pr, after.hero, Object.keys(after.logo)], [1, hero, ['src']]);
+  assert.match(after.logo.src, /^img-site\/logo-[a-z0-9]+\.webp$/);
+
+  const u = setup();
+  const png = Buffer.from('\x89PNG\r\n\x1a\n\0\0\0\0', 'latin1').toString('base64');
+  for (const [id, f, re] of [
+    ['logo', { webp: webp(513, 512) }, /512×512/],
+    ['contact_pic', { webp: webp(1200, 1201) }, /1200×1200/],
+    ['hero', { webp: webp(2001, 900) }, /2000×1400/],
+    ['hero', { webp: webp(1600, 900, 0x08) }, /EXIF/],
+    ['hero', { webp: png }, /not a WebP/],
+    ['hero', { webp: webp(10, 10), alt: { en: 'x' } }, /alt/],
+    ['hero', { webp: webp(10, 10), alt: { he: 'א', ru: 'б', en: '柔道' } }, /alt/],
+  ]) {
+    const y = await u.call('POST', '/save', siteImage(u, id, f), OWNER);
+    assert.deepEqual([y.status, y.body.error], [400, 'invalid'], id);
+    assert.match(y.body.detail, re);
+  }
+  const y = await u.call('POST', '/save', { op: 'site.image', id: 'gallery', base_sha: 'x', fields: { webp: webp(10, 10) } }, OWNER);
+  assert.deepEqual([y.status, y.body.detail], [400, 'unknown id']);
+  assert.equal((await u.call('POST', '/save', siteImage(u, 'hero', { webp: webp(10, 10) }))).status, 403);
+  assert.equal(u.writes().length, 0);
+});
+
 // ---- translate, deploy status, failure notices ----
 function anthropic(reply = { he: { bio: 'ביו' }, ru: { bio: 'Тренеры клуба' }, en: { bio: 'Bio' } }) {
   const seen = [];
@@ -652,6 +748,19 @@ test('/translate takes only known field names, a bounded count, and counts keys 
   assert.equal((await tr('coach-bio', { bio: 'x', 'about.0': 'y', 'approach.3': 'z', dan_rank: 'w', alt: 'v' })).status, 502, 'reply lacks those keys');
   assert.equal(a.seen.length, 1);
   assert.equal(t.env.DB.db.prepare("SELECT n FROM usage WHERE kind = 'translate'").get().n, 1, 'refused calls cost no slot');
+});
+
+test('/translate context site: dotted keys for owner and editors only', async () => {
+  const a = anthropic({ he: { 'hero.subline': 'א' }, ru: { 'hero.subline': 'б' }, en: { 'hero.subline': 'c' } });
+  const t = setup({ ANTHROPIC_KEY: 'k' }, [a.handler]);
+  const tr = (fields, who = EDITOR) => t.call('POST', '/translate', { source_lang: 'en', context: 'site', fields }, who);
+  const r = await tr({ 'hero.subline': 'Judo for kids' });
+  assert.equal(r.status, 200, JSON.stringify(r.body));
+  assert.match(a.seen[0].system, /text on the club website for parents and visitors/);
+  assert.equal((await tr({ 'hero.subline': 'x' }, COACH)).status, 403);
+  for (const k of ['Hero', 'a.b.c.d.e.f', 'a b', '../x', 'hero.']) assert.equal((await tr({ [k]: 'x' })).status, 400, k);
+  assert.match((await tr(Object.fromEntries(Array.from({ length: 25 }, (_, i) => [`ui.k${i}`, 'x'])))).body.detail, /too many fields/);
+  assert.equal(a.seen.length, 1);
 });
 
 test('no commit message carries an email or a Telegram id', () => {

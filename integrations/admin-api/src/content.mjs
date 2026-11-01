@@ -6,13 +6,13 @@ import { checkTranslations } from '../../../src/lib/integrity.mjs';
 import { checkSchedule } from '../../../src/lib/schedule-check.mjs';
 import { checkChanges } from '../../../src/lib/schedule-changes.mjs';
 import { checkCoachWebp } from '../../../src/lib/image-check.mjs';
-import { CJK } from '../../../src/lib/site-check.mjs';
+import { CJK, SITE_FILES, IMAGE_SLOTS, mergeSite, checkSite } from '../../../src/lib/site-check.mjs';
 import { buildPrompt, detectLang, MAX_CHARS } from '../../../src/lib/translate-prompt.mjs';
 import { translate } from './translate.mjs';
 
 const SAVES_PER_DAY = 30;
 const TRANSLATES_PER_DAY = 60;
-const TRANSLATE_KEYS = { 'coach-bio': /^(bio|dan_rank|alt|(about|approach)\.\d{1,2})$/, 'schedule-note': /^note$/ };
+const TRANSLATE_KEYS = { 'coach-bio': /^(bio|dan_rank|alt|(about|approach)\.\d{1,2})$/, 'schedule-note': /^note$/, site: /^[a-z_]+(\.[a-z0-9_]+){0,4}$/ };
 const MAX_TRANSLATE_FIELDS = 24;
 const LANGS = ['he', 'ru', 'en'];
 
@@ -88,7 +88,7 @@ async function mergeBuild(head, c) {
   return [{ path, content: serialize(c.merged) }];
 }
 
-function decodePhoto(fields) {
+function decodePhoto(fields, limits) {
   const s = typeof fields.webp === 'string' ? fields.webp.replace(/\s/g, '') : '';
   if (!s) throw new Error('photo is missing');
   if (s.length > MAX_B64) throw new Error('photo is larger than 1.5 MB');
@@ -96,7 +96,7 @@ function decodePhoto(fields) {
   try { bytes = Uint8Array.from(atob(s), (ch) => ch.charCodeAt(0)); } catch { throw new Error('photo is not valid base64'); }
   const f = fields.face;
   const face = Array.isArray(f) && f.length === 2 && f.every((x) => typeof x === 'number' && x >= 0 && x <= 1) ? f : [0.5, 0.3];
-  return { b64: s, face, ...checkCoachWebp(bytes) };
+  return { b64: s, face, ...checkCoachWebp(bytes, limits) };
 }
 
 // Copies only known keys: the file ends up in HTML via build.py.
@@ -149,6 +149,10 @@ async function checkMeta(m, { env, head, path }) {
   });
 }
 const checkSection = (m, { path }) => shape(m, path, { title: [...TEXT, true], intro: [...TEXT, true], more_coaches: TEXT, founded_note: TEXT });
+
+const SITE_LABEL = { contact: 'contacts', hero: 'hero texts', footer: 'footer', ui: 'schedule and sign-up texts', pages: 'page titles' };
+const IMAGES = 'content/site/images.json';
+const sitePath = (id) => `content/site/${id}.json`;
 
 const coachKey = (id) => `coach:${id}`;
 const scheduleKey = (id) => `schedule:${id}`;
@@ -208,6 +212,35 @@ export const SAVE_OPS = {
       return [{ path, delete: true }];
     },
     subject: async (m, { env, id, head }) => `Schedule: ${await coachName(env, id, head)}, removed ${m.type} ${m.from}` },
+  'site.text': { edits: true, ids: SITE_FILES, target: () => ({}), coach: () => null, key: (id) => `site:${id}`,
+    build: async (head, c) => {
+      const path = sitePath(c.id);
+      const cur = await readBase(c.env, path, head, c.base_sha);
+      await vet(() => {
+        c.merged = mergeSite(cur.data, c.fields, path);
+        checkTranslations(c.merged, path);
+        checkSite(c.id, c.merged, cur.data);
+      });
+      return [{ path, content: serialize(c.merged) }];
+    },
+    subject: (_, { id }) => `Site: ${SITE_LABEL[id]}` },
+  'site.image': { edits: true, ids: Object.keys(IMAGE_SLOTS), target: () => ({}), coach: () => null, key: () => 'site:images',
+    check: (f, id) => {
+      const { alt } = f;
+      if (alt !== undefined && !(isText(alt) && !LANGS.some((l) => CJK.test(alt[l])))) throw new Error('alt: must be he, ru and en text');
+      const [maxW, maxH] = IMAGE_SLOTS[id];
+      return { ...decodePhoto(f, { maxW, maxH }), alt: alt && Object.fromEntries(LANGS.map((l) => [l, alt[l]])) };
+    },
+    build: async (head, c) => {
+      const cur = await readBase(c.env, IMAGES, head, c.base_sha);
+      // A new name per upload: the old URL stays cached for a year.
+      const src = `img-site/${c.id}-${Date.now().toString(36)}.webp`;
+      // The old alt described the old picture; without a new one the slot is decorative.
+      c.merged = { ...cur.data, [c.id]: { src, ...(c.pre.alt && { alt: c.pre.alt }) } };
+      await vet(() => checkTranslations(c.merged, IMAGES));
+      return [{ path: `public/${src}`, base64: c.pre.b64 }, { path: IMAGES, content: serialize(c.merged) }];
+    },
+    subject: (_, { id }) => `Site: ${id} image` },
 };
 
 // Handlers throw Responses for early exits from inside the commit build; GitHub failures map to 502/503.
@@ -274,14 +307,22 @@ route('GET', '/content/section', guard(async ({ env, user }) => {
   return json(await readJson(env, SECTION, await pendingRef(env, 'section')));
 }));
 
+route('GET', '/content/site/:id', guard(async ({ env, user, params: { id } }) => {
+  if (!can(user, 'site.text', {})) return fail(403, 'forbidden');
+  if (!SITE_FILES.includes(id) && id !== 'images') return fail(404, 'not_found');
+  const f = await readJson(env, id === 'images' ? IMAGES : sitePath(id), await pendingRef(env, `site:${id}`));
+  return f ? json(f) : fail(404, 'not_found');
+}));
+
 route('POST', '/save', guard(async ({ env, user, body }) => {
   const { op, id, base_sha, fields } = body;
   const spec = Object.hasOwn(SAVE_OPS, op) ? SAVE_OPS[op] : null;
   if (!spec) return invalid('unknown op');
+  if (spec.ids && !spec.ids.includes(id)) return invalid('unknown id');
   if (!fields || typeof fields !== 'object' || Array.isArray(fields)) return invalid('fields must be an object');
   if (spec.edits && !(typeof base_sha === 'string' && base_sha)) return invalid('base_sha is required');
   let pre;
-  try { pre = spec.check?.(fields); } catch (e) { return invalid(e.message); }
+  try { pre = spec.check?.(fields, id); } catch (e) { return invalid(e.message); }
   if (!(await allowed(env, user, op, spec.target(id)))) return fail(403, 'forbidden');
   if ((await take(env, user.email, new Date().toISOString().slice(0, 10), 'save')) > SAVES_PER_DAY) return fail(429, 'rate_limited');
 
@@ -348,7 +389,8 @@ route('POST', '/save', guard(async ({ env, user, body }) => {
 route('POST', '/translate', guard(async ({ env, user, body }) => {
   if (!env.ANTHROPIC_KEY) return fail(503, 'not_configured');
   const { source_lang, context = 'coach-bio', coach, fields } = body;
-  if (!['coach-bio', 'schedule-note'].includes(context)) return invalid('unknown context');
+  if (!Object.hasOwn(TRANSLATE_KEYS, context)) return invalid('unknown context');
+  if (context === 'site' && !can(user, 'site.text', {})) return fail(403, 'forbidden');
   // Keys reach the prompt too: allowlist them, cap their number and count them in the size limit.
   const keys = fields && typeof fields === 'object' && !Array.isArray(fields) ? Object.keys(fields) : [];
   if (keys.length > MAX_TRANSLATE_FIELDS) return invalid('too many fields');
