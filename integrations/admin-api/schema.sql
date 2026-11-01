@@ -6,3 +6,8 @@ CREATE TABLE IF NOT EXISTS tg_links (telegram_id TEXT PRIMARY KEY, email TEXT NO
 CREATE TABLE IF NOT EXISTS link_codes (code_hash TEXT PRIMARY KEY, email TEXT NOT NULL, expires_at INTEGER NOT NULL, used_at INTEGER);
 CREATE TABLE IF NOT EXISTS edits (sha TEXT PRIMARY KEY, email TEXT, coach_id TEXT, op TEXT, created INTEGER, status TEXT, conclusion TEXT, notified INTEGER DEFAULT 0);
 CREATE TABLE IF NOT EXISTS usage (email TEXT, day TEXT, kind TEXT, n INTEGER, PRIMARY KEY (email, day, kind));
+-- One open PR per target key; the partial unique index stops two racing first saves from opening two PRs.
+CREATE TABLE IF NOT EXISTS prs (n INTEGER PRIMARY KEY AUTOINCREMENT, key TEXT NOT NULL, number INTEGER, branch TEXT, title TEXT,
+  email TEXT, who TEXT, created INTEGER, updated INTEGER, state TEXT NOT NULL DEFAULT 'opening', head_sha TEXT, step TEXT,
+  merge_sha TEXT, tg_msg INTEGER, tg_state TEXT, notified INTEGER DEFAULT 0, saves INTEGER DEFAULT 1);
+CREATE UNIQUE INDEX IF NOT EXISTS prs_open_key ON prs(key) WHERE state NOT IN ('merged','live','live_failed','closed');

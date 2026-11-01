@@ -2,22 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { jwtVerify } from 'jose';
 import { installationToken, readJson, listDir, commitFiles } from '../integrations/admin-api/src/github.mjs';
-import { stubFetch } from './helpers/admin-env.mjs';
-
-const { publicKey, privateKey } = await crypto.subtle.generateKey(
-  { name: 'RSASSA-PKCS1-v1_5', modulusLength: 2048, publicExponent: new Uint8Array([1, 0, 1]), hash: 'SHA-256' }, true, ['sign', 'verify']);
-const pkcs8 = Buffer.from(await crypto.subtle.exportKey('pkcs8', privateKey)).toString('base64');
-const APP_KEY = `-----BEGIN PRIVATE KEY-----\n${pkcs8.match(/.{1,64}/g).join('\n')}\n-----END PRIVATE KEY-----\n`;
-
-let installs = 0;
-const ghEnv = (handlers, over = {}) => {
-  const s = stubFetch([
-    ['POST', /\/app\/installations\/\w+\/access_tokens$/, () => ({ token: 'inst-token', expires_at: new Date(Date.now() + 3600e3).toISOString() })],
-    ...handlers,
-  ]);
-  // A fresh installation id per env keeps the module token cache from leaking between tests.
-  return { env: { REPO: 'o/r', BRANCH: 'main', GITHUB_APP_ID: '123', GITHUB_INSTALLATION_ID: `i${++installs}`, GITHUB_APP_KEY: APP_KEY, __fetch: s.fetch, ...over }, s };
-};
+import { ghEnv, publicKey, setup, messages, sha1, json, COACH, EDITOR, OWNER, actions, run, edit, FAILED_JOBS, SHA_A, SHA_B } from './helpers/admin-repo.mjs';
 
 test('installationToken signs an RS256 app JWT and caches the token', async () => {
   let auth;
@@ -105,70 +90,10 @@ test('commitFiles rebuilds from the new head after a 422 and gives up after four
 });
 
 // ---- content routes and saves, against a stubbed GitHub serving the real repo files ----
-const { readFileSync, readdirSync } = await import('node:fs');
-const { createHash } = await import('node:crypto');
+const { readdirSync } = await import('node:fs');
 const { makeEnv } = await import('./helpers/admin-env.mjs');
-const { signSession } = await import('../integrations/admin-api/src/auth.mjs');
 const { serialize } = await import('../integrations/admin-api/src/content.mjs');
 const { default: worker } = await import('../integrations/admin-api/src/index.mjs');
-
-const messages = [];
-const sha1 = (t) => createHash('sha1').update(t).digest('hex');
-const disk = (p) => readFileSync(new URL(`../${p}`, import.meta.url), 'utf8');
-const json = (p) => JSON.parse(disk(p));
-
-function fakeRepo() {
-  const files = new Map();
-  for (const d of ['content/coaches', 'content/schedule']) {
-    for (const n of readdirSync(new URL(`../${d}`, import.meta.url))) files.set(`${d}/${n}`, disk(`${d}/${n}`));
-  }
-  for (const f of ['content/venues.json', 'content/glossary.json', 'content/videos.json']) files.set(f, disk(f));
-  const blobs = new Map();
-  const trees = new Map();
-  const commits = new Map();
-  let head = 'h0';
-  let n = 0;
-  const handlers = [
-    ['GET', /\/repos\/[^/]+\/[^/]+\/contents\/([^?]+)\?ref=/, (_, m) => {
-      const p = decodeURIComponent(m[1]);
-      if (files.has(p)) return { sha: sha1(files.get(p)), content: Buffer.from(files.get(p)).toString('base64') };
-      const kids = [...files.keys()].filter((k) => k.startsWith(`${p}/`) && !k.slice(p.length + 1).includes('/'));
-      return kids.length ? kids.map((k) => ({ name: k.slice(p.length + 1), type: 'file' })) : new Response('{}', { status: 404 });
-    }],
-    ['GET', /\/git\/ref\/heads\/main$/, () => ({ object: { sha: head } })],
-    ['GET', /\/git\/commits\/\w+$/, () => ({ tree: { sha: 'base' } })],
-    ['POST', /\/git\/blobs$/, async (req) => { const b = await req.json(); blobs.set(`b${++n}`, b.content); return { sha: `b${n}` }; }],
-    ['POST', /\/git\/trees$/, async (req) => { trees.set(`t${++n}`, (await req.json()).tree); return { sha: `t${n}` }; }],
-    ['POST', /\/git\/commits$/, async (req) => { const c = await req.json(); commits.set(`c${++n}`, c); messages.push(c.message); return { sha: `c${n}` }; }],
-    ['PATCH', /\/git\/refs\/heads\/main$/, async (req) => {
-      const { sha } = await req.json();
-      for (const e of trees.get(commits.get(sha).tree)) e.sha ? files.set(e.path, blobs.get(e.sha)) : files.delete(e.path);
-      head = sha;
-      return { object: { sha } };
-    }],
-  ];
-  return { handlers, files, commits, sha: (p) => sha1(files.get(p)) };
-}
-
-const COACH = 'coach@example.com';
-const EDITOR = 'editor@example.com';
-const OWNER = 'owner@example.com';
-
-function setup(over = {}, extra = []) {
-  const repo = fakeRepo();
-  const { env, s } = ghEnv([...extra, ...repo.handlers]);
-  const e = makeEnv({ ...env, ...over });
-  e.DB.db.exec(`INSERT INTO users (email, coach_id, role) VALUES ('${COACH}', 'natanel-zhurovel', 'coach'), ('${EDITOR}', NULL, 'editor')`);
-  const call = async (method, path, body, email = COACH) => {
-    const res = await worker.fetch(new Request(`https://api.test${path}`, {
-      method, headers: { Authorization: `Bearer ${await signSession({ email }, e)}` }, ...(body && { body: JSON.stringify(body) }),
-    }), e, {});
-    return { status: res.status, body: await res.json() };
-  };
-  const writes = () => s.calls.filter((c) => c.method !== 'GET' && !c.url.includes('/access_tokens'));
-  const repoCalls = () => s.calls.filter((c) => c.url.includes('/repos/'));
-  return { repo, env: e, s, call, writes, repoCalls };
-}
 
 const NAT = 'content/coaches/natanel-zhurovel.json';
 const NAT_S = 'content/schedule/natanel-zhurovel.json';
@@ -460,21 +385,6 @@ test('/translate: glossary from main, coach name in the prompt, daily cap, size 
   const u = setup({}, [a.handler]);
   assert.deepEqual((await u.call('POST', '/translate', { context: 'schedule-note', fields: { note: 'x' } })).body, { error: 'not_configured' });
 });
-
-const SHA_A = 'a'.repeat(40);
-const SHA_B = 'b'.repeat(40);
-// runs: {sha: run}; jobs: {runId: jobs}; mainRuns: list for ?branch=main
-function actions(state) {
-  return [
-    ['GET', /\/actions\/runs\?head_sha=(\w+)&event=push$/, (_, m) => ({ workflow_runs: state.runs[m[1]] ? [state.runs[m[1]]] : [] })],
-    ['GET', /\/actions\/runs\/(\d+)\/jobs$/, (_, m) => ({ jobs: state.jobs[m[1]] ?? [] })],
-    ['GET', /\/actions\/runs\?branch=main&event=push$/, () => ({ workflow_runs: state.main ?? [] })],
-  ];
-}
-const run = (id, status, conclusion, created_at = '2026-11-01T10:00:00Z') => ({ id, name: 'Deploy to GitHub Pages', status, conclusion, created_at });
-const edit = (t, sha, email = COACH, created = Math.floor(Date.now() / 1000)) =>
-  t.env.DB.db.prepare("INSERT INTO edits (sha, email, coach_id, op, created, status) VALUES (?, ?, 'natanel-zhurovel', 'coach.text', ?, 'pending')").run(sha, email, created);
-const FAILED_JOBS = [{ conclusion: 'success', steps: [] }, { conclusion: 'failure', steps: [{ name: 'Set up job', conclusion: 'success' }, { name: 'Run withastro/action@v6', conclusion: 'failure' }] }];
 
 test('/status maps runs to pending, live and failed with the failed step, and stores it', async () => {
   const st = { runs: {}, jobs: {} };
