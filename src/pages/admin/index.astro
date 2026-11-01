@@ -1,0 +1,164 @@
+---
+import Fonts from '../../components/Fonts.astro';
+import { NAMES } from '../../i18n/ui';
+import '../../styles/tokens.css';
+
+// Public values only: the Google client id and the Worker URL. Secrets live in the Worker.
+const cfg = JSON.stringify({ api: import.meta.env.PUBLIC_ADMIN_API || null, google: import.meta.env.PUBLIC_GOOGLE_CLIENT_ID || null }).replace(/</g, '\\u003c');
+const LANGS = [['he', 'rtl'], ['ru', 'ltr'], ['en', 'ltr']] as const;
+const base = import.meta.env.BASE_URL;
+---
+<!doctype html>
+<html lang="ru" dir="ltr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>Unifight · панель</title>
+    <link rel="icon" href={`${base}favicon.ico`} sizes="48x48" />
+    <Fonts lang="ru" />
+    <script type="application/json" id="cfg" set:html={cfg} />
+  </head>
+  <body>
+    <main>
+      <h1 data-t="title">Unifight · панель</h1>
+      <p id="notice" hidden data-t="notConfigured">Панель ещё не подключена.</p>
+
+      <section id="signin" hidden>
+        <p data-t="signinLead"></p>
+        <div id="gsi"></div>
+        <form id="tgcode" hidden>
+          <label><span data-t="tgCodeLabel"></span>
+            <input name="code" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]{6}" required dir="ltr" />
+          </label>
+          <button data-t="tgCodeSubmit"></button>
+        </form>
+      </section>
+
+      <section id="who" hidden>
+        <span data-t="signedInAs"></span> <b id="who-email" dir="ltr"></b>
+        <label><span data-t="uiLang"></span>
+          <select id="uilang">{LANGS.map(([l]) => <option value={l}>{NAMES[l]}</option>)}</select>
+        </label>
+        <button id="signout" data-t="signOut"></button>
+      </section>
+
+      <p id="status" role="status" aria-live="polite"></p>
+
+      <section id="picker" hidden>
+        <label><span data-t="coachPick"></span> <select id="coach"></select></label>
+      </section>
+
+      <section id="profile" hidden>
+        <h2 data-t="profile"></h2>
+        <form id="profile-form">
+          <fieldset class="src">
+            <legend data-t="sourceLang"></legend>
+            {LANGS.map(([l], i) => <label><input type="radio" name="source" value={l} checked={i === 1} /> {NAMES[l]}</label>)}
+          </fieldset>
+          {['bio', 'dan_rank', 'alt'].map((f) => (
+            <fieldset>
+              <legend data-t={{ bio: 'bio', dan_rank: 'danRank', alt: 'alt' }[f]}></legend>
+              <div class="tri">
+                {LANGS.map(([l, d]) => (
+                  <label><span>{NAMES[l]}</span><textarea name={`${f}.${l}`} lang={l} dir={d} rows={f === 'bio' ? 5 : 2}></textarea></label>
+                ))}
+              </div>
+            </fieldset>
+          ))}
+          {['about', 'approach'].map((f) => (
+            <fieldset data-list={f}>
+              <legend data-t={f}></legend>
+              {f === 'approach' && <label><input type="checkbox" name="approach_own" /> <span data-t="approachOwn"></span></label>}
+              <div class="paras"></div>
+              <button type="button" class="add" data-t="addPara"></button>
+            </fieldset>
+          ))}
+          <div class="actions">
+            <button type="button" id="translate" data-t="translate"></button>
+            <button id="save" data-t="save"></button>
+            <button type="button" id="reload" hidden data-t="reload"></button>
+          </div>
+        </form>
+        <template id="para">
+          <fieldset class="para">
+            <legend data-t="paragraph"></legend>
+            <div class="tri">
+              {LANGS.map(([l, d]) => <label><span>{NAMES[l]}</span><textarea data-lang={l} lang={l} dir={d} rows="4"></textarea></label>)}
+            </div>
+            <button type="button" class="rm" data-t="removePara"></button>
+          </fieldset>
+        </template>
+      </section>
+
+      <section id="photo" hidden></section>
+      <section id="schedule" hidden></section>
+
+      <section id="telegram" hidden>
+        <h2 data-t="telegram"></h2>
+        <p id="tg-linked" hidden data-t="tgLinked"></p>
+        <button id="tg-connect" data-t="connectTelegram"></button>
+        <div id="tg-out" hidden>
+          <a id="tg-link" class="big" dir="ltr"></a>
+          <p data-t="tgCodeHint"></p>
+          <p id="tg-code" class="code" dir="ltr"></p>
+          <p id="tg-exp"></p>
+        </div>
+      </section>
+
+      <section id="access" hidden>
+        <h2 data-t="access"></h2>
+        <div class="scroll">
+          <table>
+            <thead><tr><th data-t="accessEmail"></th><th data-t="accessRole"></th><th data-t="accessCoach"></th><th>Telegram</th><th></th></tr></thead>
+            <tbody id="access-rows"></tbody>
+          </table>
+        </div>
+        <form id="access-add">
+          <label><span data-t="accessEmail"></span><input name="email" type="email" required dir="ltr" autocomplete="off" /></label>
+          <label><span data-t="accessRole"></span>
+            <select name="role"><option value="coach" data-t="roleCoach"></option><option value="editor" data-t="roleEditor"></option></select>
+          </label>
+          <label><span data-t="accessCoach"></span><select name="coach_id"></select></label>
+          <button data-t="accessAdd"></button>
+        </form>
+      </section>
+    </main>
+    <script>
+      import '../../admin/app.js';
+    </script>
+  </body>
+</html>
+
+<style is:global>
+  main{max-inline-size:1200px;margin-inline:auto;padding:16px var(--gut) 48px}
+  h1{font:600 1.4rem var(--disp);color:var(--gold-2);margin-block:0 12px}
+  h2{font:600 1.2rem var(--disp);color:var(--gold);margin-block:24px 8px}
+  section{margin-block-end:16px}
+  label{display:block}
+  fieldset{border:1px solid var(--line);border-radius:8px;margin:0 0 12px;padding:8px 10px 10px;min-inline-size:0}
+  legend{color:var(--gold);padding-inline:4px}
+  .src label,#who label{display:inline-block;margin-inline-end:12px}
+  .tri{display:grid;gap:8px}
+  @media (min-width:900px){.tri{grid-template-columns:repeat(3,1fr)}}
+  .tri span{display:block;font-size:.85rem;color:var(--mute)}
+  textarea,input,select{box-sizing:border-box;font:inherit;color:var(--paper);background:var(--ink-2);border:1px solid var(--line);border-radius:6px;padding:8px}
+  textarea{inline-size:100%;resize:vertical}
+  input[name=email],input[name=code]{inline-size:100%;max-inline-size:28rem}
+  input[name=code]{font-size:1.6rem;letter-spacing:.3em}
+  select,input{min-block-size:44px}
+  button{min-block-size:44px;padding:8px 16px;font:inherit;color:var(--ink);background:var(--gold);border:0;border-radius:6px;cursor:pointer}
+  button.rm,button.add,#reload,#signout{background:transparent;color:var(--gold-2);border:1px solid var(--line)}
+  button:disabled{opacity:.6}
+  .actions{display:flex;flex-wrap:wrap;gap:8px;position:sticky;inset-block-end:0;background:var(--ink);padding-block:8px}
+  label[data-proposed]::after{content:attr(data-proposed);display:block;font-size:.8rem;color:var(--red-3)}
+  #status{min-block-size:1.5em;font-weight:600}
+  #status.bad{color:var(--red-3)}
+  #status.good{color:var(--gold-2)}
+  .scroll{overflow-x:auto}
+  table{border-collapse:collapse;inline-size:100%}
+  th,td{text-align:start;padding:6px 8px;border-block-end:1px solid var(--line)}
+  #access-add{display:grid;gap:8px;margin-block-start:12px;max-inline-size:28rem}
+  .big{display:block;font-size:1.2rem;color:var(--gold-2);word-break:break-all;margin-block:8px}
+  .code{font:600 2.4rem var(--num);letter-spacing:.2em}
+</style>
