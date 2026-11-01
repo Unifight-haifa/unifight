@@ -31,6 +31,9 @@ env:
   # unset means off; see docs/google-analytics-setup.ru.md
   PUBLIC_GA_ID: ${{ vars.PUBLIC_GA_ID }}
   PUBLIC_GSC_VERIFICATION: ${{ vars.PUBLIC_GSC_VERIFICATION }}
+  # admin panel; unset shows "not connected", docs/admin-panel-setup.ru.md
+  PUBLIC_ADMIN_API: ${{ vars.PUBLIC_ADMIN_API }}
+  PUBLIC_GOOGLE_CLIENT_ID: ${{ vars.PUBLIC_GOOGLE_CLIENT_ID }}
 
 jobs:
   build:
@@ -51,7 +54,8 @@ jobs:
       - run: python -m playwright install --with-deps --only-shell chromium
       - uses: withastro/action@v6
         with:
-          build-cmd: npm run build && npm test
+          # panel commits change only content JSON; rebuild the landing
+          build-cmd: npm run gen && npm run build && npm test
       - run: npm run build:linkcheck
       - uses: lycheeverse/lychee-action@v2
         with:
