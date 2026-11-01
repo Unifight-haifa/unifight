@@ -97,7 +97,7 @@ const base = import.meta.env.BASE_URL;
         <details class="card" name="card" data-card="photo">
           <summary data-t="photo"></summary>
           <p data-t="photoHint"></p>
-          <div id="ph-wrap" dir="ltr"><img id="ph-img" alt="" /><span id="ph-face" hidden></span></div>
+          <div id="ph-row" dir="ltr"><div id="ph-wrap"><img id="ph-img" alt="" /><span id="ph-face" hidden></span></div><figure id="ph-ava" hidden><span class="ava"><img alt="" /></span><figcaption data-t="photoAva"></figcaption></figure></div>
           <label class="file"><span data-t="photoPick"></span> <input id="ph-file" type="file" accept="image/*" /></label>
           <button type="button" id="ph-save" disabled data-t="photoSave"></button>
         </details>
@@ -254,10 +254,18 @@ const base = import.meta.env.BASE_URL;
   #ph-file{max-inline-size:100%}
   #ph-file::file-selector-button{min-block-size:36px;margin-inline-end:8px;padding:6px 14px;font:inherit;color:var(--gold-2);background:transparent;border:1px solid var(--line);border-radius:6px;cursor:pointer}
   /* Size the frame, not the img: a % cap inside a fit-content box resolves against the file's natural width. */
-  #ph-wrap{position:relative;inline-size:min(100%,320px);overflow:hidden;cursor:crosshair}
+  #ph-row{display:flex;flex-wrap:wrap;align-items:flex-start;gap:16px}
+  #ph-wrap{position:relative;inline-size:min(100%,320px)}
   #ph-wrap:has(#ph-img:not([src])),#ph-wrap:has(#ph-img[src=""]){display:none}
   #ph-img{display:block;inline-size:100%;block-size:auto}
   #ph-img:not([src]),#ph-img[src=""]{display:none}
-  #ph-face{position:absolute;inline-size:50%;aspect-ratio:1;border:2px solid var(--gold-2);border-radius:50%;transform:translate(-50%,-50%);box-shadow:0 0 0 999px rgb(0 0 0 / .4);pointer-events:none}
+  #ph-wrap.pick{cursor:crosshair}
+  /* marker only; the avatar beside it shows the real crop */
+  #ph-face{position:absolute;inline-size:14px;aspect-ratio:1;border:2px solid var(--gold-2);border-radius:50%;background:rgb(0 0 0 / .35);transform:translate(-50%,-50%);pointer-events:none}
+  #ph-ava{display:grid;justify-items:center;gap:6px;margin:0;font-size:.85em;color:var(--muted,inherit)}
+  #ph-ava[hidden]{display:none}
+  /* mirrors .ava in night.css (scale = AVA_ZOOM in build.py) */
+  #ph-ava .ava{display:block;inline-size:72px;block-size:72px;border-radius:50%;overflow:hidden;background:#efe9de;box-shadow:0 0 0 2px var(--gold-2)}
+  #ph-ava img{display:block;inline-size:100%;block-size:100%;object-fit:cover;object-position:50% 0;transform:scale(2)}
   .code{font:600 2.4rem var(--num);letter-spacing:.2em}
 </style>

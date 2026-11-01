@@ -269,10 +269,19 @@ $('#reload').addEventListener('click', () => loadProfile(S.coach));
 
 /* ---- photo ---- */
 
-const PH = { webp: null, face: [0.5, 0.3], url: '' };
+$('#ph-img').addEventListener('load', () => showFace());
+
+const PH = { webp: null, face: [0.5, 0.2], url: '' };
 
 function showFace() {
   Object.assign($('#ph-face').style, { insetInlineStart: `${PH.face[0] * 100}%`, insetBlockStart: `${PH.face[1] * 100}%` });
+  const img = $('#ph-img'), w = img.naturalWidth, h = img.naturalHeight;
+  if (!w) return;
+  // same origin maths as ava() in scripts/landing/build.py, zoom 2
+  let [fx, fy] = PH.face;
+  [fx, fy] = h >= w ? [fx, (fy * h) / w] : [0.5 + ((fx - 0.5) * w) / h, fy];
+  const o = (f) => Math.min(Math.max(2 * f - 0.5, 0), 1) * 100;
+  $('#ph-ava img').style.transformOrigin = `${o(fx)}% ${o(fy)}%`;
 }
 
 function setPreview(src, face) {
@@ -280,7 +289,10 @@ function setPreview(src, face) {
   PH.url = src.startsWith('blob:') ? src : '';
   PH.face = face;
   $('#ph-img').src = src;
-  $('#ph-face').hidden = !src;
+  $('#ph-ava img').src = src;
+  $('#ph-ava').hidden = !src;
+  $('#ph-face').hidden = !PH.webp;
+  $('#ph-wrap').classList.toggle('pick', !!PH.webp);
   $('#ph-save').disabled = !PH.webp;
   showFace();
 }
@@ -289,7 +301,7 @@ function loadPhoto() {
   const p = S.base.data.photo;
   PH.webp = null;
   $('#ph-file').value = '';
-  setPreview(p?.src ? `${import.meta.env.BASE_URL}${p.src}` : '', p?.face ?? [0.5, 0.3]);
+  setPreview(p?.src ? `${import.meta.env.BASE_URL}${p.src}` : '', p?.face ?? [0.5, 0.2]);
   show('#photo');
 }
 
@@ -304,7 +316,7 @@ $('#ph-file').addEventListener('change', async (ev) => {
     PH.webp = null;
     return status(e?.code === 'heic' ? t('heic') : errText(e), 'bad');
   }
-  setPreview(URL.createObjectURL(new Blob([PH.webp.bytes], { type: 'image/webp' })), [0.5, 0.3]);
+  setPreview(URL.createObjectURL(new Blob([PH.webp.bytes], { type: 'image/webp' })), [0.5, 0.2]);
   status(t('photoFace'));
 });
 
