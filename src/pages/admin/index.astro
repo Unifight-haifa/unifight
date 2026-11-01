@@ -100,7 +100,61 @@ const base = import.meta.env.BASE_URL;
           <button type="button" id="ph-save" disabled data-t="photoSave"></button>
         </details>
       </section>
-      <section id="schedule" hidden></section>
+      <section id="schedule" hidden>
+        <details>
+          <summary data-t="schedule"></summary>
+          <form id="ses-form">
+            <div id="ses-rows"></div>
+            <div class="row">
+              <button type="button" id="ses-add" class="add" data-t="addSession"></button>
+              <button id="ses-save" data-t="saveSchedule"></button>
+            </div>
+          </form>
+        </details>
+        <details>
+          <summary data-t="changes"></summary>
+          <ul id="chg-list"></ul>
+          <p id="chg-none" hidden data-t="noChanges"></p>
+          <form id="chg-form">
+            <fieldset class="src">
+              <legend data-t="chgType"></legend>
+              {['cancel', 'move', 'extra', 'note'].map((ty, i) => <label><input type="radio" name="type" value={ty} checked={i === 0} /> <span data-t={`type.${ty}`}></span></label>)}
+            </fieldset>
+            <div class="grid">
+              <label data-for="cancel move extra" class="wide"><span data-t="chgClass"></span><select name="ses"></select></label>
+              <label data-for="cancel move note"><span data-t="chgDate"></span><input type="date" name="date" dir="ltr" /></label>
+              <label data-for="cancel note"><span data-t="chgTo"></span><input type="date" name="to" dir="ltr" /></label>
+              <label data-for="move extra"><span data-t="chgNewDate"></span><input type="date" name="new_date" dir="ltr" /></label>
+              <label data-for="move extra"><span data-t="sesStart"></span><input type="time" name="new_start" dir="ltr" /></label>
+              <label data-for="move extra"><span data-t="sesEnd"></span><input type="time" name="new_end" dir="ltr" /></label>
+              <label data-for="move extra"><span data-t="sesVenue"></span><select name="new_venue"></select></label>
+            </div>
+            <fieldset>
+              <legend data-t="chgNote"></legend>
+              <div class="tri">
+                {LANGS.map(([l, d]) => <label><span>{NAMES[l]}</span><textarea name={`note.${l}`} lang={l} dir={d} rows="2"></textarea></label>)}
+              </div>
+            </fieldset>
+            <div class="row">
+              <button type="button" id="chg-translate" data-t="translate"></button>
+              <button id="chg-save" data-t="publishChange"></button>
+            </div>
+          </form>
+        </details>
+        <template id="ses-row">
+          <fieldset class="ses">
+            <div class="grid">
+              <label><span data-t="sesDay"></span><select name="day"></select></label>
+              <label><span data-t="sesVenue"></span><select name="venue"></select></label>
+              <label><span data-t="sesStart"></span><input type="time" name="start" required dir="ltr" /></label>
+              <label><span data-t="sesEnd"></span><input type="time" name="end" required dir="ltr" /></label>
+              <label><span data-t="sesKind"></span><select name="kind"></select></label>
+              <label><span data-t="sesGrades"></span><span class="gr" dir="ltr"><input type="number" name="g0" min="0" max="12" inputmode="numeric" /> – <input type="number" name="g1" min="0" max="12" inputmode="numeric" /></span></label>
+            </div>
+            <button type="button" class="rm" data-t="removeSession"></button>
+          </fieldset>
+        </template>
+      </section>
 
       <section id="telegram" hidden>
         <h2 data-t="telegram"></h2>
@@ -144,6 +198,7 @@ const base = import.meta.env.BASE_URL;
   h2{font:600 1.2rem var(--disp);color:var(--gold);margin-block:24px 8px}
   section{margin-block-end:16px}
   label{display:block}
+  [hidden]{display:none !important}
   fieldset{border:1px solid var(--line);border-radius:8px;margin:0 0 12px;padding:8px 10px 10px;min-inline-size:0}
   legend{color:var(--gold);padding-inline:4px}
   .src label,#who label{display:inline-block;margin-inline-end:12px}
@@ -170,6 +225,17 @@ const base = import.meta.env.BASE_URL;
   .big{display:block;font-size:1.2rem;color:var(--gold-2);word-break:break-all;margin-block:8px}
   summary{font:600 1.2rem var(--disp);color:var(--gold);cursor:pointer;min-block-size:44px;display:flex;align-items:center}
   details>*+*{margin-block-start:10px}
+  .row{display:flex;flex-wrap:wrap;gap:8px}
+  .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-block-end:8px}
+  @media (min-width:900px){.grid{grid-template-columns:repeat(6,minmax(0,1fr))}}
+  .grid .wide{grid-column:1/-1}
+  .grid label>span[data-t]{display:block;font-size:.85rem;color:var(--mute)}
+  .grid select,.grid input{inline-size:100%}
+  .grid .gr{display:flex;align-items:center;gap:4px}
+  .grid .gr input{inline-size:4.2em}
+  #chg-list{padding-inline-start:18px}
+  #chg-list li{margin-block-end:8px}
+  #chg-list .rm{margin-inline-start:8px}
   #ph-file{max-inline-size:100%}
   #ph-wrap{position:relative;inline-size:fit-content;max-inline-size:100%;overflow:hidden}
   #ph-img{display:block;max-inline-size:min(100%,320px);block-size:auto}

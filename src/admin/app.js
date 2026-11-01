@@ -1,6 +1,7 @@
 import { api, config, setToken, clearToken, hasToken, errText } from './api.js';
 import { LANGS, t, uiLang, setUiLang } from './i18n.js';
 import { toWebp, toBase64 } from './photo.js';
+import { mountSchedule } from './schedule.js';
 
 const $ = (s, root = document) => root.querySelector(s);
 const show = (s, on = true) => ($(s).hidden = !on);
@@ -25,6 +26,12 @@ function loadScript(src) {
     const s = Object.assign(document.createElement('script'), { src, async: true, onload: ok, onerror: bad });
     document.head.append(s);
   });
+}
+
+// a stale save offers the reload button, whichever section failed
+function fail(e) {
+  show('#reload', e?.code === 'stale');
+  status(errText(e), 'bad');
 }
 
 async function busy(btn, fn) {
@@ -180,6 +187,7 @@ async function loadProfile(id) {
     fill(S.base.data);
     show('#profile');
     loadPhoto();
+    mountSchedule($('#schedule'), { id, watch, status, busy, fail, applyT });
     if (!S.poll) status('');
   } catch (e) {
     status(errText(e), 'bad');
@@ -228,10 +236,7 @@ form.addEventListener('submit', (ev) => {
     clearProposed();
     watch(sha);
     S.base = await api('GET', `/content/coach/${encodeURIComponent(id)}`);
-  }).catch((e) => {
-    show('#reload', e.code === 'stale');
-    status(errText(e), 'bad');
-  });
+  }).catch(fail);
 });
 
 $('#reload').addEventListener('click', () => loadProfile(S.coach));
@@ -294,10 +299,7 @@ $('#ph-save').addEventListener('click', (ev) => {
     PH.webp = null;
     watch(sha);
     S.base = await api('GET', `/content/coach/${encodeURIComponent(id)}`);
-  }).catch((e) => {
-    show('#reload', e.code === 'stale');
-    status(errText(e), 'bad');
-  }).finally(() => ($('#ph-save').disabled = !PH.webp));
+  }).catch(fail).finally(() => ($('#ph-save').disabled = !PH.webp));
 });
 
 /* ---- deploy status ---- */
