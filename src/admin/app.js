@@ -1,5 +1,6 @@
 import { api, config, setToken, clearToken, hasToken, errText } from './api.js';
 import { LANGS, t, uiLang, setUiLang } from './i18n.js';
+import { toWebp, toBase64 } from './photo.js';
 
 const $ = (s, root = document) => root.querySelector(s);
 const show = (s, on = true) => ($(s).hidden = !on);
@@ -178,6 +179,7 @@ async function loadProfile(id) {
     S.coach = id;
     fill(S.base.data);
     show('#profile');
+    loadPhoto();
     if (!S.poll) status('');
   } catch (e) {
     status(errText(e), 'bad');
@@ -233,6 +235,70 @@ form.addEventListener('submit', (ev) => {
 });
 
 $('#reload').addEventListener('click', () => loadProfile(S.coach));
+
+/* ---- photo ---- */
+
+const PH = { webp: null, face: [0.5, 0.3], url: '' };
+
+function showFace() {
+  Object.assign($('#ph-face').style, { insetInlineStart: `${PH.face[0] * 100}%`, insetBlockStart: `${PH.face[1] * 100}%` });
+}
+
+function setPreview(src, face) {
+  URL.revokeObjectURL(PH.url);
+  PH.url = src.startsWith('blob:') ? src : '';
+  PH.face = face;
+  $('#ph-img').src = src;
+  $('#ph-face').hidden = !src;
+  $('#ph-save').disabled = !PH.webp;
+  showFace();
+}
+
+function loadPhoto() {
+  const p = S.base.data.photo;
+  PH.webp = null;
+  $('#ph-file').value = '';
+  setPreview(p?.src ? `${import.meta.env.BASE_URL}${p.src}` : '', p?.face ?? [0.5, 0.3]);
+  show('#photo');
+}
+
+$('#ph-file').addEventListener('change', async (ev) => {
+  const file = ev.target.files[0];
+  if (!file) return;
+  $('#ph-save').disabled = true;
+  status(t('photoBusy'));
+  try {
+    PH.webp = await toWebp(file);
+  } catch (e) {
+    PH.webp = null;
+    return status(e?.code === 'heic' ? t('heic') : errText(e), 'bad');
+  }
+  setPreview(URL.createObjectURL(new Blob([PH.webp.bytes], { type: 'image/webp' })), [0.5, 0.3]);
+  status(t('photoFace'));
+});
+
+$('#ph-wrap').addEventListener('click', (e) => {
+  if (!PH.webp) return;
+  const r = $('#ph-img').getBoundingClientRect();
+  const c = (v) => Math.round(Math.min(1, Math.max(0, v)) * 100) / 100;
+  PH.face = [c((e.clientX - r.left) / r.width), c((e.clientY - r.top) / r.height)];
+  showFace();
+});
+
+$('#ph-save').addEventListener('click', (ev) => {
+  const id = S.coach;
+  status(t('saving'));
+  busy(ev.currentTarget, async () => {
+    const fields = { webp: toBase64(PH.webp.bytes), face: PH.face };
+    const { sha } = await api('POST', '/save', { op: 'coach.photo', id, base_sha: S.base.sha, fields });
+    PH.webp = null;
+    watch(sha);
+    S.base = await api('GET', `/content/coach/${encodeURIComponent(id)}`);
+  }).catch((e) => {
+    show('#reload', e.code === 'stale');
+    status(errText(e), 'bad');
+  }).finally(() => ($('#ph-save').disabled = !PH.webp));
+});
 
 /* ---- deploy status ---- */
 

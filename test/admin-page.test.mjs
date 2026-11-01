@@ -2,6 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { T, CODES, LANGS } from '../src/admin/i18n.js';
+import { fitSize, isWebpBlob, toBase64 } from '../src/admin/photo.js';
 
 const dist = new URL('../dist/', import.meta.url);
 const read = (p) => readFileSync(new URL(p, dist), 'utf8');
@@ -36,4 +37,27 @@ test('the panel script wires sign-in and deploy status, never the unsigned Teleg
   assert.ok(!js.includes('initDataUnsafe'));
   assert.ok(js.includes('sessionStorage'));
   assert.doesNotMatch(js, SECRETS);
+});
+
+test('photo: fitSize never upscales, isWebpBlob, chunked base64', () => {
+  assert.deepEqual(fitSize(4032, 3024, 800, 1200), { w: 800, h: 600 });
+  assert.deepEqual(fitSize(3024, 4032), { w: 800, h: 1067 });
+  assert.deepEqual(fitSize(600, 400), { w: 600, h: 400 });
+  assert.deepEqual(fitSize(1000, 3000), { w: 400, h: 1200 });
+  assert.equal(isWebpBlob({ type: 'image/png' }), false);
+  assert.equal(isWebpBlob({ type: 'image/webp' }), true);
+  const big = Uint8Array.from({ length: 100_000 }, (_, i) => i * 7);
+  assert.equal(toBase64(big), Buffer.from(big).toString('base64'));
+});
+
+test('the WebP encoder is vendored and loaded lazily, not bundled', () => {
+  for (const f of ['encode.js', 'meta.js', 'utils.js', 'codec/enc/webp_enc.js', 'codec/enc/webp_enc.wasm', 'LICENSE']) {
+    assert.ok(existsSync(new URL(`vendor/jsquash-webp/${f}`, dist)), f);
+  }
+  const enc = read('vendor/jsquash-webp/encode.js');
+  assert.doesNotMatch(enc, /from '[^.]/, 'bare import would not resolve by URL');
+  const js = pageJs(read('admin/index.html'));
+  assert.ok(js.includes('coach.photo'));
+  assert.ok(js.includes('vendor/jsquash-webp/encode.js'));
+  assert.doesNotMatch(js, /AGFzbQ|\0asm/, 'wasm inlined into the page bundle');
 });
