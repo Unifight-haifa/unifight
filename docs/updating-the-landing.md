@@ -1,5 +1,29 @@
 # Updating the landing page
 
+Coaches can also edit their own content from a phone in the coach panel (below). Both paths write the same files.
+
+## Coach panel
+
+https://unifight-haifa.com/admin/, also opened from the panel's Telegram bot. Who edits what:
+
+- A coach: their own bio (card and dossier), photo, schedule sessions and one-off changes
+- Ilana, Alexander and Natanel: every coach and schedule, plus the coaches section (`_section.json`)
+- The owner only: Access, the list of who may sign in
+- Nobody: news, which stays on n8n
+
+Each save is one commit to `main` by the club's GitHub App, live after the usual ~3 min deploy. The owner and the assistant still commit directly as before. A direct edit and a panel edit to the same coach file only clash if they land within the same few minutes; the panel then asks the coach to reload.
+
+### Onboarding a coach
+
+1. The owner opens /admin/ → Access, adds the coach's gmail, picks the coach and the role.
+2. The coach signs in with Google.
+3. Optional: "Connect Telegram", after which the panel opens from the bot's menu button.
+4. First edit: one bio sentence, Translate, review the other two languages, Save, and wait for the status to say it is on the site.
+
+Setup (Cloudflare, GitHub App, Google sign-in, the bot): [admin-panel-setup.ru.md](admin-panel-setup.ru.md).
+
+## Editing content directly
+
 Text, coaches, schedule and venues live in `content/`:
 
 - `content/site.json`: shared page copy in he/ru/en (hero, kids, achievements, history, contacts…); owner only
@@ -32,6 +56,8 @@ npm run build && npm test
 ```
 
 Commit the regenerated files together with the content change. Never hand-edit `src/generated/`.
+
+CI runs `npm run gen` before the build, so a content-only commit (from the panel, say) still updates the landing, and the committed `src/generated/*` may lag until the next local gen; that's fine. A build that fails blocks every later deploy until someone fixes it with a direct commit.
 
 Share previews (`public/og/<lang>.jpg`) use the club name and hero headline. Re-render them after changing either: `python3 scripts/landing/og.py` (needs Pillow with libraqm, and downloads Rubik on the first run).
 
