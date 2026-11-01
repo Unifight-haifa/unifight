@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { jwtVerify } from 'jose';
-import { installationToken, readJson, listDir, commitFiles } from '../integrations/admin-api/src/github.mjs';
+import { installationToken, readJson, listDir, commitFiles, openPull, deleteBranch } from '../integrations/admin-api/src/github.mjs';
 import { ghEnv, publicKey, setup, messages, sha1, json, COACH, EDITOR, OWNER, actions, run, edit, FAILED_JOBS, SHA_A, SHA_B } from './helpers/admin-repo.mjs';
 
 test('installationToken signs an RS256 app JWT and caches the token', async () => {
@@ -40,22 +40,27 @@ test('readJson decodes content and blob sha; 404 is null; listDir lists', async 
 // Minimal Git Data API: refusing the first `moves` ref updates as a moved head.
 function gitStub(moves = 0) {
   const log = [];
-  let head = 'c0';
+  const heads = { main: 'c0', 'panel-3': 'p0' };
   let n = 0;
   const handlers = [
-    ['GET', /\/git\/ref\/heads\/main$/, () => ({ object: { sha: head } })],
+    ['GET', /\/git\/ref\/heads\/([\w-]+)$/, (_, m) => ({ object: { sha: heads[m[1]] } })],
     ['GET', /\/git\/commits\/(\w+)$/, (_, m) => ({ tree: { sha: `t-${m[1]}` } })],
     ['POST', /\/git\/blobs$/, async (req) => ({ sha: `b${++n}`, _: log.push(['blob', await req.json()]) })],
     ['POST', /\/git\/trees$/, async (req) => ({ sha: `t${++n}`, _: log.push(['tree', await req.json()]) })],
     ['POST', /\/git\/commits$/, async (req) => ({ sha: `c${++n}`, _: log.push(['commit', await req.json()]) })],
-    ['PATCH', /\/git\/refs\/heads\/main$/, async (req) => {
+    ['PATCH', /\/git\/refs\/heads\/([\w-]+)$/, async (req, m) => {
       log.push(['patch', await req.json()]);
-      if (moves-- > 0) { head = `moved${moves}`; return new Response('{}', { status: 422 }); }
+      if (moves-- > 0) { heads[m[1]] = `moved${moves}`; return new Response('{}', { status: 422 }); }
       return { object: { sha: 'ok' } };
     }],
+    ['POST', /\/git\/refs$/, async (req) => ({ _: log.push(['ref', await req.json()]) })],
+    ['POST', /\/pulls$/, async (req) => ({ number: 5, html_url: 'https://github.com/o/r/pull/5', _: log.push(['pull', await req.json()]) })],
+    ['DELETE', /\/git\/refs\/heads\/gone-(\d+)$/, (_, m) => new Response('{}', { status: Number(m[1]) })],
+    ['DELETE', /\/git\/refs\/heads\/[\w-]+$/, () => new Response(null, { status: 204 })],
   ];
   return { handlers, log };
 }
+const gitCalls = (s) => s.calls.filter((c) => /\/(git|pulls)/.test(c.url)).map((c) => `${c.method} ${new URL(c.url).pathname.replace('/repos/o/r', '')}`);
 
 test('commitFiles: six calls in order, no author, force false', async () => {
   const g = gitStub();
@@ -87,6 +92,42 @@ test('commitFiles rebuilds from the new head after a 422 and gives up after four
   const e4 = ghEnv(g4.handlers);
   await assert.rejects(commitFiles(e4.env, async () => [{ path: 'a', content: 'x' }], 'm'), /github: main kept moving/);
   assert.equal(g4.log.filter(([k]) => k === 'patch').length, 4);
+});
+
+test('commitFiles create: parent is main head, the branch is created after the commit, no PATCH', async () => {
+  const g = gitStub();
+  const { env, s } = ghEnv(g.handlers);
+  const sha = await commitFiles(env, async (h) => [{ path: 'a', content: h }], 'm', { branch: 'panel-3', create: true });
+  assert.deepEqual(gitCalls(s), ['GET /git/ref/heads/main', 'GET /git/commits/c0', 'POST /git/blobs', 'POST /git/trees', 'POST /git/commits', 'POST /git/refs']);
+  assert.deepEqual(g.log.find(([k]) => k === 'commit')[1].parents, ['c0']);
+  assert.deepEqual(g.log.at(-1), ['ref', { ref: 'refs/heads/panel-3', sha }]);
+});
+
+test('commitFiles on a branch: reads and fast-forwards that branch, retries on 422, names it when giving up', async () => {
+  const g = gitStub(1);
+  const { env, s } = ghEnv(g.handlers);
+  const heads = [];
+  await commitFiles(env, async (h) => { heads.push(h); return [{ path: 'a', content: h }]; }, 'm', { branch: 'panel-3' });
+  assert.deepEqual(heads, ['p0', 'moved0']);
+  assert.ok(gitCalls(s).every((c) => !c.includes('/main')));
+  assert.deepEqual(gitCalls(s).filter((c) => c.startsWith('PATCH')), ['PATCH /git/refs/heads/panel-3', 'PATCH /git/refs/heads/panel-3']);
+  assert.deepEqual(g.log.at(-1)[1].force, false);
+
+  const g4 = gitStub(4);
+  await assert.rejects(commitFiles(ghEnv(g4.handlers).env, async () => [{ path: 'a', content: 'x' }], 'm', { branch: 'panel-3' }), /github: panel-3 kept moving/);
+  await assert.rejects(commitFiles(ghEnv(gitStub().handlers).env, async () => [], 'm', { branch: '../main' }), /bad branch/);
+});
+
+test('openPull targets the base branch; deleteBranch ignores 404 and 422 only', async () => {
+  const g = gitStub();
+  const { env } = ghEnv(g.handlers);
+  assert.deepEqual(await openPull(env, { title: 'T', head: 'panel-3', body: 'B' }), { number: 5, html_url: 'https://github.com/o/r/pull/5' });
+  assert.deepEqual(g.log.at(-1), ['pull', { title: 'T', head: 'panel-3', base: 'main', body: 'B' }]);
+  await deleteBranch(env, 'panel-3');
+  await deleteBranch(env, 'gone-404');
+  await deleteBranch(env, 'gone-422');
+  await assert.rejects(deleteBranch(env, 'gone-500'), (e) => e.status === 500);
+  await assert.rejects(deleteBranch(env, 'a/b'), /bad branch/);
 });
 
 // ---- content routes and saves, against a stubbed GitHub serving the real repo files ----
