@@ -30,3 +30,7 @@ export async function currentUser(req, env) {
   if (!s) return null;
   return (await userByEmail(env, s.email)) ?? { email: s.email, role: null };
 }
+
+// Take the slot and read the count in one statement, so parallel requests can't all pass a stale check.
+export const take = (env, key, day, kind) => env.DB.prepare(
+  'INSERT INTO usage (email, day, kind, n) VALUES (?, ?, ?, 1) ON CONFLICT(email, day, kind) DO UPDATE SET n = n + 1 RETURNING n').bind(key, day, kind).first('n');

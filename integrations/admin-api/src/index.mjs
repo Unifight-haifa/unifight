@@ -1,5 +1,6 @@
-import { routes, route, json, fail, list, isOwner, userByEmail, currentUser } from './router.mjs';
+import { routes, route, json, fail, list, isOwner, userByEmail, currentUser, take } from './router.mjs';
 import { googleUser, signSession, tgUser, newLinkCode, sha256hex } from './auth.mjs';
+import './content.mjs';
 
 const now = () => Math.floor(Date.now() / 1000);
 const EMAIL = /^[^\s@,]+@[^\s@,]+\.[^\s@,]+$/;
@@ -27,10 +28,6 @@ route('POST', '/session/google', async ({ env, body }) => {
   if (!(await pinSub(env, isOwner(env, g.email) ? 'owners' : 'users', g.email, g.sub))) return fail(403, 'forbidden');
   return json(await session(env, g.email));
 }, { auth: false });
-
-// Take the slot and read the count in one statement, so parallel requests can't all pass a stale check.
-const take = (env, key, day, kind) => env.DB.prepare(
-  'INSERT INTO usage (email, day, kind, n) VALUES (?, ?, ?, 1) ON CONFLICT(email, day, kind) DO UPDATE SET n = n + 1 RETURNING n').bind(key, day, kind).first('n');
 
 route('POST', '/session/telegram', async ({ env, body }) => {
   if (!env.TG_BOT_TOKEN) return fail(503, 'not_configured');
