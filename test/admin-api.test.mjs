@@ -109,6 +109,7 @@ const { readFileSync, readdirSync } = await import('node:fs');
 const { createHash } = await import('node:crypto');
 const { makeEnv } = await import('./helpers/admin-env.mjs');
 const { signSession } = await import('../integrations/admin-api/src/auth.mjs');
+const { serialize } = await import('../integrations/admin-api/src/content.mjs');
 const { default: worker } = await import('../integrations/admin-api/src/index.mjs');
 
 const messages = [];
@@ -121,7 +122,7 @@ function fakeRepo() {
   for (const d of ['content/coaches', 'content/schedule']) {
     for (const n of readdirSync(new URL(`../${d}`, import.meta.url))) files.set(`${d}/${n}`, disk(`${d}/${n}`));
   }
-  files.set('content/venues.json', disk('content/venues.json'));
+  for (const f of ['content/venues.json', 'content/glossary.json']) files.set(f, disk(f));
   const blobs = new Map();
   const trees = new Map();
   const commits = new Map();
@@ -312,6 +313,120 @@ test('GET /coaches, /content/coach, /content/changes and /health', async () => {
 
   const h = await worker.fetch(new Request('https://api.test/health'), makeEnv(), {});
   assert.deepEqual(await h.json(), { ok: true, d1: true, github: false });
+});
+
+// ---- photos and one-off changes ----
+const riffChunk = (cc, p) => {
+  const c = Buffer.alloc(8 + p.length + (p.length & 1));
+  c.write(cc, 0, 'latin1');
+  c.writeUInt32LE(p.length, 4);
+  p.copy(c, 8);
+  return c;
+};
+const webp = (w, h, flags = 0, pad = 0) => {
+  const p = Buffer.alloc(10);
+  p[0] = flags;
+  p.writeUIntLE(w - 1, 4, 3);
+  p.writeUIntLE(h - 1, 7, 3);
+  const body = Buffer.concat([Buffer.from('WEBP', 'latin1'), riffChunk('VP8X', p), ...(pad ? [riffChunk('VP8 ', Buffer.alloc(pad))] : [])]);
+  const hd = Buffer.from('RIFF\0\0\0\0', 'latin1');
+  hd.writeUInt32LE(body.length, 4);
+  return Buffer.concat([hd, body]).toString('base64');
+};
+const photo = (t, id, fields, extra) => ({ op: 'coach.photo', id, base_sha: t.repo.sha(`content/coaches/${id}.json`), fields, ...extra });
+
+test('coach.photo: webp and coach JSON land in one commit; alt kept', async () => {
+  const t = setup();
+  const before = json(NAT);
+  const b64 = webp(800, 1200);
+  const r = await t.call('POST', '/save', photo(t, 'natanel-zhurovel', { webp: b64, face: [0.4, 0.25] }));
+  assert.equal(r.status, 200, JSON.stringify(r.body));
+  assert.equal(t.writes().filter((c) => c.method === 'PATCH').length, 1);
+  assert.equal(t.repo.files.get('public/coaches/natanel-zhurovel.webp'), b64);
+  const ph = JSON.parse(t.repo.files.get(NAT)).photo;
+  assert.deepEqual(ph, { ...before.photo, src: 'coaches/natanel-zhurovel.webp', face: [0.4, 0.25], w: 800, h: 1200, source: `panel ${new Date().toISOString().slice(0, 10)}` });
+  assert.equal(t.repo.commits.get(r.body.sha).message.split('\n')[0], 'Coaches: Natanel Zhurovel, photo');
+
+  const r2 = await t.call('POST', '/save', photo(t, 'natanel-zhurovel', { webp: webp(100, 100), face: [2, 0] }), EDITOR);
+  assert.equal(r2.status, 200);
+  assert.deepEqual(JSON.parse(t.repo.files.get(NAT)).photo.face, [0.5, 0.3]);
+});
+
+test('coach.photo refuses bad images, other coaches and a missing base_sha without writing', async () => {
+  const t = setup();
+  const png = Buffer.from('\x89PNG\r\n\x1a\n\0\0\0\0', 'latin1').toString('base64');
+  for (const [b64, re] of [[png, /not a WebP/], [webp(800, 1200, 0x08), /EXIF/], [webp(801, 1200), /800/],
+    [webp(100, 100, 0, 1.5 * 1024 * 1024), /1\.5 MB/], ['A'.repeat(2.2 * 1024 * 1024), /1\.5 MB/], ['@@@@', /base64/], [undefined, /missing/]]) {
+    const r = await t.call('POST', '/save', photo(t, 'natanel-zhurovel', { webp: b64 }));
+    assert.deepEqual([r.status, r.body.error], [400, 'invalid']);
+    assert.match(r.body.detail, re);
+  }
+  assert.equal((await t.call('POST', '/save', photo(t, 'ilana-kratysh', { webp: webp(800, 1200) }))).status, 403);
+  const before = t.repoCalls().length;
+  for (const op of ['coach.photo', 'change.delete']) {
+    const r = await t.call('POST', '/save', { op, id: 'natanel-zhurovel', fields: { webp: webp(10, 10), change_id: 'x' } });
+    assert.deepEqual([r.status, r.body.detail], [400, 'base_sha is required']);
+  }
+  assert.equal(t.repoCalls().length, before);
+  assert.equal(t.writes().length, 0);
+});
+
+const cancel = (o = {}) => ({ type: 'cancel', from: '2026-11-03', to: '2026-11-03', session: { day: 2, start: '17:30', junk: '<b>' },
+  note: { he: 'האימון בוטל', ru: 'Тренировка отменена', en: 'Class cancelled' }, ...o });
+const CH = 'content/schedule-changes/2026-11-03-natanel-zhurovel-cancel.json';
+
+test('change.create writes a checkChanges-valid file with the coach as author; a repeat gets -2', async () => {
+  const { checkChanges } = await import('../src/lib/schedule-changes.mjs');
+  const t = setup();
+  const r = await t.call('POST', '/save', { op: 'change.create', id: 'natanel-zhurovel', fields: cancel() });
+  assert.equal(r.status, 200, JSON.stringify(r.body));
+  assert.equal(r.body.change_id, '2026-11-03-natanel-zhurovel-cancel');
+  const f = JSON.parse(t.repo.files.get(CH));
+  assert.deepEqual(f.session, { day: 2, start: '17:30' });
+  assert.equal(f.author, 'natanel-zhurovel');
+  assert.ok(!Number.isNaN(Date.parse(f.created)));
+  const schedules = { 'natanel-zhurovel': json(NAT_S), 'ilana-kratysh': json('content/schedule/ilana-kratysh.json') };
+  assert.equal(checkChanges([[`${f.id}.json`, f]], schedules, json('content/venues.json')).length, 1);
+  assert.equal(t.repo.commits.get(r.body.sha).message.split('\n')[0], 'Schedule: Natanel Zhurovel, cancel 2026-11-03');
+  const row = t.env.DB.db.prepare('SELECT coach_id, op FROM edits WHERE sha = ?').get(r.body.sha);
+  assert.deepEqual({ ...row }, { coach_id: 'natanel-zhurovel', op: 'change.create' });
+
+  const r2 = await t.call('POST', '/save', { op: 'change.create', id: 'natanel-zhurovel', fields: cancel() }, OWNER);
+  assert.equal(r2.body.change_id, '2026-11-03-natanel-zhurovel-cancel-2');
+  assert.equal(JSON.parse(t.repo.files.get(`${CH.slice(0, -5)}-2.json`)).author, 'owner');
+});
+
+test('change.create refuses other schedules, bad sessions and bad dates', async () => {
+  const t = setup();
+  assert.equal((await t.call('POST', '/save', { op: 'change.create', id: 'ilana-kratysh', fields: cancel() })).status, 403);
+  let r = await t.call('POST', '/save', { op: 'change.create', id: 'natanel-zhurovel', fields: cancel({ session: { day: 2, start: '09:00' } }) });
+  assert.deepEqual([r.status, r.body.error], [400, 'invalid']);
+  assert.match(r.body.detail, /no session matches day 2 09:00/);
+  const before = t.repoCalls().length;
+  for (const bad of [{ from: '2026-13-01' }, { to: '2026-02-30' }, { type: 'x' }, { from: 20261103 }]) {
+    r = await t.call('POST', '/save', { op: 'change.create', id: 'natanel-zhurovel', fields: cancel(bad) });
+    assert.deepEqual([r.status, r.body.error], [400, 'invalid'], JSON.stringify(bad));
+  }
+  assert.equal(t.repoCalls().length, before);
+  assert.equal(t.writes().length, 0);
+});
+
+test('change.delete trusts the file schedule, not the id the coach sends', async () => {
+  const t = setup();
+  const other = { id: '2026-11-04-ilana-kratysh-note', schedule: 'ilana-kratysh', type: 'note', from: '2026-11-04', to: '2026-11-04' };
+  t.repo.files.set(`content/schedule-changes/${other.id}.json`, serialize(other));
+  const p = `content/schedule-changes/${other.id}.json`;
+  let r = await t.call('POST', '/save', { op: 'change.delete', id: 'natanel-zhurovel', base_sha: t.repo.sha(p), fields: { change_id: other.id } });
+  assert.equal(r.status, 403);
+  assert.equal((await t.call('POST', '/save', { op: 'change.delete', id: 'natanel-zhurovel', base_sha: 'x', fields: { change_id: '../x' } })).status, 400);
+  assert.equal(t.writes().length, 0);
+
+  r = await t.call('POST', '/save', { op: 'change.create', id: 'natanel-zhurovel', fields: cancel() });
+  r = await t.call('POST', '/save', { op: 'change.delete', id: 'natanel-zhurovel', base_sha: t.repo.sha(CH), fields: { change_id: r.body.change_id } });
+  assert.equal(r.status, 200, JSON.stringify(r.body));
+  assert.ok(!t.repo.files.has(CH));
+  const last = [...t.repo.commits.values()].at(-1);
+  assert.equal(last.message.split('\n')[0], 'Schedule: Natanel Zhurovel, removed cancel 2026-11-03');
 });
 
 test('no commit message carries an email or a Telegram id', () => {
