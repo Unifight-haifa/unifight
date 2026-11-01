@@ -29,8 +29,10 @@ SC = load("schedule/natanel-zhurovel.json")  # days, grade letters, slogan and v
 SCHEDS = {c["id"]: load(f"schedule/{c['id']}.json") for c in COACHES if (R / f"content/schedule/{c['id']}.json").exists()}
 VIDEOS = {v["id"]: v for v in load("videos.json")}
 LANGS = ("he", "ru", "en")
-WA = "https://wa.me/972547632054"
-WA_NUM = "054-763-2054"
+P0 = C["contact"]["phones"][0]  # the club's WhatsApp and tel number
+WA = "https://wa.me/" + re.sub(r"\D", "", P0["tel"])
+WA_NUM = P0["phone"]
+TEL = html.escape(P0["tel"])
 USED = []  # local asset paths, in order of first use
 PHOTO_ALT = C["photos"]["alt"]
 SITE, PFX = True, "%BASE%"
@@ -133,7 +135,7 @@ def wa(label, placement, extra="", msg=None):
     """msg: {he, ru, en} text prefilled in the chat, in the page language."""
     href = attr("href", {l: f"{WA}?text={urllib.parse.quote(msg[l])}" for l in LANGS}) if msg else f'href="{WA}"'
     return (f'<div class="wa-row {extra}"><a class="btn btn-wa" {href} target="_blank" rel="noopener" {ga("whatsapp_click", placement=placement)}>{WA_SVG}{t(label)}</a>'
-            f'<a class="wa-num" href="tel:+972547632054" {ga("phone_click", placement=placement)}>{ltr(WA_NUM)}</a></div>')
+            f'<a class="wa-num" href="tel:{TEL}" {ga("phone_click", placement=placement)}>{ltr(WA_NUM)}</a></div>')
 
 
 def head(nav_id, kanji, title, intro=None):
@@ -224,8 +226,8 @@ def hero_sec():
   <h1 class="h1">{h1}</h1>
   <p class="hero-p">{t(hero["subline"])}</p>
   <div class="cta-row">
-   <a class="btn btn-wa btn-lg" href="{hero["cta_primary"]["href"]}">{t(hero["cta_primary"])} {ARROW}</a>
-   <a class="btn btn-ghost btn-lg" href="{hero["cta_secondary"]["href"]}">{t(hero["cta_secondary"])}</a>
+   <a class="btn btn-wa btn-lg" href="{html.escape(hero["cta_primary"]["href"])}">{t(hero["cta_primary"])} {ARROW}</a>
+   <a class="btn btn-ghost btn-lg" href="{html.escape(hero["cta_secondary"]["href"])}">{t(hero["cta_secondary"])}</a>
   </div>
   <p class="hero-disc"><span class="kj" aria-hidden="true">柔</span>{t(club["disciplines"])}</p>
  </div>
@@ -394,7 +396,7 @@ def achievements():
   {more_link(a, "achievements/")}
   <div class="cta-band rv">
    <p class="cta-line">{t(C["taglines"][2])}</p>
-   <div class="cta-row"><a class="btn btn-wa btn-lg" href="{hero["cta_primary"]["href"]}">{t(hero["cta_primary"])} {ARROW}</a></div>
+   <div class="cta-row"><a class="btn btn-wa btn-lg" href="{html.escape(hero["cta_primary"]["href"])}">{t(hero["cta_primary"])} {ARROW}</a></div>
   </div>
  </div>
 </section>'''
@@ -756,7 +758,7 @@ def contact():
             soc += t(s)
         else:
             lab = esc(s["label"]) + (f' <bdi dir="ltr">{esc(s["handle"])}</bdi>' if s.get("handle") else "")
-            soc += f'<a class="soc" href="{s["url"]}" target="_blank" rel="noopener" {ga("social_click", network=s["id"])}>{lab} {ARROW}</a>'
+            soc += f'<a class="soc" href="{html.escape(s["url"])}" target="_blank" rel="noopener" {ga("social_click", network=s["id"])}>{lab} {ARROW}</a>'
     return f'''
 <section class="sec contact" id="contact">
  <div class="ct-bg">{img("kids-belts-throw.jpg")}</div>
@@ -767,7 +769,7 @@ def contact():
    <div class="ct-card rv">
     {wa(co["whatsapp_cta"]["label"], "contact", "wa-big")}
     <ul class="phones">{phones}</ul>
-    <p class="mail"><a href="mailto:{co["email"]["value"]}">{ltr(co["email"]["value"])}</a></p>
+    <p class="mail"><a href="mailto:{html.escape(co["email"]["value"])}">{ltr(co["email"]["value"])}</a></p>
     <div class="socs">{soc}</div>
    </div>
    <div class="ct-pic rv">{img("belts-air.jpg", "pic")}</div>

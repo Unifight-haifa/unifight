@@ -1,7 +1,7 @@
 ---
 import { i18n } from 'astro:config/client';
 import { getRelativeLocaleUrl } from 'astro:i18n';
-import { site } from '../../../lib/site';
+import { phone, site } from '../../../lib/site';
 import venues from '../../../../content/venues.json';
 import Base from '../../../layouts/Base.astro';
 import PageHead from '../../../components/PageHead.astro';
@@ -65,7 +65,7 @@ const s = {
 const co = site.contact;
 const heading = site.nav.find((n) => n.id === 'contact')![lang];
 const title = `${heading} · ${t(lang, 'siteName')}`;
-const wa = `https://wa.me/972547632054?text=${encodeURIComponent(s.msg)}`;
+const wa = `${phone.wa}?text=${encodeURIComponent(s.msg)}`;
 const social = co.social.filter((x) => !('placeholder' in x) && x.url);
 const PROVIDERS = ['google_maps', 'waze', 'transit'];
 const places = Object.entries(venues).map(([id, v]) => {
@@ -94,7 +94,7 @@ const ld = {
     '@id': abs(`${import.meta.env.BASE_URL}#club`),
     name: site.club.name[lang],
     email: co.email.value,
-    contactPoint: { '@type': 'ContactPoint', telephone: '+972-54-763-2054', email: co.email.value, contactType: 'customer service' },
+    contactPoint: { '@type': 'ContactPoint', telephone: phone.ld, email: co.email.value, contactType: 'customer service' },
   },
 };
 ---
@@ -109,7 +109,7 @@ const ld = {
     <section class="club-join" aria-label={co.whatsapp_cta.label[lang]}>
       <div class="wa-row">
         <a class="btn btn-wa" href={wa} target="_blank" rel="noopener" data-ga="whatsapp_click" data-ga-placement="contact_page">{co.whatsapp_cta.label[lang]}</a>
-        <a class="wa-num" href="tel:+972547632054" data-ga="phone_click" data-ga-placement="contact_page"><bdi dir="ltr">054-763-2054</bdi></a>
+        <a class="wa-num" href={`tel:${phone.tel}`} data-ga="phone_click" data-ga-placement="contact_page"><bdi dir="ltr">{phone.display}</bdi></a>
       </div>
       <dl class="club-facts">
         <div>
