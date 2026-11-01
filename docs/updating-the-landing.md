@@ -26,7 +26,8 @@ Setup (Cloudflare, GitHub App, Google sign-in, the bot): [admin-panel-setup.ru.m
 
 Text, coaches, schedule and venues live in `content/`:
 
-- `content/site.json`: shared page copy in he/ru/en (hero, kids, achievements, history, contacts…); owner only
+- `content/site.json`: shared page copy in he/ru/en (kids, achievements, history…); owner only
+- `content/site/*.json`: small site-wide files the panel edits: `contact` (phones, email, socials; the first phone is the WhatsApp/tel number), `hero`, `footer`
 - `content/coaches/<id>.json`: one file per coach. `group` is `main` | `lead` | `club` | `young`, `order` sorts the page. A coach with a schedule needs `color` (hex, their stripe and avatar ring in the schedule); `photo.face` `[x, y]` (face centre as fractions of the photo) centres the avatar crop
 - `content/coaches/_section.json`: the coaches section's title, intro, team photo and roster group titles
 - `content/schedule/<id>.json`: a coach's groups (day 0 = Sunday; grades `[from, to]`, `to: null` = "and up", `0` = kindergarten). Every file whose name is a coach id is on the page (Ilana Kratysh and Natanel Zhurovel so far); `audience` (`girls`, `boys`, `adults`) adds a badge, and `grades: null` means the source gives none. One-off cancellations, moves and extra classes go in `content/schedule-changes/` (see [bot-content-contracts.md](bot-content-contracts.md)), never in the schedule file
@@ -35,7 +36,7 @@ Text, coaches, schedule and venues live in `content/`:
 - `confidence` on a fact is its verified flag: `confirmed` or `owner` is verified, `likely` and `unverified` are not (club pages hide them). `npm run review` lists what still needs checking, and the photos not yet classified for minors
 - `content/consent.json`: the consent ledger (signed forms by reference, never a child's name). A photo marked `minors: true` must point to a live consent with the `site` scope, or the build fails
 - Every `he`/`ru`/`en` text needs all three languages, or the build fails
-- `contact.lead_endpoint` in `content/site.json`: the sign-up form's Apps Script URL; empty means the form sends to WhatsApp. Setup: `docs/lead-form-setup.ru.md`
+- `lead_endpoint` in `content/site/contact.json`: the sign-up form's Apps Script URL; empty means the form sends to WhatsApp. Setup: `docs/lead-form-setup.ru.md`
 - `content/videos.json`: the /video/ page. One entry per YouTube upload: `id` (11 chars from the youtu.be link), `kind` `video` | `short`, `date` (YYYY-MM-DD), `playlist` `promo` | `coaches` | `competitions` | `camps` | `training` | `events`, `title` and `description` in he/ru/en, optional `duration` in seconds, and `thumb`, a JPEG in `public/videos/` (1280 px wide at most, under 200 KB). The build checks every field
 - `content/gallery.json`: the /gallery/ page. One entry per album: `id`, `title` in he/ru/en, optional `description`, and `photos`. Each photo has `file` (`<album>/<name>.jpg` under `src/assets/gallery/`), `alt` in he/ru/en, optional `caption` in he/ru/en, `year` and `featured` (the first featured photo 1200 px or wider is the share image). Never name a minor in alt or caption, and blur name patches on judogi backs. Re-encode with Pillow (`Image.open(p).convert('RGB').save(out, quality=82)`), which also drops EXIF; `exiftool -all=` breaks Astro's image probe on these files
 - `content/belts.json`: the /belts/ page. `ladder.steps` is the belt ladder in order: `colours` (one, or two for an in-between belt, keys of `colours`), `kyu` or `dan`, `official` (`false` = a club in-between belt the association doesn't define), `name` in he/ru/en. Every entry cites ids from `sources`; official kyu facts come from the association's grading regulations (S1). The build fails on an unknown colour or source id

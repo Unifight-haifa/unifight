@@ -1,0 +1,68 @@
+{
+ "title": {
+  "he": "בואו להתאמן איתנו",
+  "ru": "Приходите тренироваться",
+  "en": "Come train with us"
+ },
+ "text": {
+  "he": "שאלה על קבוצה, גיל או סניף? כתבו לנו או התקשרו — נשמח לעזור.",
+  "ru": "Вопрос о группе, возрасте или филиале? Напишите или позвоните — с радостью поможем.",
+  "en": "Questions about a group, age or location? Message or call us — we're happy to help."
+ },
+ "whatsapp_cta": {
+  "label": {
+   "he": "כתבו לנו בוואטסאפ",
+   "ru": "Написать в WhatsApp",
+   "en": "Message us on WhatsApp"
+  }
+ },
+ "lead_endpoint": "",
+ "phones": [
+  {
+   "name": {
+    "he": "אילנה",
+    "ru": "Илана",
+    "en": "Ilana"
+   },
+   "phone": "054-763-2054",
+   "tel": "+972547632054",
+   "source": "https://www.israeldojo.co.il/מורה-אומנויות-לחימה/unifight/",
+   "confidence": "confirmed"
+  }
+ ],
+ "email": {
+  "value": "unifight.haifa@outlook.com",
+  "source": "https://www.facebook.com/unifightjudoclub/",
+  "confidence": "confirmed",
+  "note": "owner confirmed 2026-10-17"
+ },
+ "social": [
+  {
+   "id": "facebook",
+   "label": "Facebook",
+   "url": "https://www.facebook.com/unifightjudoclub/",
+   "confidence": "confirmed"
+  },
+  {
+   "id": "instagram",
+   "label": "Instagram",
+   "handle": "@unifight_haifa",
+   "url": "https://www.instagram.com/unifight_haifa/",
+   "confidence": "likely",
+   "note": "linked from coach's bio; owner to confirm it's official"
+  },
+  {
+   "id": "tiktok",
+   "label": "TikTok",
+   "placeholder": true,
+   "he": "[טיקטוק — כתובת מהבעלים]",
+   "ru": "[TikTok — ссылка от владельца]",
+   "en": "[TikTok — handle from owner]"
+  }
+ ],
+ "more": {
+  "he": "כל פרטי הקשר ואיך מגיעים",
+  "ru": "Все контакты и как добраться",
+  "en": "All contacts and directions"
+ }
+}

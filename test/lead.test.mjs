@@ -5,7 +5,7 @@ import vm from 'node:vm';
 
 const json = (p) => JSON.parse(readFileSync(new URL(p, import.meta.url), 'utf8'));
 const read = (p) => readFileSync(new URL(`../dist/${p}`, import.meta.url), 'utf8');
-const site = json('../content/site.json');
+const contact = json('../content/site/contact.json');
 const venues = json('../content/venues.json');
 const LANGS = [['he', 'rtl'], ['ru', 'ltr'], ['en', 'ltr']];
 const form = (html) => html.match(/<form class="lf-f"[\s\S]*?<\/form>/)[0];
@@ -38,7 +38,7 @@ test('the hall select lists exactly the venues in content/venues.json, labelled 
 });
 
 test('with no endpoint the form submits to WhatsApp; with one it posts there', () => {
-  const ep = site.contact.lead_endpoint;
+  const ep = contact.lead_endpoint;
   assert.equal(typeof ep, 'string');
   if (ep) assert.match(ep, /^https:\/\/script\.google\.com\/macros\/s\/[\w-]+\/exec$/);
   const f = form(read('en/index.html'));

@@ -17,7 +17,8 @@ def load(name):
     return json.loads((R / "content" / name).read_text())
 
 
-C, CO, VENUES = load("site.json"), load("coaches/_section.json"), load("venues.json")
+C = {**load("site.json"), **{p.stem: json.loads(p.read_text()) for p in sorted((R / "content/site").glob("*.json"))}}
+CO, VENUES = load("coaches/_section.json"), load("venues.json")
 COACHES = sorted((load(f"coaches/{p.name}") for p in (R / "content/coaches").glob("[!_]*.json")), key=lambda c: c["order"])
 # coaches edit their files from the panel; color goes into style="" unescaped
 for _c in COACHES:

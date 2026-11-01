@@ -9,7 +9,7 @@ from PIL import Image, ImageDraw, ImageFont, features
 
 R = Path(__file__).resolve().parents[2]
 PUB = R / "public"
-C = json.loads((R / "content/site.json").read_text())
+C = {**json.loads((R / "content/site.json").read_text()), **{p.stem: json.loads(p.read_text()) for p in sorted((R / "content/site").glob("*.json"))}}
 FONT_URL = "https://github.com/google/fonts/raw/main/ofl/rubik/Rubik%5Bwght%5D.ttf"
 FONT = Path.home() / ".cache/unifight/Rubik.ttf"
 BG = "img-night/groundwork.jpg"
