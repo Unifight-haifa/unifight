@@ -122,7 +122,7 @@ function fakeRepo() {
   for (const d of ['content/coaches', 'content/schedule']) {
     for (const n of readdirSync(new URL(`../${d}`, import.meta.url))) files.set(`${d}/${n}`, disk(`${d}/${n}`));
   }
-  for (const f of ['content/venues.json', 'content/glossary.json']) files.set(f, disk(f));
+  for (const f of ['content/venues.json', 'content/glossary.json', 'content/videos.json']) files.set(f, disk(f));
   const blobs = new Map();
   const trees = new Map();
   const commits = new Map();
@@ -551,6 +551,74 @@ test('scheduled() hands the sweep to waitUntil', async () => {
   await worker.scheduled({}, t.env, { waitUntil: (p) => waits.push(p) });
   assert.equal(waits.length, 1);
   await waits[0];
+});
+
+// ---- field shapes: build.py renders plain strings and attribute values raw ----
+test('every real coach and section file passes the shape checks unchanged', async () => {
+  const t = setup();
+  for (const n of readdirSync(new URL('../content/coaches', import.meta.url))) {
+    const id = n.slice(0, -5);
+    const ops = id === '_section' ? [['shared.section', null]] : [['coach.text', id], ['coach.meta', id]];
+    for (const [op, x] of ops) {
+      t.env.DB.db.exec('DELETE FROM usage');
+      const r = await t.call('POST', '/save', save(t, op, x, {}), EDITOR);
+      assert.equal(r.status, 200, `${op} ${id}: ${JSON.stringify(r.body)}`);
+    }
+  }
+});
+
+test('text, meta, section and venue values of the wrong shape are refused', async () => {
+  const t = setup();
+  const cases = [
+    ['coach.text', { bio: '<script>alert(1)</script>' }, /bio: must be he, ru and en text/],
+    ['coach.text', { bio: bio({ onclick: 'x' }) }, /bio: must be/],
+    ['coach.text', { bio: bio({ placeholder: 'yes' }) }, /bio: must be/],
+    ['coach.text', { about: 'x' }, /about: must be a list/],
+    ['coach.text', { approach: ['<b>x</b>'] }, /approach: must be a list/],
+    ['coach.text', { dan_rank: { he: 1, ru: 'x', en: 'x' } }, /dan_rank: /],
+    ['coach.text', { alt: '<img>' }, /alt: must be/],
+    ['coach.text', { approach_own: 'yes' }, /approach_own: must be true or false/],
+    ['coach.meta', { color: 'red;"><script>' }, /color: must be a #hex colour/],
+    ['coach.meta', { order: 1.5 }, /order: must be a whole number/],
+    ['coach.meta', { group: '"><x' }, /group: must be one of main, lead, club, young/],
+    ['coach.meta', { youtube: 'nope' }, /youtube: must be a video id/],
+    ['coach.meta', { name: 'Natanel' }, /name: must be/],
+    ['coach.meta', { role: { he: 'x' } }, /role: /], ['coach.meta', { role: 'x' }, /role: must be/],
+    ['shared.section', { title: '<h1>' }, /title: must be/],
+  ];
+  for (const [op, fields, re] of cases) {
+    const r = await t.call('POST', '/save', save(t, op, op === 'shared.section' ? null : 'natanel-zhurovel', fields), EDITOR);
+    assert.deepEqual([r.status, r.body.error], [400, 'invalid'], `${op} ${JSON.stringify(fields)}`);
+    assert.match(r.body.detail, re);
+  }
+  const sessions = structuredClone(json(NAT_S).sessions);
+  sessions[0].venue = '"><script>';
+  const r = await t.call('POST', '/save', save(t, 'schedule.sessions', 'natanel-zhurovel', { sessions }));
+  assert.match(r.body.detail, /sessions\[0\]: unknown venue/);
+  assert.equal(t.writes().length, 0);
+});
+
+test('/translate takes only known field names, a bounded count, and counts keys in the size cap', async () => {
+  const a = anthropic();
+  const t = setup({ ANTHROPIC_KEY: 'k' }, [a.handler]);
+  const tr = (context, fields) => t.call('POST', '/translate', { source_lang: 'en', context, fields });
+  for (const [ctx, fields, re] of [
+    ['coach-bio', { evil: 'x' }, /"evil" cannot be translated/],
+    ['coach-bio', { 'about.123': 'x' }, /cannot be translated/],
+    ['schedule-note', { bio: 'x' }, /cannot be translated/],
+    ['coach-bio', { bio: 5 }, /cannot be translated/],
+    ['coach-bio', Object.fromEntries(Array.from({ length: 25 }, (_, i) => [`about.${i}`, 'x'])), /too many fields/],
+    ['coach-bio', { bio: 'x'.repeat(3998), 'about.0': 'x' }, /text too long/],
+  ]) {
+    const r = await tr(ctx, fields);
+    assert.deepEqual([r.status, r.body.error], [400, 'invalid'], JSON.stringify(Object.keys(fields)));
+    assert.match(r.body.detail, re);
+  }
+  assert.equal((await tr('nope', { bio: 'x' })).status, 400);
+  assert.equal(a.seen.length, 0);
+  assert.equal((await tr('coach-bio', { bio: 'x', 'about.0': 'y', 'approach.3': 'z', dan_rank: 'w', alt: 'v' })).status, 502, 'reply lacks those keys');
+  assert.equal(a.seen.length, 1);
+  assert.equal(t.env.DB.db.prepare("SELECT n FROM usage WHERE kind = 'translate'").get().n, 1, 'refused calls cost no slot');
 });
 
 test('no commit message carries an email or a Telegram id', () => {

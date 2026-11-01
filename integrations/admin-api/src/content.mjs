@@ -6,11 +6,13 @@ import { checkTranslations } from '../../../src/lib/integrity.mjs';
 import { checkSchedule } from '../../../src/lib/schedule-check.mjs';
 import { checkChanges } from '../../../src/lib/schedule-changes.mjs';
 import { checkCoachWebp } from '../../../src/lib/image-check.mjs';
-import { buildPrompt, detectLang } from '../../../src/lib/translate-prompt.mjs';
+import { buildPrompt, detectLang, MAX_CHARS } from '../../../src/lib/translate-prompt.mjs';
 import { translate } from './translate.mjs';
 
 const SAVES_PER_DAY = 30;
 const TRANSLATES_PER_DAY = 60;
+const TRANSLATE_KEYS = { 'coach-bio': /^(bio|dan_rank|alt|(about|approach)\.\d{1,2})$/, 'schedule-note': /^note$/ };
+const MAX_TRANSLATE_FIELDS = 24;
 // Kana and CJK ideographs: build.py fails on any kanji word missing from content/kanji.json.
 const CJK = /[぀-ヿ㐀-鿿豈-﫿]/;
 const LANGS = ['he', 'ru', 'en'];
@@ -106,19 +108,50 @@ async function loadSchedules(env, head) {
   return Object.fromEntries(files);
 }
 
+// build.py renders a plain string raw, so every text must be a {he, ru, en} object.
+const TEXT_EXTRA = { placeholder: 'boolean', source: 'string' };
+const isText = (v) => !!v && typeof v === 'object' && !Array.isArray(v) && LANGS.every((l) => typeof v[l] === 'string')
+  && Object.entries(v).every(([k, x]) => LANGS.includes(k) || typeof x === TEXT_EXTRA[k]);
+const isTexts = (v) => Array.isArray(v) && v.every(isText);
+
+function shape(m, at, rules) {
+  for (const [k, [ok, what, required]] of Object.entries(rules)) {
+    const v = k === 'alt' ? m.photo?.alt : m[k];
+    if (v === undefined ? required : !ok(v)) throw new Error(`${at}.${k}: must be ${what}`);
+  }
+}
+const TEXT = [isText, 'he, ru and en text'];
+const checkText = (m, { path }) => shape(m, path, {
+  bio: TEXT, dan_rank: TEXT, alt: TEXT, about: [isTexts, 'a list of he, ru and en paragraphs'],
+  approach: [isTexts, 'a list of he, ru and en paragraphs'], approach_own: [(v) => typeof v === 'boolean', 'true or false'],
+});
+async function checkMeta(m, { env, head, path }) {
+  const section = (await readJson(env, SECTION, head))?.data ?? {};
+  const groups = ['main', 'lead', ...(section.roster ?? []).map((r) => r.group)];
+  const videos = new Set(((await readJson(env, 'content/videos.json', head))?.data ?? []).map((v) => v.id));
+  shape(m, path, {
+    name: [...TEXT, true], role: TEXT,
+    order: [Number.isInteger, 'a whole number', true],
+    group: [(v) => groups.includes(v), `one of ${groups.join(', ')}`, true],
+    color: [(v) => typeof v === 'string' && /^#[0-9a-fA-F]{3,8}$/.test(v), 'a #hex colour'],
+    youtube: [(v) => videos.has(v), 'a video id from content/videos.json'],
+  });
+}
+const checkSection = (m, { path }) => shape(m, path, { title: [...TEXT, true], intro: [...TEXT, true], more_coaches: TEXT, founded_note: TEXT });
+
 /**
  * Each op: target(id) for can(), coach(id) for the edits log, edits (needs base_sha), optional check(fields)
  * before any GitHub call, build(head, ctx) -> files (default mergeBuild), subject(merged, ctx).
  */
 export const SAVE_OPS = {
-  'coach.text': { edits: true, target: (id) => ({ coach: id }), coach: (id) => id, path: coachPath,
+  'coach.text': { edits: true, target: (id) => ({ coach: id }), coach: (id) => id, path: coachPath, validate: checkText,
     subject: (m, { id }) => `Coaches: ${m.name?.en ?? id}, bio` },
-  'coach.meta': { edits: true, target: (id) => ({ coach: id }), coach: (id) => id, path: coachPath,
+  'coach.meta': { edits: true, target: (id) => ({ coach: id }), coach: (id) => id, path: coachPath, validate: checkMeta,
     subject: (m, { id }) => `Coaches: ${m.name?.en ?? id}, name and card details` },
   'schedule.sessions': { edits: true, target: (id) => ({ schedule: id }), coach: (id) => id, path: schedulePath,
     validate: async (m, { env, head, path }) => checkSchedule(m, (await readJson(env, 'content/venues.json', head))?.data ?? {}, path),
     subject: async (_, { env, id, head }) => `Schedule: ${await coachName(env, id, head)}, weekly sessions` },
-  'shared.section': { edits: true, target: () => ({}), coach: () => null, path: () => SECTION,
+  'shared.section': { edits: true, target: () => ({}), coach: () => null, path: () => SECTION, validate: checkSection,
     subject: () => 'Coaches: section text' },
   'coach.photo': { edits: true, target: (id) => ({ coach: id }), coach: (id) => id,
     check: decodePhoto,
@@ -250,7 +283,12 @@ route('POST', '/translate', guard(async ({ env, user, body }) => {
   if (!env.ANTHROPIC_KEY) return fail(503, 'not_configured');
   const { source_lang, context = 'coach-bio', coach, fields } = body;
   if (!['coach-bio', 'schedule-note'].includes(context)) return invalid('unknown context');
-  // buildPrompt's own checks (empty, over MAX_CHARS) run before a daily slot is spent.
+  // Keys reach the prompt too: allowlist them, cap their number and count them in the size limit.
+  const keys = fields && typeof fields === 'object' && !Array.isArray(fields) ? Object.keys(fields) : [];
+  if (keys.length > MAX_TRANSLATE_FIELDS) return invalid('too many fields');
+  const bad = keys.find((k) => !TRANSLATE_KEYS[context].test(k) || typeof fields[k] !== 'string');
+  if (bad !== undefined) return invalid(`field ${JSON.stringify(bad.slice(0, 40))} cannot be translated`);
+  if (keys.reduce((n, k) => n + k.length + fields[k].length, 0) > MAX_CHARS) return invalid('text too long');
   try { buildPrompt({ fields, context }); } catch (e) { return invalid(e.message); }
   if (coach !== undefined && !(await allowed(env, user, 'coach.text', { coach }))) return fail(403, 'forbidden');
   if ((await take(env, user.email, new Date().toISOString().slice(0, 10), 'translate')) > TRANSLATES_PER_DAY) return fail(429, 'rate_limited');

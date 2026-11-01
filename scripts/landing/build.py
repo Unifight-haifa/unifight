@@ -19,6 +19,10 @@ def load(name):
 
 C, CO, VENUES = load("site.json"), load("coaches/_section.json"), load("venues.json")
 COACHES = sorted((load(f"coaches/{p.name}") for p in (R / "content/coaches").glob("[!_]*.json")), key=lambda c: c["order"])
+# coaches edit their files from the panel; color goes into style="" unescaped
+for _c in COACHES:
+    if "color" in _c and not re.fullmatch(r"#[0-9a-fA-F]{3,8}", str(_c["color"])):
+        sys.exit(f"content/coaches/{_c.get('id')}.json: color must be a #hex value")
 SC = load("schedule/natanel-zhurovel.json")  # days, grade letters, slogan and values are shared
 # schedule id = coach id; coaches' order on the site
 SCHEDS = {c["id"]: load(f"schedule/{c['id']}.json") for c in COACHES if (R / f"content/schedule/{c['id']}.json").exists()}
@@ -57,7 +61,7 @@ def one(lang, s):
 def t(o, tag="span", cls=None):
     """Three language spans; placeholder objects become dashed chips."""
     if isinstance(o, str):
-        return o
+        return esc(o)
     # unanswered owner questions never reach the public page
     if isinstance(o, dict) and o.get("placeholder"):
         return ""
@@ -550,11 +554,11 @@ def schedule():
         # night.js adds the day and time on click; the hall is there even without JS
         href = attr("href", {l: f"{WA}?text={urllib.parse.quote(U['wa_msg'][l] + VENUES[s['venue']][l])}" for l in LANGS})
         # markers: the landing page slots dated changes (content/schedule-changes) in at build; key = sessionKey()
-        return (f'<li class="ses" data-v="{s["venue"]}" data-g="{grade_range(s)}" data-c="{cid}" style="--cc:{c["color"]}"><!--SES {cid}#{i}-->'
+        return (f'<li class="ses" data-v="{html.escape(s["venue"])}" data-g="{grade_range(s)}" data-c="{cid}" style="--cc:{c["color"]}"><!--SES {cid}#{i}-->'
                 f'{ava(c)}<span class="ses-time">{ltr(s["start"] + "–" + s["end"])}</span><span class="ses-grade">{grade}</span>'
                 + (f'<span class="ses-meta">{meta}</span>' if meta else "") +
                 f'<span class="ses-coach vh">{t(c["name"])}</span>'
-                f'<a class="ses-wa" {href} target="_blank" rel="noopener" {attr("aria-label", U["join"])} {ga("whatsapp_click", placement="schedule", venue=s["venue"])}>{WA_SVG}</a></li>')
+                f'<a class="ses-wa" {href} target="_blank" rel="noopener" {attr("aria-label", U["join"])} {ga("whatsapp_click", placement="schedule", venue=html.escape(s["venue"]))}>{WA_SVG}</a></li>')
 
     days = ""
     for d in range(6):
