@@ -17,5 +17,8 @@
   },
   "dependencies": {
     "astro": "7.4.0"
+  },
+  "devDependencies": {
+    "jose": "^6.2.14"
   }
 }
