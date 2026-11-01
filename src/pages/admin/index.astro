@@ -252,8 +252,11 @@ const base = import.meta.env.BASE_URL;
   #chg-list li{margin-block-end:8px}
   #chg-list .rm{margin-inline-start:8px}
   #ph-file{max-inline-size:100%}
-  #ph-wrap{position:relative;inline-size:fit-content;max-inline-size:100%;overflow:hidden}
-  #ph-img{display:block;max-inline-size:min(100%,320px);block-size:auto}
+  #ph-file::file-selector-button{min-block-size:36px;margin-inline-end:8px;padding:6px 14px;font:inherit;color:var(--gold-2);background:transparent;border:1px solid var(--line);border-radius:6px;cursor:pointer}
+  /* Size the frame, not the img: a % cap inside a fit-content box resolves against the file's natural width. */
+  #ph-wrap{position:relative;inline-size:min(100%,320px);overflow:hidden;cursor:crosshair}
+  #ph-wrap:has(#ph-img:not([src])),#ph-wrap:has(#ph-img[src=""]){display:none}
+  #ph-img{display:block;inline-size:100%;block-size:auto}
   #ph-img:not([src]),#ph-img[src=""]{display:none}
   #ph-face{position:absolute;inline-size:50%;aspect-ratio:1;border:2px solid var(--gold-2);border-radius:50%;transform:translate(-50%,-50%);box-shadow:0 0 0 999px rgb(0 0 0 / .4);pointer-events:none}
   .code{font:600 2.4rem var(--num);letter-spacing:.2em}
