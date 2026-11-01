@@ -7,7 +7,7 @@ let cfgCache;
 export function config() {
   if (cfgCache === undefined) {
     const c = JSON.parse(document.getElementById('cfg')?.textContent || '{}');
-    cfgCache = c.api ? { api: c.api.replace(/\/$/, ''), google: c.google } : null;
+    cfgCache = c.api && c.google ? { api: c.api.replace(/\/$/, ''), google: c.google } : null;
   }
   return cfgCache;
 }

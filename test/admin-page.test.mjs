@@ -23,3 +23,17 @@ test('UI strings: same keys in he/ru/en, every API error code, «тренера�
   for (const s of ['pending', 'live', 'failed']) assert.ok(T.ru[`st.${s}`], s);
   for (const s of Object.values(T.ru)) assert.doesNotMatch(s, /тренеры/i, s);
 });
+
+// Astro inlines small scripts and bundles larger ones into _astro/; read both.
+const pageJs = (html) => [
+  ...[...html.matchAll(/<script type="module">([\s\S]*?)<\/script>/g)].map((m) => m[1]),
+  ...[...html.matchAll(/<script[^>]+src="[^"]*\/(_astro\/[^"]+\.js)"/g)].map((m) => read(m[1])),
+].join('\n');
+
+test('the panel script wires sign-in and deploy status, never the unsigned Telegram data', () => {
+  const js = pageJs(read('admin/index.html'));
+  for (const s of ['/session/google', '/session/telegram', '/status/', '/save', '/translate', '/access', '/telegram/link-code']) assert.ok(js.includes(s), s);
+  assert.ok(!js.includes('initDataUnsafe'));
+  assert.ok(js.includes('sessionStorage'));
+  assert.doesNotMatch(js, SECRETS);
+});

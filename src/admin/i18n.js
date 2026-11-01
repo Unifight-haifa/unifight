@@ -193,7 +193,7 @@ export const T = {
 
 let cur;
 
-// Telegram's language_code comes from the signed initData string, not initDataUnsafe.
+// language_code is read from the signed initData string, never the unsigned copy.
 function tgLang() {
   try {
     const raw = new URLSearchParams(globalThis.Telegram?.WebApp?.initData || '').get('user');
