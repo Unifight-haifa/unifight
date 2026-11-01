@@ -2,6 +2,7 @@ import { api, config, setToken, clearToken, hasToken, errText } from './api.js';
 import { LANGS, t, uiLang, setUiLang, store } from './i18n.js';
 import { toWebp, toBase64 } from './photo.js';
 import { mountSchedule, relabelSchedule } from './schedule.js';
+import { mountSite } from './site.js';
 
 const $ = (s, root = document) => root.querySelector(s);
 const show = (s, on = true) => ($(s).hidden = !on);
@@ -98,6 +99,8 @@ async function signedIn(me) {
   S.coaches = (await api('GET', '/coaches')).coaches;
   fillCoachSelects();
   show('#picker', S.coaches.length > 1);
+  // coaches keep their own scope; the Worker refuses them site edits too
+  if (['owner', 'editor'].includes(me.role)) mountSite($('#site'), { watch, status, busy, applyT });
   if (me.role === 'owner') loadAccess().catch((e) => status(errText(e), 'bad'));
   window.addEventListener('hashchange', route);
   route();
@@ -110,7 +113,7 @@ const cardKey = () => `adminCard:${S.me?.email ?? ''}`;
 
 function openCard() {
   const own = S.coaches.find((c) => c.id === $('#coach').value);
-  const ok = ['profile', 'photo', ...(own?.schedule ? ['weekly', 'changes'] : []), 'edits', ...(TG ? [] : ['telegram']), ...(S.me.role === 'owner' ? ['access'] : [])];
+  const ok = ['profile', 'photo', ...(own?.schedule ? ['weekly', 'changes'] : []), ...(['owner', 'editor'].includes(S.me.role) ? ['site'] : []), 'edits', ...(TG ? [] : ['telegram']), ...(S.me.role === 'owner' ? ['access'] : [])];
   const saved = store.get(cardKey());
   const name = ok.includes(saved) ? saved : own?.schedule ? 'changes' : 'profile';
   $(`details[data-card="${name}"]`).open = true;
