@@ -1,6 +1,7 @@
 // Panel PRs: state from GitHub (cron and on demand), one Telegram channel message per PR, owner-only merge.
+import { route, json, fail, isOwner } from './router.mjs';
 import { gh, deleteBranch } from './github.mjs';
-import { previewUrl } from './content.mjs';
+import { OPEN, previewUrl } from './content.mjs';
 import { runState, tg, coachText } from './status.mjs';
 
 // Workers Free allows 50 subrequests per invocation, shared with the Phase 5 sweep.
@@ -8,6 +9,8 @@ const PER_SWEEP = 6;
 const OPENING_TTL = 300;
 const DONE = ['live', 'live_failed', 'closed'];
 const MERGED = ['merged', 'live', 'live_failed'];
+const NUMBER = /^\d{1,6}$/;
+const enc = new TextEncoder();
 const now = () => Math.floor(Date.now() / 1000);
 
 const LINE = {
@@ -119,3 +122,92 @@ export async function sweepPrs(env) {
     }
   }
 }
+
+/** Owner-only, shared by the panel and the Telegram button: merges only the green head it just checked. */
+export async function mergePr(env, row) {
+  row = await track(env, row);
+  if (MERGED.includes(row.state)) return { row };
+  if (row.state !== 'ready') return { error: 'not_ready', row };
+  let merged;
+  try {
+    // sha pins the head: GitHub answers 409 if a save landed after the checks went green.
+    merged = await gh(env, 'PUT', `/pulls/${row.number}/merge`, { sha: row.head_sha, merge_method: 'squash' });
+  } catch (e) {
+    if (e.status !== 405 && e.status !== 409) throw e;
+    return { error: 'not_ready', row: await track(env, row) };
+  }
+  row = await save(env, row, { state: 'merged', merge_sha: merged?.sha ?? null });
+  await announce(env, row);
+  return { row };
+}
+
+const view = (env, r) => ({ number: r.number, key: r.key, title: r.title, who: r.who, state: r.state, step: r.step ?? null,
+  preview: isOpen(r) ? previewUrl(env, r.branch) : null, url: prUrl(env, r.number), updated: r.updated });
+
+async function visible(env, user, number) {
+  if (!NUMBER.test(number)) return null;
+  const row = await env.DB.prepare('SELECT * FROM prs WHERE number = ?').bind(Number(number)).first();
+  return row && (user.role !== 'coach' || row.email === user.email) ? row : null;
+}
+
+const github = (fn) => async (c) => {
+  try { return await fn(c); } catch (e) {
+    if (e?.notConfigured) return fail(503, 'not_configured');
+    if (e?.github) return fail(502, 'github');
+    throw e;
+  }
+};
+
+route('GET', '/prs', async ({ env, user }) => {
+  const mine = user.role === 'coach' ? ' AND email = ?' : '';
+  const own = mine ? [user.email] : [];
+  const { results } = await env.DB.prepare(`SELECT * FROM prs WHERE number IS NOT NULL${mine} AND (${OPEN}
+    OR n IN (SELECT n FROM prs WHERE number IS NOT NULL${mine} ORDER BY updated DESC LIMIT 20)) ORDER BY updated DESC`).bind(...own, ...own).all();
+  return json({ prs: results.map((r) => view(env, r)) });
+});
+
+route('GET', '/prs/:number', github(async ({ env, user, params }) => {
+  const row = await visible(env, user, params.number);
+  return row ? json(view(env, await track(env, row))) : fail(404, 'not_found');
+}));
+
+route('POST', '/prs/:number/merge', github(async ({ env, user, params }) => {
+  if (user.role !== 'owner') return fail(403, 'forbidden');
+  const row = await visible(env, user, params.number);
+  if (!row) return fail(404, 'not_found');
+  const r = await mergePr(env, row);
+  return r.error ? fail(409, r.error) : json(view(env, r.row));
+}));
+
+// HMAC both sides under a throwaway key, then compare digests without an early exit.
+async function sameSecret(got, want) {
+  if (!want || typeof got !== 'string') return false;
+  const key = await crypto.subtle.generateKey({ name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
+  const [a, b] = await Promise.all([got, want].map(async (x) => new Uint8Array(await crypto.subtle.sign('HMAC', key, enc.encode(x)))));
+  let d = 0;
+  for (let i = 0; i < a.length; i++) d |= a[i] ^ b[i];
+  return d === 0;
+}
+
+// Telegram retries anything but 200, so every update past the secret check gets 200. Nothing from the body is logged.
+route('POST', '/telegram/webhook', async ({ req, env, body }) => {
+  if (!(await sameSecret(req.headers.get('X-Telegram-Bot-Api-Secret-Token'), env.TG_WEBHOOK_SECRET))) return fail(401, 'unauthorized');
+  const q = body.callback_query;
+  const m = typeof q?.data === 'string' && /^merge:(\d{1,6})$/.exec(q.data);
+  if (!m || q.from?.id == null) return json({ ok: true });
+  const answer = (text, show_alert = false) => tg(env, 'answerCallbackQuery', { callback_query_id: q.id, text, show_alert });
+  const email = await env.DB.prepare('SELECT email FROM tg_links WHERE telegram_id = ?').bind(String(q.from.id)).first('email');
+  if (!email || !isOwner(env, email.toLowerCase())) {
+    await answer('Принять может только владелец', true);
+    return json({ ok: true });
+  }
+  const row = await env.DB.prepare('SELECT * FROM prs WHERE number = ?').bind(Number(m[1])).first();
+  try {
+    const r = row && (await mergePr(env, row));
+    await answer(!r ? 'PR не найден' : r.error ? 'Нельзя принять: проверки не пройдены или PR изменился' : 'Принято', !r?.row || !!r.error);
+  } catch (e) {
+    console.error('telegram merge', e?.status ?? e?.name);
+    await answer('Не получилось, попробуйте ещё раз', true);
+  }
+  return json({ ok: true });
+}, { auth: false });
