@@ -6,6 +6,7 @@ import { checkTranslations } from '../../../src/lib/integrity.mjs';
 import { checkSchedule } from '../../../src/lib/schedule-check.mjs';
 import { checkChanges } from '../../../src/lib/schedule-changes.mjs';
 import { checkCoachWebp } from '../../../src/lib/image-check.mjs';
+import { CJK } from '../../../src/lib/site-check.mjs';
 import { buildPrompt, detectLang, MAX_CHARS } from '../../../src/lib/translate-prompt.mjs';
 import { translate } from './translate.mjs';
 
@@ -13,8 +14,6 @@ const SAVES_PER_DAY = 30;
 const TRANSLATES_PER_DAY = 60;
 const TRANSLATE_KEYS = { 'coach-bio': /^(bio|dan_rank|alt|(about|approach)\.\d{1,2})$/, 'schedule-note': /^note$/ };
 const MAX_TRANSLATE_FIELDS = 24;
-// Kana and CJK ideographs: build.py fails on any kanji word missing from content/kanji.json.
-const CJK = /[぀-ヿ㐀-鿿豈-﫿]/;
 const LANGS = ['he', 'ru', 'en'];
 
 const coachPath = (id) => `content/coaches/${id}.json`;
