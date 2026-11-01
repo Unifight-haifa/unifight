@@ -133,26 +133,107 @@ test('openPull targets the base branch; deleteBranch ignores 404 and 422 only', 
 // ---- content routes and saves, against a stubbed GitHub serving the real repo files ----
 const { readdirSync } = await import('node:fs');
 const { makeEnv } = await import('./helpers/admin-env.mjs');
-const { serialize } = await import('../integrations/admin-api/src/content.mjs');
+const { serialize, SAVE_OPS, OPEN } = await import('../integrations/admin-api/src/content.mjs');
 const { default: worker } = await import('../integrations/admin-api/src/index.mjs');
 
 const NAT = 'content/coaches/natanel-zhurovel.json';
 const NAT_S = 'content/schedule/natanel-zhurovel.json';
-const save = (t, op, id, fields, extra = {}) => ({ op, id, base_sha: t.repo.sha(op === 'shared.section' ? 'content/coaches/_section.json' : op.startsWith('schedule') ? `content/schedule/${id}.json` : `content/coaches/${id}.json`), fields, ...extra });
+// The branch the next save for op+id stacks onto ('main' when no PR is open).
+const at = (t, op, id) => t.env.DB.db.prepare(`SELECT branch FROM prs WHERE key = ? AND number IS NOT NULL AND ${OPEN}`).get(SAVE_OPS[op].key(id))?.branch ?? 'main';
+const save = (t, op, id, fields, extra = {}) => ({ op, id, base_sha: t.repo.sha(op === 'shared.section' ? 'content/coaches/_section.json' : op.startsWith('schedule') ? `content/schedule/${id}.json` : `content/coaches/${id}.json`, at(t, op, id)), fields, ...extra });
+const prRow = (t, key) => ({ ...t.env.DB.db.prepare('SELECT * FROM prs WHERE key = ? ORDER BY n DESC').get(key) });
+const toMain = (t) => t.s.calls.filter((c) => c.method !== 'GET' && c.url.includes('/git/refs/heads/main'));
 const bio = (o = {}) => ({ he: 'ביו חדש', ru: 'Новое био', en: 'New bio', ...o });
 
-test('coach saves own bio: one commit, only bio changed, repo-style message, edit logged', async () => {
-  const t = setup();
+test('coach saves own bio: a branch and a PR, main untouched, repo-style message, edit logged', async () => {
+  const t = setup({ PREVIEW_HOST: 'preview.example' });
   const before = json(NAT);
   const r = await t.call('POST', '/save', save(t, 'coach.text', 'natanel-zhurovel', { bio: bio() }));
   assert.equal(r.status, 200, JSON.stringify(r.body));
-  assert.equal(t.writes().filter((c) => c.method === 'PATCH').length, 1);
-  assert.deepEqual(JSON.parse(t.repo.files.get(NAT)), { ...before, bio: bio() });
+  assert.deepEqual(r.body, { sha: r.body.sha, pr: 1, branch: 'panel-1', preview: 'https://panel-1.preview.example/', state: 'checks' });
+  assert.deepEqual(t.writes().filter((c) => !/blobs|trees|commits$/.test(c.url)).map((c) => `${c.method} ${new URL(c.url).pathname}`),
+    ['POST /repos/o/r/git/refs', 'POST /repos/o/r/pulls']);
+  assert.deepEqual(toMain(t), []);
+  assert.deepEqual(JSON.parse(t.repo.file(NAT)), before);
+  assert.deepEqual(JSON.parse(t.repo.file(NAT, 'panel-1')), { ...before, bio: bio() });
   const c = t.repo.commits.get(r.body.sha);
   assert.equal(c.message, 'Coaches: Natanel Zhurovel, bio\n\nFrom the coach panel (natanel-zhurovel).');
   assert.ok(!('author' in c) && !('committer' in c));
+  assert.deepEqual(t.repo.pulls[0], { title: 'Coaches: Natanel Zhurovel, bio', head: 'panel-1', base: 'main', state: 'open', merged_at: null,
+    body: 'From the coach panel (natanel-zhurovel).\n\nPreview: https://panel-1.preview.example/' });
+  const pr = prRow(t, 'coach:natanel-zhurovel');
+  assert.deepEqual([pr.number, pr.branch, pr.state, pr.head_sha, pr.who, pr.email, pr.saves, pr.title],
+    [1, 'panel-1', 'checks', r.body.sha, 'natanel-zhurovel', COACH, 1, 'Coaches: Natanel Zhurovel, bio']);
   const row = t.env.DB.db.prepare('SELECT * FROM edits').get();
-  assert.deepEqual({ ...row }, { sha: r.body.sha, email: COACH, coach_id: 'natanel-zhurovel', op: 'coach.text', created: row.created, status: 'pending', conclusion: null, notified: 0 });
+  assert.deepEqual({ ...row }, { sha: r.body.sha, email: COACH, coach_id: 'natanel-zhurovel', op: 'coach.text', created: row.created, status: 'pr', conclusion: null, notified: 0 });
+});
+
+test('a second save for the same key reads and stacks onto the open branch; another key gets its own PR', async () => {
+  const t = setup();
+  const r1 = await t.call('POST', '/save', save(t, 'coach.text', 'natanel-zhurovel', { bio: bio() }));
+  assert.equal(r1.body.preview, null);
+  const g = await t.call('GET', '/content/coach/natanel-zhurovel');
+  assert.deepEqual(g.body, { data: JSON.parse(t.repo.file(NAT, 'panel-1')), sha: t.repo.sha(NAT, 'panel-1') });
+  assert.equal((await t.call('POST', '/save', { op: 'coach.text', id: 'natanel-zhurovel', base_sha: t.repo.sha(NAT), fields: { bio: bio() } })).status, 409, 'main sha is stale now');
+  const r2 = await t.call('POST', '/save', { op: 'coach.meta', id: 'natanel-zhurovel', base_sha: g.body.sha, fields: { order: 3 } }, EDITOR);
+  assert.equal(r2.status, 200, JSON.stringify(r2.body));
+  assert.deepEqual([r2.body.pr, r2.body.branch], [1, 'panel-1']);
+  assert.equal(t.repo.pulls.length, 1);
+  assert.ok(t.s.calls.some((c) => c.method === 'PATCH' && c.url.endsWith('/git/refs/heads/panel-1')));
+  const after = JSON.parse(t.repo.file(NAT, 'panel-1'));
+  assert.deepEqual([after.bio, after.order], [bio(), 3]);
+  let pr = prRow(t, 'coach:natanel-zhurovel');
+  assert.deepEqual([pr.saves, pr.head_sha, pr.state, pr.who], [2, r2.body.sha, 'checks', 'natanel-zhurovel']);
+
+  const sessions = structuredClone(json(NAT_S).sessions);
+  sessions[0].start = '12:05';
+  const r3 = await t.call('POST', '/save', save(t, 'schedule.sessions', 'natanel-zhurovel', { sessions }));
+  assert.deepEqual([r3.status, r3.body.pr, r3.body.branch], [200, 2, 'panel-2']);
+  assert.equal(JSON.parse(t.repo.file(NAT_S, 'panel-2')).sessions[0].start, '12:05');
+  assert.equal(t.repo.file(NAT_S, 'panel-1'), t.repo.file(NAT_S), 'keys touch disjoint branches');
+  assert.equal((await t.call('GET', '/content/schedule/natanel-zhurovel')).body.sha, t.repo.sha(NAT_S, 'panel-2'));
+
+  // PR 1 closed on GitHub: the next save marks it and opens a fresh one from main.
+  t.repo.pulls[0].state = 'closed';
+  t.repo.pulls[0].merged_at = '2026-11-02T10:00:00Z';
+  const r4 = await t.call('POST', '/save', save(t, 'coach.text', 'natanel-zhurovel', { bio: bio({ en: 'Again' }) }, { base_sha: t.repo.sha(NAT) }));
+  assert.deepEqual([r4.status, r4.body.pr, r4.body.branch], [200, 3, 'panel-3']);
+  assert.equal(t.env.DB.db.prepare('SELECT state FROM prs WHERE n = 1').get().state, 'merged');
+  pr = prRow(t, 'coach:natanel-zhurovel');
+  assert.deepEqual([pr.n, pr.number, pr.saves], [3, 3, 1]);
+  assert.deepEqual(toMain(t), []);
+
+  // Branch deleted on merge before the sweep caught up: reads fall back to main.
+  t.repo.refs.delete('panel-3');
+  assert.equal((await t.call('GET', '/content/coach/natanel-zhurovel')).body.sha, t.repo.sha(NAT));
+});
+
+test('a first save in flight, a failed PR or a refused edit leave no branch and no blocked key', async () => {
+  const t = setup();
+  t.env.DB.db.exec("INSERT INTO prs (key, created) VALUES ('coach:natanel-zhurovel', 0)");
+  let r = await t.call('POST', '/save', save(t, 'coach.text', 'natanel-zhurovel', { bio: bio() }));
+  assert.deepEqual([r.status, r.body.error], [409, 'stale']);
+  assert.equal(t.writes().length, 0);
+  t.env.DB.db.exec('DELETE FROM prs');
+
+  r = await t.call('POST', '/save', save(t, 'coach.text', 'natanel-zhurovel', { bio: bio({ en: 'Judo 柔道' }) }));
+  assert.deepEqual([r.status, r.body.error], [400, 'invalid']);
+  assert.equal(t.writes().length, 0);
+  assert.equal(t.env.DB.db.prepare('SELECT count(*) AS n FROM prs').get().n, 0);
+
+  t.repo.failPulls = true;
+  r = await t.call('POST', '/save', save(t, 'coach.text', 'natanel-zhurovel', { bio: bio() }));
+  assert.deepEqual([r.status, r.body.error], [502, 'github']);
+  assert.ok(t.s.calls.some((c) => c.method === 'DELETE' && /\/git\/refs\/heads\/panel-\d+$/.test(c.url)));
+  assert.deepEqual([...t.repo.refs.keys()], ['main']);
+  assert.equal(t.env.DB.db.prepare('SELECT count(*) AS n FROM prs').get().n, 0);
+  assert.equal(t.env.DB.db.prepare('SELECT count(*) AS n FROM edits').get().n, 0);
+
+  t.repo.failPulls = false;
+  r = await t.call('POST', '/save', save(t, 'coach.text', 'natanel-zhurovel', { bio: bio() }));
+  assert.equal(r.status, 200, JSON.stringify(r.body));
+  assert.equal(r.body.pr, 1);
+  assert.deepEqual(toMain(t), []);
 });
 
 test('coach is refused on another coach, meta, section and odd ids, with no GitHub write', async () => {
@@ -181,11 +262,11 @@ test('editor may change meta; a coach payload cannot change order or color', asy
   const t = setup();
   let r = await t.call('POST', '/save', save(t, 'coach.meta', 'natanel-zhurovel', { order: 7 }), EDITOR);
   assert.equal(r.status, 200, JSON.stringify(r.body));
-  assert.equal(JSON.parse(t.repo.files.get(NAT)).order, 7);
+  assert.equal(JSON.parse(t.repo.file(NAT, 'panel-1')).order, 7);
   assert.match(t.repo.commits.get(r.body.sha).message, /\(editor\)\.$/);
   r = await t.call('POST', '/save', save(t, 'coach.text', 'natanel-zhurovel', { bio: bio(), order: 0, color: '#000' }));
   assert.equal(r.status, 200);
-  const after = JSON.parse(t.repo.files.get(NAT));
+  const after = JSON.parse(t.repo.file(NAT, 'panel-1'));
   assert.deepEqual([after.order, after.color, after.bio], [7, json(NAT).color, bio()]);
 });
 
@@ -232,7 +313,7 @@ test('schedule: venue names for the select, Saturday refused, valid save touches
   sessions[2].start = '12:05';
   r = await t.call('POST', '/save', save(t, 'schedule.sessions', 'natanel-zhurovel', { sessions, kinds: {} }));
   assert.equal(r.status, 200, JSON.stringify(r.body));
-  assert.deepEqual(JSON.parse(t.repo.files.get(NAT_S)), { ...json(NAT_S), sessions });
+  assert.deepEqual(JSON.parse(t.repo.file(NAT_S, r.body.branch)), { ...json(NAT_S), sessions });
   assert.equal(t.repo.commits.get(r.body.sha).message.split('\n')[0], 'Schedule: Natanel Zhurovel, weekly sessions');
 });
 
@@ -244,7 +325,7 @@ test('shared section: editor changes the title only; coach gets 403', async () =
   const title = { he: 'המאמנים', ru: 'Тренера', en: 'Coaches' };
   const r = await t.call('POST', '/save', save(t, 'shared.section', null, { title, team_count: 99 }), EDITOR);
   assert.equal(r.status, 200, JSON.stringify(r.body));
-  assert.deepEqual(JSON.parse(t.repo.files.get(SEC)), { ...json(SEC), title });
+  assert.deepEqual(JSON.parse(t.repo.file(SEC, 'panel-1')), { ...json(SEC), title });
   assert.equal(t.repo.commits.get(r.body.sha).message.split('\n')[0], 'Coaches: section text');
 });
 
@@ -299,7 +380,7 @@ const webp = (w, h, flags = 0, pad = 0) => {
   hd.writeUInt32LE(body.length, 4);
   return Buffer.concat([hd, body]).toString('base64');
 };
-const photo = (t, id, fields, extra) => ({ op: 'coach.photo', id, base_sha: t.repo.sha(`content/coaches/${id}.json`), fields, ...extra });
+const photo = (t, id, fields, extra) => ({ op: 'coach.photo', id, base_sha: t.repo.sha(`content/coaches/${id}.json`, at(t, 'coach.photo', id)), fields, ...extra });
 
 test('coach.photo: webp and coach JSON land in one commit; alt kept', async () => {
   const t = setup();
@@ -307,15 +388,15 @@ test('coach.photo: webp and coach JSON land in one commit; alt kept', async () =
   const b64 = webp(800, 1200);
   const r = await t.call('POST', '/save', photo(t, 'natanel-zhurovel', { webp: b64, face: [0.4, 0.25] }));
   assert.equal(r.status, 200, JSON.stringify(r.body));
-  assert.equal(t.writes().filter((c) => c.method === 'PATCH').length, 1);
-  assert.equal(t.repo.files.get('public/coaches/natanel-zhurovel.webp'), b64);
-  const ph = JSON.parse(t.repo.files.get(NAT)).photo;
+  assert.equal(t.s.calls.filter((c) => c.method === 'POST' && c.url.endsWith('/git/commits')).length, 1);
+  assert.equal(t.repo.file('public/coaches/natanel-zhurovel.webp', 'panel-1'), b64);
+  const ph = JSON.parse(t.repo.file(NAT, 'panel-1')).photo;
   assert.deepEqual(ph, { ...before.photo, src: 'coaches/natanel-zhurovel.webp', face: [0.4, 0.25], w: 800, h: 1200, source: `panel ${new Date().toISOString().slice(0, 10)}` });
   assert.equal(t.repo.commits.get(r.body.sha).message.split('\n')[0], 'Coaches: Natanel Zhurovel, photo');
 
   const r2 = await t.call('POST', '/save', photo(t, 'natanel-zhurovel', { webp: webp(100, 100), face: [2, 0] }), EDITOR);
   assert.equal(r2.status, 200);
-  assert.deepEqual(JSON.parse(t.repo.files.get(NAT)).photo.face, [0.5, 0.3]);
+  assert.deepEqual(JSON.parse(t.repo.file(NAT, 'panel-1')).photo.face, [0.5, 0.3]);
 });
 
 test('coach.photo refuses bad images, other coaches and a missing base_sha without writing', async () => {
@@ -347,7 +428,7 @@ test('change.create writes a checkChanges-valid file with the coach as author; a
   const r = await t.call('POST', '/save', { op: 'change.create', id: 'natanel-zhurovel', fields: cancel() });
   assert.equal(r.status, 200, JSON.stringify(r.body));
   assert.equal(r.body.change_id, '2026-11-03-natanel-zhurovel-cancel');
-  const f = JSON.parse(t.repo.files.get(CH));
+  const f = JSON.parse(t.repo.file(CH, 'panel-1'));
   assert.deepEqual(f.session, { day: 2, start: '17:30' });
   assert.equal(f.author, 'natanel-zhurovel');
   assert.ok(!Number.isNaN(Date.parse(f.created)));
@@ -359,7 +440,7 @@ test('change.create writes a checkChanges-valid file with the coach as author; a
 
   const r2 = await t.call('POST', '/save', { op: 'change.create', id: 'natanel-zhurovel', fields: cancel() }, OWNER);
   assert.equal(r2.body.change_id, '2026-11-03-natanel-zhurovel-cancel-2');
-  assert.equal(JSON.parse(t.repo.files.get(`${CH.slice(0, -5)}-2.json`)).author, 'owner');
+  assert.equal(JSON.parse(t.repo.file(`${CH.slice(0, -5)}-2.json`, 'panel-1')).author, 'owner');
 });
 
 test('change.create refuses other schedules, bad sessions and bad dates', async () => {
@@ -388,9 +469,10 @@ test('change.delete trusts the file schedule, not the id the coach sends', async
   assert.equal(t.writes().length, 0);
 
   r = await t.call('POST', '/save', { op: 'change.create', id: 'natanel-zhurovel', fields: cancel() });
-  r = await t.call('POST', '/save', { op: 'change.delete', id: 'natanel-zhurovel', base_sha: t.repo.sha(CH), fields: { change_id: r.body.change_id } });
+  const { branch } = r.body;
+  r = await t.call('POST', '/save', { op: 'change.delete', id: 'natanel-zhurovel', base_sha: t.repo.sha(CH, branch), fields: { change_id: r.body.change_id } });
   assert.equal(r.status, 200, JSON.stringify(r.body));
-  assert.ok(!t.repo.files.has(CH));
+  assert.equal(t.repo.file(CH, branch), undefined);
   const last = [...t.repo.commits.values()].at(-1);
   assert.equal(last.message.split('\n')[0], 'Schedule: Natanel Zhurovel, removed cancel 2026-11-03');
 });

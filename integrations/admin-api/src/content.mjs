@@ -1,6 +1,6 @@
 // Content reads and saves. The client sends an op, an id and field values; paths come only from validated ids.
 import { route, json, fail, take } from './router.mjs';
-import { installationToken, readJson, listDir, commitFiles } from './github.mjs';
+import { installationToken, gh, readJson, listDir, commitFiles, openPull, deleteBranch } from './github.mjs';
 import { can, mergeFields } from '../../../src/lib/admin-perms.mjs';
 import { checkTranslations } from '../../../src/lib/integrity.mjs';
 import { checkSchedule } from '../../../src/lib/schedule-check.mjs';
@@ -30,6 +30,18 @@ const SECTION = 'content/coaches/_section.json';
 export const serialize = (obj) => `${JSON.stringify(obj, null, 1)}\n`;
 
 const invalid = (detail) => fail(400, 'invalid', detail);
+
+// prs rows in these states still own their key (matches the prs_open_key index).
+export const OPEN = "state NOT IN ('merged','live','live_failed','closed')";
+export const previewUrl = (env, branch) => (env.PREVIEW_HOST ? `https://${branch}.${env.PREVIEW_HOST}/` : null);
+
+/** Branch of the open PR for key, else undefined (= main). */
+export async function pendingRef(env, key) {
+  const branch = await env.DB.prepare(`SELECT branch FROM prs WHERE key = ? AND number IS NOT NULL AND ${OPEN}`).bind(key).first('branch');
+  if (!branch) return undefined;
+  // A merged PR's branch is deleted before the sweep marks its row; main has the text by then.
+  return gh(env, 'GET', `/git/ref/heads/${branch}`).then(() => branch, (e) => { if (e.status === 404) return undefined; throw e; });
+}
 
 /** Live coach ids on main (file names in content/coaches/ minus _section); pass as `known` to can(). */
 export async function loadContext(env, ref) {
@@ -139,21 +151,24 @@ async function checkMeta(m, { env, head, path }) {
 }
 const checkSection = (m, { path }) => shape(m, path, { title: [...TEXT, true], intro: [...TEXT, true], more_coaches: TEXT, founded_note: TEXT });
 
+const coachKey = (id) => `coach:${id}`;
+const scheduleKey = (id) => `schedule:${id}`;
+
 /**
- * Each op: target(id) for can(), coach(id) for the edits log, edits (needs base_sha), optional check(fields)
- * before any GitHub call, build(head, ctx) -> files (default mergeBuild), subject(merged, ctx).
+ * Each op: target(id) for can(), coach(id) for the edits log, key(id) = the open PR it stacks onto, edits (needs base_sha),
+ * optional check(fields) before any GitHub call, build(head, ctx) -> files (default mergeBuild), subject(merged, ctx).
  */
 export const SAVE_OPS = {
-  'coach.text': { edits: true, target: (id) => ({ coach: id }), coach: (id) => id, path: coachPath, validate: checkText,
+  'coach.text': { edits: true, target: (id) => ({ coach: id }), coach: (id) => id, key: coachKey, path: coachPath, validate: checkText,
     subject: (m, { id }) => `Coaches: ${m.name?.en ?? id}, bio` },
-  'coach.meta': { edits: true, target: (id) => ({ coach: id }), coach: (id) => id, path: coachPath, validate: checkMeta,
+  'coach.meta': { edits: true, target: (id) => ({ coach: id }), coach: (id) => id, key: coachKey, path: coachPath, validate: checkMeta,
     subject: (m, { id }) => `Coaches: ${m.name?.en ?? id}, name and card details` },
-  'schedule.sessions': { edits: true, target: (id) => ({ schedule: id }), coach: (id) => id, path: schedulePath,
+  'schedule.sessions': { edits: true, target: (id) => ({ schedule: id }), coach: (id) => id, key: scheduleKey, path: schedulePath,
     validate: async (m, { env, head, path }) => checkSchedule(m, (await readJson(env, 'content/venues.json', head))?.data ?? {}, path),
     subject: async (_, { env, id, head }) => `Schedule: ${await coachName(env, id, head)}, weekly sessions` },
-  'shared.section': { edits: true, target: () => ({}), coach: () => null, path: () => SECTION, validate: checkSection,
+  'shared.section': { edits: true, target: () => ({}), coach: () => null, key: () => 'section', path: () => SECTION, validate: checkSection,
     subject: () => 'Coaches: section text' },
-  'coach.photo': { edits: true, target: (id) => ({ coach: id }), coach: (id) => id,
+  'coach.photo': { edits: true, target: (id) => ({ coach: id }), coach: (id) => id, key: coachKey,
     check: decodePhoto,
     build: async (head, c) => {
       const path = coachPath(c.id);
@@ -164,7 +179,7 @@ export const SAVE_OPS = {
       return [{ path: `public/coaches/${c.id}.webp`, base64: b64 }, { path, content: serialize(c.merged) }];
     },
     subject: (m, { id }) => `Coaches: ${m.name?.en ?? id}, photo` },
-  'change.create': { edits: false, target: (id) => ({ schedule: id }), coach: (id) => id,
+  'change.create': { edits: false, target: (id) => ({ schedule: id }), coach: (id) => id, key: scheduleKey,
     check: changeCandidate,
     build: async (head, c) => {
       const { env, id, user } = c;
@@ -183,7 +198,7 @@ export const SAVE_OPS = {
       return [{ path: changePath(cid), content: serialize(obj) }];
     },
     subject: async (m, { env, id, head }) => `Schedule: ${await coachName(env, id, head)}, ${m.type} ${m.from}` },
-  'change.delete': { edits: true, target: (id) => ({ schedule: id }), coach: (id) => id,
+  'change.delete': { edits: true, target: (id) => ({ schedule: id }), coach: (id) => id, key: scheduleKey,
     check: (f) => { if (!(typeof f.change_id === 'string' && CHANGE_ID.test(f.change_id))) throw new Error('change_id is invalid'); },
     build: async (head, c) => {
       const path = changePath(c.fields.change_id);
@@ -233,13 +248,13 @@ route('GET', '/coaches', guard(async ({ env, user }) => {
 
 route('GET', '/content/coach/:id', guard(async ({ env, user, params: { id } }) => {
   if (!(await allowed(env, user, 'coach.text', { coach: id }))) return fail(403, 'forbidden');
-  const f = await readJson(env, coachPath(id));
+  const f = await readJson(env, coachPath(id), await pendingRef(env, coachKey(id)));
   return f ? json(f) : fail(404, 'not_found');
 }));
 
 route('GET', '/content/schedule/:id', guard(async ({ env, user, params: { id } }) => {
   if (!(await allowed(env, user, 'schedule.sessions', { schedule: id }))) return fail(403, 'forbidden');
-  const f = await readJson(env, schedulePath(id));
+  const f = await readJson(env, schedulePath(id), await pendingRef(env, scheduleKey(id)));
   if (!f) return fail(404, 'not_found');
   const all = (await readJson(env, 'content/venues.json'))?.data ?? {};
   // Names only: addresses and their sources stay out of the panel.
@@ -249,14 +264,15 @@ route('GET', '/content/schedule/:id', guard(async ({ env, user, params: { id } }
 
 route('GET', '/content/changes/:id', guard(async ({ env, user, params: { id } }) => {
   if (!(await allowed(env, user, 'change.create', { schedule: id }))) return fail(403, 'forbidden');
-  const names = (await listDir(env, 'content/schedule-changes')).filter((f) => f.type === 'file' && f.name.endsWith('.json'));
-  const files = await Promise.all(names.map((f) => readJson(env, `content/schedule-changes/${f.name}`)));
+  const ref = await pendingRef(env, scheduleKey(id));
+  const names = (await listDir(env, 'content/schedule-changes', ref)).filter((f) => f.type === 'file' && f.name.endsWith('.json'));
+  const files = await Promise.all(names.map((f) => readJson(env, `content/schedule-changes/${f.name}`, ref)));
   return json({ changes: files.filter((f) => f?.data?.schedule === id) });
 }));
 
 route('GET', '/content/section', guard(async ({ env, user }) => {
   if (!can(user, 'shared.section', {})) return fail(403, 'forbidden');
-  return json(await readJson(env, SECTION));
+  return json(await readJson(env, SECTION, await pendingRef(env, 'section')));
 }));
 
 route('POST', '/save', guard(async ({ env, user, body }) => {
@@ -271,12 +287,63 @@ route('POST', '/save', guard(async ({ env, user, body }) => {
   if ((await take(env, user.email, new Date().toISOString().slice(0, 10), 'save')) > SAVES_PER_DAY) return fail(429, 'rate_limited');
 
   const c = { env, user, spec, op, id, base_sha, fields, pre, out: {} };
-  const sha = await commitFiles(env, (head) => (spec.build ?? mergeBuild)(head, c),
-    async (head) => `${await spec.subject(c.merged, { env, head, id })}\n\nFrom the coach panel (${user.coach_id ?? user.role}).`);
+  const key = spec.key(id);
+  const who = user.coach_id ?? user.role;
+  const now = Math.floor(Date.now() / 1000);
+  let row = await env.DB.prepare(`SELECT * FROM prs WHERE key = ? AND ${OPEN}`).bind(key).first();
+  // No number yet: another first save for this key is still opening its PR.
+  if (row && !row.number) return fail(409, 'stale');
+  if (row) {
+    const pr = await gh(env, 'GET', `/pulls/${row.number}`);
+    if (pr.state !== 'open' || pr.merged_at) {
+      await env.DB.prepare('UPDATE prs SET state = ?, updated = ? WHERE n = ?').bind(pr.merged_at ? 'merged' : 'closed', now, row.n).run();
+      row = null;
+    }
+  }
+  if (!row) {
+    let n;
+    try {
+      n = await env.DB.prepare('INSERT INTO prs (key, email, who, created, updated) VALUES (?, ?, ?, ?, ?) RETURNING n')
+        .bind(key, user.email, who, now, now).first('n');
+    } catch (e) {
+      if (/UNIQUE/.test(e.message)) return fail(409, 'stale');
+      throw e;
+    }
+    row = { n, branch: `panel-${n}`, number: null };
+    await env.DB.prepare('UPDATE prs SET branch = ? WHERE n = ?').bind(row.branch, n).run();
+  }
 
-  await env.DB.prepare("INSERT INTO edits (sha, email, coach_id, op, created, status) VALUES (?, ?, ?, ?, ?, 'pending')")
-    .bind(sha, user.email, spec.coach(id), op, Math.floor(Date.now() / 1000)).run();
-  return json({ sha, ...c.out });
+  const { branch } = row;
+  const fresh = !row.number;
+  const preview = previewUrl(env, branch);
+  let subject;
+  let number = row.number;
+  let sha;
+  try {
+    sha = await commitFiles(env, (head) => (spec.build ?? mergeBuild)(head, c), async (head) => {
+      subject = await spec.subject(c.merged, { env, head, id });
+      return `${subject}\n\nFrom the coach panel (${who}).`;
+    }, { branch, create: fresh });
+    if (fresh) {
+      const body = `From the coach panel (${who}).${preview ? `\n\nPreview: ${preview}` : ''}`;
+      try {
+        ({ number } = await openPull(env, { title: subject, head: branch, body }));
+      } catch (e) {
+        await deleteBranch(env, branch);
+        throw e;
+      }
+    }
+  } finally {
+    // A first save that didn't get its PR must not keep the key blocked.
+    if (!number) await env.DB.prepare('DELETE FROM prs WHERE n = ?').bind(row.n).run();
+  }
+
+  await env.DB.prepare(`UPDATE prs SET number = ?, head_sha = ?, state = 'checks', step = NULL, updated = ?,
+    saves = saves + ?, title = COALESCE(title, ?) WHERE n = ?`).bind(number, sha, now, fresh ? 0 : 1, subject, row.n).run();
+  // status 'pr': the Phase 5 sweep polls push runs on main only for 'pending' rows.
+  await env.DB.prepare("INSERT INTO edits (sha, email, coach_id, op, created, status) VALUES (?, ?, ?, ?, ?, 'pr')")
+    .bind(sha, user.email, spec.coach(id), op, now).run();
+  return json({ sha, pr: number, branch, preview, state: 'checks', ...c.out });
 }));
 
 route('POST', '/translate', guard(async ({ env, user, body }) => {
