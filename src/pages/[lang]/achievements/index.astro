@@ -20,7 +20,6 @@ export function getStaticPaths() {
 const lang = Astro.params.lang as Lang;
 const s = {
   he: {
-    desc: 'הישגי מועדון הג׳ודו יוניפייט חיפה: אולימפיאדות, אליפויות העולם ואירופה ואליפויות ישראל.',
     level: 'סינון לפי רמה',
     year: 'סינון לפי שנה',
     all: 'הכול',
@@ -28,7 +27,6 @@ const s = {
     levels: { olympics: 'אולימפיאדה', world: 'עולם', europe: 'אירופה', israel: 'ישראל' },
   },
   ru: {
-    desc: 'Достижения клуба дзюдо «Юнифайт Хайфа»: Олимпийские игры, турниры мирового и европейского уровня и чемпионаты Израиля.',
     level: 'Фильтр по уровню',
     year: 'Фильтр по году',
     all: 'Все',
@@ -36,7 +34,6 @@ const s = {
     levels: { olympics: 'Олимпиада', world: 'Мир', europe: 'Европа', israel: 'Израиль' },
   },
   en: {
-    desc: 'Achievements of the Unifight Haifa judo club: the Olympics, world and European events, and Israeli championships.',
     level: 'Filter by level',
     year: 'Filter by year',
     all: 'All',
@@ -44,6 +41,7 @@ const s = {
     levels: { olympics: 'Olympics', world: 'World', europe: 'Europe', israel: 'Israel' },
   },
 }[lang];
+const meta = site.pages.achievements;
 
 const a = site.achievements;
 const title = `${a.title[lang]} · ${t(lang, 'siteName')}`;
@@ -59,9 +57,9 @@ const ld = {
   itemListElement: achievements.map((c, i) => ({ '@type': 'ListItem', position: i + 1, name: c.title[lang] })),
 };
 ---
-<Base lang={lang} title={title} description={s.desc}>
+<Base lang={lang} title={title} description={meta.desc[lang]}>
   <Fragment slot="head">
-    <PageHead lang={lang} path="achievements/" title={title} desc={s.desc} />
+    <PageHead lang={lang} path="achievements/" title={title} desc={meta.desc[lang]} />
     <JsonLd data={ld} />
   </Fragment>
   <div class="news club">

@@ -2,6 +2,7 @@
 import { i18n } from 'astro:config/client';
 import { getRelativeLocaleUrl } from 'astro:i18n';
 import data from '../../../../content/techniques.json';
+import { site } from '../../../lib/site';
 import Base from '../../../layouts/Base.astro';
 import JsonLd from '../../../components/JsonLd.astro';
 import PageHead from '../../../components/PageHead.astro';
@@ -22,8 +23,6 @@ export function getStaticPaths() {
 const lang = Astro.params.lang as Lang;
 const s = {
   he: {
-    title: 'טכניקות הג׳ודו של הקודוקאן',
-    desc: '100 הטכניקות הרשמיות של הקודוקאן: הטלות, ריתוקים, חניקות ובריחים, עם הסרטונים של הקודוקאן ו־IJF Academy, חיפוש וסינון.',
     lead: 'כל 100 הטכניקות ברשימה הרשמית של הקודוקאן (2017): 68 הטלות ו־32 טכניקות קרקע. לכל טכניקה הסבר קצר שלנו וסרטון של הקודוקאן ו־IJF Academy.',
     tree: 'מבנה הרשימה',
     families: { nage: 'טכניקות הטלה', katame: 'טכניקות קרקע' },
@@ -48,8 +47,6 @@ const s = {
     sources: 'מקורות',
   },
   ru: {
-    title: 'Техника дзюдо Кодокан',
-    desc: '100 официальных техник Кодокан: броски, удержания, удушения и болевые приёмы, с видео Кодокан и IJF Academy, поиском и фильтрами.',
     lead: 'Все 100 техник из официального списка Кодокан (2017): 68 бросков и 32 приёма борьбы лёжа. К каждой короткое описание от нас и видео Кодокан и IJF Academy.',
     tree: 'Как устроен список',
     families: { nage: 'Броски', katame: 'Сковывающие приёмы' },
@@ -74,8 +71,6 @@ const s = {
     sources: 'Источники',
   },
   en: {
-    title: 'Kodokan judo techniques',
-    desc: 'The 100 official Kodokan techniques: throws, hold-downs, chokes and joint locks, with the Kodokan and IJF Academy videos, search and filters.',
     lead: 'All 100 techniques on the official Kodokan list (2017): 68 throws and 32 grappling techniques. Each has a short description of ours and the Kodokan × IJF Academy video.',
     tree: 'How the list is organised',
     families: { nage: 'Throwing techniques', katame: 'Grappling techniques' },
@@ -100,6 +95,7 @@ const s = {
     sources: 'Sources',
   },
 }[lang];
+const meta = site.pages.techniques;
 
 const SOURCES = [
   { title: 'Kodokan — Names of Judo Techniques', url: 'https://kdkjudo.org/en/techniques/names-of-judo-techniques/' },
@@ -116,8 +112,8 @@ const yt = (id: string) => `https://youtu.be/${id}`;
 const index = (x: Item) => norm([x.id, x.romaji, x.kanji, x.he_read, polivanov(x.romaji), ...Object.values(x.name)].join(' '));
 const read = (x: Item) => (lang === 'he' ? x.he_read : lang === 'ru' ? polivanov(x.romaji) : '');
 const words = ['投技', '固技', ...groups.map((g) => g.kanji), ...data.items.map((x) => x.kanji)];
-const title = `${s.title} · ${t(lang, 'siteName')}`;
-const ld = { '@context': 'https://schema.org', '@type': 'WebPage', name: s.title, description: s.desc, inLanguage: lang, citation: SOURCES.map((x) => x.url) };
+const title = `${meta.title[lang]} · ${t(lang, 'siteName')}`;
+const ld = { '@context': 'https://schema.org', '@type': 'WebPage', name: meta.title[lang], description: meta.desc[lang], inLanguage: lang, citation: SOURCES.map((x) => x.url) };
 const script = `var norm = ${norm.toString()}; var COUNT = ${JSON.stringify(s.count(0).replace('0', '{n}'))};`;
 // filter state lives in the query string so a filtered view can be shared; without JS the bar stays hidden
 const TQ_JS = `(function () {
@@ -167,14 +163,14 @@ const TQ_JS = `(function () {
   if (location.search) apply();
 })();`;
 ---
-<Base lang={lang} title={title} description={s.desc}>
+<Base lang={lang} title={title} description={meta.desc[lang]}>
   <Fragment slot="head">
-    <PageHead lang={lang} path="techniques/" title={title} desc={s.desc} />
+    <PageHead lang={lang} path="techniques/" title={title} desc={meta.desc[lang]} />
     <JsonLd data={ld} />
   </Fragment>
   <Fragment set:html={kanjiDefs(words)} />
   <div class="news club tq">
-    <h1 class="h2">{s.title}</h1>
+    <h1 class="h2">{meta.title[lang]}</h1>
     <p class="lead" set:html={bidi(lang, s.lead)} />
 
     <section class="tq-tree" aria-labelledby="tq-tree-h">

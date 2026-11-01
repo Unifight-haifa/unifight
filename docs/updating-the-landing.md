@@ -27,7 +27,7 @@ Setup (Cloudflare, GitHub App, Google sign-in, the bot): [admin-panel-setup.ru.m
 Text, coaches, schedule and venues live in `content/`:
 
 - `content/site.json`: shared page copy in he/ru/en (kids, achievements, history…); owner only
-- `content/site/*.json`: small site-wide files the panel edits: `contact` (phones, email, socials; the first phone is the WhatsApp/tel number), `hero`, `footer`
+- `content/site/*.json`: small site-wide files the panel edits: `contact` (phones, email, socials; the first phone is the WhatsApp/tel number), `hero`, `footer`, `ui` (schedule and sign-up form texts), `images` (logo, hero and section photos), `pages` (inner pages' titles and descriptions)
 - `content/coaches/<id>.json`: one file per coach. `group` is `main` | `lead` | `club` | `young`, `order` sorts the page. A coach with a schedule needs `color` (hex, their stripe and avatar ring in the schedule); `photo.face` `[x, y]` (face centre as fractions of the photo) centres the avatar crop
 - `content/coaches/_section.json`: the coaches section's title, intro, team photo and roster group titles
 - `content/schedule/<id>.json`: a coach's groups (day 0 = Sunday; grades `[from, to]`, `to: null` = "and up", `0` = kindergarten). Every file whose name is a coach id is on the page (Ilana Kratysh and Natanel Zhurovel so far); `audience` (`girls`, `boys`, `adults`) adds a badge, and `grades: null` means the source gives none. One-off cancellations, moves and extra classes go in `content/schedule-changes/` (see [bot-content-contracts.md](bot-content-contracts.md)), never in the schedule file

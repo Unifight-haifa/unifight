@@ -11,6 +11,8 @@ import { authorName, fmtDate, getPosts, ogCover, postPath, type Post } from '../
 import videos from '../../../../content/videos.json';
 import '../../../styles/landing.css';
 import '../../../styles/news.css';
+// after the CSS imports: an earlier JSON import reorders the page's stylesheets
+import images from '../../../../content/site/images.json';
 
 export async function getStaticPaths() {
   const posts = await getPosts();
@@ -44,7 +46,7 @@ const article = {
     '@type': 'Organization',
     '@id': abs(`${import.meta.env.BASE_URL}#club`),
     name: t(lang, 'siteName'),
-    logo: abs(`${import.meta.env.BASE_URL}brand/logo.png`),
+    logo: abs(`${import.meta.env.BASE_URL}${images.logo.src}`),
   },
 };
 // WhatsApp glyph is the landing's WA_SVG (scripts/landing/build.py)

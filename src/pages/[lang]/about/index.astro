@@ -21,8 +21,6 @@ export function getStaticPaths() {
 const lang = Astro.params.lang as Lang;
 const s = {
   he: {
-    title: 'על המועדון',
-    desc: 'מועדון הג׳ודו יוניפייט חיפה: העמותה, ההנהלה והמאמנים, הענפים, האולמות והתחרויות שארגנו.',
     team: 'הנהלה ומאמנים',
     teamText: (n: number) => `בצוות המועדון ${n} מאמנים.`,
     teamLink: 'כל המאמנים',
@@ -35,8 +33,6 @@ const s = {
     story: 'הסיפור שלנו',
   },
   ru: {
-    title: 'О клубе',
-    desc: 'Клуб дзюдо «Юнифайт Хайфа»: амута, руководство и тренеры, виды спорта, залы и турниры, которые мы провели.',
     team: 'Руководство и тренера',
     teamText: (n: number) => `Тренеров в клубе: ${n}.`,
     teamLink: 'Все тренера',
@@ -49,8 +45,6 @@ const s = {
     story: 'История клуба',
   },
   en: {
-    title: 'About the club',
-    desc: 'The Unifight Haifa judo club: the association, its leadership and coaches, disciplines, venues and the tournaments we have run.',
     team: 'Leadership and coaches',
     teamText: (n: number) => `The club has ${n} coaches.`,
     teamLink: 'All coaches',
@@ -63,6 +57,7 @@ const s = {
     story: 'Our story',
   },
 }[lang];
+const meta = site.pages.about;
 
 type Coach = { id: string; group: string; order: number; name: T; role?: T };
 const coaches = Object.values(import.meta.glob<Coach>('../../../../content/coaches/[!_]*.json', { eager: true, import: 'default' }));
@@ -71,7 +66,7 @@ const cities = [...new Set(Object.values(venues).map((v) => v.address[lang].spli
 const events = [...tournaments].sort((a, b) => b.date.localeCompare(a.date));
 const stats = published(site.achievements.stats) as { value: string; label: T }[];
 const home = getRelativeLocaleUrl(lang);
-const title = `${s.title} · ${t(lang, 'siteName')}`;
+const title = `${meta.title[lang]} · ${t(lang, 'siteName')}`;
 const abs = (p: string) => new URL(p, Astro.site).href;
 const ld = {
   '@context': 'https://schema.org',
@@ -81,13 +76,13 @@ const ld = {
   mainEntity: { '@id': abs(`${import.meta.env.BASE_URL}#club`) },
 };
 ---
-<Base lang={lang} title={title} description={s.desc}>
+<Base lang={lang} title={title} description={meta.desc[lang]}>
   <Fragment slot="head">
-    <PageHead lang={lang} path="about/" title={title} desc={s.desc} />
+    <PageHead lang={lang} path="about/" title={title} desc={meta.desc[lang]} />
     <JsonLd data={ld} />
   </Fragment>
   <div class="news club">
-    <h1 class="h2">{s.title}</h1>
+    <h1 class="h2">{meta.title[lang]}</h1>
     <p class="lead" set:html={bidi(lang, site.footer.tagline[lang])} />
     <section class="club-about" aria-labelledby="amuta">
       <div>

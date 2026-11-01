@@ -3,6 +3,7 @@ import { Picture, getImage } from 'astro:assets';
 import { i18n } from 'astro:config/client';
 import { getRelativeLocaleUrl } from 'astro:i18n';
 import gallery from '../../../../content/gallery.json';
+import { site } from '../../../lib/site';
 import Base from '../../../layouts/Base.astro';
 import JsonLd from '../../../components/JsonLd.astro';
 import { LANGS, t, type Lang } from '../../../i18n/ui';
@@ -17,8 +18,6 @@ export function getStaticPaths() {
 const lang = Astro.params.lang as Lang;
 const s = {
   he: {
-    title: 'תמונות',
-    desc: 'תמונות ממועדון הג׳ודו יוניפייט חיפה: אימונים, תחרויות, מחנות אימונים וחיי המועדון.',
     all: 'הכול',
     filter: 'סינון לפי אלבום',
     viewer: 'צפייה בתמונה',
@@ -27,8 +26,6 @@ const s = {
     next: 'התמונה הבאה',
   },
   ru: {
-    title: 'Фото',
-    desc: 'Фотографии клуба дзюдо «Юнифайт Хайфа»: тренировки, соревнования, сборы и жизнь клуба.',
     all: 'Все',
     filter: 'Фильтр по альбому',
     viewer: 'Просмотр фото',
@@ -37,8 +34,6 @@ const s = {
     next: 'Следующее фото',
   },
   en: {
-    title: 'Photos',
-    desc: 'Photos from the Unifight Haifa judo club: training, competitions, camps and club life.',
     all: 'All',
     filter: 'Filter by album',
     viewer: 'Photo viewer',
@@ -47,12 +42,13 @@ const s = {
     next: 'Next photo',
   },
 }[lang];
+const meta = site.pages.gallery;
 
 const files = import.meta.glob<{ default: ImageMetadata }>('../../../assets/gallery/*/*.{jpg,jpeg}', { eager: true });
 const src = (file: string) => files[`../../../assets/gallery/${file}`].default;
 const abs = (path: string) => new URL(path, Astro.site).href;
 const url = abs(getRelativeLocaleUrl(lang, 'gallery/'));
-const title = `${s.title} · ${t(lang, 'siteName')}`;
+const title = `${meta.title[lang]} · ${t(lang, 'siteName')}`;
 const LOCALE = { he: 'he_IL', ru: 'ru_RU', en: 'en_US' };
 const WIDTHS = [400, 800, 1600];
 // the no-JS link target; same transform as the srcset's widest entry, so it is built once
@@ -72,7 +68,7 @@ const ld = {
   '@context': 'https://schema.org',
   '@type': 'ImageGallery',
   name: title,
-  description: s.desc,
+  description: meta.desc[lang],
   url,
   inLanguage: lang,
   image: albums.flatMap((a) =>
@@ -88,14 +84,14 @@ const ld = {
   ),
 };
 ---
-<Base lang={lang} title={title} description={s.desc}>
+<Base lang={lang} title={title} description={meta.desc[lang]}>
   <Fragment slot="head">
     <link rel="canonical" href={url} />
     {LANGS.map((l) => <link rel="alternate" hreflang={l} href={abs(getRelativeLocaleUrl(l, 'gallery/'))} />)}
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content={t(lang, 'siteName')} />
     <meta property="og:title" content={title} />
-    <meta property="og:description" content={s.desc} />
+    <meta property="og:description" content={meta.desc[lang]} />
     <meta property="og:url" content={url} />
     <meta property="og:image" content={abs(og.src)} />
     <meta property="og:image:width" content={String(og.attributes.width)} />
@@ -107,7 +103,7 @@ const ld = {
     <JsonLd data={ld} />
   </Fragment>
   <div class="news">
-    <h1 class="h2">{s.title}</h1>
+    <h1 class="h2">{meta.title[lang]}</h1>
     <div class="chips gal-filter" role="group" aria-label={s.filter} data-gal-filter hidden>
       <button type="button" class="chip" data-filter="" aria-pressed="true">{s.all}</button>
       {albums.map((a) => <button type="button" class="chip" data-filter={a.id} aria-pressed="false">{a.title[lang]}</button>)}

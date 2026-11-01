@@ -17,11 +17,7 @@ export function getStaticPaths() {
 
 const lang = Astro.params.lang as Lang;
 const h = site.history;
-const desc = {
-  he: 'הסיפור של מועדון הג׳ודו יוניפייט חיפה: ציר זמן מאומת מהקמת המועדון ועד היום, ועל העמותה.',
-  ru: 'История клуба дзюдо «Юнифайт Хайфа»: проверенная хронология от основания до наших дней и об амуте.',
-  en: 'The story of the Unifight Haifa judo club: a verified timeline from its founding to today, and about the association.',
-}[lang];
+const desc = site.pages.history.desc[lang];
 const title = `${h.title[lang]} · ${t(lang, 'siteName')}`;
 ---
 <Base lang={lang} title={title} description={desc}>

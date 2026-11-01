@@ -1,0 +1,83 @@
+{
+ "about": {
+  "title": {
+   "he": "על המועדון",
+   "ru": "О клубе",
+   "en": "About the club"
+  },
+  "desc": {
+   "he": "מועדון הג׳ודו יוניפייט חיפה: העמותה, ההנהלה והמאמנים, הענפים, האולמות והתחרויות שארגנו.",
+   "ru": "Клуб дзюдо «Юнифайт Хайфа»: амута, руководство и тренеры, виды спорта, залы и турниры, которые мы провели.",
+   "en": "The Unifight Haifa judo club: the association, its leadership and coaches, disciplines, venues and the tournaments we have run."
+  }
+ },
+ "contact": {
+  "desc": {
+   "he": "איך יוצרים קשר עם מועדון הג׳ודו יוניפייט חיפה: וואטסאפ, טלפונים, מייל, כתובות האולמות ומפה.",
+   "ru": "Как связаться с клубом дзюдо «Юнифайт Хайфа»: WhatsApp, телефоны, почта, адреса залов и карта.",
+   "en": "How to reach the Unifight Haifa judo club: WhatsApp, phones, email, venue addresses and a map."
+  }
+ },
+ "achievements": {
+  "desc": {
+   "he": "הישגי מועדון הג׳ודו יוניפייט חיפה: אולימפיאדות, אליפויות העולם ואירופה ואליפויות ישראל.",
+   "ru": "Достижения клуба дзюдо «Юнифайт Хайфа»: Олимпийские игры, турниры мирового и европейского уровня и чемпионаты Израиля.",
+   "en": "Achievements of the Unifight Haifa judo club: the Olympics, world and European events, and Israeli championships."
+  }
+ },
+ "gallery": {
+  "title": {
+   "he": "תמונות",
+   "ru": "Фото",
+   "en": "Photos"
+  },
+  "desc": {
+   "he": "תמונות ממועדון הג׳ודו יוניפייט חיפה: אימונים, תחרויות, מחנות אימונים וחיי המועדון.",
+   "ru": "Фотографии клуба дзюдо «Юнифайт Хайфа»: тренировки, соревнования, сборы и жизнь клуба.",
+   "en": "Photos from the Unifight Haifa judo club: training, competitions, camps and club life."
+  }
+ },
+ "video": {
+  "title": {
+   "he": "וידאו",
+   "ru": "Видео",
+   "en": "Video"
+  },
+  "desc": {
+   "he": "סרטונים של מועדון הג׳ודו יוניפייט חיפה: אימונים, תחרויות ומחנות אימונים.",
+   "ru": "Видео клуба дзюдо «Юнифайт Хайфа»: тренировки, турниры и сборы.",
+   "en": "Videos from the Unifight Haifa judo club: training, competitions and camps."
+  }
+ },
+ "techniques": {
+  "title": {
+   "he": "טכניקות הג׳ודו של הקודוקאן",
+   "ru": "Техника дзюдо Кодокан",
+   "en": "Kodokan judo techniques"
+  },
+  "desc": {
+   "he": "100 הטכניקות הרשמיות של הקודוקאן: הטלות, ריתוקים, חניקות ובריחים, עם הסרטונים של הקודוקאן ו־IJF Academy, חיפוש וסינון.",
+   "ru": "100 официальных техник Кодокан: броски, удержания, удушения и болевые приёмы, с видео Кодокан и IJF Academy, поиском и фильтрами.",
+   "en": "The 100 official Kodokan techniques: throws, hold-downs, chokes and joint locks, with the Kodokan and IJF Academy videos, search and filters."
+  }
+ },
+ "history": {
+  "desc": {
+   "he": "הסיפור של מועדון הג׳ודו יוניפייט חיפה: ציר זמן מאומת מהקמת המועדון ועד היום, ועל העמותה.",
+   "ru": "История клуба дзюдо «Юнифайт Хайфа»: проверенная хронология от основания до наших дней и об амуте.",
+   "en": "The story of the Unifight Haifa judo club: a verified timeline from its founding to today, and about the association."
+  }
+ },
+ "map": {
+  "title": {
+   "he": "מקומות האימון",
+   "ru": "Места тренировок",
+   "en": "Training venues"
+  },
+  "desc": {
+   "he": "כתובות ומפה של מקומות האימון של יוניפייט חיפה.",
+   "ru": "Адреса и карта мест тренировок «Юнифайт Хайфа».",
+   "en": "Addresses and a map of Unifight Haifa training venues."
+  }
+ }
+}

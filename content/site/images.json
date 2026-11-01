@@ -1,0 +1,17 @@
+{
+ "hero": {
+  "src": "groundwork.jpg"
+ },
+ "schedule_bg": {
+  "src": "train-georgia-randori.jpg"
+ },
+ "contact_bg": {
+  "src": "kids-belts-throw.jpg"
+ },
+ "contact_pic": {
+  "src": "belts-air.jpg"
+ },
+ "logo": {
+  "src": "brand/logo.png"
+ }
+}

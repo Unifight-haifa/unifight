@@ -1,0 +1,176 @@
+{
+ "schedule": {
+  "heading": {
+   "he": "עונת 2026/27",
+   "ru": "Сезон 2026/27",
+   "en": "Season 2026/27"
+  },
+  "coach_q": {
+   "he": "עם מי?",
+   "ru": "Тренер",
+   "en": "Coach"
+  },
+  "adults": {
+   "he": "מבוגרים",
+   "ru": "Взрослые",
+   "en": "Adults"
+  },
+  "grade_q": {
+   "he": "באיזו כיתה הילד/ה?",
+   "ru": "В каком классе ребёнок?",
+   "en": "Your child's grade?"
+  },
+  "venue_q": {
+   "he": "איפה נוח לכם?",
+   "ru": "Где удобнее?",
+   "en": "Which venue?"
+  },
+  "all": {
+   "he": "הכול",
+   "ru": "Все",
+   "en": "All"
+  },
+  "today": {
+   "he": "היום",
+   "ru": "сегодня",
+   "en": "today"
+  },
+  "none_day": {
+   "he": "אין אימון מתאים ביום הזה",
+   "ru": "В этот день подходящих тренировок нет",
+   "en": "No matching class this day"
+  },
+  "none_all": {
+   "he": "לא מצאנו קבוצה מתאימה — כתבו לנו ונמצא פתרון.",
+   "ru": "Подходящей группы не нашлось — напишите нам, подберём.",
+   "en": "No matching group — message us and we'll sort it out."
+  },
+  "others": {
+   "he": "לוחות האימונים של שאר המאמנים יעלו בקרוב.",
+   "ru": "Расписание групп других тренеров скоро появится.",
+   "en": "Other coaches' schedules are coming soon."
+  },
+  "join": {
+   "he": "הרשמה לקבוצה",
+   "ru": "Записаться",
+   "en": "Join"
+  },
+  "days": {
+   "he": "ימי השבוע",
+   "ru": "Дни недели",
+   "en": "Days of the week"
+  },
+  "count": {
+   "he": "אימונים מתאימים: ",
+   "ru": "Подходящих тренировок: ",
+   "en": "Matching classes: "
+  },
+  "wa_msg": {
+   "he": "שלום! אשמח להצטרף לאימון: ",
+   "ru": "Здравствуйте! Хотим записаться на тренировку: ",
+   "en": "Hi! We'd like to join this class: "
+  }
+ },
+ "lead": {
+  "title": {
+   "he": "השאירו פרטים ונחזור אליכם",
+   "ru": "Оставьте заявку — мы перезвоним",
+   "en": "Leave your details and we'll call you back"
+  },
+  "intro": {
+   "he": "נחזור אליכם ונעזור לבחור קבוצה מתאימה.",
+   "ru": "Перезвоним и поможем подобрать группу.",
+   "en": "We'll call you back and help you pick a group."
+  },
+  "name": {
+   "he": "שם",
+   "ru": "Имя",
+   "en": "Name"
+  },
+  "phone": {
+   "he": "טלפון",
+   "ru": "Телефон",
+   "en": "Phone"
+  },
+  "who": {
+   "he": "למי האימון?",
+   "ru": "Для кого тренировки?",
+   "en": "Who is it for?"
+  },
+  "child": {
+   "he": "ילד/ה",
+   "ru": "Ребёнок",
+   "en": "Child"
+  },
+  "adult": {
+   "he": "מבוגר/ת",
+   "ru": "Взрослый",
+   "en": "Adult"
+  },
+  "age": {
+   "he": "גיל",
+   "ru": "Возраст",
+   "en": "Age"
+  },
+  "hall": {
+   "he": "אולם",
+   "ru": "Зал",
+   "en": "Venue"
+  },
+  "any": {
+   "he": "עוד לא החלטנו",
+   "ru": "Пока не знаем",
+   "en": "Not sure yet"
+  },
+  "message": {
+   "he": "הודעה (לא חובה)",
+   "ru": "Сообщение (необязательно)",
+   "en": "Message (optional)"
+  },
+  "consent": {
+   "he": "אני מסכים/ה שהמועדון ישמור את הפרטים כדי לחזור אליי.",
+   "ru": "Согласен(на), что клуб сохранит эти данные, чтобы связаться со мной.",
+   "en": "I agree the club may keep these details to contact me."
+  },
+  "privacy": {
+   "he": "מדיניות פרטיות",
+   "ru": "Политика конфиденциальности",
+   "en": "Privacy policy"
+  },
+  "send": {
+   "he": "שליחה",
+   "ru": "Отправить",
+   "en": "Send"
+  },
+  "send_wa": {
+   "he": "שליחה בוואטסאפ",
+   "ru": "Отправить в WhatsApp",
+   "en": "Send via WhatsApp"
+  },
+  "done": {
+   "he": "תודה! קיבלנו את הפרטים ונחזור אליכם בקרוב.",
+   "ru": "Спасибо! Заявка получена, мы скоро перезвоним.",
+   "en": "Thanks! We've got your details and will call you back soon."
+  },
+  "done_wa": {
+   "he": "תודה! שלחו את ההודעה בוואטסאפ ונחזור אליכם.",
+   "ru": "Спасибо! Отправьте сообщение в WhatsApp, и мы вам ответим.",
+   "en": "Thanks! Send the message in WhatsApp and we'll get back to you."
+  },
+  "bad_phone": {
+   "he": "מספר טלפון ישראלי, למשל 050-1234567",
+   "ru": "Израильский номер, например 050-123-4567",
+   "en": "An Israeli number, e.g. 050-123-4567"
+  },
+  "tpl": {
+   "he": "שלום! פנייה מהאתר.\nשם: {name}\nטלפון: {phone}\nעבור: {who}, גיל {age}\nאולם: {hall}\n{message}",
+   "ru": "Здравствуйте! Заявка с сайта.\nИмя: {name}\nТелефон: {phone}\nДля кого: {who}, возраст {age}\nЗал: {hall}\n{message}",
+   "en": "Hi! A sign-up from the website.\nName: {name}\nPhone: {phone}\nFor: {who}, age {age}\nVenue: {hall}\n{message}"
+  },
+  "after": {
+   "he": "שלום! השארתי פרטים באתר. אולם: {hall}",
+   "ru": "Здравствуйте! Оставили заявку на сайте. Зал: {hall}",
+   "en": "Hi! I've just left my details on the website. Venue: {hall}"
+  }
+ }
+}

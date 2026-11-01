@@ -22,7 +22,6 @@ export function getStaticPaths() {
 const lang = Astro.params.lang as Lang;
 const s = {
   he: {
-    desc: 'איך יוצרים קשר עם מועדון הג׳ודו יוניפייט חיפה: וואטסאפ, טלפונים, מייל, כתובות האולמות ומפה.',
     msg: 'שלום! יש לי שאלה על האימונים ביוניפייט.',
     phones: 'טלפונים',
     email: 'מייל',
@@ -35,7 +34,6 @@ const s = {
     amuta: 'העמותה',
   },
   ru: {
-    desc: 'Как связаться с клубом дзюдо «Юнифайт Хайфа»: WhatsApp, телефоны, почта, адреса залов и карта.',
     msg: 'Здравствуйте! У меня вопрос о тренировках в «Юнифайт».',
     phones: 'Телефоны',
     email: 'Почта',
@@ -48,7 +46,6 @@ const s = {
     amuta: 'Амута',
   },
   en: {
-    desc: 'How to reach the Unifight Haifa judo club: WhatsApp, phones, email, venue addresses and a map.',
     msg: 'Hi! I have a question about training at Unifight.',
     phones: 'Phones',
     email: 'Email',
@@ -61,6 +58,7 @@ const s = {
     amuta: 'The association',
   },
 }[lang];
+const meta = site.pages.contact;
 
 const co = site.contact;
 const heading = site.nav.find((n) => n.id === 'contact')![lang];
@@ -98,9 +96,9 @@ const ld = {
   },
 };
 ---
-<Base lang={lang} title={title} description={s.desc}>
+<Base lang={lang} title={title} description={meta.desc[lang]}>
   <Fragment slot="head">
-    <PageHead lang={lang} path="contact/" title={title} desc={s.desc} />
+    <PageHead lang={lang} path="contact/" title={title} desc={meta.desc[lang]} />
     <JsonLd data={ld} />
   </Fragment>
   <div class="news club">

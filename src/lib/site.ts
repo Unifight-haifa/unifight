@@ -2,9 +2,12 @@ import base from '../../content/site.json';
 import contact from '../../content/site/contact.json';
 import footer from '../../content/site/footer.json';
 import hero from '../../content/site/hero.json';
+import images from '../../content/site/images.json';
+import pages from '../../content/site/pages.json';
+import ui from '../../content/site/ui.json';
 
 // site.json plus the small files the panel edits, as one object
-export const site = { ...base, contact, hero, footer };
+export const site = { ...base, contact, hero, footer, ui, images, pages };
 
 // contact.phones[0] is the club's WhatsApp and tel number
 const p0 = contact.phones[0];

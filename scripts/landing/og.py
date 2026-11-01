@@ -62,7 +62,7 @@ def render(lang):
     anchor = "r" if rtl else "l"
     d.rectangle((W - 12, 0, W, H) if rtl else (0, 0, 12, H), fill=RED)
 
-    logo = Image.open(PUB / "brand/logo.png").convert("RGBA")
+    logo = Image.open(PUB / C["images"]["logo"]["src"]).convert("RGBA")
     logo.thumbnail((112, 112), Image.LANCZOS)  # downscale only: the source is 256px
     lx = start - logo.width if rtl else start
     im.paste(logo, (lx, PAD), logo)
