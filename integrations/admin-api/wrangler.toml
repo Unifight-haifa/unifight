@@ -5,7 +5,7 @@ compatibility_date = "2026-10-01"
 # Secrets (SESSION_KEY, OWNER_EMAILS, TG_BOT_TOKEN, GITHUB_APP_KEY, ANTHROPIC_KEY) go via `wrangler secret put`, never here.
 [vars]
 ALLOWED_ORIGINS = "https://unifight-haifa.com,http://localhost:4321"
-GOOGLE_CLIENT_ID = ""
+GOOGLE_CLIENT_ID = "1007583043765-07m7tf5qjauijn3pepbh1hbif0mnc02j.apps.googleusercontent.com"
 REPO = "Unifight-haifa/unifight"
 BRANCH = "main"
 TG_BOT_USERNAME = ""
