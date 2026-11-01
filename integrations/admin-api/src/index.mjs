@@ -5,8 +5,8 @@ const now = () => Math.floor(Date.now() / 1000);
 const EMAIL = /^[^\s@,]+@[^\s@,]+\.[^\s@,]+$/;
 const SLUG = /^[a-z0-9]+(-[a-z0-9]+)*$/;
 const CODE_TTL = 600;
-const TG_FAIL_PER_ID = 6; // per Telegram id per UTC day
-const TG_FAIL_ALL = 30; // across all ids per UTC hour: many accounts could otherwise share the guessing
+const TG_TRY_PER_ID = 6; // code attempts per Telegram id per UTC day
+const TG_TRY_ALL = 30; // across all ids per UTC hour: many accounts could otherwise share the guessing
 
 const session = async (env, email) => ({ token: await signSession({ email }, env), me: await userByEmail(env, email) });
 
@@ -28,8 +28,9 @@ route('POST', '/session/google', async ({ env, body }) => {
   return json(await session(env, g.email));
 }, { auth: false });
 
-const counter = (env, key, day, kind) => env.DB.prepare('SELECT n FROM usage WHERE email = ? AND day = ? AND kind = ?').bind(key, day, kind).first('n');
-const bump = (env, key, day, kind) => env.DB.prepare('INSERT INTO usage (email, day, kind, n) VALUES (?, ?, ?, 1) ON CONFLICT(email, day, kind) DO UPDATE SET n = n + 1').bind(key, day, kind);
+// Take the slot and read the count in one statement, so parallel requests can't all pass a stale check.
+const take = (env, key, day, kind) => env.DB.prepare(
+  'INSERT INTO usage (email, day, kind, n) VALUES (?, ?, ?, 1) ON CONFLICT(email, day, kind) DO UPDATE SET n = n + 1 RETURNING n').bind(key, day, kind).first('n');
 
 route('POST', '/session/telegram', async ({ env, body }) => {
   if (!env.TG_BOT_TOKEN) return fail(503, 'not_configured');
@@ -40,16 +41,14 @@ route('POST', '/session/telegram', async ({ env, body }) => {
     const iso = new Date().toISOString();
     const [day, hour] = [iso.slice(0, 10), iso.slice(0, 13)];
     const idKey = await sha256hex(`tg:${t.id}`);
-    if ((await counter(env, '*', hour, 'tg_code_fail_all')) >= TG_FAIL_ALL
-      || (await counter(env, idKey, day, 'tg_code_fail')) >= TG_FAIL_PER_ID) return fail(429, 'rate_limited');
+    // Per-id slot first: a single id hammering 429s must not drain the global budget.
+    if ((await take(env, idKey, day, 'tg_code_try')) > TG_TRY_PER_ID
+      || (await take(env, '*', hour, 'tg_code_try_all')) > TG_TRY_ALL) return fail(429, 'rate_limited');
     const hash = await sha256hex(String(code));
     const won = /^\d{6}$/.test(String(code)) && (await env.DB.prepare(
       'UPDATE link_codes SET used_at = ? WHERE code_hash = ? AND used_at IS NULL AND expires_at > ?').bind(now(), hash, now()).run()).meta.changes === 1;
     const email = won && (await env.DB.prepare('SELECT email FROM link_codes WHERE code_hash = ?').bind(hash).first('email'));
-    if (!email || !(await userByEmail(env, email))) {
-      await env.DB.batch([bump(env, idKey, day, 'tg_code_fail'), bump(env, '*', hour, 'tg_code_fail_all')]);
-      return fail(400, 'bad_code');
-    }
+    if (!email || !(await userByEmail(env, email))) return fail(400, 'bad_code');
     await env.DB.prepare('INSERT OR REPLACE INTO tg_links (telegram_id, email, linked_at) VALUES (?, ?, ?)').bind(t.id, email, iso).run();
     return json(await session(env, email));
   }

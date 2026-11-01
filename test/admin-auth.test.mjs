@@ -244,3 +244,15 @@ test('Telegram: per-id daily limit and global hourly cap', async (t) => {
   const fresh = await linkCode(env, 'coach@example.com');
   assert.equal((await redeem(8000, fresh.code)).status, 200);
 });
+
+test('Telegram: parallel code attempts never exceed the caps', async () => {
+  const env = env0();
+  await grant(env, 'coach@example.com');
+  const attempt = async (id) => call(env, 'POST', '/session/telegram', { body: { initData: await tg(id), code: '000000' } });
+  const one = await Promise.all(Array.from({ length: 20 }, () => attempt(9000)));
+  assert.equal(one.filter((r) => r.status === 400).length, 6);
+  assert.equal(one.filter((r) => r.status === 429).length, 14);
+  const many = await Promise.all(Array.from({ length: 40 }, (_, i) => attempt(9100 + i)));
+  assert.equal(many.filter((r) => r.status === 400).length, 24); // 30 global minus the 6 above
+  assert.equal(many.filter((r) => r.status === 429).length, 16);
+});
