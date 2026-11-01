@@ -2,6 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readdirSync, readFileSync } from 'node:fs';
 import { activeChanges, checkChanges, fillSchedule, renderSchedule, sessionKey } from '../src/lib/schedule-changes.mjs';
+import { checkSchedule } from '../src/lib/schedule-check.mjs';
 
 const read = (u) => JSON.parse(readFileSync(u, 'utf8'));
 const fx = new URL('./fixtures/schedule-changes/', import.meta.url);
@@ -22,6 +23,20 @@ test('a bad change file fails with a message naming the problem', () => {
   assert.throws(bad({ id: 'other' }), /match the file name/);
   assert.throws(bad({ new: { ...ok.new, date: '2026-10-24' } }), /Saturday/);
   assert.throws(bad({ from: '2026-10-20', to: '2026-10-20' }), /falls on weekday 3/);
+});
+
+test('weekly sessions: real files pass, bad sessions fail with the index', () => {
+  for (const [id, sc] of Object.entries(schedules)) checkSchedule(sc, venues, id);
+  const sc = schedules['natanel-zhurovel'], i = 3, ok = sc.sessions[i];
+  const bad = (patch, base = sc) => () => checkSchedule({ ...base, sessions: base.sessions.map((s, j) => (j === i ? { ...ok, ...patch } : s)) }, venues);
+  const at = /schedule\.sessions\[3\]: /;
+  for (const patch of [{ day: 6 }, { day: 7 }, { day: '1' }, { start: '9:00' }, { start: '24:00' }, { end: ok.start }, { venue: 'moon' }, { venue: 'constructor' }, { kind: 'karate' },
+    { audience: 'girls' }, { grades: [0, 13] }, { grades: [5, 3] }, { grades: [1.5, 3] }, { grades: [1] }, { grades: undefined }, { subgroup: 0 }, { subgroup: '1' }, { note: { he: 'a' } }, { evil: 1 }])
+    assert.throws(bad(patch), at, JSON.stringify(patch));
+  assert.throws(bad({ audience: 'pets' }, schedules['ilana-kratysh']), /sessions\[3\]: unknown audience "pets"/);
+  checkSchedule({ ...sc, sessions: [{ ...ok, grades: [6, null], subgroup: 2, note: { he: 'a', ru: 'b', en: 'c' } }] }, venues);
+  assert.throws(() => checkSchedule({ ...sc, sessions: [] }, venues), /at least one session/);
+  assert.throws(() => checkSchedule({ ...sc, sessions: Array(81).fill(ok) }, venues), /more than 80/);
 });
 
 test('expired changes are dropped, the rest keep their display window', () => {
