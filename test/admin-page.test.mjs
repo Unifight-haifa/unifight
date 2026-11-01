@@ -16,6 +16,10 @@ test('/admin/ is built, noindex, out of the sitemap and the language trees', () 
   assert.ok(!read('sitemap.xml').includes('/admin/'));
   for (const l of LANGS) assert.ok(!existsSync(new URL(`${l}/admin/`, dist)), l);
   assert.match(html, /<textarea[^>]*name="bio\.he"[^>]*dir="rtl"/);
+  // every section is a collapsed card, so a phone sees a short list first
+  const cards = [...html.matchAll(/<details class="card" name="card" data-card="([a-z]+)"( open)?/g)];
+  assert.deepEqual(cards.map((m) => m[1]), ['profile', 'photo', 'weekly', 'changes', 'telegram', 'access']);
+  assert.ok(cards.every((m) => !m[2]));
   assert.doesNotMatch(html, SECRETS);
 });
 

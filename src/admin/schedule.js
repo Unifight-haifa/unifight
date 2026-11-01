@@ -45,31 +45,85 @@ let C; // ctx from app.js: {id, watch, status, busy, fail, applyT}
 let D; // {sc, sha, venues, changes}
 
 const label = (o, fallback = '') => o?.[uiLang()] || o?.ru || fallback;
-const opts = (sel, pairs, blank) => sel.replaceChildren(...(blank ? [new Option('—', '')] : []), ...pairs.map(([v, text]) => new Option(text, v)));
-const sesText = (s) => [`${D.sc.days[uiLang()]?.[s.day] ?? s.day} ${s.start}`, label(D.venues[s.venue], s.venue), label(D.sc.kinds?.[s.kind]), label(D.sc.audiences?.[s.audience])].filter(Boolean).join(' · ');
+// keeps the chosen value, so a relabel on language change loses nothing
+function opts(sel, pairs, blank) {
+  const keep = sel.value;
+  sel.replaceChildren(...(blank ? [new Option('—', '')] : []), ...pairs.map(([v, text]) => new Option(text, v)));
+  if ([...sel.options].some((o) => o.value === keep)) sel.value = keep;
+}
+const days = () => D.sc.days[uiLang()] ?? D.sc.days.ru;
+const kindText = (k) => label(D.sc.kinds?.[k], k === 'regular' ? t('kindRegular') : k);
+const sesText = (s) => [`${days()[s.day] ?? s.day} ${s.start}`, label(D.venues[s.venue], s.venue), label(D.sc.kinds?.[s.kind]), label(D.sc.audiences?.[s.audience])].filter(Boolean).join(' · ');
+const dayBox = (d) => $(`#ses-rows .day[data-day="${d}"]`);
+const field = (row, n) => $(`[name="${n}"]`, row);
 
-function addRow(s = {}) {
+function rowOpts(row) {
+  opts(field(row, 'day'), days().map((d, i) => [i, d]));
+  opts(field(row, 'venue'), Object.keys(D.venues).map((k) => [k, label(D.venues[k], k)]));
+  opts(field(row, 'kind'), Object.keys(D.sc.kinds ?? {}).map((k) => [k, kindText(k)]));
+}
+
+function rowSum(row) {
+  const f = (n) => field(row, n).value;
+  const grades = f('g0') && `${f('g0')}–${f('g1')}`.replace(/–$/, '+');
+  const group = label(D.sc.kinds?.[f('kind')]) || label(D.sc.audiences?.[row.orig.audience]) || grades;
+  $('summary', row).textContent = [`${f('start')}–${f('end')}`, label(D.venues[f('venue')], f('venue')), group].filter(Boolean).join(' · ');
+}
+
+function daySum(d) {
+  const box = dayBox(d);
+  $('summary', box).textContent = `${days()[d]} (${box.querySelectorAll('.ses').length})`;
+}
+
+// order = index in the file, so grouping by day never reorders the saved sessions
+function addRow(s = {}, order = 1e9) {
   const row = $('#ses-row').content.firstElementChild.cloneNode(true);
   C.applyT(row);
-  row.orig = s;
-  const f = (n) => $(`[name="${n}"]`, row);
-  opts(f('day'), (D.sc.days[uiLang()] ?? D.sc.days.ru).map((d, i) => [i, d]));
-  opts(f('venue'), Object.keys(D.venues).map((k) => [k, label(D.venues[k], k)]));
-  opts(f('kind'), Object.keys(D.sc.kinds ?? {}).map((k) => [k, label(D.sc.kinds[k], k === 'regular' ? t('kindRegular') : k)]));
-  f('day').value = s.day ?? 0;
-  f('start').value = s.start ?? '';
-  f('end').value = s.end ?? '';
-  if (s.venue) f('venue').value = s.venue;
-  if (s.kind) f('kind').value = s.kind;
-  f('g0').value = s.grades?.[0] ?? '';
-  f('g1').value = s.grades?.[1] ?? '';
-  $('.rm', row).addEventListener('click', () => row.remove());
-  $('#ses-rows').append(row);
+  Object.assign(row, { orig: s, order });
+  rowOpts(row);
+  const set = (n, v) => (field(row, n).value = v ?? '');
+  set('day', s.day ?? 0);
+  for (const n of ['start', 'end', 'venue', 'kind']) if (s[n]) set(n, s[n]);
+  set('g0', s.grades?.[0]);
+  set('g1', s.grades?.[1]);
+  rowSum(row);
+  row.addEventListener('input', () => rowSum(row));
+  field(row, 'day').addEventListener('change', (e) => {
+    const from = row.closest('.day').dataset.day;
+    $('.list', dayBox(e.target.value)).append(row);
+    daySum(from);
+    daySum(e.target.value);
+  });
+  $('.rm', row).addEventListener('click', () => {
+    const d = row.closest('.day').dataset.day;
+    row.remove();
+    daySum(d);
+  });
+  $('.list', dayBox(s.day ?? 0)).append(row);
+  return row;
+}
+
+function renderSessions() {
+  // a reload after save keeps the days the coach had open
+  const open = new Set([...$('#ses-rows').querySelectorAll('.day[open]')].map((x) => x.dataset.day));
+  $('#ses-rows').replaceChildren(...days().map((_, d) => {
+    const box = $('#ses-day').content.firstElementChild.cloneNode(true);
+    C.applyT(box);
+    box.dataset.day = d;
+    box.open = open.has(String(d));
+    $('.add', box).addEventListener('click', () => {
+      addRow({ day: d }).open = true;
+      daySum(d);
+    });
+    return box;
+  }));
+  (D.sc.sessions ?? []).forEach((s, i) => addRow(s, i));
+  days().forEach((_, d) => daySum(d));
 }
 
 function collectSessions() {
-  return [...$('#ses-rows').children].map((row) => {
-    const f = (n) => $(`[name="${n}"]`, row).value;
+  return [...$('#ses-rows').querySelectorAll('.ses')].sort((a, b) => a.order - b.order).map((row) => {
+    const f = (n) => field(row, n).value;
     const num = (n) => (f(n) === '' ? null : Number(f(n)));
     // spread first keeps unknown keys (subgroup, audience, note) and the file's key order
     return { ...row.orig, day: Number(f('day')), venue: f('venue'), start: f('start'), end: f('end'), grades: num('g0') === null ? null : [num('g0'), num('g1')], kind: f('kind') };
@@ -96,6 +150,10 @@ function changeRow({ data: c, sha }) {
 async function loadChanges() {
   const today = jerusalemToday();
   D.changes = (await api('GET', `/content/changes/${enc(C.id)}`)).changes.filter((f) => f.data.to >= today).sort((a, b) => a.data.from.localeCompare(b.data.from));
+  renderChanges();
+}
+
+function renderChanges() {
   $('#chg-list').replaceChildren(...D.changes.map(changeRow));
   $('#chg-none').hidden = D.changes.length > 0;
 }
@@ -128,7 +186,10 @@ function bindOnce(root) {
   if (root.dataset.ready) return;
   root.dataset.ready = '1';
   const form = $('#chg-form');
-  $('#ses-add').addEventListener('click', () => addRow());
+  // a required field inside a collapsed row would block submit with no visible hint
+  $('#ses-form').addEventListener('invalid', (e) => {
+    for (let d = e.target.closest('details'); d; d = d.parentElement.closest('details')) d.open = true;
+  }, true);
   $('#ses-form').addEventListener('submit', (ev) => {
     ev.preventDefault();
     C.status(t('saving'));
@@ -185,8 +246,7 @@ function bindOnce(root) {
 async function load() {
   const r = await api('GET', `/content/schedule/${enc(C.id)}`);
   D = { sc: r.data, sha: r.sha, venues: r.venues ?? {}, changes: [] };
-  $('#ses-rows').replaceChildren();
-  for (const s of D.sc.sessions ?? []) addRow(s);
+  renderSessions();
   opts($('#chg-form').elements.new_venue, Object.keys(D.venues).map((k) => [k, label(D.venues[k], k)]));
   syncType();
   await loadChanges();
@@ -203,4 +263,17 @@ export async function mountSchedule(root, ctx) {
   } catch (e) {
     if (e?.code !== 'not_found') C.fail(e);
   }
+}
+
+/** Re-labels day/venue/group texts after a panel language change, keeping unsaved edits. */
+export function relabelSchedule() {
+  if (!D) return;
+  for (const row of $('#ses-rows').querySelectorAll('.ses')) {
+    rowOpts(row);
+    rowSum(row);
+  }
+  days().forEach((_, d) => daySum(d));
+  opts($('#chg-form').elements.new_venue, Object.keys(D.venues).map((k) => [k, label(D.venues[k], k)]));
+  syncType();
+  renderChanges();
 }

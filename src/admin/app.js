@@ -1,7 +1,7 @@
 import { api, config, setToken, clearToken, hasToken, errText } from './api.js';
-import { LANGS, t, uiLang, setUiLang } from './i18n.js';
+import { LANGS, t, uiLang, setUiLang, store } from './i18n.js';
 import { toWebp, toBase64 } from './photo.js';
-import { mountSchedule } from './schedule.js';
+import { mountSchedule, relabelSchedule } from './schedule.js';
 
 const $ = (s, root = document) => root.querySelector(s);
 const show = (s, on = true) => ($(s).hidden = !on);
@@ -100,7 +100,24 @@ async function signedIn(me) {
   if (me.role === 'owner') loadAccess().catch((e) => status(errText(e), 'bad'));
   window.addEventListener('hashchange', route);
   route();
+  openCard();
 }
+
+/* ---- cards: one open at a time (details name=card), last one remembered per viewer ---- */
+
+const cardKey = () => `adminCard:${S.me?.email ?? ''}`;
+
+function openCard() {
+  const own = S.coaches.find((c) => c.id === $('#coach').value);
+  const ok = ['profile', 'photo', ...(own?.schedule ? ['weekly', 'changes'] : []), ...(TG ? [] : ['telegram']), ...(S.me.role === 'owner' ? ['access'] : [])];
+  const saved = store.get(cardKey());
+  const name = ok.includes(saved) ? saved : own?.schedule ? 'changes' : 'profile';
+  $(`details[data-card="${name}"]`).open = true;
+}
+
+document.addEventListener('toggle', (e) => {
+  if (e.target.matches?.('details.card') && e.target.open && S.me) store.set(cardKey(), e.target.dataset.card);
+}, true);
 
 /* ---- coach picker ---- */
 
@@ -135,16 +152,25 @@ $('#coach').addEventListener('change', (e) => (location.hash = `coach=${e.target
 const tri = (prefix) => Object.fromEntries(LANGS.map((l) => [l, form.elements[`${prefix}.${l}`]]));
 const paraBox = (list) => $(`[data-list="${list}"] .paras`, form);
 
+// collapsed paragraph shows its first line, in the panel language when there is one
+function paraSum(fs) {
+  const text = [uiLang(), ...LANGS].map((l) => $(`[data-lang="${l}"]`, fs).value.trim()).find(Boolean);
+  $('summary', fs).textContent = text?.split('\n')[0] || t('paragraph');
+}
+
 function addPara(list, p = {}) {
   const fs = $('#para').content.firstElementChild.cloneNode(true);
   applyT(fs);
   for (const l of LANGS) $(`[data-lang="${l}"]`, fs).value = p[l] ?? '';
   $('.rm', fs).addEventListener('click', () => fs.remove());
+  fs.addEventListener('input', () => paraSum(fs));
+  paraSum(fs);
   paraBox(list).append(fs);
+  return fs;
 }
 
 for (const fs of form.querySelectorAll('[data-list]')) {
-  $('.add', fs).addEventListener('click', () => addPara(fs.dataset.list));
+  $('.add', fs).addEventListener('click', () => (addPara(fs.dataset.list).open = true));
 }
 
 // Every translatable text as {key, els: {he, ru, en}}; key is what /translate sees.
@@ -393,6 +419,8 @@ $('#uilang').addEventListener('change', (e) => {
   setUiLang(e.target.value);
   applyT();
   if (S.me) fillCoachSelects();
+  form.querySelectorAll('.para').forEach(paraSum);
+  relabelSchedule();
   if (S.me?.role === 'owner') loadAccess().catch(() => {});
 });
 

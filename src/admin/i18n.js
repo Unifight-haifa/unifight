@@ -298,6 +298,12 @@ export const T = {
 
 let cur;
 
+// localStorage throws when the browser blocks it; a lost preference must not break the panel.
+export const store = {
+  get: (k) => { try { return globalThis.localStorage?.getItem(k) ?? null; } catch { return null; } },
+  set: (k, v) => { try { globalThis.localStorage?.setItem(k, v); } catch { /* keep going without it */ } },
+};
+
 // language_code is read from the signed initData string, never the unsigned copy.
 function tgLang() {
   try {
@@ -310,7 +316,7 @@ function tgLang() {
 
 export function uiLang() {
   if (cur) return cur;
-  const pick = [globalThis.localStorage?.getItem('adminLang'), tgLang(), globalThis.navigator?.language]
+  const pick = [store.get('adminLang'), tgLang(), globalThis.navigator?.language]
     .map((l) => String(l || '').slice(0, 2).replace('iw', 'he'))
     .find((l) => LANGS.includes(l));
   return (cur = pick || 'ru');
@@ -318,7 +324,7 @@ export function uiLang() {
 
 export function setUiLang(l) {
   cur = LANGS.includes(l) ? l : 'ru';
-  globalThis.localStorage?.setItem('adminLang', cur);
+  store.set('adminLang', cur);
   document.documentElement.lang = cur;
   document.documentElement.dir = cur === 'he' ? 'rtl' : 'ltr';
   document.title = T[cur].title;
