@@ -35,13 +35,14 @@ const fail = (e) => C.status(errText(e), 'bad');
 let F; // {id, data, sha}
 const imgSrc = (src) => `${import.meta.env.BASE_URL}${src.includes('/') ? src : `img-night/${src}`}`;
 
-// list items are named by their own label or name, not by index; LRI..PDI keeps the path order on an RTL page
+// list items are named by their own label or name, not by index; the path runs in the panel's direction,
+// each part isolated (FSI..PDI) so a Latin name like Facebook can't flip the order in Hebrew
 function title(path) {
-  return '\u2066' + path.map((k, i) => {
+  return (uiLang() === 'he' ? '\u2067' : '\u2066') + path.map((k, i) => {
     if (!/^\d+$/.test(k)) return fieldLabel(k);
     const item = getAt(F.data, path.slice(0, i + 1));
     return item?.label || item?.name?.[uiLang()] || item?.name?.ru || String(Number(k) + 1);
-  }).join(' › ') + '\u2069';
+  }).map((s) => `\u2068${s}\u2069`).join(' › ') + '\u2069';
 }
 
 function input(value, { lang, rows }) {
