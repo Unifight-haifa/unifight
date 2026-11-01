@@ -31,10 +31,13 @@ jobs:
           private-key: ${{ secrets.PANEL_APP_KEY }}
           owner: ${{ github.repository_owner }}
           repositories: ${{ github.event.repository.name }}
+          permission-contents: write
+          permission-pull-requests: write
       - uses: actions/checkout@v7
         with:
           ref: main
-          token: ${{ steps.app.outputs.token }}
+          # the App token goes only to the push/PR step below
+          persist-credentials: false
       - uses: actions/checkout@v7
         with:
           repository: ${{ env.INBOX_REPO }}
@@ -71,7 +74,8 @@ jobs:
           git add src/assets/gallery content/gallery.json
           { echo "Gallery: add submitted photos"; echo
             cat "$RUNNER_TEMP/added.txt"; } | git commit -s -F -
-          git push origin "HEAD:refs/heads/$BRANCH"
+          origin="https://x-access-token:$GH_TOKEN@github.com/$GITHUB_REPOSITORY"
+          git push "$origin" "HEAD:refs/heads/$BRANCH"
           gh pr create --base main --head "$BRANCH" \
             --title "Gallery: add submitted photos" \
             --body-file "$RUNNER_TEMP/added.txt"
