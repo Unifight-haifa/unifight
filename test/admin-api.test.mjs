@@ -154,9 +154,9 @@ const COACH = 'coach@example.com';
 const EDITOR = 'editor@example.com';
 const OWNER = 'owner@example.com';
 
-function setup(over = {}) {
+function setup(over = {}, extra = []) {
   const repo = fakeRepo();
-  const { env, s } = ghEnv(repo.handlers);
+  const { env, s } = ghEnv([...extra, ...repo.handlers]);
   const e = makeEnv({ ...env, ...over });
   e.DB.db.exec(`INSERT INTO users (email, coach_id, role) VALUES ('${COACH}', 'natanel-zhurovel', 'coach'), ('${EDITOR}', NULL, 'editor')`);
   const call = async (method, path, body, email = COACH) => {
@@ -427,6 +427,130 @@ test('change.delete trusts the file schedule, not the id the coach sends', async
   assert.ok(!t.repo.files.has(CH));
   const last = [...t.repo.commits.values()].at(-1);
   assert.equal(last.message.split('\n')[0], 'Schedule: Natanel Zhurovel, removed cancel 2026-11-03');
+});
+
+// ---- translate, deploy status, failure notices ----
+function anthropic(reply = { he: { bio: 'ביו' }, ru: { bio: 'Тренеры клуба' }, en: { bio: 'Bio' } }) {
+  const seen = [];
+  return { seen, handler: ['POST', /api\.anthropic\.com\/v1\/messages$/, async (req) => { seen.push(await req.json()); return { content: [{ text: JSON.stringify(reply) }] }; }] };
+}
+
+test('/translate: glossary from main, coach name in the prompt, daily cap, size and key checks', async () => {
+  const a = anthropic();
+  const t = setup({ ANTHROPIC_KEY: 'k' }, [a.handler]);
+  const r = await t.call('POST', '/translate', { source_lang: 'en', context: 'coach-bio', coach: 'natanel-zhurovel', fields: { bio: 'Coaches kids' } });
+  assert.equal(r.status, 200, JSON.stringify(r.body));
+  assert.deepEqual(r.body, { he: { bio: 'ביו' }, ru: { bio: 'Тренера клуба' }, en: { bio: 'Coaches kids' } });
+  const { system } = a.seen[0];
+  assert.match(system, /bio of Natanel Zhurovel\./);
+  assert.ok(json('content/glossary.json').rules.every((x) => system.includes(x)));
+  assert.ok(t.repoCalls().some((c) => c.url.includes('/contents/content/glossary.json?ref=main')));
+
+  await t.call('POST', '/translate', { context: 'coach-bio', coach: 'natanel-zhurovel', fields: { bio: 'Тренирует детей' } });
+  assert.match(a.seen[1].system, /bio of Натанель Журовель\./);
+
+  assert.equal((await t.call('POST', '/translate', { context: 'coach-bio', coach: 'ilana-kratysh', fields: { bio: 'x' } })).status, 403);
+  let x = await t.call('POST', '/translate', { context: 'schedule-note', fields: { note: 'a'.repeat(4001) } });
+  assert.deepEqual([x.status, x.body.error], [400, 'invalid']);
+  t.env.DB.db.prepare("INSERT INTO usage (email, day, kind, n) VALUES (?, ?, 'translate', 60) ON CONFLICT DO UPDATE SET n = 60").run(COACH, new Date().toISOString().slice(0, 10));
+  x = await t.call('POST', '/translate', { context: 'schedule-note', fields: { note: 'Class moved' } });
+  assert.deepEqual([x.status, x.body.error], [429, 'rate_limited']);
+  assert.equal(a.seen.length, 2);
+
+  const u = setup({}, [a.handler]);
+  assert.deepEqual((await u.call('POST', '/translate', { context: 'schedule-note', fields: { note: 'x' } })).body, { error: 'not_configured' });
+});
+
+const SHA_A = 'a'.repeat(40);
+const SHA_B = 'b'.repeat(40);
+// runs: {sha: run}; jobs: {runId: jobs}; mainRuns: list for ?branch=main
+function actions(state) {
+  return [
+    ['GET', /\/actions\/runs\?head_sha=(\w+)&event=push$/, (_, m) => ({ workflow_runs: state.runs[m[1]] ? [state.runs[m[1]]] : [] })],
+    ['GET', /\/actions\/runs\/(\d+)\/jobs$/, (_, m) => ({ jobs: state.jobs[m[1]] ?? [] })],
+    ['GET', /\/actions\/runs\?branch=main&event=push$/, () => ({ workflow_runs: state.main ?? [] })],
+  ];
+}
+const run = (id, status, conclusion, created_at = '2026-11-01T10:00:00Z') => ({ id, name: 'Deploy to GitHub Pages', status, conclusion, created_at });
+const edit = (t, sha, email = COACH, created = Math.floor(Date.now() / 1000)) =>
+  t.env.DB.db.prepare("INSERT INTO edits (sha, email, coach_id, op, created, status) VALUES (?, ?, 'natanel-zhurovel', 'coach.text', ?, 'pending')").run(sha, email, created);
+const FAILED_JOBS = [{ conclusion: 'success', steps: [] }, { conclusion: 'failure', steps: [{ name: 'Set up job', conclusion: 'success' }, { name: 'Run withastro/action@v6', conclusion: 'failure' }] }];
+
+test('/status maps runs to pending, live and failed with the failed step, and stores it', async () => {
+  const st = { runs: {}, jobs: {} };
+  const t = setup({}, actions(st));
+  edit(t, SHA_A);
+  const status = async (who) => (await t.call('GET', `/status/${SHA_A}`, null, who)).body;
+  const row = () => ({ ...t.env.DB.db.prepare('SELECT status, conclusion FROM edits WHERE sha = ?').get(SHA_A) });
+  assert.deepEqual(await status(), { state: 'pending' });
+  st.runs[SHA_A] = run(7, 'in_progress', null);
+  assert.deepEqual(await status(), { state: 'pending' });
+  st.runs[SHA_A] = run(7, 'completed', 'failure');
+  st.jobs[7] = FAILED_JOBS;
+  assert.deepEqual(await status(), { state: 'failed', step: 'Run withastro/action@v6' });
+  assert.deepEqual(row(), { status: 'failed', conclusion: 'Run withastro/action@v6' });
+  assert.deepEqual(await status(EDITOR), { state: 'failed', step: 'Run withastro/action@v6' });
+
+  edit(t, SHA_B, OWNER);
+  st.runs[SHA_B] = run(8, 'completed', 'success');
+  assert.equal((await t.call('GET', `/status/${SHA_B}`)).status, 404, 'coach reads only their own edits');
+  assert.deepEqual((await t.call('GET', `/status/${SHA_B}`, null, OWNER)).body, { state: 'live' });
+  assert.equal({ ...t.env.DB.db.prepare('SELECT status FROM edits WHERE sha = ?').get(SHA_B) }.status, 'live');
+  assert.equal((await t.call('GET', `/status/${'c'.repeat(40)}`, null, OWNER)).status, 404);
+  assert.equal((await t.call('GET', '/status/not-a-sha', null, OWNER)).status, 404);
+});
+
+test('cancelled run: live after a later green push run, else pending; no notice either way', async () => {
+  const { sweep } = await import('../integrations/admin-api/src/status.mjs');
+  const { runState } = await import('../integrations/admin-api/src/status.mjs');
+  const tg = [];
+  const st = { runs: { [SHA_A]: run(9, 'completed', 'cancelled') }, jobs: {}, main: [run(10, 'completed', 'failure', '2026-11-01T10:05:00Z'), run(9, 'completed', 'cancelled')] };
+  const t = setup({}, [...actions(st), ['POST', /api\.telegram\.org/, async (req) => { tg.push(await req.json()); return { ok: true }; }]]);
+  assert.deepEqual(await runState(t.env, SHA_A), { state: 'pending' });
+  st.main.unshift(run(11, 'completed', 'success', '2026-11-01T10:09:00Z'));
+  assert.deepEqual(await runState(t.env, SHA_A), { state: 'live' });
+  st.main = [run(1, 'completed', 'success', '2026-11-01T09:00:00Z')];
+  edit(t, SHA_A);
+  t.env.DB.db.exec(`INSERT INTO tg_links (telegram_id, email) VALUES ('5550001', '${COACH}')`);
+  await sweep(t.env);
+  assert.equal(tg.length, 0);
+  assert.equal({ ...t.env.DB.db.prepare('SELECT status FROM edits').get() }.status, 'pending');
+});
+
+test('sweep: one notice per failed edit to the coach and owners, never twice, no email; no token = statuses only', async () => {
+  const { sweep } = await import('../integrations/admin-api/src/status.mjs');
+  const tg = [];
+  const st = { runs: { [SHA_A]: run(7, 'completed', 'failure'), [SHA_B]: run(8, 'completed', 'success') }, jobs: { 7: FAILED_JOBS } };
+  const telegram = ['POST', /api\.telegram\.org\/bot123:TEST\/sendMessage$/, async (req) => { tg.push(await req.json()); return { ok: true }; }];
+  const t = setup({}, [...actions(st), telegram]);
+  edit(t, SHA_A);
+  edit(t, SHA_B);
+  edit(t, 'd'.repeat(40), COACH, Math.floor(Date.now() / 1000) - 3 * 3600);
+  t.env.DB.db.exec(`INSERT INTO tg_links (telegram_id, email) VALUES ('5550001', '${COACH}'), ('5550002', '${OWNER}'), ('5550003', '${EDITOR}')`);
+  await sweep(t.env);
+  assert.deepEqual(tg.map((m) => m.chat_id).sort(), ['5550001', '5550002']);
+  assert.match(tg.find((m) => m.chat_id === '5550001').text, /^Сайт не собрался на шаге «Run withastro\/action@v6»\. Ваше изменение не опубликовано, владелец знает\./);
+  assert.ok(tg.every((m) => ![COACH, OWNER, 'example.com'].some((e) => m.text.includes(e))));
+  const rows = Object.fromEntries(t.env.DB.db.prepare('SELECT sha, status, notified FROM edits').all().map((r) => [r.sha[0], [r.status, r.notified]]));
+  assert.deepEqual(rows, { a: ['failed', 1], b: ['live', 0], d: ['pending', 0] });
+  assert.ok(!t.s.calls.some((c) => c.url.includes(`head_sha=${'d'.repeat(40)}`)), 'old edits are left alone');
+  await sweep(t.env);
+  assert.equal(tg.length, 2);
+
+  const u = setup({ TG_BOT_TOKEN: undefined }, [...actions(st), telegram]);
+  edit(u, SHA_A);
+  u.env.DB.db.exec(`INSERT INTO tg_links (telegram_id, email) VALUES ('5550001', '${COACH}')`);
+  await sweep(u.env);
+  assert.equal(tg.length, 2);
+  assert.deepEqual({ ...u.env.DB.db.prepare('SELECT status, notified FROM edits').get() }, { status: 'failed', notified: 0 });
+});
+
+test('scheduled() hands the sweep to waitUntil', async () => {
+  const t = setup();
+  const waits = [];
+  await worker.scheduled({}, t.env, { waitUntil: (p) => waits.push(p) });
+  assert.equal(waits.length, 1);
+  await waits[0];
 });
 
 test('no commit message carries an email or a Telegram id', () => {

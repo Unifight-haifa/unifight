@@ -6,8 +6,11 @@ import { checkTranslations } from '../../../src/lib/integrity.mjs';
 import { checkSchedule } from '../../../src/lib/schedule-check.mjs';
 import { checkChanges } from '../../../src/lib/schedule-changes.mjs';
 import { checkCoachWebp } from '../../../src/lib/image-check.mjs';
+import { buildPrompt, detectLang } from '../../../src/lib/translate-prompt.mjs';
+import { translate } from './translate.mjs';
 
 const SAVES_PER_DAY = 30;
+const TRANSLATES_PER_DAY = 60;
 // Kana and CJK ideographs: build.py fails on any kanji word missing from content/kanji.json.
 const CJK = /[぀-ヿ㐀-鿿豈-﫿]/;
 const LANGS = ['he', 'ru', 'en'];
@@ -241,4 +244,24 @@ route('POST', '/save', guard(async ({ env, user, body }) => {
   await env.DB.prepare("INSERT INTO edits (sha, email, coach_id, op, created, status) VALUES (?, ?, ?, ?, ?, 'pending')")
     .bind(sha, user.email, spec.coach(id), op, Math.floor(Date.now() / 1000)).run();
   return json({ sha, ...c.out });
+}));
+
+route('POST', '/translate', guard(async ({ env, user, body }) => {
+  if (!env.ANTHROPIC_KEY) return fail(503, 'not_configured');
+  const { source_lang, context = 'coach-bio', coach, fields } = body;
+  if (!['coach-bio', 'schedule-note'].includes(context)) return invalid('unknown context');
+  // buildPrompt's own checks (empty, over MAX_CHARS) run before a daily slot is spent.
+  try { buildPrompt({ fields, context }); } catch (e) { return invalid(e.message); }
+  if (coach !== undefined && !(await allowed(env, user, 'coach.text', { coach }))) return fail(403, 'forbidden');
+  if ((await take(env, user.email, new Date().toISOString().slice(0, 10), 'translate')) > TRANSLATES_PER_DAY) return fail(429, 'rate_limited');
+  const src = LANGS.includes(source_lang) ? source_lang : detectLang(Object.values(fields).join(' '));
+  // The prompt names the coach so the model writes about them; the slug would read as a word.
+  const name = coach === undefined ? undefined : (await readJson(env, coachPath(coach)))?.data?.name;
+  const glossary = (await readJson(env, 'content/glossary.json'))?.data ?? {};
+  try {
+    return json(await translate(env, { glossary, source_lang: src, fields, context, coach: name?.[src] || name?.en }, env.__fetch ?? fetch));
+  } catch (e) {
+    if (e.message === 'not_configured') return fail(503, 'not_configured');
+    return fail(502, 'translate', e.message === 'translation incomplete' ? e.message : undefined);
+  }
 }));

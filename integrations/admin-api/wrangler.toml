@@ -11,7 +11,7 @@ BRANCH = "main"
 TG_BOT_USERNAME = ""
 GITHUB_APP_ID = ""
 GITHUB_INSTALLATION_ID = ""
-TRANSLATE_MODEL = ""
+TRANSLATE_MODEL = "claude-sonnet-5-5"
 
 [[d1_databases]]
 binding = "DB"

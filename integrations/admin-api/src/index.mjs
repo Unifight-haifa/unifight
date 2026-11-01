@@ -1,6 +1,7 @@
 import { routes, route, json, fail, list, isOwner, userByEmail, currentUser, take } from './router.mjs';
 import { googleUser, signSession, tgUser, newLinkCode, sha256hex } from './auth.mjs';
 import './content.mjs';
+import { sweep } from './status.mjs';
 
 const now = () => Math.floor(Date.now() / 1000);
 const EMAIL = /^[^\s@,]+@[^\s@,]+\.[^\s@,]+$/;
@@ -142,5 +143,8 @@ export default {
     res = new Response(res.body, res);
     for (const [k, v] of Object.entries(cors)) res.headers.set(k, v);
     return res;
+  },
+  async scheduled(event, env, ctx) {
+    ctx.waitUntil(sweep(env));
   },
 };
