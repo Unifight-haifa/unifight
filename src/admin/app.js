@@ -94,6 +94,7 @@ async function signedIn(me) {
     show('#telegram');
     show('#tg-linked', !!me.telegram);
   }
+  show('#edits');
   S.coaches = (await api('GET', '/coaches')).coaches;
   fillCoachSelects();
   show('#picker', S.coaches.length > 1);
@@ -109,7 +110,7 @@ const cardKey = () => `adminCard:${S.me?.email ?? ''}`;
 
 function openCard() {
   const own = S.coaches.find((c) => c.id === $('#coach').value);
-  const ok = ['profile', 'photo', ...(own?.schedule ? ['weekly', 'changes'] : []), ...(TG ? [] : ['telegram']), ...(S.me.role === 'owner' ? ['access'] : [])];
+  const ok = ['profile', 'photo', ...(own?.schedule ? ['weekly', 'changes'] : []), 'edits', ...(TG ? [] : ['telegram']), ...(S.me.role === 'owner' ? ['access'] : [])];
   const saved = store.get(cardKey());
   const name = ok.includes(saved) ? saved : own?.schedule ? 'changes' : 'profile';
   $(`details[data-card="${name}"]`).open = true;
@@ -258,9 +259,9 @@ form.addEventListener('submit', (ev) => {
   const id = S.coach;
   status(t('saving'));
   busy($('#save'), async () => {
-    const { sha } = await api('POST', '/save', { op: 'coach.text', id, base_sha: S.base.sha, fields: collect() });
+    const r = await api('POST', '/save', { op: 'coach.text', id, base_sha: S.base.sha, fields: collect() });
     clearProposed();
-    watch(sha);
+    watch(r);
     S.base = await api('GET', `/content/coach/${encodeURIComponent(id)}`);
   }).catch(fail);
 });
@@ -333,36 +334,79 @@ $('#ph-save').addEventListener('click', (ev) => {
   status(t('saving'));
   busy(ev.currentTarget, async () => {
     const fields = { webp: toBase64(PH.webp.bytes), face: PH.face };
-    const { sha } = await api('POST', '/save', { op: 'coach.photo', id, base_sha: S.base.sha, fields });
+    const r = await api('POST', '/save', { op: 'coach.photo', id, base_sha: S.base.sha, fields });
     PH.webp = null;
-    watch(sha);
+    watch(r);
     S.base = await api('GET', `/content/coach/${encodeURIComponent(id)}`);
   }).catch(fail).finally(() => ($('#ph-save').disabled = !PH.webp));
 });
 
-/* ---- deploy status ---- */
+/* ---- edit PRs ---- */
 
-function watch(sha) {
+const SETTLED = ['ready', 'failed', 'conflict', 'live', 'live_failed', 'closed'];
+const BAD = ['failed', 'conflict', 'live_failed'];
+const prText = (p) => t(`pr.${p.state}`, { step: p.step || '?' });
+const prKind = (p) => (BAD.includes(p.state) ? 'bad' : p.state === 'live' || p.state === 'ready' ? 'good' : '');
+
+function prLinks(p) {
+  const out = [];
+  for (const [href, key] of [[p.preview, 'pr.preview'], [p.url, 'pr.link']]) {
+    if (!/^https:\/\//.test(href ?? '')) continue;
+    out.push(Object.assign(document.createElement('a'), { href, textContent: t(key), target: '_blank', rel: 'noopener' }));
+  }
+  return out;
+}
+
+// r: the /save response; the PR link arrives with the first poll
+function watch(r) {
   clearInterval(S.poll);
-  status(t('st.pending'));
+  status(t('pr.checks'));
+  $('#pr-links').replaceChildren(...prLinks(r));
   let n = 0;
   const done = (text, kind) => {
     clearInterval(S.poll);
     S.poll = 0;
     status(text, kind);
+    if ($('details[data-card="edits"]').open) loadPrs().catch(() => {});
   };
   S.poll = setInterval(async () => {
     n++;
     try {
-      const s = await api('GET', `/status/${encodeURIComponent(sha)}`);
-      if (s.state === 'live') return done(t('st.live'), 'good');
-      if (s.state === 'failed') return done(t('st.failed', { step: s.step || '?' }), 'bad');
+      const p = await api('GET', `/prs/${encodeURIComponent(r.pr)}`);
+      $('#pr-links').replaceChildren(...prLinks(p));
+      if (SETTLED.includes(p.state)) return done(prText(p), prKind(p));
     } catch {
-      // a missed poll is not a failed build; the next tick retries
+      // a missed poll is not a failed check; the next tick retries
     }
-    if (n >= POLL_MAX) done(t('st.timeout'), 'bad');
+    if (n >= POLL_MAX) done(t('pr.later'));
   }, POLL_MS);
 }
+
+function prRow(p) {
+  const li = document.createElement('li');
+  const title = Object.assign(document.createElement('b'), { textContent: p.title || `#${p.number}` });
+  const state = Object.assign(document.createElement('span'), { className: prKind(p), textContent: `${p.who} · ${prText(p)}` });
+  const links = Object.assign(document.createElement('div'), { className: 'links' });
+  links.append(...prLinks(p));
+  // the Worker refuses non-owners too; the button is only a shortcut
+  if (S.me.role === 'owner' && p.state === 'ready') {
+    const b = Object.assign(document.createElement('button'), { type: 'button', textContent: t('pr.merge') });
+    b.addEventListener('click', () => busy(b, () => api('POST', `/prs/${encodeURIComponent(p.number)}/merge`).then(loadPrs)).catch((e) => status(errText(e), 'bad')));
+    links.append(b);
+  }
+  li.append(title, state, links);
+  return li;
+}
+
+async function loadPrs() {
+  const { prs } = await api('GET', '/prs');
+  $('#pr-list').replaceChildren(...prs.map(prRow));
+  show('#pr-none', !prs.length);
+}
+
+$('details[data-card="edits"]').addEventListener('toggle', (e) => {
+  if (e.target.open) loadPrs().catch((err) => status(errText(err), 'bad'));
+});
 
 /* ---- Access (owner) ---- */
 
@@ -434,6 +478,7 @@ $('#uilang').addEventListener('change', (e) => {
   form.querySelectorAll('.para').forEach(paraSum);
   relabelSchedule();
   if (S.me?.role === 'owner') loadAccess().catch(() => {});
+  if ($('details[data-card="edits"]').open) loadPrs().catch(() => {});
 });
 
 $('#signout').addEventListener('click', () => {
