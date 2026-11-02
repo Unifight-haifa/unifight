@@ -1,6 +1,6 @@
 import type { ImageMetadata } from 'astro';
 import { getRelativeLocaleUrl } from 'astro:i18n';
-import site from '../../content/site.json';
+import { site } from './site';
 import achievementsData from '../../content/achievements.json';
 import beltsData from '../../content/belts.json';
 import historyData from '../../content/history.json';

@@ -1,9 +1,10 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
-import { T, CODES, LANGS } from '../src/admin/i18n.js';
+import { T, CODES, LANGS, FIELD } from '../src/admin/i18n.js';
 import { fitSize, isWebpBlob, toBase64 } from '../src/admin/photo.js';
 import { changeBody, sessionRef } from '../src/admin/schedule.js';
+import { siteFields, getAt, setAt } from '../src/admin/site.js';
 import { checkChanges } from '../src/lib/schedule-changes.mjs';
 
 const dist = new URL('../dist/', import.meta.url);
@@ -18,7 +19,7 @@ test('/admin/ is built, noindex, out of the sitemap and the language trees', () 
   assert.match(html, /<textarea[^>]*name="bio\.he"[^>]*dir="rtl"/);
   // every section is a collapsed card, so a phone sees a short list first
   const cards = [...html.matchAll(/<details class="card" name="card" data-card="([a-z]+)"( open)?/g)];
-  assert.deepEqual(cards.map((m) => m[1]), ['profile', 'photo', 'weekly', 'changes', 'telegram', 'access']);
+  assert.deepEqual(cards.map((m) => m[1]), ['profile', 'photo', 'weekly', 'changes', 'site', 'edits', 'telegram', 'access']);
   assert.ok(cards.every((m) => !m[2]));
   assert.doesNotMatch(html, SECRETS);
 });
@@ -27,7 +28,7 @@ test('UI strings: same keys in he/ru/en, every API error code, «тренера�
   const keys = Object.keys(T.ru).sort();
   for (const l of LANGS) assert.deepEqual(Object.keys(T[l]).sort(), keys, l);
   for (const c of CODES) for (const l of LANGS) assert.ok(T[l][`err.${c}`], `${l} err.${c}`);
-  for (const s of ['pending', 'live', 'failed']) assert.ok(T.ru[`st.${s}`], s);
+  for (const s of ['checks', 'ready', 'failed', 'conflict', 'merged', 'live', 'live_failed', 'closed']) assert.ok(T.ru[`pr.${s}`], s);
   for (const s of Object.values(T.ru)) assert.doesNotMatch(s, /тренеры/i, s);
 });
 
@@ -37,9 +38,9 @@ const pageJs = (html) => [
   ...[...html.matchAll(/<script[^>]+src="[^"]*\/(_astro\/[^"]+\.js)"/g)].map((m) => read(m[1])),
 ].join('\n');
 
-test('the panel script wires sign-in and deploy status, never the unsigned Telegram data', () => {
+test('the panel script wires sign-in and edit PRs, never the unsigned Telegram data', () => {
   const js = pageJs(read('admin/index.html'));
-  for (const s of ['/session/google', '/session/telegram', '/status/', '/save', '/translate', '/access', '/telegram/link-code', 'schedule.sessions', 'change.create', 'change.delete', '/content/changes/']) assert.ok(js.includes(s), s);
+  for (const s of ['/session/google', '/session/telegram', '/prs/', '/save', '/translate', '/access', '/telegram/link-code', 'schedule.sessions', 'change.create', 'change.delete', '/content/changes/', '/content/site/', 'site.text', 'site.image']) assert.ok(js.includes(s), s);
   assert.ok(!js.includes('initDataUnsafe'));
   assert.ok(js.includes('sessionStorage'));
   assert.doesNotMatch(js, SECRETS);
@@ -96,5 +97,33 @@ test('sessionRef adds group only where two classes share day and start, and chec
       const c = { id: 'x', schedule: id, author: id, created: '2026-11-01T00:00:00Z', ...changeBody({ type: 'cancel', date: day, ...ref, note }) };
       assert.equal(checkChanges([['x.json', c]], { [id]: sc }, venues)[0].ses, s, `${id}#${i}`);
     });
+  }
+});
+
+test('siteFields covers every text and link of content/site, skips provenance, round-trips', () => {
+  for (const id of ['contact', 'hero', 'footer', 'ui', 'pages']) {
+    const data = content(`site/${id}.json`);
+    const fs = siteFields(data);
+    const paths = fs.map((f) => f.path.join('.'));
+    assert.ok(fs.length, id);
+    assert.ok(!paths.some((p) => /(^|\.)(source|confidence|note|legal_source|id)$/.test(p)), id);
+    const copy = structuredClone(data);
+    for (const f of fs) setAt(copy, f.path, f.kind === 'one' ? getAt(data, f.path) : { ...getAt(data, f.path) });
+    assert.deepEqual(copy, data, id);
+    if (id === 'contact') {
+      for (const p of ['phones.0.tel', 'phones.0.phone', 'email.value', 'social.0.url', 'social.2']) assert.ok(paths.includes(p), p);
+      // TikTok is a placeholder without a url
+      assert.ok(!paths.includes('social.2.url'));
+    }
+    if (id === 'hero') assert.ok(paths.includes('cta_primary.href'));
+  }
+});
+
+test('every key in a Site card field path has a label in he, ru and en', () => {
+  const used = new Set(['contact', 'hero', 'footer', 'ui', 'pages']
+    .flatMap((id) => siteFields(content(`site/${id}.json`)).flatMap((f) => f.path.filter((k) => !/^\d+$/.test(k)))));
+  for (const k of used) {
+    assert.equal(FIELD[k]?.length, LANGS.length, k);
+    assert.ok(FIELD[k].every((s) => s.trim()), k);
   }
 });

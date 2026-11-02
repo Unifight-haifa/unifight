@@ -4,7 +4,7 @@ import { z } from 'astro/zod';
 import consent from '../content/consent.json';
 import gallery from '../content/gallery.json';
 import history from '../content/history.json';
-import site from '../content/site.json';
+import { site } from './lib/site';
 import techniques from '../content/techniques.json';
 import videos from '../content/videos.json';
 import { checkGallery } from './lib/gallery-check.mjs';

@@ -1,11 +1,11 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
 import vm from 'node:vm';
 
 const json = (p) => JSON.parse(readFileSync(new URL(p, import.meta.url), 'utf8'));
 const read = (p) => readFileSync(new URL(`../dist/${p}`, import.meta.url), 'utf8');
-const site = json('../content/site.json');
+const contact = json('../content/site/contact.json');
 const venues = json('../content/venues.json');
 const LANGS = [['he', 'rtl'], ['ru', 'ltr'], ['en', 'ltr']];
 const form = (html) => html.match(/<form class="lf-f"[\s\S]*?<\/form>/)[0];
@@ -38,7 +38,7 @@ test('the hall select lists exactly the venues in content/venues.json, labelled 
 });
 
 test('with no endpoint the form submits to WhatsApp; with one it posts there', () => {
-  const ep = site.contact.lead_endpoint;
+  const ep = contact.lead_endpoint;
   assert.equal(typeof ep, 'string');
   if (ep) assert.match(ep, /^https:\/\/script\.google\.com\/macros\/s\/[\w-]+\/exec$/);
   const f = form(read('en/index.html'));
@@ -135,4 +135,13 @@ test('Apps Script: no recipient set keeps the row and sends nothing; digest list
   assert.equal(digest.to, 'b@example.org');
   assert.match(digest.subject, /: 1$/);
   assert.ok(digest.body.includes('Тест') && !digest.body.includes('Done'));
+});
+
+test('the club phone lives only in content/site/contact.json, not in code', () => {
+  const root = new URL('../', import.meta.url);
+  const files = ['src', 'scripts'].flatMap((d) => readdirSync(new URL(d, root), { recursive: true }).map((f) => `${d}/${f}`))
+    .filter((f) => !f.startsWith('src/generated/') && /\.(astro|ts|mjs|js|py|sh|css|html|md)$/.test(f));
+  assert.ok(files.length > 50);
+  const hits = files.filter((f) => /972547632054|054-763-2054|972-54-763-2054/.test(readFileSync(new URL(f, root), 'utf8')));
+  assert.deepEqual(hits, []);
 });

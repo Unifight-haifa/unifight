@@ -28,8 +28,9 @@ env:
     || format('https://{0}.github.io', github.repository_owner) }}
   BASE_PATH: >-
     ${{ vars.BASE_PATH || format('/{0}', github.event.repository.name) }}
-  # unset means off; see docs/google-analytics-setup.ru.md
-  PUBLIC_GA_ID: ${{ vars.PUBLIC_GA_ID }}
+  # unset means off; PR previews never count; docs/google-analytics-setup.ru.md
+  PUBLIC_GA_ID: >-
+    ${{ github.event_name != 'pull_request' && vars.PUBLIC_GA_ID || '' }}
   PUBLIC_GSC_VERIFICATION: ${{ vars.PUBLIC_GSC_VERIFICATION }}
   # admin panel; unset shows "not connected", docs/admin-panel-setup.ru.md
   PUBLIC_ADMIN_API: ${{ vars.PUBLIC_ADMIN_API }}
@@ -56,6 +57,20 @@ jobs:
         with:
           # panel commits change only content JSON; rebuild the landing
           build-cmd: npm run gen && npm run build && npm test
+      - name: Preview
+        if: >-
+          github.event_name == 'pull_request'
+          && github.event.pull_request.head.repo.full_name == github.repository
+        # a Cloudflare outage must not block the required check
+        continue-on-error: true
+        uses: cloudflare/wrangler-action@v4
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: >-
+            pages deploy dist
+            --project-name=unifight-preview --branch=${{ github.head_ref }}
+            --commit-hash=${{ github.event.pull_request.head.sha }}
       - run: npm run build:linkcheck
       - uses: lycheeverse/lychee-action@v2
         with:

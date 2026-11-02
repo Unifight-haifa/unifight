@@ -63,10 +63,11 @@ export async function listDir(env, dir, ref) {
  * build(head) -> [{path, content} | {path, base64} | {path, delete: true}] runs on every attempt,
  * so a retry after a moved head recomputes the files from the new head instead of reusing old blobs.
  */
-export async function commitFiles(env, build, message, { retries = 3 } = {}) {
-  const ref = `/git/refs/heads/${env.BRANCH}`;
+export async function commitFiles(env, build, message, { retries = 3, branch = env.BRANCH, create = false } = {}) {
+  checkBranch(branch);
   for (let i = 0; i <= retries; i++) {
-    const head = (await gh(env, 'GET', `/git/ref/heads/${env.BRANCH}`)).object.sha;
+    // A new branch starts from main and is created only after its first commit, so a failed save leaves no ref.
+    const head = (await gh(env, 'GET', `/git/ref/heads/${create ? env.BRANCH : branch}`)).object.sha;
     const baseTree = (await gh(env, 'GET', `/git/commits/${head}`)).tree.sha;
     const files = await build(head);
     const msg = typeof message === 'function' ? await message(head) : message;
@@ -80,11 +81,33 @@ export async function commitFiles(env, build, message, { retries = 3 } = {}) {
     // No author/committer: GitHub then signs the commit as the App bot.
     const c = await gh(env, 'POST', '/git/commits', { message: msg, tree: t.sha, parents: [head] });
     try {
-      await gh(env, 'PATCH', ref, { sha: c.sha, force: false });
+      if (create) await gh(env, 'POST', '/git/refs', { ref: `refs/heads/${branch}`, sha: c.sha });
+      else await gh(env, 'PATCH', `/git/refs/heads/${branch}`, { sha: c.sha, force: false });
       return c.sha;
     } catch (e) {
       if (e.status !== 422) throw e;
     }
   }
-  throw ghError('github: main kept moving', 422);
+  throw ghError(`github: ${branch} kept moving`, 422);
+}
+
+// Branch names end up in an API path segment.
+function checkBranch(branch) {
+  if (!/^[a-z0-9-]+$/.test(branch)) throw new Error(`github: bad branch ${JSON.stringify(branch)}`);
+}
+
+/** -> {number, html_url}; the PR always targets env.BRANCH. */
+export async function openPull(env, { title, head, body }) {
+  const { number, html_url } = await gh(env, 'POST', '/pulls', { title, head, base: env.BRANCH, body });
+  return { number, html_url };
+}
+
+/** Already gone (404) or not deletable (422) both count as done. */
+export async function deleteBranch(env, branch) {
+  checkBranch(branch);
+  try {
+    await gh(env, 'DELETE', `/git/refs/heads/${branch}`);
+  } catch (e) {
+    if (e.status !== 404 && e.status !== 422) throw e;
+  }
 }

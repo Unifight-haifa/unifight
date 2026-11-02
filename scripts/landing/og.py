@@ -9,7 +9,7 @@ from PIL import Image, ImageDraw, ImageFont, features
 
 R = Path(__file__).resolve().parents[2]
 PUB = R / "public"
-C = json.loads((R / "content/site.json").read_text())
+C = {**json.loads((R / "content/site.json").read_text()), **{p.stem: json.loads(p.read_text()) for p in sorted((R / "content/site").glob("*.json"))}}
 FONT_URL = "https://github.com/google/fonts/raw/main/ofl/rubik/Rubik%5Bwght%5D.ttf"
 FONT = Path.home() / ".cache/unifight/Rubik.ttf"
 BG = "img-night/groundwork.jpg"
@@ -62,7 +62,7 @@ def render(lang):
     anchor = "r" if rtl else "l"
     d.rectangle((W - 12, 0, W, H) if rtl else (0, 0, 12, H), fill=RED)
 
-    logo = Image.open(PUB / "brand/logo.png").convert("RGBA")
+    logo = Image.open(PUB / C["images"]["logo"]["src"]).convert("RGBA")
     logo.thumbnail((112, 112), Image.LANCZOS)  # downscale only: the source is 256px
     lx = start - logo.width if rtl else start
     im.paste(logo, (lx, PAD), logo)

@@ -1,7 +1,7 @@
 ---
 import landing from '../../generated/landing.html?raw';
 import js from '../../generated/landing.js?raw';
-import site from '../../../content/site.json';
+import { phone, site } from '../../lib/site';
 import venues from '../../../content/venues.json';
 import geo from '../../../content/venues-geo.json';
 import { Font } from 'astro:assets';
@@ -48,9 +48,9 @@ const club = {
   name: site.club.name[lang],
   description: desc,
   url: abs(getRelativeLocaleUrl(lang)),
-  logo: abs(`${import.meta.env.BASE_URL}${site.club.logo}`),
+  logo: abs(`${import.meta.env.BASE_URL}${site.images.logo.src}`),
   sameAs: site.contact.social.filter((s) => s.confidence === 'confirmed').map((s) => s.url),
-  telephone: '+972-54-763-2054',
+  telephone: phone.ld,
   email: site.contact.email.value,
   sport: 'Judo',
   location: Object.entries(venues).map(([id, v]) => {

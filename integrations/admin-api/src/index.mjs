@@ -2,6 +2,7 @@ import { routes, route, json, fail, list, isOwner, userByEmail, currentUser, tak
 import { googleUser, signSession, tgUser, newLinkCode, sha256hex } from './auth.mjs';
 import './content.mjs';
 import { sweep } from './status.mjs';
+import { sweepPrs } from './prs.mjs';
 
 const now = () => Math.floor(Date.now() / 1000);
 const EMAIL = /^[^\s@,]+@[^\s@,]+\.[^\s@,]+$/;
@@ -145,6 +146,7 @@ export default {
     return res;
   },
   async scheduled(event, env, ctx) {
-    ctx.waitUntil(sweep(env));
+    // PRs first: they share the invocation's subrequest budget with the Phase 5 sweep.
+    ctx.waitUntil(sweepPrs(env).catch((e) => console.error('sweepPrs', e?.status ?? e?.message)).then(() => sweep(env)));
   },
 };

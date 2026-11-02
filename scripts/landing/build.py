@@ -17,7 +17,8 @@ def load(name):
     return json.loads((R / "content" / name).read_text())
 
 
-C, CO, VENUES = load("site.json"), load("coaches/_section.json"), load("venues.json")
+C = {**load("site.json"), **{p.stem: json.loads(p.read_text()) for p in sorted((R / "content/site").glob("*.json"))}}
+CO, VENUES = load("coaches/_section.json"), load("venues.json")
 COACHES = sorted((load(f"coaches/{p.name}") for p in (R / "content/coaches").glob("[!_]*.json")), key=lambda c: c["order"])
 # coaches edit their files from the panel; color goes into style="" unescaped
 for _c in COACHES:
@@ -28,10 +29,13 @@ SC = load("schedule/natanel-zhurovel.json")  # days, grade letters, slogan and v
 SCHEDS = {c["id"]: load(f"schedule/{c['id']}.json") for c in COACHES if (R / f"content/schedule/{c['id']}.json").exists()}
 VIDEOS = {v["id"]: v for v in load("videos.json")}
 LANGS = ("he", "ru", "en")
-WA = "https://wa.me/972547632054"
-WA_NUM = "054-763-2054"
+P0 = C["contact"]["phones"][0]  # the club's WhatsApp and tel number
+WA = "https://wa.me/" + re.sub(r"\D", "", P0["tel"])
+WA_NUM = P0["phone"]
+TEL = html.escape(P0["tel"])
 USED = []  # local asset paths, in order of first use
 PHOTO_ALT = C["photos"]["alt"]
+IMAGES = C["images"]  # slot -> {src, alt?}
 SITE, PFX = True, "%BASE%"
 PREVIEW = Path(sys.argv[sys.argv.index("--preview") + 1]) if "--preview" in sys.argv else None
 
@@ -110,9 +114,14 @@ def img(name, cls="", eager=False, alt=None):
         USED.append(p)
     w, h = Image.open(PUB / p).size
     load = 'fetchpriority="high"' if eager else 'loading="lazy"'
-    a = PHOTO_ALT.get(name, "") if alt is None else alt
+    a = PHOTO_ALT.get(Path(name).name, "") if alt is None else alt
     a = f'alt="{html.escape(a)}"' if isinstance(a, str) else attr("alt", a)
     return f'<img class="{cls}" src="{PFX}{p}" width="{w}" height="{h}" {a} {load} decoding="async">'
+
+
+def slot(name, cls="", eager=False):
+    s = IMAGES[name]
+    return img(s["src"], cls, eager, s.get("alt"))
 
 
 def nav_label(i):
@@ -132,7 +141,7 @@ def wa(label, placement, extra="", msg=None):
     """msg: {he, ru, en} text prefilled in the chat, in the page language."""
     href = attr("href", {l: f"{WA}?text={urllib.parse.quote(msg[l])}" for l in LANGS}) if msg else f'href="{WA}"'
     return (f'<div class="wa-row {extra}"><a class="btn btn-wa" {href} target="_blank" rel="noopener" {ga("whatsapp_click", placement=placement)}>{WA_SVG}{t(label)}</a>'
-            f'<a class="wa-num" href="tel:+972547632054" {ga("phone_click", placement=placement)}>{ltr(WA_NUM)}</a></div>')
+            f'<a class="wa-num" href="tel:{TEL}" {ga("phone_click", placement=placement)}>{ltr(WA_NUM)}</a></div>')
 
 
 def head(nav_id, kanji, title, intro=None):
@@ -157,7 +166,7 @@ def split_dash(o):
 
 # ---------- sections ----------
 club, hero, kids, fc = C["club"], C["hero"], C["kids"], C["kids"]["first_class"]
-LOGO = "brand/logo.png"
+LOGO = IMAGES["logo"]["src"]
 USED.append(LOGO)
 
 
@@ -215,7 +224,7 @@ def hero_sec():
         h1 += f'<span data-l="{l}">{one(l, a + ".")} <span class="g">{one(l, b)}</span></span>'
     return f'''
 <section class="hero" id="top">
- <div class="hero-media">{img("groundwork.jpg", eager=True)}</div>
+ <div class="hero-media">{slot("hero", eager=True)}</div>
  <svg class="enso" viewBox="0 0 400 400" aria-hidden="true"><circle cx="200" cy="200" r="186"/></svg>
  <div class="hero-kanji kj" aria-hidden="true"><span>柔道</span></div>
  <div class="wrap hero-c">
@@ -223,8 +232,8 @@ def hero_sec():
   <h1 class="h1">{h1}</h1>
   <p class="hero-p">{t(hero["subline"])}</p>
   <div class="cta-row">
-   <a class="btn btn-wa btn-lg" href="{hero["cta_primary"]["href"]}">{t(hero["cta_primary"])} {ARROW}</a>
-   <a class="btn btn-ghost btn-lg" href="{hero["cta_secondary"]["href"]}">{t(hero["cta_secondary"])}</a>
+   <a class="btn btn-wa btn-lg" href="{html.escape(hero["cta_primary"]["href"])}">{t(hero["cta_primary"])} {ARROW}</a>
+   <a class="btn btn-ghost btn-lg" href="{html.escape(hero["cta_secondary"]["href"])}">{t(hero["cta_secondary"])}</a>
   </div>
   <p class="hero-disc"><span class="kj" aria-hidden="true">柔</span>{t(club["disciplines"])}</p>
  </div>
@@ -393,7 +402,7 @@ def achievements():
   {more_link(a, "achievements/")}
   <div class="cta-band rv">
    <p class="cta-line">{t(C["taglines"][2])}</p>
-   <div class="cta-row"><a class="btn btn-wa btn-lg" href="{hero["cta_primary"]["href"]}">{t(hero["cta_primary"])} {ARROW}</a></div>
+   <div class="cta-row"><a class="btn btn-wa btn-lg" href="{html.escape(hero["cta_primary"]["href"])}">{t(hero["cta_primary"])} {ARROW}</a></div>
   </div>
  </div>
 </section>'''
@@ -402,7 +411,7 @@ def achievements():
 def history():
     hi = C["history"]
     items = "".join(f'<li class="tl-i rv"><span class="tl-y">{ltr(i["year"])}</span><h3 class="h3 tl-t">{t(i["title"])}</h3><p>{t(i["text"])}</p></li>' for i in hi["items"])
-    strip = "".join(f'<figure>{img(n, "pic")}</figure>' for n in C["photos"]["gallery_strip"] if n != "groundwork.jpg")
+    strip = "".join(f'<figure>{img(n, "pic")}</figure>' for n in C["photos"]["gallery_strip"] if n != IMAGES["hero"]["src"])
     return f'''
 <section class="sec tatami" id="history">
  <div class="wrap">
@@ -466,22 +475,7 @@ def camps():
 </section>'''
 
 
-SCHED_UI = {
-    "heading": {"he": "עונת 2026/27", "ru": "Сезон 2026/27", "en": "Season 2026/27"},
-    "coach_q": {"he": "עם מי?", "ru": "Тренер", "en": "Coach"},
-    "adults": {"he": "מבוגרים", "ru": "Взрослые", "en": "Adults"},
-    "grade_q": {"he": "באיזו כיתה הילד/ה?", "ru": "В каком классе ребёнок?", "en": "Your child's grade?"},
-    "venue_q": {"he": "איפה נוח לכם?", "ru": "Где удобнее?", "en": "Which venue?"},
-    "all": {"he": "הכול", "ru": "Все", "en": "All"},
-    "today": {"he": "היום", "ru": "сегодня", "en": "today"},
-    "none_day": {"he": "אין אימון מתאים ביום הזה", "ru": "В этот день подходящих тренировок нет", "en": "No matching class this day"},
-    "none_all": {"he": "לא מצאנו קבוצה מתאימה — כתבו לנו ונמצא פתרון.", "ru": "Подходящей группы не нашлось — напишите нам, подберём.", "en": "No matching group — message us and we'll sort it out."},
-    "others": {"he": "לוחות האימונים של שאר המאמנים יעלו בקרוב.", "ru": "Расписание групп других тренеров скоро появится.", "en": "Other coaches' schedules are coming soon."},
-    "join": {"he": "הרשמה לקבוצה", "ru": "Записаться", "en": "Join"},
-    "days": {"he": "ימי השבוע", "ru": "Дни недели", "en": "Days of the week"},
-    "count": {"he": "אימונים מתאימים: ", "ru": "Подходящих тренировок: ", "en": "Matching classes: "},
-    "wa_msg": {"he": "שלום! אשמח להצטרף לאימון: ", "ru": "Здравствуйте! Хотим записаться на тренировку: ", "en": "Hi! We'd like to join this class: "},
-}
+SCHED_UI = C["ui"]["schedule"]
 AVA_ZOOM = 2.0  # keep in step with .ava img scale() in night.css
 DAY_SHORT = {"he": ["א׳", "ב׳", "ג׳", "ד׳", "ה׳", "ו׳"], "ru": ["Вс", "Пн", "Вт", "Ср", "Чт", "Пт"], "en": ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri"]}
 VENUE_COLOR = {"ein-hayam": "#5aa9e6", "ironi-alef": "#e0414a", "leo-baeck-hadar": "#4fbf7f", "dror-school": "#a47be0",
@@ -586,7 +580,7 @@ def schedule():
     msg = "".join(f'<span data-l="{l}" class="wa-msg" hidden>{esc(U["wa_msg"][l])}</span>' for l in LANGS)
     return f'''
 <section class="sec sched-sec" id="schedule">
- <div class="sched-bg">{img("train-georgia-randori.jpg")}</div>
+ <div class="sched-bg">{slot("schedule_bg")}</div>
  <div class="wrap">
   {head("schedule", "稽古", sc["title"])}
   <div class="sc-head rv"><h3 class="h3 grp">{t(U["heading"])}</h3><p class="sc-slogan">{t(SC["slogan"])}</p></div>
@@ -646,31 +640,7 @@ BR_UI = {"days": {"he": "ימי אימון", "ru": "Дни тренировок"
          "cal": {"he": "הוספה ליומן", "ru": "В календарь", "en": "Add to calendar"},
          "group": {"he": "קבוצת הוואטסאפ של האולם", "ru": "Группа зала в WhatsApp", "en": "Venue WhatsApp group"}}
 
-LEAD_UI = {
-    "title": {"he": "השאירו פרטים ונחזור אליכם", "ru": "Оставьте заявку — мы перезвоним", "en": "Leave your details and we'll call you back"},
-    "intro": {"he": "נחזור אליכם ונעזור לבחור קבוצה מתאימה.", "ru": "Перезвоним и поможем подобрать группу.", "en": "We'll call you back and help you pick a group."},
-    "name": {"he": "שם", "ru": "Имя", "en": "Name"},
-    "phone": {"he": "טלפון", "ru": "Телефон", "en": "Phone"},
-    "who": {"he": "למי האימון?", "ru": "Для кого тренировки?", "en": "Who is it for?"},
-    "child": {"he": "ילד/ה", "ru": "Ребёнок", "en": "Child"},
-    "adult": {"he": "מבוגר/ת", "ru": "Взрослый", "en": "Adult"},
-    "age": {"he": "גיל", "ru": "Возраст", "en": "Age"},
-    "hall": {"he": "אולם", "ru": "Зал", "en": "Venue"},
-    "any": {"he": "עוד לא החלטנו", "ru": "Пока не знаем", "en": "Not sure yet"},
-    "message": {"he": "הודעה (לא חובה)", "ru": "Сообщение (необязательно)", "en": "Message (optional)"},
-    "consent": {"he": "אני מסכים/ה שהמועדון ישמור את הפרטים כדי לחזור אליי.", "ru": "Согласен(на), что клуб сохранит эти данные, чтобы связаться со мной.",
-                "en": "I agree the club may keep these details to contact me."},
-    "privacy": {"he": "מדיניות פרטיות", "ru": "Политика конфиденциальности", "en": "Privacy policy"},
-    "send": {"he": "שליחה", "ru": "Отправить", "en": "Send"},
-    "send_wa": {"he": "שליחה בוואטסאפ", "ru": "Отправить в WhatsApp", "en": "Send via WhatsApp"},
-    "done": {"he": "תודה! קיבלנו את הפרטים ונחזור אליכם בקרוב.", "ru": "Спасибо! Заявка получена, мы скоро перезвоним.", "en": "Thanks! We've got your details and will call you back soon."},
-    "done_wa": {"he": "תודה! שלחו את ההודעה בוואטסאפ ונחזור אליכם.", "ru": "Спасибо! Отправьте сообщение в WhatsApp, и мы вам ответим.", "en": "Thanks! Send the message in WhatsApp and we'll get back to you."},
-    "bad_phone": {"he": "מספר טלפון ישראלי, למשל 050-1234567", "ru": "Израильский номер, например 050-123-4567", "en": "An Israeli number, e.g. 050-123-4567"},
-    "tpl": {"he": "שלום! פנייה מהאתר.\nשם: {name}\nטלפון: {phone}\nעבור: {who}, גיל {age}\nאולם: {hall}\n{message}",
-            "ru": "Здравствуйте! Заявка с сайта.\nИмя: {name}\nТелефон: {phone}\nДля кого: {who}, возраст {age}\nЗал: {hall}\n{message}",
-            "en": "Hi! A sign-up from the website.\nName: {name}\nPhone: {phone}\nFor: {who}, age {age}\nVenue: {hall}\n{message}"},
-    "after": {"he": "שלום! השארתי פרטים באתר. אולם: {hall}", "ru": "Здравствуйте! Оставили заявку на сайте. Зал: {hall}", "en": "Hi! I've just left my details on the website. Venue: {hall}"},
-}
+LEAD_UI = C["ui"]["lead"]
 
 
 def lead_form():
@@ -755,10 +725,10 @@ def contact():
             soc += t(s)
         else:
             lab = esc(s["label"]) + (f' <bdi dir="ltr">{esc(s["handle"])}</bdi>' if s.get("handle") else "")
-            soc += f'<a class="soc" href="{s["url"]}" target="_blank" rel="noopener" {ga("social_click", network=s["id"])}>{lab} {ARROW}</a>'
+            soc += f'<a class="soc" href="{html.escape(s["url"])}" target="_blank" rel="noopener" {ga("social_click", network=s["id"])}>{lab} {ARROW}</a>'
     return f'''
 <section class="sec contact" id="contact">
- <div class="ct-bg">{img("kids-belts-throw.jpg")}</div>
+ <div class="ct-bg">{slot("contact_bg")}</div>
  <span class="ct-k kj" aria-hidden="true">礼</span>
  <div class="wrap">
   <div class="sh rv"><span class="kicker"><span class="kj" aria-hidden="true">連絡</span>{t(nav_label("contact"))}</span><h2 class="h2 ct-h">{t(co["title"])}</h2><p class="lead">{t(co["text"])}</p></div>
@@ -766,10 +736,10 @@ def contact():
    <div class="ct-card rv">
     {wa(co["whatsapp_cta"]["label"], "contact", "wa-big")}
     <ul class="phones">{phones}</ul>
-    <p class="mail"><a href="mailto:{co["email"]["value"]}">{ltr(co["email"]["value"])}</a></p>
+    <p class="mail"><a href="mailto:{html.escape(co["email"]["value"])}">{ltr(co["email"]["value"])}</a></p>
     <div class="socs">{soc}</div>
    </div>
-   <div class="ct-pic rv">{img("belts-air.jpg", "pic")}</div>
+   <div class="ct-pic rv">{slot("contact_pic", "pic")}</div>
   </div>
   {lead_form()}
   {more_link(co, "contact/")}

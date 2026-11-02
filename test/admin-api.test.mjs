@@ -1,23 +1,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { jwtVerify } from 'jose';
-import { installationToken, readJson, listDir, commitFiles } from '../integrations/admin-api/src/github.mjs';
-import { stubFetch } from './helpers/admin-env.mjs';
-
-const { publicKey, privateKey } = await crypto.subtle.generateKey(
-  { name: 'RSASSA-PKCS1-v1_5', modulusLength: 2048, publicExponent: new Uint8Array([1, 0, 1]), hash: 'SHA-256' }, true, ['sign', 'verify']);
-const pkcs8 = Buffer.from(await crypto.subtle.exportKey('pkcs8', privateKey)).toString('base64');
-const APP_KEY = `-----BEGIN PRIVATE KEY-----\n${pkcs8.match(/.{1,64}/g).join('\n')}\n-----END PRIVATE KEY-----\n`;
-
-let installs = 0;
-const ghEnv = (handlers, over = {}) => {
-  const s = stubFetch([
-    ['POST', /\/app\/installations\/\w+\/access_tokens$/, () => ({ token: 'inst-token', expires_at: new Date(Date.now() + 3600e3).toISOString() })],
-    ...handlers,
-  ]);
-  // A fresh installation id per env keeps the module token cache from leaking between tests.
-  return { env: { REPO: 'o/r', BRANCH: 'main', GITHUB_APP_ID: '123', GITHUB_INSTALLATION_ID: `i${++installs}`, GITHUB_APP_KEY: APP_KEY, __fetch: s.fetch, ...over }, s };
-};
+import { installationToken, readJson, listDir, commitFiles, openPull, deleteBranch } from '../integrations/admin-api/src/github.mjs';
+import { ghEnv, publicKey, setup, messages, sha1, json, COACH, EDITOR, OWNER, actions, run, edit, FAILED_JOBS, SHA_A, SHA_B } from './helpers/admin-repo.mjs';
 
 test('installationToken signs an RS256 app JWT and caches the token', async () => {
   let auth;
@@ -55,22 +40,27 @@ test('readJson decodes content and blob sha; 404 is null; listDir lists', async 
 // Minimal Git Data API: refusing the first `moves` ref updates as a moved head.
 function gitStub(moves = 0) {
   const log = [];
-  let head = 'c0';
+  const heads = { main: 'c0', 'panel-3': 'p0' };
   let n = 0;
   const handlers = [
-    ['GET', /\/git\/ref\/heads\/main$/, () => ({ object: { sha: head } })],
+    ['GET', /\/git\/ref\/heads\/([\w-]+)$/, (_, m) => ({ object: { sha: heads[m[1]] } })],
     ['GET', /\/git\/commits\/(\w+)$/, (_, m) => ({ tree: { sha: `t-${m[1]}` } })],
     ['POST', /\/git\/blobs$/, async (req) => ({ sha: `b${++n}`, _: log.push(['blob', await req.json()]) })],
     ['POST', /\/git\/trees$/, async (req) => ({ sha: `t${++n}`, _: log.push(['tree', await req.json()]) })],
     ['POST', /\/git\/commits$/, async (req) => ({ sha: `c${++n}`, _: log.push(['commit', await req.json()]) })],
-    ['PATCH', /\/git\/refs\/heads\/main$/, async (req) => {
+    ['PATCH', /\/git\/refs\/heads\/([\w-]+)$/, async (req, m) => {
       log.push(['patch', await req.json()]);
-      if (moves-- > 0) { head = `moved${moves}`; return new Response('{}', { status: 422 }); }
+      if (moves-- > 0) { heads[m[1]] = `moved${moves}`; return new Response('{}', { status: 422 }); }
       return { object: { sha: 'ok' } };
     }],
+    ['POST', /\/git\/refs$/, async (req) => ({ _: log.push(['ref', await req.json()]) })],
+    ['POST', /\/pulls$/, async (req) => ({ number: 5, html_url: 'https://github.com/o/r/pull/5', _: log.push(['pull', await req.json()]) })],
+    ['DELETE', /\/git\/refs\/heads\/gone-(\d+)$/, (_, m) => new Response('{}', { status: Number(m[1]) })],
+    ['DELETE', /\/git\/refs\/heads\/[\w-]+$/, () => new Response(null, { status: 204 })],
   ];
   return { handlers, log };
 }
+const gitCalls = (s) => s.calls.filter((c) => /\/(git|pulls)/.test(c.url)).map((c) => `${c.method} ${new URL(c.url).pathname.replace('/repos/o/r', '')}`);
 
 test('commitFiles: six calls in order, no author, force false', async () => {
   const g = gitStub();
@@ -104,89 +94,146 @@ test('commitFiles rebuilds from the new head after a 422 and gives up after four
   assert.equal(g4.log.filter(([k]) => k === 'patch').length, 4);
 });
 
+test('commitFiles create: parent is main head, the branch is created after the commit, no PATCH', async () => {
+  const g = gitStub();
+  const { env, s } = ghEnv(g.handlers);
+  const sha = await commitFiles(env, async (h) => [{ path: 'a', content: h }], 'm', { branch: 'panel-3', create: true });
+  assert.deepEqual(gitCalls(s), ['GET /git/ref/heads/main', 'GET /git/commits/c0', 'POST /git/blobs', 'POST /git/trees', 'POST /git/commits', 'POST /git/refs']);
+  assert.deepEqual(g.log.find(([k]) => k === 'commit')[1].parents, ['c0']);
+  assert.deepEqual(g.log.at(-1), ['ref', { ref: 'refs/heads/panel-3', sha }]);
+});
+
+test('commitFiles on a branch: reads and fast-forwards that branch, retries on 422, names it when giving up', async () => {
+  const g = gitStub(1);
+  const { env, s } = ghEnv(g.handlers);
+  const heads = [];
+  await commitFiles(env, async (h) => { heads.push(h); return [{ path: 'a', content: h }]; }, 'm', { branch: 'panel-3' });
+  assert.deepEqual(heads, ['p0', 'moved0']);
+  assert.ok(gitCalls(s).every((c) => !c.includes('/main')));
+  assert.deepEqual(gitCalls(s).filter((c) => c.startsWith('PATCH')), ['PATCH /git/refs/heads/panel-3', 'PATCH /git/refs/heads/panel-3']);
+  assert.deepEqual(g.log.at(-1)[1].force, false);
+
+  const g4 = gitStub(4);
+  await assert.rejects(commitFiles(ghEnv(g4.handlers).env, async () => [{ path: 'a', content: 'x' }], 'm', { branch: 'panel-3' }), /github: panel-3 kept moving/);
+  await assert.rejects(commitFiles(ghEnv(gitStub().handlers).env, async () => [], 'm', { branch: '../main' }), /bad branch/);
+});
+
+test('openPull targets the base branch; deleteBranch ignores 404 and 422 only', async () => {
+  const g = gitStub();
+  const { env } = ghEnv(g.handlers);
+  assert.deepEqual(await openPull(env, { title: 'T', head: 'panel-3', body: 'B' }), { number: 5, html_url: 'https://github.com/o/r/pull/5' });
+  assert.deepEqual(g.log.at(-1), ['pull', { title: 'T', head: 'panel-3', base: 'main', body: 'B' }]);
+  await deleteBranch(env, 'panel-3');
+  await deleteBranch(env, 'gone-404');
+  await deleteBranch(env, 'gone-422');
+  await assert.rejects(deleteBranch(env, 'gone-500'), (e) => e.status === 500);
+  await assert.rejects(deleteBranch(env, 'a/b'), /bad branch/);
+});
+
 // ---- content routes and saves, against a stubbed GitHub serving the real repo files ----
-const { readFileSync, readdirSync } = await import('node:fs');
-const { createHash } = await import('node:crypto');
+const { readdirSync } = await import('node:fs');
 const { makeEnv } = await import('./helpers/admin-env.mjs');
-const { signSession } = await import('../integrations/admin-api/src/auth.mjs');
-const { serialize } = await import('../integrations/admin-api/src/content.mjs');
+const { serialize, SAVE_OPS, OPEN } = await import('../integrations/admin-api/src/content.mjs');
 const { default: worker } = await import('../integrations/admin-api/src/index.mjs');
-
-const messages = [];
-const sha1 = (t) => createHash('sha1').update(t).digest('hex');
-const disk = (p) => readFileSync(new URL(`../${p}`, import.meta.url), 'utf8');
-const json = (p) => JSON.parse(disk(p));
-
-function fakeRepo() {
-  const files = new Map();
-  for (const d of ['content/coaches', 'content/schedule']) {
-    for (const n of readdirSync(new URL(`../${d}`, import.meta.url))) files.set(`${d}/${n}`, disk(`${d}/${n}`));
-  }
-  for (const f of ['content/venues.json', 'content/glossary.json', 'content/videos.json']) files.set(f, disk(f));
-  const blobs = new Map();
-  const trees = new Map();
-  const commits = new Map();
-  let head = 'h0';
-  let n = 0;
-  const handlers = [
-    ['GET', /\/repos\/[^/]+\/[^/]+\/contents\/([^?]+)\?ref=/, (_, m) => {
-      const p = decodeURIComponent(m[1]);
-      if (files.has(p)) return { sha: sha1(files.get(p)), content: Buffer.from(files.get(p)).toString('base64') };
-      const kids = [...files.keys()].filter((k) => k.startsWith(`${p}/`) && !k.slice(p.length + 1).includes('/'));
-      return kids.length ? kids.map((k) => ({ name: k.slice(p.length + 1), type: 'file' })) : new Response('{}', { status: 404 });
-    }],
-    ['GET', /\/git\/ref\/heads\/main$/, () => ({ object: { sha: head } })],
-    ['GET', /\/git\/commits\/\w+$/, () => ({ tree: { sha: 'base' } })],
-    ['POST', /\/git\/blobs$/, async (req) => { const b = await req.json(); blobs.set(`b${++n}`, b.content); return { sha: `b${n}` }; }],
-    ['POST', /\/git\/trees$/, async (req) => { trees.set(`t${++n}`, (await req.json()).tree); return { sha: `t${n}` }; }],
-    ['POST', /\/git\/commits$/, async (req) => { const c = await req.json(); commits.set(`c${++n}`, c); messages.push(c.message); return { sha: `c${n}` }; }],
-    ['PATCH', /\/git\/refs\/heads\/main$/, async (req) => {
-      const { sha } = await req.json();
-      for (const e of trees.get(commits.get(sha).tree)) e.sha ? files.set(e.path, blobs.get(e.sha)) : files.delete(e.path);
-      head = sha;
-      return { object: { sha } };
-    }],
-  ];
-  return { handlers, files, commits, sha: (p) => sha1(files.get(p)) };
-}
-
-const COACH = 'coach@example.com';
-const EDITOR = 'editor@example.com';
-const OWNER = 'owner@example.com';
-
-function setup(over = {}, extra = []) {
-  const repo = fakeRepo();
-  const { env, s } = ghEnv([...extra, ...repo.handlers]);
-  const e = makeEnv({ ...env, ...over });
-  e.DB.db.exec(`INSERT INTO users (email, coach_id, role) VALUES ('${COACH}', 'natanel-zhurovel', 'coach'), ('${EDITOR}', NULL, 'editor')`);
-  const call = async (method, path, body, email = COACH) => {
-    const res = await worker.fetch(new Request(`https://api.test${path}`, {
-      method, headers: { Authorization: `Bearer ${await signSession({ email }, e)}` }, ...(body && { body: JSON.stringify(body) }),
-    }), e, {});
-    return { status: res.status, body: await res.json() };
-  };
-  const writes = () => s.calls.filter((c) => c.method !== 'GET' && !c.url.includes('/access_tokens'));
-  const repoCalls = () => s.calls.filter((c) => c.url.includes('/repos/'));
-  return { repo, env: e, s, call, writes, repoCalls };
-}
 
 const NAT = 'content/coaches/natanel-zhurovel.json';
 const NAT_S = 'content/schedule/natanel-zhurovel.json';
-const save = (t, op, id, fields, extra = {}) => ({ op, id, base_sha: t.repo.sha(op === 'shared.section' ? 'content/coaches/_section.json' : op.startsWith('schedule') ? `content/schedule/${id}.json` : `content/coaches/${id}.json`), fields, ...extra });
+// The branch the next save for op+id stacks onto ('main' when no PR is open).
+const at = (t, op, id) => t.env.DB.db.prepare(`SELECT branch FROM prs WHERE key = ? AND number IS NOT NULL AND ${OPEN}`).get(SAVE_OPS[op].key(id))?.branch ?? 'main';
+const save = (t, op, id, fields, extra = {}) => ({ op, id, base_sha: t.repo.sha(op === 'shared.section' ? 'content/coaches/_section.json' : op.startsWith('schedule') ? `content/schedule/${id}.json` : `content/coaches/${id}.json`, at(t, op, id)), fields, ...extra });
+const prRow = (t, key) => ({ ...t.env.DB.db.prepare('SELECT * FROM prs WHERE key = ? ORDER BY n DESC').get(key) });
+const toMain = (t) => t.s.calls.filter((c) => c.method !== 'GET' && c.url.includes('/git/refs/heads/main'));
 const bio = (o = {}) => ({ he: 'ביו חדש', ru: 'Новое био', en: 'New bio', ...o });
 
-test('coach saves own bio: one commit, only bio changed, repo-style message, edit logged', async () => {
-  const t = setup();
+test('coach saves own bio: a branch and a PR, main untouched, repo-style message, edit logged', async () => {
+  const t = setup({ PREVIEW_HOST: 'preview.example' });
   const before = json(NAT);
   const r = await t.call('POST', '/save', save(t, 'coach.text', 'natanel-zhurovel', { bio: bio() }));
   assert.equal(r.status, 200, JSON.stringify(r.body));
-  assert.equal(t.writes().filter((c) => c.method === 'PATCH').length, 1);
-  assert.deepEqual(JSON.parse(t.repo.files.get(NAT)), { ...before, bio: bio() });
+  assert.deepEqual(r.body, { sha: r.body.sha, pr: 1, branch: 'panel-1', preview: 'https://panel-1.preview.example/', state: 'checks' });
+  assert.deepEqual(t.writes().filter((c) => !/blobs|trees|commits$/.test(c.url)).map((c) => `${c.method} ${new URL(c.url).pathname}`),
+    ['POST /repos/o/r/git/refs', 'POST /repos/o/r/pulls']);
+  assert.deepEqual(toMain(t), []);
+  assert.deepEqual(JSON.parse(t.repo.file(NAT)), before);
+  assert.deepEqual(JSON.parse(t.repo.file(NAT, 'panel-1')), { ...before, bio: bio() });
   const c = t.repo.commits.get(r.body.sha);
   assert.equal(c.message, 'Coaches: Natanel Zhurovel, bio\n\nFrom the coach panel (natanel-zhurovel).');
   assert.ok(!('author' in c) && !('committer' in c));
+  assert.deepEqual(t.repo.pulls[0], { title: 'Coaches: Natanel Zhurovel, bio', head: 'panel-1', base: 'main', state: 'open', merged_at: null,
+    body: 'From the coach panel (natanel-zhurovel).\n\nPreview: https://panel-1.preview.example/' });
+  const pr = prRow(t, 'coach:natanel-zhurovel');
+  assert.deepEqual([pr.number, pr.branch, pr.state, pr.head_sha, pr.who, pr.email, pr.saves, pr.title],
+    [1, 'panel-1', 'checks', r.body.sha, 'natanel-zhurovel', COACH, 1, 'Coaches: Natanel Zhurovel, bio']);
   const row = t.env.DB.db.prepare('SELECT * FROM edits').get();
-  assert.deepEqual({ ...row }, { sha: r.body.sha, email: COACH, coach_id: 'natanel-zhurovel', op: 'coach.text', created: row.created, status: 'pending', conclusion: null, notified: 0 });
+  assert.deepEqual({ ...row }, { sha: r.body.sha, email: COACH, coach_id: 'natanel-zhurovel', op: 'coach.text', created: row.created, status: 'pr', conclusion: null, notified: 0 });
+});
+
+test('a second save for the same key reads and stacks onto the open branch; another key gets its own PR', async () => {
+  const t = setup();
+  const r1 = await t.call('POST', '/save', save(t, 'coach.text', 'natanel-zhurovel', { bio: bio() }));
+  assert.equal(r1.body.preview, null);
+  const g = await t.call('GET', '/content/coach/natanel-zhurovel');
+  assert.deepEqual(g.body, { data: JSON.parse(t.repo.file(NAT, 'panel-1')), sha: t.repo.sha(NAT, 'panel-1') });
+  assert.equal((await t.call('POST', '/save', { op: 'coach.text', id: 'natanel-zhurovel', base_sha: t.repo.sha(NAT), fields: { bio: bio() } })).status, 409, 'main sha is stale now');
+  const r2 = await t.call('POST', '/save', { op: 'coach.meta', id: 'natanel-zhurovel', base_sha: g.body.sha, fields: { order: 3 } }, EDITOR);
+  assert.equal(r2.status, 200, JSON.stringify(r2.body));
+  assert.deepEqual([r2.body.pr, r2.body.branch], [1, 'panel-1']);
+  assert.equal(t.repo.pulls.length, 1);
+  assert.ok(t.s.calls.some((c) => c.method === 'PATCH' && c.url.endsWith('/git/refs/heads/panel-1')));
+  const after = JSON.parse(t.repo.file(NAT, 'panel-1'));
+  assert.deepEqual([after.bio, after.order], [bio(), 3]);
+  let pr = prRow(t, 'coach:natanel-zhurovel');
+  assert.deepEqual([pr.saves, pr.head_sha, pr.state, pr.who], [2, r2.body.sha, 'checks', 'natanel-zhurovel']);
+
+  const sessions = structuredClone(json(NAT_S).sessions);
+  sessions[0].start = '12:05';
+  const r3 = await t.call('POST', '/save', save(t, 'schedule.sessions', 'natanel-zhurovel', { sessions }));
+  assert.deepEqual([r3.status, r3.body.pr, r3.body.branch], [200, 2, 'panel-2']);
+  assert.equal(JSON.parse(t.repo.file(NAT_S, 'panel-2')).sessions[0].start, '12:05');
+  assert.equal(t.repo.file(NAT_S, 'panel-1'), t.repo.file(NAT_S), 'keys touch disjoint branches');
+  assert.equal((await t.call('GET', '/content/schedule/natanel-zhurovel')).body.sha, t.repo.sha(NAT_S, 'panel-2'));
+
+  // PR 1 closed on GitHub: the next save marks it and opens a fresh one from main.
+  t.repo.pulls[0].state = 'closed';
+  t.repo.pulls[0].merged_at = '2026-11-02T10:00:00Z';
+  const r4 = await t.call('POST', '/save', save(t, 'coach.text', 'natanel-zhurovel', { bio: bio({ en: 'Again' }) }, { base_sha: t.repo.sha(NAT) }));
+  assert.deepEqual([r4.status, r4.body.pr, r4.body.branch], [200, 3, 'panel-3']);
+  assert.equal(t.env.DB.db.prepare('SELECT state FROM prs WHERE n = 1').get().state, 'merged');
+  pr = prRow(t, 'coach:natanel-zhurovel');
+  assert.deepEqual([pr.n, pr.number, pr.saves], [3, 3, 1]);
+  assert.deepEqual(toMain(t), []);
+
+  // Branch deleted on merge before the sweep caught up: reads fall back to main.
+  t.repo.refs.delete('panel-3');
+  assert.equal((await t.call('GET', '/content/coach/natanel-zhurovel')).body.sha, t.repo.sha(NAT));
+});
+
+test('a first save in flight, a failed PR or a refused edit leave no branch and no blocked key', async () => {
+  const t = setup();
+  t.env.DB.db.exec("INSERT INTO prs (key, created) VALUES ('coach:natanel-zhurovel', 0)");
+  let r = await t.call('POST', '/save', save(t, 'coach.text', 'natanel-zhurovel', { bio: bio() }));
+  assert.deepEqual([r.status, r.body.error], [409, 'stale']);
+  assert.equal(t.writes().length, 0);
+  t.env.DB.db.exec('DELETE FROM prs');
+
+  r = await t.call('POST', '/save', save(t, 'coach.text', 'natanel-zhurovel', { bio: bio({ en: 'Judo 柔道' }) }));
+  assert.deepEqual([r.status, r.body.error], [400, 'invalid']);
+  assert.equal(t.writes().length, 0);
+  assert.equal(t.env.DB.db.prepare('SELECT count(*) AS n FROM prs').get().n, 0);
+
+  t.repo.failPulls = true;
+  r = await t.call('POST', '/save', save(t, 'coach.text', 'natanel-zhurovel', { bio: bio() }));
+  assert.deepEqual([r.status, r.body.error], [502, 'github']);
+  assert.ok(t.s.calls.some((c) => c.method === 'DELETE' && /\/git\/refs\/heads\/panel-\d+$/.test(c.url)));
+  assert.deepEqual([...t.repo.refs.keys()], ['main']);
+  assert.equal(t.env.DB.db.prepare('SELECT count(*) AS n FROM prs').get().n, 0);
+  assert.equal(t.env.DB.db.prepare('SELECT count(*) AS n FROM edits').get().n, 0);
+
+  t.repo.failPulls = false;
+  r = await t.call('POST', '/save', save(t, 'coach.text', 'natanel-zhurovel', { bio: bio() }));
+  assert.equal(r.status, 200, JSON.stringify(r.body));
+  assert.equal(r.body.pr, 1);
+  assert.deepEqual(toMain(t), []);
 });
 
 test('coach is refused on another coach, meta, section and odd ids, with no GitHub write', async () => {
@@ -215,11 +262,11 @@ test('editor may change meta; a coach payload cannot change order or color', asy
   const t = setup();
   let r = await t.call('POST', '/save', save(t, 'coach.meta', 'natanel-zhurovel', { order: 7 }), EDITOR);
   assert.equal(r.status, 200, JSON.stringify(r.body));
-  assert.equal(JSON.parse(t.repo.files.get(NAT)).order, 7);
+  assert.equal(JSON.parse(t.repo.file(NAT, 'panel-1')).order, 7);
   assert.match(t.repo.commits.get(r.body.sha).message, /\(editor\)\.$/);
   r = await t.call('POST', '/save', save(t, 'coach.text', 'natanel-zhurovel', { bio: bio(), order: 0, color: '#000' }));
   assert.equal(r.status, 200);
-  const after = JSON.parse(t.repo.files.get(NAT));
+  const after = JSON.parse(t.repo.file(NAT, 'panel-1'));
   assert.deepEqual([after.order, after.color, after.bio], [7, json(NAT).color, bio()]);
 });
 
@@ -266,7 +313,7 @@ test('schedule: venue names for the select, Saturday refused, valid save touches
   sessions[2].start = '12:05';
   r = await t.call('POST', '/save', save(t, 'schedule.sessions', 'natanel-zhurovel', { sessions, kinds: {} }));
   assert.equal(r.status, 200, JSON.stringify(r.body));
-  assert.deepEqual(JSON.parse(t.repo.files.get(NAT_S)), { ...json(NAT_S), sessions });
+  assert.deepEqual(JSON.parse(t.repo.file(NAT_S, r.body.branch)), { ...json(NAT_S), sessions });
   assert.equal(t.repo.commits.get(r.body.sha).message.split('\n')[0], 'Schedule: Natanel Zhurovel, weekly sessions');
 });
 
@@ -278,7 +325,7 @@ test('shared section: editor changes the title only; coach gets 403', async () =
   const title = { he: 'המאמנים', ru: 'Тренера', en: 'Coaches' };
   const r = await t.call('POST', '/save', save(t, 'shared.section', null, { title, team_count: 99 }), EDITOR);
   assert.equal(r.status, 200, JSON.stringify(r.body));
-  assert.deepEqual(JSON.parse(t.repo.files.get(SEC)), { ...json(SEC), title });
+  assert.deepEqual(JSON.parse(t.repo.file(SEC, 'panel-1')), { ...json(SEC), title });
   assert.equal(t.repo.commits.get(r.body.sha).message.split('\n')[0], 'Coaches: section text');
 });
 
@@ -333,7 +380,7 @@ const webp = (w, h, flags = 0, pad = 0) => {
   hd.writeUInt32LE(body.length, 4);
   return Buffer.concat([hd, body]).toString('base64');
 };
-const photo = (t, id, fields, extra) => ({ op: 'coach.photo', id, base_sha: t.repo.sha(`content/coaches/${id}.json`), fields, ...extra });
+const photo = (t, id, fields, extra) => ({ op: 'coach.photo', id, base_sha: t.repo.sha(`content/coaches/${id}.json`, at(t, 'coach.photo', id)), fields, ...extra });
 
 test('coach.photo: webp and coach JSON land in one commit; alt kept', async () => {
   const t = setup();
@@ -341,15 +388,15 @@ test('coach.photo: webp and coach JSON land in one commit; alt kept', async () =
   const b64 = webp(800, 1200);
   const r = await t.call('POST', '/save', photo(t, 'natanel-zhurovel', { webp: b64, face: [0.4, 0.25] }));
   assert.equal(r.status, 200, JSON.stringify(r.body));
-  assert.equal(t.writes().filter((c) => c.method === 'PATCH').length, 1);
-  assert.equal(t.repo.files.get('public/coaches/natanel-zhurovel.webp'), b64);
-  const ph = JSON.parse(t.repo.files.get(NAT)).photo;
+  assert.equal(t.s.calls.filter((c) => c.method === 'POST' && c.url.endsWith('/git/commits')).length, 1);
+  assert.equal(t.repo.file('public/coaches/natanel-zhurovel.webp', 'panel-1'), b64);
+  const ph = JSON.parse(t.repo.file(NAT, 'panel-1')).photo;
   assert.deepEqual(ph, { ...before.photo, src: 'coaches/natanel-zhurovel.webp', face: [0.4, 0.25], w: 800, h: 1200, source: `panel ${new Date().toISOString().slice(0, 10)}` });
   assert.equal(t.repo.commits.get(r.body.sha).message.split('\n')[0], 'Coaches: Natanel Zhurovel, photo');
 
   const r2 = await t.call('POST', '/save', photo(t, 'natanel-zhurovel', { webp: webp(100, 100), face: [2, 0] }), EDITOR);
   assert.equal(r2.status, 200);
-  assert.deepEqual(JSON.parse(t.repo.files.get(NAT)).photo.face, [0.5, 0.3]);
+  assert.deepEqual(JSON.parse(t.repo.file(NAT, 'panel-1')).photo.face, [0.5, 0.3]);
 });
 
 test('coach.photo refuses bad images, other coaches and a missing base_sha without writing', async () => {
@@ -381,7 +428,7 @@ test('change.create writes a checkChanges-valid file with the coach as author; a
   const r = await t.call('POST', '/save', { op: 'change.create', id: 'natanel-zhurovel', fields: cancel() });
   assert.equal(r.status, 200, JSON.stringify(r.body));
   assert.equal(r.body.change_id, '2026-11-03-natanel-zhurovel-cancel');
-  const f = JSON.parse(t.repo.files.get(CH));
+  const f = JSON.parse(t.repo.file(CH, 'panel-1'));
   assert.deepEqual(f.session, { day: 2, start: '17:30' });
   assert.equal(f.author, 'natanel-zhurovel');
   assert.ok(!Number.isNaN(Date.parse(f.created)));
@@ -393,7 +440,7 @@ test('change.create writes a checkChanges-valid file with the coach as author; a
 
   const r2 = await t.call('POST', '/save', { op: 'change.create', id: 'natanel-zhurovel', fields: cancel() }, OWNER);
   assert.equal(r2.body.change_id, '2026-11-03-natanel-zhurovel-cancel-2');
-  assert.equal(JSON.parse(t.repo.files.get(`${CH.slice(0, -5)}-2.json`)).author, 'owner');
+  assert.equal(JSON.parse(t.repo.file(`${CH.slice(0, -5)}-2.json`, 'panel-1')).author, 'owner');
 });
 
 test('change.create refuses other schedules, bad sessions and bad dates', async () => {
@@ -422,11 +469,108 @@ test('change.delete trusts the file schedule, not the id the coach sends', async
   assert.equal(t.writes().length, 0);
 
   r = await t.call('POST', '/save', { op: 'change.create', id: 'natanel-zhurovel', fields: cancel() });
-  r = await t.call('POST', '/save', { op: 'change.delete', id: 'natanel-zhurovel', base_sha: t.repo.sha(CH), fields: { change_id: r.body.change_id } });
+  const { branch } = r.body;
+  r = await t.call('POST', '/save', { op: 'change.delete', id: 'natanel-zhurovel', base_sha: t.repo.sha(CH, branch), fields: { change_id: r.body.change_id } });
   assert.equal(r.status, 200, JSON.stringify(r.body));
-  assert.ok(!t.repo.files.has(CH));
+  assert.equal(t.repo.file(CH, branch), undefined);
   const last = [...t.repo.commits.values()].at(-1);
   assert.equal(last.message.split('\n')[0], 'Schedule: Natanel Zhurovel, removed cancel 2026-11-03');
+});
+
+// ---- site-wide content ----
+const HERO = 'content/site/hero.json';
+const IMG = 'content/site/images.json';
+const siteSave = (t, id, fields) => ({ op: 'site.text', id, base_sha: t.repo.sha(`content/site/${id}.json`, at(t, 'site.text', id)), fields });
+const siteImage = (t, id, fields) => ({ op: 'site.image', id, base_sha: t.repo.sha(IMG, at(t, 'site.image', id)), fields });
+
+test('GET /content/site: owner and editors read the open branch; coaches 403; unknown files 404', async () => {
+  const t = setup();
+  assert.equal((await t.call('GET', '/content/site/hero')).status, 403);
+  assert.deepEqual((await t.call('GET', '/content/site/hero', null, EDITOR)).body, { data: json(HERO), sha: t.repo.sha(HERO) });
+  assert.equal((await t.call('GET', '/content/site/images', null, OWNER)).body.sha, t.repo.sha(IMG));
+  for (const id of ['site', 'nope', '..%2Fsite']) assert.equal((await t.call('GET', `/content/site/${id}`, null, OWNER)).status, 404, id);
+  const d = json(HERO);
+  d.subline.en = 'Judo for everyone in Haifa.';
+  assert.equal((await t.call('POST', '/save', siteSave(t, 'hero', d), EDITOR)).status, 200);
+  assert.equal((await t.call('GET', '/content/site/hero', null, OWNER)).body.data.subline.en, 'Judo for everyone in Haifa.');
+});
+
+test('site.text: an editor changes one value through a PR; coaches, unknown ids and broken values write nothing', async () => {
+  const t = setup();
+  const d = json(HERO);
+  d.subline.ru = 'Дзюдо для всех.';
+  const r = await t.call('POST', '/save', siteSave(t, 'hero', d), EDITOR);
+  assert.equal(r.status, 200, JSON.stringify(r.body));
+  assert.deepEqual([r.body.pr, r.body.branch], [1, 'panel-1']);
+  assert.deepEqual(toMain(t), []);
+  const before = json(HERO);
+  assert.deepEqual(JSON.parse(t.repo.file(HERO, 'panel-1')), { ...before, subline: { ...before.subline, ru: 'Дзюдо для всех.' } });
+  assert.equal(t.repo.commits.get(r.body.sha).message, 'Site: hero texts\n\nFrom the coach panel (editor).');
+  assert.equal(prRow(t, 'site:hero').number, 1);
+  assert.equal(t.env.DB.db.prepare('SELECT coach_id FROM edits').get().coach_id, null);
+
+  const u = setup();
+  assert.equal((await u.call('POST', '/save', siteSave(u, 'hero', d))).status, 403);
+  const x = await u.call('POST', '/save', { op: 'site.text', id: 'site', base_sha: 'x', fields: {} }, OWNER);
+  assert.deepEqual([x.status, x.body.detail], [400, 'unknown id']);
+  for (const [id, edit, re] of [
+    ['hero', (h) => { h.headline.en = 'Strong on the mat'; }, /headline\.en: must contain/],
+    ['hero', (h) => { h.extra = 1; }, /extra: unknown field/],
+    ['contact', (c) => { c.phones[0].tel = '+972547632055'; }, /phone and tel/],
+    ['contact', (c) => { c.social[0].url = 'javascript:alert(1)'; }, /social\[0\]\.url/],
+    ['ui', (ui) => { ui.lead.after.en = 'Hi!'; }, /keep \{hall\}/],
+    ['footer', (f) => { f.tagline.he = ''; }, /tagline/],
+    ['pages', (p) => { p.video.title.he = p.gallery.title.he; }, /two pages share/],
+  ]) {
+    const f = json(`content/site/${id}.json`);
+    edit(f);
+    const y = await u.call('POST', '/save', siteSave(u, id, f), OWNER);
+    assert.deepEqual([y.status, y.body.error], [400, 'invalid'], id);
+    assert.match(y.body.detail, re);
+  }
+  assert.equal(u.writes().length, 0);
+});
+
+test('site.image: WebP and images.json in one commit under a new name; bad images, slots and coaches write nothing', async () => {
+  const t = setup();
+  const alt = { he: 'אימון', ru: 'Тренировка', en: 'Training' };
+  const b64 = webp(1600, 900);
+  const r = await t.call('POST', '/save', siteImage(t, 'hero', { webp: b64, alt: { ...alt, placeholder: true } }), EDITOR);
+  assert.equal(r.status, 200, JSON.stringify(r.body));
+  assert.equal(t.s.calls.filter((c) => c.method === 'POST' && c.url.endsWith('/git/commits')).length, 1);
+  const hero = JSON.parse(t.repo.file(IMG, 'panel-1')).hero;
+  assert.match(hero.src, /^img-site\/hero-[a-z0-9]+\.webp$/);
+  assert.deepEqual(hero, { src: hero.src, alt });
+  assert.equal(t.repo.file(`public/${hero.src}`, 'panel-1'), b64);
+  assert.deepEqual({ ...JSON.parse(t.repo.file(IMG, 'panel-1')), hero: json(IMG).hero }, json(IMG));
+  assert.equal(t.repo.commits.get(r.body.sha).message.split('\n')[0], 'Site: hero image');
+
+  await new Promise((ok) => setTimeout(ok, 2));
+  const r2 = await t.call('POST', '/save', siteImage(t, 'logo', { webp: webp(512, 512) }), OWNER);
+  assert.equal(r2.status, 200, JSON.stringify(r2.body));
+  const after = JSON.parse(t.repo.file(IMG, 'panel-1'));
+  assert.deepEqual([r2.body.pr, after.hero, Object.keys(after.logo)], [1, hero, ['src']]);
+  assert.match(after.logo.src, /^img-site\/logo-[a-z0-9]+\.webp$/);
+
+  const u = setup();
+  const png = Buffer.from('\x89PNG\r\n\x1a\n\0\0\0\0', 'latin1').toString('base64');
+  for (const [id, f, re] of [
+    ['logo', { webp: webp(513, 512) }, /512×512/],
+    ['contact_pic', { webp: webp(1200, 1201) }, /1200×1200/],
+    ['hero', { webp: webp(2001, 900) }, /2000×1400/],
+    ['hero', { webp: webp(1600, 900, 0x08) }, /EXIF/],
+    ['hero', { webp: png }, /not a WebP/],
+    ['hero', { webp: webp(10, 10), alt: { en: 'x' } }, /alt/],
+    ['hero', { webp: webp(10, 10), alt: { he: 'א', ru: 'б', en: '柔道' } }, /alt/],
+  ]) {
+    const y = await u.call('POST', '/save', siteImage(u, id, f), OWNER);
+    assert.deepEqual([y.status, y.body.error], [400, 'invalid'], id);
+    assert.match(y.body.detail, re);
+  }
+  const y = await u.call('POST', '/save', { op: 'site.image', id: 'gallery', base_sha: 'x', fields: { webp: webp(10, 10) } }, OWNER);
+  assert.deepEqual([y.status, y.body.detail], [400, 'unknown id']);
+  assert.equal((await u.call('POST', '/save', siteImage(u, 'hero', { webp: webp(10, 10) }))).status, 403);
+  assert.equal(u.writes().length, 0);
 });
 
 // ---- translate, deploy status, failure notices ----
@@ -460,21 +604,6 @@ test('/translate: glossary from main, coach name in the prompt, daily cap, size 
   const u = setup({}, [a.handler]);
   assert.deepEqual((await u.call('POST', '/translate', { context: 'schedule-note', fields: { note: 'x' } })).body, { error: 'not_configured' });
 });
-
-const SHA_A = 'a'.repeat(40);
-const SHA_B = 'b'.repeat(40);
-// runs: {sha: run}; jobs: {runId: jobs}; mainRuns: list for ?branch=main
-function actions(state) {
-  return [
-    ['GET', /\/actions\/runs\?head_sha=(\w+)&event=push$/, (_, m) => ({ workflow_runs: state.runs[m[1]] ? [state.runs[m[1]]] : [] })],
-    ['GET', /\/actions\/runs\/(\d+)\/jobs$/, (_, m) => ({ jobs: state.jobs[m[1]] ?? [] })],
-    ['GET', /\/actions\/runs\?branch=main&event=push$/, () => ({ workflow_runs: state.main ?? [] })],
-  ];
-}
-const run = (id, status, conclusion, created_at = '2026-11-01T10:00:00Z') => ({ id, name: 'Deploy to GitHub Pages', status, conclusion, created_at });
-const edit = (t, sha, email = COACH, created = Math.floor(Date.now() / 1000)) =>
-  t.env.DB.db.prepare("INSERT INTO edits (sha, email, coach_id, op, created, status) VALUES (?, ?, 'natanel-zhurovel', 'coach.text', ?, 'pending')").run(sha, email, created);
-const FAILED_JOBS = [{ conclusion: 'success', steps: [] }, { conclusion: 'failure', steps: [{ name: 'Set up job', conclusion: 'success' }, { name: 'Run withastro/action@v6', conclusion: 'failure' }] }];
 
 test('/status maps runs to pending, live and failed with the failed step, and stores it', async () => {
   const st = { runs: {}, jobs: {} };
@@ -619,6 +748,19 @@ test('/translate takes only known field names, a bounded count, and counts keys 
   assert.equal((await tr('coach-bio', { bio: 'x', 'about.0': 'y', 'approach.3': 'z', dan_rank: 'w', alt: 'v' })).status, 502, 'reply lacks those keys');
   assert.equal(a.seen.length, 1);
   assert.equal(t.env.DB.db.prepare("SELECT n FROM usage WHERE kind = 'translate'").get().n, 1, 'refused calls cost no slot');
+});
+
+test('/translate context site: dotted keys for owner and editors only', async () => {
+  const a = anthropic({ he: { 'hero.subline': 'א' }, ru: { 'hero.subline': 'б' }, en: { 'hero.subline': 'c' } });
+  const t = setup({ ANTHROPIC_KEY: 'k' }, [a.handler]);
+  const tr = (fields, who = EDITOR) => t.call('POST', '/translate', { source_lang: 'en', context: 'site', fields }, who);
+  const r = await tr({ 'hero.subline': 'Judo for kids' });
+  assert.equal(r.status, 200, JSON.stringify(r.body));
+  assert.match(a.seen[0].system, /text on the club website for parents and visitors/);
+  assert.equal((await tr({ 'hero.subline': 'x' }, COACH)).status, 403);
+  for (const k of ['Hero', 'a.b.c.d.e.f', 'a b', '../x', 'hero.']) assert.equal((await tr({ [k]: 'x' })).status, 400, k);
+  assert.match((await tr(Object.fromEntries(Array.from({ length: 25 }, (_, i) => [`ui.k${i}`, 'x'])))).body.detail, /too many fields/);
+  assert.equal(a.seen.length, 1);
 });
 
 test('no commit message carries an email or a Telegram id', () => {

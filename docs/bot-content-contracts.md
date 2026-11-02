@@ -95,7 +95,7 @@ POST https://api.github.com/repos/Unifight-haifa/unifight/dispatches
 - writes `src/assets/gallery/<album>/<slug>.jpg` and appends the photo to `content/gallery.json` with `"source": "<original file name without extension>"` and the EXIF year if there was one;
 - fails the whole run before writing anything if any sidecar is bad.
 
-The workflow then checks `gallery.json` the way the build does, commits only the cleaned JPEG and `gallery.json` here as `github-actions[bot]` (signed off, author and approver in the message), deletes the originals from staging in a second commit there, and starts the Pages deploy. Deleting from staging removes the files from its working tree only: the originals stay in the private repo's history until that history is rewritten or the repo is recreated.
+The workflow then checks `gallery.json` the way the build does, commits only the cleaned JPEG and `gallery.json` as `github-actions[bot]` (signed off, author and approver in the message) on a `gallery-<run id>` branch, opens a PR to `main` with the panel's GitHub App token (`PANEL_APP_ID` / `PANEL_APP_KEY`) so the build check runs on it, and deletes the originals from staging in a second commit there. The site updates once the owner merges the PR. Deleting from staging removes the files from its working tree only: the originals stay in the private repo's history until that history is rewritten or the repo is recreated.
 
 Confirming: `<base>gallery.json` lists every gallery photo:
 

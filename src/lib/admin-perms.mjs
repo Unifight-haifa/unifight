@@ -1,5 +1,5 @@
 // Admin panel permissions and field merge. Plain ESM without imports so the Worker bundles it.
-export const OPS = ['coach.text', 'coach.photo', 'coach.meta', 'schedule.sessions', 'change.create', 'change.delete', 'shared.section', 'access.manage'];
+export const OPS = ['coach.text', 'coach.photo', 'coach.meta', 'schedule.sessions', 'change.create', 'change.delete', 'shared.section', 'site.text', 'site.image', 'access.manage'];
 
 export const isCoachId = (s) => typeof s === 'string' && /^[a-z0-9]+(-[a-z0-9]+)*$/.test(s);
 

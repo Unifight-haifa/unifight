@@ -43,8 +43,7 @@
    "en": "judo, wrestling, sambo"
   },
   "disciplines_source": "https://www.davar1.co.il/452598/",
-  "disciplines_confidence": "confirmed",
-  "logo": "brand/logo.png"
+  "disciplines_confidence": "confirmed"
  },
  "nav": [
   {
@@ -158,35 +157,6 @@
   "he": "עברית",
   "ru": "Русский",
   "en": "English"
- },
- "hero": {
-  "eyebrow": {
-   "he": "בית ספר לג׳ודו · חיפה",
-   "ru": "Школа дзюдо · Хайфа",
-   "en": "Judo school · Haifa"
-  },
-  "headline": {
-   "he": "חזקים על המזרן. חזקים בחיים.",
-   "ru": "Сильные на татами. Сильные в жизни.",
-   "en": "Strong on the mat. Strong in life."
-  },
-  "subline": {
-   "he": "ג׳ודו לילדים, לנוער ולמבוגרים בחיפה והסביבה. מהנפילה הראשונה ועד הפודיום הבינלאומי — עם מאמנים שעברו את הדרך הזאת בעצמם.",
-   "ru": "Дзюдо для детей, подростков и взрослых в Хайфе и окрестностях. От первого падения до международного пьедестала — с тренерами, которые сами прошли этот путь.",
-   "en": "Judo for kids, teens and adults in Haifa and the area. From the very first fall to international podiums — with coaches who have walked that road themselves."
-  },
-  "cta_primary": {
-   "he": "הצטרפו ליוניפייט",
-   "ru": "Присоединяйтесь к Юнифайт",
-   "en": "Join Unifight",
-   "href": "#contact"
-  },
-  "cta_secondary": {
-   "he": "ללוח האימונים",
-   "ru": "Расписание тренировок",
-   "en": "See the schedule",
-   "href": "#schedule"
-  }
  },
  "taglines": [
   {
@@ -1911,112 +1881,6 @@
    "he": "[מפה — אחרי אישור הכתובות]",
    "ru": "[Карта — после подтверждения адресов]",
    "en": "[Map — once addresses are confirmed]"
-  }
- },
- "contact": {
-  "title": {
-   "he": "בואו להתאמן איתנו",
-   "ru": "Приходите тренироваться",
-   "en": "Come train with us"
-  },
-  "text": {
-   "he": "שאלה על קבוצה, גיל או סניף? כתבו לנו או התקשרו — נשמח לעזור.",
-   "ru": "Вопрос о группе, возрасте или филиале? Напишите или позвоните — с радостью поможем.",
-   "en": "Questions about a group, age or location? Message or call us — we're happy to help."
-  },
-  "whatsapp_cta": {
-   "label": {
-    "he": "כתבו לנו בוואטסאפ",
-    "ru": "Написать в WhatsApp",
-    "en": "Message us on WhatsApp"
-   },
-   "number": {
-    "placeholder": true,
-    "he": "[איזה מספר מקבל את פניות האתר — לבחירת הבעלים]",
-    "ru": "[Какой номер получает заявки с сайта — выбор владельца]",
-    "en": "[Which number receives site enquiries — owner to choose]"
-   },
-   "mockup_default": "054-763-2054",
-   "mockup_default_note": "Ilana's public number (confirmed). Use for mockups only; real WhatsApp link pending owner choice."
-  },
-  "lead_endpoint": "",
-  "phones": [
-   {
-    "name": {
-     "he": "אילנה",
-     "ru": "Илана",
-     "en": "Ilana"
-    },
-    "phone": "054-763-2054",
-    "tel": "+972547632054",
-    "source": "https://www.israeldojo.co.il/מורה-אומנויות-לחימה/unifight/",
-    "confidence": "confirmed"
-   }
-  ],
-  "email": {
-   "value": "unifight.haifa@outlook.com",
-   "source": "https://www.facebook.com/unifightjudoclub/",
-   "confidence": "confirmed",
-   "note": "owner confirmed 2026-10-17"
-  },
-  "social": [
-   {
-    "id": "facebook",
-    "label": "Facebook",
-    "url": "https://www.facebook.com/unifightjudoclub/",
-    "confidence": "confirmed"
-   },
-   {
-    "id": "instagram",
-    "label": "Instagram",
-    "handle": "@unifight_haifa",
-    "url": "https://www.instagram.com/unifight_haifa/",
-    "confidence": "likely",
-    "note": "linked from coach's bio; owner to confirm it's official"
-   },
-   {
-    "id": "tiktok",
-    "label": "TikTok",
-    "placeholder": true,
-    "he": "[טיקטוק — כתובת מהבעלים]",
-    "ru": "[TikTok — ссылка от владельца]",
-    "en": "[TikTok — handle from owner]"
-   }
-  ],
-  "more": {
-   "he": "כל פרטי הקשר ואיך מגיעים",
-   "ru": "Все контакты и как добраться",
-   "en": "All contacts and directions"
-  }
- },
- "footer": {
-  "tagline": {
-   "he": "יוניפייט חיפה — בית ספר לג׳ודו בחיפה והסביבה",
-   "ru": "Юнифайт Хайфа — школа дзюдо в Хайфе и окрестностях",
-   "en": "Unifight Haifa — judo school in Haifa and the area"
-  },
-  "legal": {
-   "he": "יוניפייט חיפה (ע״ר)",
-   "ru": "Амута «Юнифайт Хайфа»",
-   "en": "Unifight Haifa (registered non-profit)"
-  },
-  "legal_source": "https://www.guidestar.org.il/he/organization/580472751",
-  "amuta_number": {
-   "he": "ע״ר 580472751",
-   "ru": "№ 580472751",
-   "en": "No. 580472751",
-   "source": "owner confirmed 2026-10-17"
-  },
-  "copyright": {
-   "he": "© 2026 יוניפייט חיפה. כל הזכויות שמורות.",
-   "ru": "© 2026 Юнифайт Хайфа. Все права защищены.",
-   "en": "© 2026 Unifight Haifa. All rights reserved."
-  },
-  "accessibility_link": {
-   "placeholder": true,
-   "he": "[הצהרת נגישות]",
-   "ru": "[Заявление о доступности]",
-   "en": "[Accessibility statement]"
   }
  },
  "photos": {

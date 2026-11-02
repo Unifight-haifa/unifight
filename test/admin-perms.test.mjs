@@ -10,7 +10,7 @@ const own = 'natanel-zhurovel', other = 'ilana-kratysh';
 const T = { he: 'א', ru: 'б', en: 'c' };
 
 test('OPS is exactly the admin surface; nothing writes news, .github, src or scripts', () => {
-  assert.deepEqual([...OPS].sort(), ['access.manage', 'change.create', 'change.delete', 'coach.meta', 'coach.photo', 'coach.text', 'schedule.sessions', 'shared.section']);
+  assert.deepEqual([...OPS].sort(), ['access.manage', 'change.create', 'change.delete', 'coach.meta', 'coach.photo', 'coach.text', 'schedule.sessions', 'shared.section', 'site.image', 'site.text']);
   assert.ok(ids.includes(own) && ids.includes(other));
 });
 

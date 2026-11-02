@@ -17,6 +17,11 @@ test('without PUBLIC_GA_ID nothing analytics-related is rendered', { skip: !!pro
   }
 });
 
+test('PR builds (previews) get no GA id', () => {
+  const yml = readFileSync(new URL('../.github/workflows/deploy.yml', import.meta.url), 'utf8');
+  assert.match(yml, /^  PUBLIC_GA_ID: >-\n    \$\{\{ github\.event_name != 'pull_request' && vars\.PUBLIC_GA_ID \|\| '' \}\}$/m);
+});
+
 // one extra build with the club's real ID; the consent code path is what's under test
 const ID = 'G-3XKDLN1MLL';
 let ga;

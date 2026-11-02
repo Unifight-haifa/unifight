@@ -139,7 +139,7 @@ function changeRow({ data: c, sha }) {
     if (!confirm(t('deleteConfirm'))) return;
     C.busy(b, async () => {
       const r = await api('POST', '/save', { op: 'change.delete', id: C.id, base_sha: sha, fields: { change_id: c.id } });
-      C.watch(r.sha);
+      C.watch(r);
       await loadChanges();
     }).catch(C.fail);
   });
@@ -195,7 +195,7 @@ function bindOnce(root) {
     C.status(t('saving'));
     C.busy($('#ses-save'), async () => {
       const r = await api('POST', '/save', { op: 'schedule.sessions', id: C.id, base_sha: D.sha, fields: { sessions: collectSessions() } });
-      C.watch(r.sha);
+      C.watch(r);
       await load();
     }).catch(C.fail);
   });
@@ -234,7 +234,7 @@ function bindOnce(root) {
     C.status(t('saving'));
     C.busy($('#chg-save'), async () => {
       const r = await api('POST', '/save', { op: 'change.create', id: C.id, fields: changeBody(f) });
-      C.watch(r.sha);
+      C.watch(r);
       form.reset();
       syncType();
       for (const lab of form.querySelectorAll('label[data-proposed]')) delete lab.dataset.proposed;

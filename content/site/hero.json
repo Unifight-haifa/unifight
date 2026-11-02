@@ -1,0 +1,29 @@
+{
+ "eyebrow": {
+  "he": "בית ספר לג׳ודו · חיפה",
+  "ru": "Школа дзюдо · Хайфа",
+  "en": "Judo school · Haifa"
+ },
+ "headline": {
+  "he": "חזקים על המזרן. חזקים בחיים.",
+  "ru": "Сильные на татами. Сильные в жизни.",
+  "en": "Strong on the mat. Strong in life."
+ },
+ "subline": {
+  "he": "ג׳ודו לילדים, לנוער ולמבוגרים בחיפה והסביבה. מהנפילה הראשונה ועד הפודיום הבינלאומי — עם מאמנים שעברו את הדרך הזאת בעצמם.",
+  "ru": "Дзюдо для детей, подростков и взрослых в Хайфе и окрестностях. От первого падения до международного пьедестала — с тренерами, которые сами прошли этот путь.",
+  "en": "Judo for kids, teens and adults in Haifa and the area. From the very first fall to international podiums — with coaches who have walked that road themselves."
+ },
+ "cta_primary": {
+  "he": "הצטרפו ליוניפייט",
+  "ru": "Присоединяйтесь к Юнифайт",
+  "en": "Join Unifight",
+  "href": "#contact"
+ },
+ "cta_secondary": {
+  "he": "ללוח האימונים",
+  "ru": "Расписание тренировок",
+  "en": "See the schedule",
+  "href": "#schedule"
+ }
+}

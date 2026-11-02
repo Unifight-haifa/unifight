@@ -7,9 +7,9 @@ const SWEEP_WINDOW = 2 * 3600;
 const FAILED = ['failure', 'timed_out', 'startup_failure'];
 const SHA = /^[0-9a-f]{7,40}$/;
 
-/** -> {state: 'pending'|'live'|'failed', step?} for the push deploy run of `sha`. */
-export async function runState(env, sha) {
-  const runs = (await gh(env, 'GET', `/actions/runs?head_sha=${sha}&event=push`)).workflow_runs ?? [];
+/** -> {state: 'pending'|'live'|'failed', step?} for the deploy run of `sha` (push, or pull_request for a PR head). */
+export async function runState(env, sha, event = 'push') {
+  const runs = (await gh(env, 'GET', `/actions/runs?head_sha=${sha}&event=${event}`)).workflow_runs ?? [];
   const run = runs.find((r) => r.name === WORKFLOW);
   if (!run || run.status !== 'completed') return { state: 'pending' };
   if (run.conclusion === 'success') return { state: 'live' };
@@ -18,6 +18,8 @@ export async function runState(env, sha) {
     const step = jobs.find((j) => j.conclusion === 'failure')?.steps?.find((s) => s.conclusion === 'failure')?.name;
     return { state: 'failed', ...(step && { step }) };
   }
+  // A cancelled PR run was superseded by a newer save on the branch; the caller checks that head instead.
+  if (event !== 'push') return { state: 'pending' };
   // The `pages` concurrency group cancels superseded runs; a later green deploy carries this commit too.
   const later = (await gh(env, 'GET', `/actions/runs?branch=${encodeURIComponent(env.BRANCH)}&event=push`)).workflow_runs ?? [];
   const live = later.some((r) => r.name === WORKFLOW && r.conclusion === 'success' && r.created_at > run.created_at);
@@ -31,6 +33,12 @@ route('GET', '/status/:sha', async ({ env, user, params: { sha } }) => {
   if (!SHA.test(sha)) return fail(404, 'not_found');
   const row = await env.DB.prepare('SELECT email, status, conclusion FROM edits WHERE sha = ?').bind(sha).first();
   if (!row || (user.role === 'coach' && row.email !== user.email)) return fail(404, 'not_found');
+  // Branch commits have no push run; the old panel still polls here during the rollout.
+  if (row.status === 'pr') {
+    const p = await env.DB.prepare('SELECT state, step FROM prs WHERE head_sha = ?').bind(sha).first();
+    if (p?.state === 'failed') return json({ state: 'failed', ...(p.step && { step: p.step }) });
+    return json({ state: p?.state === 'live' ? 'live' : 'pending' });
+  }
   if (row.status === 'live' || row.status === 'failed') return json({ state: row.status, ...(row.conclusion && { step: row.conclusion }) });
   let s;
   try { s = await runState(env, sha); } catch (e) {
@@ -42,23 +50,30 @@ route('GET', '/status/:sha', async ({ env, user, params: { sha } }) => {
   return json(s);
 });
 
-const coachText = (step) => [
+export const coachText = (step) => [
   `Сайт не собрался на шаге «${step}». Ваше изменение не опубликовано, владелец знает.`,
   `האתר לא נבנה בשלב «${step}». השינוי שלך לא פורסם, הבעלים יודע.`,
   `The site build failed at step "${step}". Your change is not live yet; the owner knows.`,
 ].join('\n\n');
 const ownerText = (step, who) => `Сайт не собрался на шаге «${step}» после правки из панели (${who}). Деплой стоит, пока в main не придёт исправление.`;
 
-async function tell(env, chat_id, text) {
+/** Bot API call -> the parsed reply ({ok: false} on any failure); "message is not modified" counts as ok. */
+export async function tg(env, method, body) {
+  if (!env.TG_BOT_TOKEN) return { ok: false };
   try {
-    const r = await (env.__fetch ?? fetch)(`https://api.telegram.org/bot${env.TG_BOT_TOKEN}/sendMessage`, {
-      method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ chat_id, text }),
+    const r = await (env.__fetch ?? fetch)(`https://api.telegram.org/bot${env.TG_BOT_TOKEN}/${method}`, {
+      method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body),
     });
-    if (!r.ok) console.error('sweep: telegram', r.status);
+    const data = await r.json().catch(() => ({}));
+    if (r.ok || /message is not modified/.test(data.description ?? '')) return { ...data, ok: true };
+    console.error('telegram', method, r.status);
+    return { ok: false };
   } catch (e) {
-    console.error('sweep: telegram', e?.name); // never the URL: it holds the bot token
+    console.error('telegram', method, e?.name); // never the URL: it holds the bot token
+    return { ok: false };
   }
 }
+const tell = (env, chat_id, text) => tg(env, 'sendMessage', { chat_id, text });
 
 /** Cron: refresh recent pending edits, then send each failed one to Telegram once. */
 export async function sweep(env) {

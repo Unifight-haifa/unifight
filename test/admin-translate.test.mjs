@@ -22,6 +22,12 @@ test('a coach bio stays about that coach; a schedule note is for parents', () =>
   assert.doesNotMatch(note, /bio of/);
 });
 
+test('site text is for parents and visitors and names no coach', () => {
+  const { system } = buildPrompt({ glossary, fields: { 'hero.subline': 'Judo for kids' }, context: 'site' });
+  assert.match(system, /text on the club website for parents and visitors/);
+  assert.doesNotMatch(system, /bio of/);
+});
+
 test('buildPrompt detects the source language and drops empty fields', () => {
   assert.equal(detectLang('שלום'), 'he');
   assert.equal(detectLang('Привет'), 'ru');
