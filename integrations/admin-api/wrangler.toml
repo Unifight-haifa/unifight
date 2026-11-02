@@ -12,6 +12,7 @@ TG_BOT_USERNAME = "unifight_admin_bot"
 GITHUB_APP_ID = "5569009"
 GITHUB_INSTALLATION_ID = "177572673"
 TRANSLATE_MODEL = "claude-sonnet-5-5"
+PREVIEW_HOST = "unifight-preview.pages.dev"
 
 [[d1_databases]]
 binding = "DB"
