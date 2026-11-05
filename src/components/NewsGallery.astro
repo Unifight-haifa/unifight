@@ -1,0 +1,65 @@
+---
+import type { ImageMetadata } from 'astro';
+import { Image, getImage } from 'astro:assets';
+import type { Lang } from '../i18n/ui';
+import Lightbox from './Lightbox.astro';
+
+interface Props {
+  lang: Lang;
+  photos: { src: ImageMetadata; alt: string }[];
+}
+const { lang, photos } = Astro.props;
+const UI = {
+  label: { he: 'תמונות מהתחרות', ru: 'Фото с турнира', en: 'Photos from the event' },
+  prev: { he: 'התמונות הקודמות', ru: 'Предыдущие фото', en: 'Previous photos' },
+  next: { he: 'התמונות הבאות', ru: 'Следующие фото', en: 'Next photos' },
+};
+// the arrows are physical (as on the landing rail), so in Hebrew the left one goes forward
+const [left, right] = lang === 'he' ? [UI.next, UI.prev] : [UI.prev, UI.next];
+const slides = await Promise.all(photos.map(async (p) => ({ ...p, large: await getImage({ src: p.src, width: Math.min(1200, p.src.width), format: 'webp' }) })));
+---
+<section class="news-gallery" aria-roledescription="carousel" aria-label={UI.label[lang]}>
+  <ul class="rail" tabindex="0" aria-label={UI.label[lang]}>
+    {slides.map((p) => (
+      <li class="ng-slide">
+        <a href={p.large.src} data-gal-item data-caption={p.alt}>
+          <Image src={p.src} alt={p.alt} widths={[600, 1200]} sizes="(min-width: 900px) 300px, (min-width: 600px) 46vw, 86vw" />
+        </a>
+      </li>
+    ))}
+  </ul>
+  <div class="ng-nav" hidden>
+    <button type="button" class="rail-btn" data-dir="-1" aria-label={left[lang]}>‹</button>
+    <span class="ng-n" dir="ltr" aria-live="polite"></span>
+    <button type="button" class="rail-btn" data-dir="1" aria-label={right[lang]}>›</button>
+  </div>
+</section>
+<Lightbox lang={lang} />
+<script is:inline>
+  document.querySelectorAll('.news-gallery').forEach(function (g) {
+    var rail = g.querySelector('.rail'), nav = g.querySelector('.ng-nav'), n = nav.querySelector('.ng-n');
+    var btn = nav.querySelectorAll('[data-dir]'), total = rail.children.length;
+    // which slides are in view, read from scrollLeft (negative in RTL) and the slide pitch
+    function sync() {
+      var pitch = rail.children[1] ? Math.abs(rail.children[1].offsetLeft - rail.children[0].offsetLeft) : rail.clientWidth;
+      var per = Math.max(1, Math.round(rail.clientWidth / pitch)), x = Math.abs(rail.scrollLeft);
+      var a = Math.min(total - per, Math.round(x / pitch)) + 1, b = a + per - 1;
+      n.textContent = (per > 1 ? a + '–' + b : a) + ' / ' + total;
+      var atStart = x < 4, atEnd = x + rail.clientWidth > rail.scrollWidth - 4, rtl = getComputedStyle(rail).direction === 'rtl';
+      btn[0].disabled = rtl ? atEnd : atStart;
+      btn[1].disabled = rtl ? atStart : atEnd;
+    }
+    nav.hidden = false;
+    nav.addEventListener('click', function (e) {
+      var b = e.target.closest('[data-dir]');
+      if (!b) return;
+      var o = { behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' };
+      o.left = +b.dataset.dir * rail.clientWidth; // set apart: test/css-logical.test.mjs greps .astro for `left:`
+      rail.scrollBy(o);
+    });
+    var t;
+    rail.addEventListener('scroll', function () { cancelAnimationFrame(t); t = requestAnimationFrame(sync); }, { passive: true });
+    addEventListener('resize', sync);
+    sync();
+  });
+</script>

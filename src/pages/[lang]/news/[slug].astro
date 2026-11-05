@@ -4,6 +4,9 @@ import { render } from 'astro:content';
 import { getRelativeLocaleUrl } from 'astro:i18n';
 import Base from '../../../layouts/Base.astro';
 import JsonLd from '../../../components/JsonLd.astro';
+import NewsGallery from '../../../components/NewsGallery.astro';
+import NewsHero from '../../../components/NewsHero.astro';
+import NewsResults from '../../../components/NewsResults.astro';
 import VideoLink from '../../../components/VideoLink.astro';
 import VideoModal from '../../../components/VideoModal.astro';
 import { LANGS, t, type Lang } from '../../../i18n/ui';
@@ -79,14 +82,20 @@ const share = [
   </Fragment>
   <article class="news post">
     <a class="news-back" href={getRelativeLocaleUrl(lang, 'news/')}>{t(lang, 'newsAll')}</a>
-    <h1 class="h2" style={`view-transition-name: news-${post.slug}`}>{d.title}</h1>
+    {d.medals ? (
+      <NewsHero lang={lang} slug={post.slug} title={d.title} cover={d.cover} coverAlt={d.cover_alt ?? ''} medals={d.medals} />
+    ) : (
+      <h1 class="h2" style={`view-transition-name: news-${post.slug}`}>{d.title}</h1>
+    )}
     <p class="news-meta">
       <time datetime={d.date.toISOString().slice(0, 10)}>{fmtDate(d.date, lang)}</time>
       · {t(lang, 'newsBy')} <bdi>{authorName(d.author, lang)}</bdi>
     </p>
-    <Image class="news-cover" src={d.cover} alt={d.cover_alt ?? ''} widths={[600, 1200]} sizes="(min-width: 800px) 760px, 100vw" />
+    {!d.medals && <Image class="news-cover" src={d.cover} alt={d.cover_alt ?? ''} widths={[600, 1200]} sizes="(min-width: 800px) 760px, 100vw" />}
     {video && <div class="news-video"><VideoLink v={video} title={video.title[lang]} /></div>}
+    {d.results.length > 0 && <NewsResults groups={d.results} />}
     <div class="news-body"><Content /></div>
+    {d.gallery.length > 0 && <NewsGallery lang={lang} photos={d.gallery} />}
     <footer class="news-end">
       <nav class="news-share" aria-labelledby="news-share-h">
         <span class="news-share-h" id="news-share-h">{t(lang, 'newsShare')}</span>

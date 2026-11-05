@@ -26,6 +26,15 @@ author: ilana-kratysh               # required, a file name in content/coaches/ 
 cover: cover.jpg                    # required, file in the same folder
 cover_alt: What the photo shows     # optional
 video: LVJtDS4MCVM                  # optional; a YouTube id from content/videos.json, shown under the cover
+medals: { gold: 5, silver: 4, bronze: 2, note: One 5th place }  # optional; the cover becomes a hero with the title and medal tally
+results:                            # optional; medal blocks under the hero
+  - medal: gold                     #   gold | silver | bronze
+    heading: Gold medals
+    athletes:
+      - { name: Full Name, weight: up to 66 kg, years: born 2010–2011 }
+gallery:                            # optional; a swipeable photo carousel after the text, tap opens the viewer
+  - src: photo-01.jpg               #   file in the same folder
+    alt: What the photo shows       #   required, no names of minors
 tags: [tournament]                  # optional
 draft: false                        # optional; true keeps the post out of the build
 ---

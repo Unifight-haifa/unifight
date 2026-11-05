@@ -1,0 +1,18 @@
+---
+interface Props {
+  groups: { medal: 'gold' | 'silver' | 'bronze'; heading: string; athletes: { name: string; weight: string; years: string }[] }[];
+}
+const { groups } = Astro.props;
+---
+<div class="nr-res">
+  {groups.map((g) => (
+    <section class={`nr-g md-${g.medal}`}>
+      <h2 class="nr-gh"><b class="md-disc" aria-hidden="true">{g.athletes.length}</b>{g.heading}</h2>
+      <ul class="nr-list">
+        {g.athletes.map((a) => (
+          <li><span class="nr-name">{a.name}</span><span class="nr-w">{a.weight}</span><span class="nr-y">{a.years}</span></li>
+        ))}
+      </ul>
+    </section>
+  ))}
+</div>

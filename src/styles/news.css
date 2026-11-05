@@ -33,3 +33,83 @@
 .share-ico.is-done { border-color: var(--gold); background: var(--gold); color: var(--ink); }
 .share-ico[hidden], .news-share.is-native a.share-ico { display: none; }
 .share-status { color: var(--gold-2); font-size: 14px; }
+
+/* medal colours shared by the hero tally and the results groups */
+.md-gold { --mc: var(--gold-2); }
+.md-silver { --mc: #d6d9de; }
+.md-bronze { --mc: #d7925a; }
+.md-disc { display: inline-grid; place-items: center; flex: none; inline-size: 1.9em; block-size: 1.9em; border-radius: 50%; background: radial-gradient(circle at 32% 28%, #fff8 0 8%, transparent 40%), var(--mc); box-shadow: inset 0 0 0 3px rgb(0 0 0 / .18), 0 4px 14px rgb(0 0 0 / .45); color: var(--ink); font: 600 1em/1 var(--disp); }
+
+/* results hero: the team photo with the headline and medal board over it on phones, side by side on wide screens */
+.nh { position: relative; display: grid; margin-block: 14px 18px; border: 1px solid var(--line); background: var(--ink-2); overflow: hidden; }
+.nh-ph { grid-area: 1 / 1; aspect-ratio: 3 / 4; }
+.nh-ph img { inline-size: 100%; block-size: 100%; object-fit: cover; }
+.nh-txt { grid-area: 1 / 1; z-index: 1; display: flex; flex-direction: column; gap: 12px; padding: 20px 16px 16px; background: linear-gradient(180deg, rgb(10 9 8 / .92), rgb(10 9 8 / .5) 30%, transparent 44%, transparent 70%, rgb(10 9 8 / .92)); }
+.news .nh-h { font-size: clamp(25px, 7.4vw, 34px); line-height: 1.08; text-wrap: balance; text-shadow: 0 2px 14px #000; }
+.nh-board { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-block-start: auto; }
+.nh-rank { font: 600 clamp(54px, 16vw, 80px)/.8 var(--disp); color: var(--gold); letter-spacing: -.02em; text-shadow: 0 0 34px rgb(212 168 75 / .45), 0 3px 0 var(--red-2); }
+.nh-tally { list-style: none; padding: 0; display: flex; gap: clamp(8px, 3vw, 16px); }
+.nh-m { display: grid; justify-items: center; gap: 4px; color: var(--paper); font-size: 13px; }
+.nh-m .md-disc { font-size: clamp(20px, 6vw, 28px); }
+.nh-note { color: var(--paper-2); font-size: 13px; text-align: center; }
+@media (min-width: 900px) {
+  .nh { grid-template-columns: 1fr 380px; }
+  .nh-ph { grid-area: 1 / 2; aspect-ratio: auto; min-block-size: 500px; }
+  .nh-ph img { object-position: 50% 62%; }
+  .nh-txt { grid-area: 1 / 1; justify-content: center; gap: 32px; padding: 48px 44px; background: radial-gradient(120% 90% at 0% 100%, rgb(194 35 46 / .2), transparent 60%); border-inline-end: 3px solid var(--red); }
+  :dir(rtl) .nh-txt { background: radial-gradient(120% 90% at 100% 100%, rgb(194 35 46 / .2), transparent 60%); }
+  .news .nh-h { font-size: clamp(32px, 3.2vw, 44px); text-shadow: none; }
+  .nh-board { justify-content: flex-start; gap: 36px; margin-block-start: 0; }
+  .nh-rank { font-size: 132px; }
+  .nh-m { font-size: 15px; }
+  .nh-m .md-disc { font-size: 36px; }
+  .nh-note { text-align: start; }
+}
+
+/* results: one block per medal, athletes as name / weight / birth years rows */
+.nr-res { display: grid; gap: 14px; margin-block: 8px 32px; }
+.nr-g { background: var(--ink-2); border: 1px solid var(--line); border-block-start: 3px solid var(--mc); padding: 14px 16px 6px; }
+.nr-gh { display: flex; align-items: center; gap: 12px; margin-block-end: 6px; color: var(--paper); font: 600 19px/1.2 var(--disp); }
+:lang(he) .nr-gh { font-weight: 400; }
+.nr-gh .md-disc { font-size: 18px; }
+.nr-list { list-style: none; padding: 0; }
+.nr-list li { display: grid; grid-template-columns: 1fr auto; gap: 2px 12px; padding-block: 10px; border-block-start: 1px solid var(--line); }
+.nr-name { grid-row: span 2; align-self: center; color: var(--paper); font-size: 17px; font-weight: 500; }
+.nr-w { color: var(--mc); font-size: 15px; font-variant-numeric: tabular-nums; text-align: end; }
+.nr-y { color: var(--mute); font-size: 13px; text-align: end; }
+@media (min-width: 900px) {
+  .nr-res { grid-template-columns: repeat(3, 1fr); align-items: start; }
+}
+
+/* photo carousel: the landing's .rail strip; a slide and a peek on phones, three across on wide screens */
+.news-gallery { margin-block: 32px 8px; }
+.news-gallery .rail { grid-auto-columns: 86%; margin: 0; scroll-behavior: smooth; }
+@media (min-width: 600px) { .news-gallery .rail { grid-auto-columns: calc((100% - 12px) / 2); } }
+@media (min-width: 900px) { .news-gallery .rail { grid-auto-columns: calc((100% - 24px) / 3); } }
+@media (prefers-reduced-motion: reduce) { .news-gallery .rail { scroll-behavior: auto; } }
+.ng-slide { scroll-snap-align: start; aspect-ratio: 3 / 4; overflow: hidden; background: var(--ink-2); border: 1px solid var(--line); }
+.ng-slide a { display: block; block-size: 100%; cursor: zoom-in; }
+.ng-slide a:focus-visible { outline: 3px solid var(--gold-2); outline-offset: -3px; }
+.ng-slide img { inline-size: 100%; block-size: 100%; object-fit: cover; transition: scale .4s; }
+.ng-slide a:hover img { scale: 1.03; }
+.ng-nav { direction: ltr; display: flex; align-items: center; justify-content: center; gap: 18px; margin-block-start: 6px; }
+.ng-nav[hidden] { display: none; }
+.ng-n { min-inline-size: 6ch; text-align: center; color: var(--paper-2); font: 500 16px/1 var(--disp); letter-spacing: .06em; font-variant-numeric: tabular-nums; }
+.ng-nav .rail-btn:disabled { opacity: .35; cursor: default; border-color: var(--line); }
+
+/* photo viewer (components/Lightbox.astro) for the gallery and posts: fits any viewport, horizontal pans go to the swipe handler */
+.lb { inline-size: 100vw; block-size: 100dvh; max-inline-size: none; max-block-size: none; margin: 0; padding: 0; border: 0; background: rgb(0 0 0 / .94); color: var(--paper); touch-action: pan-y pinch-zoom; }
+.lb::backdrop { background: rgb(0 0 0 / .85); }
+.lb[open] { display: grid; }
+.lb-fig { grid-area: 1 / 1; display: grid; grid-template-rows: 1fr auto; place-items: center; min-block-size: 0; margin: 0; padding-block: 56px 8px; padding-inline: 8px; }
+.lb-img, .lb-img picture { display: contents; }
+.lb-img img { max-inline-size: 100%; max-block-size: calc(100dvh - 140px); inline-size: auto; block-size: auto; object-fit: contain; }
+.lb-cap { max-inline-size: 70ch; padding-block: 10px; padding-inline: 56px; text-align: center; font-size: 15px; }
+.lb-n { color: var(--mute); white-space: nowrap; }
+.lb-btn { position: absolute; inline-size: 44px; block-size: 44px; border: 0; border-radius: 50%; background: rgb(19 17 15 / .7); color: var(--paper); font: 400 30px/1 var(--body); cursor: pointer; }
+.lb-btn:hover { background: var(--red); }
+.lb-btn:focus-visible { outline: 3px solid var(--gold-2); outline-offset: 2px; }
+.lb-close { inset-block-start: 8px; inset-inline-end: 8px; }
+.lb-prev, .lb-next { inset-block-start: calc(50% - 22px); }
+.lb-prev { inset-inline-start: 8px; }
+.lb-next { inset-inline-end: 8px; }
