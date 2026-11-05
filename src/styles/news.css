@@ -41,6 +41,11 @@
 
 /* full-bleed: out of the post column to the page edges, minus the news rail on wide screens */
 .bleed { margin-inline: calc(50% - (100vw - var(--nr-w, 0px)) / 2); }
+/* with the news rail beside it a bleed can't be symmetric, so wide screens keep the content column */
+@media (min-width: 1100px) {
+  .bleed { margin-inline: 0; }
+  .rh-pic { overflow: hidden; border-radius: 24px 24px 0 0; }
+}
 
 /* results hero: the team photo fading to black, a centred #1 and headline over its lower edge */
 .rh { position: relative; margin-block-start: 10px; text-align: center; }
@@ -101,7 +106,9 @@
   .pd-w { grid-column: 2; grid-row: 1 / span 2; align-self: center; }
 }
 @media (min-width: 900px) {
-  .pd { grid-template-columns: repeat(3, 1fr); grid-template-areas: "s g b"; align-items: end; gap: 0 18px; border-block-end: 1px solid rgb(241 211 138 / .35); }
+  /* a podium reads 2 | 1 | 3 from the left in every language */
+  .pd { direction: ltr; grid-template-columns: repeat(3, 1fr); grid-template-areas: "s g b"; align-items: end; gap: 0 18px; border-block-end: 1px solid rgb(241 211 138 / .35); }
+  .pd-col:dir(rtl) { direction: rtl; }
   .pd .md-gold { grid-area: g; }
   .pd .md-silver { grid-area: s; }
   .pd .md-bronze { grid-area: b; }
