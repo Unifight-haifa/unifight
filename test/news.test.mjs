@@ -318,7 +318,9 @@ test('a post with hero:, results: and gallery: renders the hero, the podium and 
       assert.equal((html.match(/<span class="pd-name">/g) ?? []).length, names, `${l}/${p.slug}`);
       const photos = (fm(p).match(/^\s+- src:/gm) ?? []).length;
       assert.equal((html.match(/<a href="[^"]+\.webp" data-gal-item/g) ?? []).length, photos, `${l}/${p.slug}`);
-      assert.ok(html.includes('data-lb') && !/<img [^>]*alt=""/.test(html), `${l}/${p.slug}`);
+      // the header logo is decorative (alt=""); only post images must carry alt text
+      const main = html.slice(html.indexOf('<main'), html.indexOf('</main>'));
+      assert.ok(html.includes('data-lb') && !/<img [^>]*alt=""/.test(main), `${l}/${p.slug}`);
     }
   }
 });
