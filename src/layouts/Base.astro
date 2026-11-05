@@ -5,6 +5,7 @@ import Fonts from '../components/Fonts.astro';
 import NewsRail from '../components/NewsRail.astro';
 import { LANGS, NAMES, dir, t, type Lang } from '../i18n/ui';
 import { GA_ID } from '../lib/analytics';
+import { site } from '../lib/site';
 import '../styles/tokens.css';
 import '../styles/global.css';
 
@@ -41,7 +42,8 @@ const rest = Astro.url.pathname.slice(import.meta.env.BASE_URL.length).split('/'
     <a class="skip" href="#main">{t(lang, 'skipToContent')}</a>
     {bare ? <slot /> : <Fragment>
     <header class="site-header">
-      <a class="site-name" href={getRelativeLocaleUrl(lang)}>{t(lang, 'siteName')}</a>
+      <a class="brand" href={getRelativeLocaleUrl(lang)}><span class="plate"><img src={`${import.meta.env.BASE_URL}${site.images.logo.src}`} width="256" height="256" alt="" /></span>
+        <span class="brand-t">{t(lang, 'siteName')}</span></a>
       <nav aria-label={t(lang, 'langLabel')}>
         {LANGS.filter((l) => l !== lang).map((l) => (
           <a href={getRelativeLocaleUrl(l, rest)} hreflang={l} lang={l} data-set-lang={l} data-ga="language_switch" data-ga-to={l}>{NAMES[l]}</a>
