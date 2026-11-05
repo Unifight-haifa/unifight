@@ -63,7 +63,8 @@ for (const c of cards) {
   checkEntries([{ ...c }], `achievements ${c.id}`, ['alt']);
   photo(c.photo);
 }
-export const achievements = (published(cards) as Card[]).sort((a, b) => Math.max(...b.years) - Math.max(...a.years));
+// cards carry years only, so same-span cards keep file order
+export const achievements = (published(cards) as Card[]).sort((a, b) => Math.max(...b.years) - Math.max(...a.years) || Math.min(...b.years) - Math.min(...a.years));
 
 type Item = Sourced & { year?: string; sort?: string; when?: T; title: T; text: T };
 // site.json history items carry a single `source`; normalise to `sources`

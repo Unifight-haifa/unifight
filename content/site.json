@@ -1308,28 +1308,30 @@
   },
   "recent": [
    {
-    "id": "germany-2023",
+    "id": "georgia-2024",
     "when": {
-     "he": "מאי 2023",
-     "ru": "Май 2023",
-     "en": "May 2023"
+     "he": "פברואר 2024",
+     "ru": "Февраль 2024",
+     "en": "February 2024"
     },
     "title": {
-     "he": "מסע לגרמניה",
-     "ru": "Поездка в Германию",
-     "en": "Trip to Germany"
+     "he": "מחנה אימונים בגאורגיה",
+     "ru": "Сборы в Грузии",
+     "en": "Training camp in Georgia"
     },
     "text": {
-     "he": "טורניר באֶרפורט, אימונים, טיולים ופארק חבלים.",
-     "ru": "Турнир в Эрфурте, тренировки, экскурсии и верёвочный парк.",
-     "en": "A tournament in Erfurt, training, sightseeing and a rope park."
+     "he": "אימונים במזרן ובחוץ, ויום בשלג בגודאורי.",
+     "ru": "Тренировки в зале и на улице, и день в снегах Гудаури.",
+     "en": "Training on the mat and outdoors, and a day in the snow at Gudauri."
     },
-    "source": "owner photo archive: drive-003/UNIFIGHT/ג׳ודו/2022-2023/גרמניה (EXIF 12–16 May 2023)",
+    "source": "owner photo archive: drive-003/UNIFIGHT/ג׳ודו/2023-2024/מחנה אימונים גיאורגיה 2-24 (EXIF 22–25 Feb 2024)",
     "confidence": "likely",
     "photos": [
-     "camp-erfurt-flag.jpg",
-     "camp-erfurt-square.jpg",
-     "camp-ropepark.jpg"
+     "georgia-dojo.jpg",
+     "train-georgia-outdoor.jpg",
+     "camp-snow-wide.jpg",
+     "snow-flag.jpg",
+     "camp-gudauri.jpg"
     ]
    },
    {
@@ -1359,30 +1361,28 @@
     ]
    },
    {
-    "id": "georgia-2024",
+    "id": "germany-2023",
     "when": {
-     "he": "פברואר 2024",
-     "ru": "Февраль 2024",
-     "en": "February 2024"
+     "he": "מאי 2023",
+     "ru": "Май 2023",
+     "en": "May 2023"
     },
     "title": {
-     "he": "מחנה אימונים בגאורגיה",
-     "ru": "Сборы в Грузии",
-     "en": "Training camp in Georgia"
+     "he": "מסע לגרמניה",
+     "ru": "Поездка в Германию",
+     "en": "Trip to Germany"
     },
     "text": {
-     "he": "אימונים במזרן ובחוץ, ויום בשלג בגודאורי.",
-     "ru": "Тренировки в зале и на улице, и день в снегах Гудаури.",
-     "en": "Training on the mat and outdoors, and a day in the snow at Gudauri."
+     "he": "טורניר באֶרפורט, אימונים, טיולים ופארק חבלים.",
+     "ru": "Турнир в Эрфурте, тренировки, экскурсии и верёвочный парк.",
+     "en": "A tournament in Erfurt, training, sightseeing and a rope park."
     },
-    "source": "owner photo archive: drive-003/UNIFIGHT/ג׳ודו/2023-2024/מחנה אימונים גיאורגיה 2-24 (EXIF 22–25 Feb 2024)",
+    "source": "owner photo archive: drive-003/UNIFIGHT/ג׳ודו/2022-2023/גרמניה (EXIF 12–16 May 2023)",
     "confidence": "likely",
     "photos": [
-     "georgia-dojo.jpg",
-     "train-georgia-outdoor.jpg",
-     "camp-snow-wide.jpg",
-     "snow-flag.jpg",
-     "camp-gudauri.jpg"
+     "camp-erfurt-flag.jpg",
+     "camp-erfurt-square.jpg",
+     "camp-ropepark.jpg"
     ]
    }
   ],
@@ -1402,43 +1402,103 @@
   ],
   "history": [
    {
-    "year": "2011",
+    "year": "2015",
     "when": {
-     "he": "אוגוסט–ספטמבר 2011",
-     "ru": "Август–сентябрь 2011",
-     "en": "Aug–Sep 2011"
+     "he": "אוגוסט 2015",
+     "ru": "Август 2015",
+     "en": "August 2015"
     },
     "place": {
-     "he": "אודסה, אוקראינה",
-     "ru": "Одесса, Украина",
-     "en": "Odessa, Ukraine"
+     "he": "כפר גלים",
+     "ru": "Кфар-Галим",
+     "en": "Kfar Galim"
     },
     "text": {
-     "he": "מחנה המועדון — יותר מ־50 ספורטאים.",
-     "ru": "Сборы клуба — более 50 спортсменов.",
-     "en": "Club camp — more than 50 athletes."
+     "he": "בני 10–16, עם שיעור אמן של אילנה קרטיש.",
+     "ru": "Ребята 10–16 лет, мастер-класс Иланы Кратыш.",
+     "en": "Ages 10–16, with a masterclass by Ilana Kratysh."
     },
-    "source": "https://web.archive.org/web/2019/http://olimpix.info/2011/08/derzhim-put-v-odessu/",
+    "source": "https://web.archive.org/web/2019/http://unifight.info/?p=2842",
+    "confidence": "likely"
+   },
+   {
+    "year": "2014",
+    "when": {
+     "he": "חנוכה 2014",
+     "ru": "Ханука 2014",
+     "en": "Hanukkah 2014"
+    },
+    "place": {
+     "he": "מודיעין",
+     "ru": "Модиин",
+     "en": "Modiin"
+    },
+    "text": {
+     "he": "מחנה חורף בן שישה ימים.",
+     "ru": "Шестидневный зимний лагерь.",
+     "en": "A six-day winter camp."
+    },
+    "source": "https://haifainfo.com/?p=46569",
+    "confidence": "likely"
+   },
+   {
+    "year": "2014",
+    "when": {
+     "he": "אוגוסט 2014",
+     "ru": "Август 2014",
+     "en": "August 2014"
+    },
+    "place": {
+     "he": "כפר הנוער כפר גלים",
+     "ru": "Молодёжная деревня Кфар-Галим",
+     "en": "Kfar Galim youth village"
+    },
+    "text": {
+     "he": "כמאה ילדים מישראל, מאוקראינה ומרוסיה, 12 ימים של ג׳ודו והיאבקות.",
+     "ru": "Около ста детей из Израиля, Украины и России, 12 дней дзюдо и вольной борьбы.",
+     "en": "About a hundred kids from Israel, Ukraine and Russia; 12 days of judo and wrestling."
+    },
+    "source": "https://haifainfo.com/?p=43105",
+    "confidence": "confirmed"
+   },
+   {
+    "year": "2013",
+    "when": {
+     "he": "יולי 2013",
+     "ru": "Июль 2013",
+     "en": "July 2013"
+    },
+    "place": {
+     "he": "הרי הקרפטים, אוקראינה",
+     "ru": "Карпаты, Украина",
+     "en": "Carpathians, Ukraine"
+    },
+    "text": {
+     "he": "J-Sport Extreme.",
+     "ru": "J-Sport Extreme.",
+     "en": "J-Sport Extreme."
+    },
+    "source": "https://haifainfo.com/?p=36818",
     "confidence": "likely"
    },
    {
     "year": "2012",
     "when": {
-     "he": "יולי 2012",
-     "ru": "Июль 2012",
-     "en": "July 2012"
+     "he": "נובמבר 2012",
+     "ru": "Ноябрь 2012",
+     "en": "November 2012"
     },
     "place": {
-     "he": "כפר הנוער נחלת יהודה",
-     "ru": "Молодёжная деревня Нахалат-Иехуда",
-     "en": "Nahalat Yehuda youth village"
+     "he": "חיפה והסביבה",
+     "ru": "Хайфа и окрестности",
+     "en": "Haifa area"
     },
     "text": {
-     "he": "כמאה ילדים בני 9–16; טומי ארשנסקי ביקר במחנה לפני לונדון 2012.",
-     "ru": "Почти сто детей 9–16 лет; Томми Аршанский заехал в лагерь перед Лондоном-2012.",
-     "en": "Nearly a hundred kids aged 9–16; Tommy Arshansky visited before London 2012."
+     "he": "מחנה סולידריות: 85 ג׳ודוקאים צעירים מאשדוד ומאשקלון, בזמן הלחימה בעזה.",
+     "ru": "Лагерь солидарности: 85 юных дзюдоистов из Ашдода и Ашкелона во время боёв в Газе.",
+     "en": "Solidarity camp: 85 young judoka from Ashdod and Ashkelon during the Gaza fighting."
     },
-    "source": "https://web.archive.org/web/2019/http://unifight.info/?p=19",
+    "source": "https://web.archive.org/web/2019/http://unifight.info/?p=21",
     "confidence": "confirmed"
    },
    {
@@ -1464,101 +1524,41 @@
    {
     "year": "2012",
     "when": {
-     "he": "נובמבר 2012",
-     "ru": "Ноябрь 2012",
-     "en": "November 2012"
+     "he": "יולי 2012",
+     "ru": "Июль 2012",
+     "en": "July 2012"
     },
     "place": {
-     "he": "חיפה והסביבה",
-     "ru": "Хайфа и окрестности",
-     "en": "Haifa area"
+     "he": "כפר הנוער נחלת יהודה",
+     "ru": "Молодёжная деревня Нахалат-Иехуда",
+     "en": "Nahalat Yehuda youth village"
     },
     "text": {
-     "he": "מחנה סולידריות: 85 ג׳ודוקאים צעירים מאשדוד ומאשקלון, בזמן הלחימה בעזה.",
-     "ru": "Лагерь солидарности: 85 юных дзюдоистов из Ашдода и Ашкелона во время боёв в Газе.",
-     "en": "Solidarity camp: 85 young judoka from Ashdod and Ashkelon during the Gaza fighting."
+     "he": "כמאה ילדים בני 9–16; טומי ארשנסקי ביקר במחנה לפני לונדון 2012.",
+     "ru": "Почти сто детей 9–16 лет; Томми Аршанский заехал в лагерь перед Лондоном-2012.",
+     "en": "Nearly a hundred kids aged 9–16; Tommy Arshansky visited before London 2012."
     },
-    "source": "https://web.archive.org/web/2019/http://unifight.info/?p=21",
+    "source": "https://web.archive.org/web/2019/http://unifight.info/?p=19",
     "confidence": "confirmed"
    },
    {
-    "year": "2013",
+    "year": "2011",
     "when": {
-     "he": "יולי 2013",
-     "ru": "Июль 2013",
-     "en": "July 2013"
+     "he": "אוגוסט–ספטמבר 2011",
+     "ru": "Август–сентябрь 2011",
+     "en": "Aug–Sep 2011"
     },
     "place": {
-     "he": "הרי הקרפטים, אוקראינה",
-     "ru": "Карпаты, Украина",
-     "en": "Carpathians, Ukraine"
+     "he": "אודסה, אוקראינה",
+     "ru": "Одесса, Украина",
+     "en": "Odessa, Ukraine"
     },
     "text": {
-     "he": "J-Sport Extreme.",
-     "ru": "J-Sport Extreme.",
-     "en": "J-Sport Extreme."
+     "he": "מחנה המועדון — יותר מ־50 ספורטאים.",
+     "ru": "Сборы клуба — более 50 спортсменов.",
+     "en": "Club camp — more than 50 athletes."
     },
-    "source": "https://haifainfo.com/?p=36818",
-    "confidence": "likely"
-   },
-   {
-    "year": "2014",
-    "when": {
-     "he": "אוגוסט 2014",
-     "ru": "Август 2014",
-     "en": "August 2014"
-    },
-    "place": {
-     "he": "כפר הנוער כפר גלים",
-     "ru": "Молодёжная деревня Кфар-Галим",
-     "en": "Kfar Galim youth village"
-    },
-    "text": {
-     "he": "כמאה ילדים מישראל, מאוקראינה ומרוסיה, 12 ימים של ג׳ודו והיאבקות.",
-     "ru": "Около ста детей из Израиля, Украины и России, 12 дней дзюдо и вольной борьбы.",
-     "en": "About a hundred kids from Israel, Ukraine and Russia; 12 days of judo and wrestling."
-    },
-    "source": "https://haifainfo.com/?p=43105",
-    "confidence": "confirmed"
-   },
-   {
-    "year": "2014",
-    "when": {
-     "he": "חנוכה 2014",
-     "ru": "Ханука 2014",
-     "en": "Hanukkah 2014"
-    },
-    "place": {
-     "he": "מודיעין",
-     "ru": "Модиин",
-     "en": "Modiin"
-    },
-    "text": {
-     "he": "מחנה חורף בן שישה ימים.",
-     "ru": "Шестидневный зимний лагерь.",
-     "en": "A six-day winter camp."
-    },
-    "source": "https://haifainfo.com/?p=46569",
-    "confidence": "likely"
-   },
-   {
-    "year": "2015",
-    "when": {
-     "he": "אוגוסט 2015",
-     "ru": "Август 2015",
-     "en": "August 2015"
-    },
-    "place": {
-     "he": "כפר גלים",
-     "ru": "Кфар-Галим",
-     "en": "Kfar Galim"
-    },
-    "text": {
-     "he": "בני 10–16, עם שיעור אמן של אילנה קרטיש.",
-     "ru": "Ребята 10–16 лет, мастер-класс Иланы Кратыш.",
-     "en": "Ages 10–16, with a masterclass by Ilana Kratysh."
-    },
-    "source": "https://web.archive.org/web/2019/http://unifight.info/?p=2842",
+    "source": "https://web.archive.org/web/2019/http://olimpix.info/2011/08/derzhim-put-v-odessu/",
     "confidence": "likely"
    }
   ],

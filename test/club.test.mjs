@@ -288,3 +288,40 @@ test('techniques: search folds every script, so seoi-nage is found by romaji, Cy
   const card = read('en/techniques/index.html').match(/<li class="tq-card[^"]*" id="seoi-nage" data-s="([^"]+)"/)[1];
   for (const q of ['Seoi', 'сэой', 'СЕОИ', 'סאוי', '背負', 'shoulder throw', 'бросок через спину']) assert.ok(card.includes(norm(q)), q);
 });
+
+test('dated lists in dist read newest first, undated last', () => {
+  // a date's key is the ISO day; a year label sorts by its last year, then its first
+  const key = (s) => {
+    const day = s.match(/\d{4}-\d\d-\d\d/);
+    const y = (s.match(/(?<!\d)(?:19|20)\d\d(?!\d)/g) ?? []).map(Number);
+    return day ? day[0] : y.length ? `${Math.max(...y)}/${Math.min(...y)}` : '';
+  };
+  const lists = (html, from, to, item) => {
+    const at = html.indexOf(from);
+    assert.ok(at >= 0, from);
+    return [...html.slice(at, html.indexOf(to, at)).matchAll(item)].map((m) => key(m[1]));
+  };
+  for (const [l] of LANGS) {
+    const home = read(`${l}/index.html`);
+    const tours = read(`${l}/tournaments/index.html`);
+    const checks = {
+      'home highlights': lists(home, 'id="achievements"', '</section>', /class="hl-y">(.*?)<\/span>/g),
+      'home more results': lists(home, 'id="achievements"', '</section>', /class="mr-y">(.*?)<\/span>/g),
+      'home tournaments': lists(home, 'id="tournaments"', '</section>', /class="tag">(.*?)<\/span>/g),
+      'home camps': lists(home, 'id="camps"', '<div class="jsport">', /class="tag">(.*?)<\/span>/g),
+      'home J-Sport camps': lists(home, '<div class="jsport">', '</section>', /class="js-w">(.*?)<\/span>/g),
+      achievements: lists(read(`${l}/achievements/index.html`), 'class="club-cards"', '</ul>', /class="club-card-meta"><bdi dir="ltr">(.*?)<\/bdi>/g),
+      nivheret: lists(read(`${l}/nivheret/index.html`), 'class="club-results"', '</ul>', /<li><bdi dir="ltr">(.*?)<\/bdi>/g),
+      'about events': lists(read(`${l}/about/index.html`), 'id="events"', '</ul>', /<a href="[^"]*"><bdi dir="ltr">(.*?)<\/bdi>/g),
+      'tournament archive': lists(tours, 'id="archive"', '<script', /<time datetime="([^"]+)"/g),
+      news: lists(read(`${l}/news/index.html`), 'class="news-list"', '</ul>', /<time datetime="([^"]+)"/g),
+    };
+    for (const [name, keys] of Object.entries(checks)) {
+      assert.ok(keys.length, `${l} ${name}: no dated items found`);
+      assert.deepEqual(keys, [...keys].sort().reverse(), `${l} ${name}`);
+    }
+    // upcoming events read soonest first
+    const up = [...tours.slice(tours.indexOf('data-sec="up"'), tours.indexOf('id="archive"')).matchAll(/<time datetime="([^"]+)"/g)].map((m) => m[1]);
+    assert.deepEqual(up, [...up].sort(), `${l} upcoming`);
+  }
+});
