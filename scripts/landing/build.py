@@ -164,6 +164,15 @@ def split_dash(o):
     return None
 
 
+def newest(items, field="year"):
+    """Latest year first (a range counts by its end); same-year items keep file order, undated go last."""
+    def key(i):
+        v = i.get(field)
+        y = [int(x) for x in re.findall(r"\d{4}", str(v["en"] if isinstance(v, dict) else v or ""))]
+        return (not y, -max(y, default=0), -min(y, default=0))
+    return sorted(items, key=key)
+
+
 # ---------- sections ----------
 club, hero, kids, fc = C["club"], C["hero"], C["kids"], C["kids"]["first_class"]
 LOGO = IMAGES["logo"]["src"]
@@ -380,13 +389,13 @@ def achievements():
     a = C["achievements"]
     stats = "".join(f'<div class="stat rv"><span class="num">{ltr(s["value"])}</span><p>{t(s["label"])}</p></div>' for s in a["stats"])
     hls = ""
-    for h in a["highlights"]:
+    for h in newest(a["highlights"]):
         sp = split_dash(h["title"])
         title = (f'<span class="hl-who">{t(sp[0])}</span><h3 class="h3 hl-t">{t(sp[1])}</h3>' if sp
                  else f'<h3 class="h3 hl-t">{t(h["title"])}</h3>')
         mark = '<span class="hl-k kj" aria-hidden="true">五輪</span>' if h["kind"] == "olympic" else ""
         hls += f'<article class="hl hl-{h["kind"]} rv">{mark}<span class="hl-y">{ltr(h["year"])}</span>{title}<p>{t(h["detail"])}</p></article>'
-    more = "".join(f'<li><span class="mr-y">{ltr(m["year"])}</span><span>{t(m["text"])}</span></li>' for m in a["more_results"])
+    more = "".join(f'<li><span class="mr-y">{ltr(m["year"])}</span><span>{t(m["text"])}</span></li>' for m in newest(a["more_results"]))
     pics = "".join(img(n, "pic") for n in ["medals-kids.jpg", "intl-medals.jpg", "result-cadets-trio.jpg", "hadera-team.jpg"])
     return f'''
 <section class="sec ach" id="achievements">
@@ -431,7 +440,7 @@ def tournaments():
     to = C["tournaments"]
     bg = {"north-2025": "tour-north-hall.jpg", "north-2022": "tour-kids-bout.jpg", "fight-sim-2026": "tour-kids-referee.jpg"}
     cards = ""
-    for o in to["organized"]:
+    for o in newest(to["organized"]):
         part = f'<span class="tour-num">{ltr(o["participants"])}</span>' if o["participants"] else ""
         cards += (f'<article class="tour rv">{img(bg[o["id"]], "tour-img")}<span class="tag">{ltr(o["year"])}</span>{part}'
                   f'<h3 class="h3 tour-t">{t(o["name"])}</h3><p class="tour-pl">{t(o["place"])}</p><p>{t(o["text"])}</p></article>')
@@ -455,11 +464,11 @@ def tournaments():
 def camps():
     ca = C["camps"]
     cards = ""
-    for c in ca["recent"]:
+    for c in newest(ca["recent"], "when"):
         ph = "".join(img(p, "pic") for p in c["photos"])
         cards += (f'<article class="camp rv"><div class="camp-mo n{len(c["photos"])}">{ph}</div>'
                   f'<div class="camp-b"><span class="tag">{t(c["when"])}</span><h3 class="h3">{t(c["title"])}</h3><p>{t(c["text"])}</p></div></article>')
-    js = "".join(f'<li class="js-i rv"><span class="js-w">{t(h["when"])}</span><h4 class="h4">{t(h["place"])}</h4><p>{t(h["text"])}</p></li>' for h in ca["history"])
+    js = "".join(f'<li class="js-i rv"><span class="js-w">{t(h["when"])}</span><h4 class="h4">{t(h["place"])}</h4><p>{t(h["text"])}</p></li>' for h in newest(ca["history"], "when"))
     return f'''
 <section class="sec tatami" id="camps">
  <div class="wrap">

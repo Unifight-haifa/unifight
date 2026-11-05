@@ -44,7 +44,7 @@ const date = (ev: Tournament) => fmtDate(new Date(ev.date), lang) + (ev.end ? ` 
     <section class="club-sec" data-sec="up" aria-labelledby="up">
       <h2 class="h3" id="up">{s.upcoming}</h2>
       <ul class="club-events">
-        {tournaments.map((ev) => {
+        {[...tournaments].sort((a, b) => a.date.localeCompare(b.date)).map((ev) => {
           const up = upcoming.includes(ev);
           return (
             <li data-when="up" data-end={lastDay(ev)} hidden={!up}>
