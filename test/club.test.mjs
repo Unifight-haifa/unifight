@@ -123,7 +123,8 @@ test('every venue with classes has a weekly .ics per language, linked from its c
 test('nivheret is never called the Israel national team', () => {
   // real national-team roles of a person stay allowed, but only these exact phrasings
   const ALLOW = [/מאמן נבחרת ישראל לנוער/, /юниорской сборной Израиля/, /בגד היאבקות של נבחרת ישראל/, /трико сборной Израиля/,
-    /היה חבר בנבחרת ישראל/, /за сборную Израиля/, /членом сборной Израиля по дзюдо/, /Israel national team member/, /the Israeli national judo team/];
+    /היה חבר בנבחרת ישראל/, /за сборную Израиля/, /членом сборной Израиля по дзюдо/, /Israel national team member/, /the Israeli national judo team/,
+    /הכניסה לנבחרת ישראל/, /отбор в сборную Израиля/, /selection for the Israeli national team/];
   const pages = readdirSync(dist(''), { recursive: true }).filter((f) => f.endsWith('.html'));
   let nivSegments = 0;
   for (const f of pages) {

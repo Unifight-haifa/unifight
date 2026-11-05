@@ -1,0 +1,56 @@
+---
+import type { ImageMetadata } from 'astro';
+import { getImage } from 'astro:assets';
+
+interface Props {
+  slug: string;
+  date: { iso: string; text: string };
+  cover: ImageMetadata;
+  coverAlt: string;
+  hero: { eyebrow: string; rank: string; headline: string; subline?: string; wide?: ImageMetadata };
+}
+const { slug, date, cover, coverAlt, hero } = Astro.props;
+const src = (img: ImageMetadata, widths: number[]) =>
+  getImage({ src: img, widths: widths.filter((w) => w <= img.width), format: 'webp' });
+// portrait cover on phones, the optional landscape shot from 700px up
+const tall = await src(cover, [480, 800, 1200]);
+const wide = hero.wide && (await src(hero.wide, [1280, 1920, 2048]));
+---
+<header class="rh bleed">
+  <picture class="rh-pic">
+    {wide && <source media="(min-width: 700px)" srcset={wide.srcSet.attribute} sizes="100vw" />}
+    <img src={tall.src} srcset={tall.srcSet.attribute} sizes="100vw" alt={coverAlt} width={cover.width} height={cover.height} fetchpriority="high" />
+  </picture>
+  <div class="rh-in">
+    <p class="rh-eyebrow"><time datetime={date.iso}>{date.text}</time><span aria-hidden="true">·</span><span>{hero.eyebrow}</span></p>
+    <p class="rh-rank" aria-hidden="true"><bdi dir="ltr">{hero.rank}</bdi></p>
+    <h1 class="rh-h" style={`view-transition-name: news-${slug}`}>
+      <span class="rh-head">{hero.headline}</span>
+      {hero.subline && <span class="rh-sub">{hero.subline}</span>}
+    </h1>
+  </div>
+</header>
+<script is:inline>
+  (function () {
+    // sections below rise in once as they scroll into view; without JS or with reduced motion they are simply there
+    if (!('IntersectionObserver' in window) || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    document.documentElement.classList.add('reveal-on');
+    var count = function (el) {
+      var to = +el.dataset.count, t0 = performance.now();
+      (function step(t) {
+        var k = Math.min(1, (t - t0) / 900);
+        el.textContent = Math.round(to * (1 - Math.pow(1 - k, 3)));
+        if (k < 1) requestAnimationFrame(step);
+      })(t0);
+    };
+    var io = new IntersectionObserver(function (es) {
+      es.forEach(function (e) {
+        if (!e.isIntersecting) return;
+        e.target.classList.add('is-in');
+        e.target.querySelectorAll('[data-count]').forEach(count);
+        io.unobserve(e.target);
+      });
+    }, { threshold: 0.15 });
+    addEventListener('DOMContentLoaded', function () { document.querySelectorAll('[data-reveal]').forEach(function (el) { io.observe(el); }); });
+  })();
+</script>

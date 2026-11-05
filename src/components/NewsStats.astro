@@ -1,0 +1,23 @@
+---
+import type { Lang } from '../i18n/ui';
+import { MEDAL } from '../lib/news';
+
+interface Props {
+  lang: Lang;
+  medals: { gold: number; silver: number; bronze: number; note?: string };
+}
+const { lang, medals } = Astro.props;
+const total = { he: 'מדליות', ru: 'медалей', en: 'medals' };
+const cells = [
+  { k: 'all', n: medals.gold + medals.silver + medals.bronze, label: total[lang] },
+  ...(['gold', 'silver', 'bronze'] as const).map((m) => ({ k: m, n: medals[m], label: MEDAL[m][lang] })),
+];
+---
+<section class="mt" aria-label={total[lang]} data-reveal>
+  <ul class="mt-row">
+    {cells.map((c) => (
+      <li class={`mt-c mt-${c.k}`}><b class="mt-n" data-count={c.n}>{c.n}</b><span class="mt-l">{c.label}</span></li>
+    ))}
+  </ul>
+  {medals.note && <p class="mt-note">+ {medals.note}</p>}
+</section>

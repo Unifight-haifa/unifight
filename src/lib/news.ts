@@ -45,3 +45,9 @@ export const postPath = (lang: Lang, slug: string) => getRelativeLocaleUrl(lang,
 const LOCALE = { he: 'he-IL', ru: 'ru-RU', en: 'en-GB' };
 export const fmtDate = (d: Date, lang: Lang) =>
   new Intl.DateTimeFormat(LOCALE[lang], { dateStyle: 'long', timeZone: 'UTC' }).format(d);
+
+export const MEDAL = {
+  gold: { he: 'זהב', ru: 'золото', en: 'gold' },
+  silver: { he: 'כסף', ru: 'серебро', en: 'silver' },
+  bronze: { he: 'ארד', ru: 'бронза', en: 'bronze' },
+};

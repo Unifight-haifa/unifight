@@ -13,7 +13,9 @@ export const GET: APIRoute = async ({ site }) => {
     for (const l of LANGS) {
       const e = p.lang[l];
       const url = abs(postPath(l, p.slug));
-      const share = socialTexts({ title: e.data.title, body: e.body ?? '', url, hashtags: social.hashtags[l], linkInBio: social.link_in_bio[l] });
+      // results live in frontmatter, not the body, but the shared text should still name the medallists
+      const results = e.data.results.map((g) => `${g.heading}:\n\n${g.athletes.map((a) => `- ${a.name} – ${a.weight} | ${a.years}`).join('\n')}`);
+      const share = socialTexts({ title: e.data.title, body: [...results, e.body ?? ''].join('\n\n'), url, hashtags: social.hashtags[l], linkInBio: social.link_in_bio[l] });
       items.push({
         id: url,
         url,

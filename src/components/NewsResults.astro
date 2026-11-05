@@ -1,0 +1,21 @@
+---
+interface Props {
+  groups: { medal: 'gold' | 'silver' | 'bronze'; heading: string; athletes: { name: string; weight: string; years: string }[] }[];
+}
+const { groups } = Astro.props;
+---
+<div class="pd" data-reveal>
+  {groups.map((g) => (
+    <section class={`pd-row md-${g.medal}`} aria-labelledby={`pd-${g.medal}`}>
+      <h2 class="pd-h" id={`pd-${g.medal}`}><b class="pd-disc" aria-hidden="true">{g.athletes.length}</b><span>{g.heading}</span></h2>
+      <ul class="pd-tiles">
+        {g.athletes.map((a) => (
+          <li class="pd-tile">
+            <span class="pd-name">{a.name}</span>
+            <span class="pd-meta"><span>{a.weight}</span> <span>{a.years}</span></span>
+          </li>
+        ))}
+      </ul>
+    </section>
+  ))}
+</div>

@@ -1,0 +1,69 @@
+---
+import type { Lang } from '../i18n/ui';
+
+// Any <a data-gal-item data-caption> wrapping a <picture> or <img> on the page opens here.
+const { lang } = Astro.props as { lang: Lang };
+const s = {
+  he: { viewer: 'צפייה בתמונה', close: 'סגירה', prev: 'התמונה הקודמת', next: 'התמונה הבאה' },
+  ru: { viewer: 'Просмотр фото', close: 'Закрыть', prev: 'Предыдущее фото', next: 'Следующее фото' },
+  en: { viewer: 'Photo viewer', close: 'Close', prev: 'Previous photo', next: 'Next photo' },
+}[lang];
+---
+<dialog class="lb" aria-label={s.viewer} data-lb>
+  <figure class="lb-fig">
+    <div class="lb-img"></div>
+    <figcaption class="lb-cap"><span data-lb-cap></span> <span class="lb-n" data-lb-n dir="ltr"></span></figcaption>
+  </figure>
+  <button type="button" class="lb-btn lb-close" data-lb-close aria-label={s.close}>×</button>
+  <button type="button" class="lb-btn lb-prev" data-lb-step="-1" aria-label={s.prev}>‹</button>
+  <button type="button" class="lb-btn lb-next" data-lb-step="1" aria-label={s.next}>›</button>
+</dialog>
+<script is:inline>
+  (function () {
+    var dlg = document.querySelector('[data-lb]'), box = dlg.querySelector('.lb-img'), items = [], i = 0, opener, x0;
+    var rtl = document.documentElement.dir === 'rtl';
+    function show(n) {
+      i = (n + items.length) % items.length;
+      var a = items[i], pic = (a.querySelector('picture') || a.querySelector('img')).cloneNode(true);
+      var img = pic.tagName === 'IMG' ? pic : pic.querySelector('img');
+      // the srcset already reaches the large file; a full-viewport sizes makes the browser pick it
+      [].forEach.call(pic === img ? [img] : pic.querySelectorAll('source, img'), function (el) { el.sizes = '100vw'; });
+      img.loading = 'eager';
+      // a native image drag would swallow mouse swipes
+      img.draggable = false;
+      box.replaceChildren(pic);
+      dlg.querySelector('[data-lb-cap]').textContent = a.dataset.caption;
+      dlg.querySelector('[data-lb-n]').textContent = (i + 1) + ' / ' + items.length;
+    }
+    document.addEventListener('click', function (e) {
+      var a = e.target.closest && e.target.closest('a[data-gal-item]');
+      if (!a || e.ctrlKey || e.metaKey || e.shiftKey || e.altKey || e.button) return;
+      e.preventDefault();
+      opener = a;
+      items = [].filter.call(document.querySelectorAll('a[data-gal-item]'), function (x) { return !x.closest('[hidden]'); });
+      show(items.indexOf(a));
+      dlg.showModal();
+      dlg.querySelector('[data-lb-close]').focus();
+    });
+    dlg.addEventListener('click', function (e) {
+      var b = e.target.closest('[data-lb-step]');
+      if (b) show(i + Number(b.dataset.lbStep));
+      else if (e.target === dlg || e.target.closest('[data-lb-close]')) dlg.close();
+    });
+    // arrow keys follow the reading direction
+    dlg.addEventListener('keydown', function (e) {
+      var d = { ArrowLeft: -1, ArrowRight: 1 }[e.key];
+      if (d) { e.preventDefault(); show(i + (rtl ? -d : d)); }
+    });
+    dlg.addEventListener('pointerdown', function (e) { x0 = e.clientX; });
+    dlg.addEventListener('pointerup', function (e) {
+      var dx = e.clientX - x0;
+      if (Math.abs(dx) > 40) show(i + ((dx < 0) !== rtl ? 1 : -1));
+    });
+    // Esc closes natively
+    dlg.addEventListener('close', function () {
+      box.textContent = '';
+      if (opener) opener.focus();
+    });
+  })();
+</script>

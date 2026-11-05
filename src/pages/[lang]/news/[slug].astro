@@ -4,6 +4,10 @@ import { render } from 'astro:content';
 import { getRelativeLocaleUrl } from 'astro:i18n';
 import Base from '../../../layouts/Base.astro';
 import JsonLd from '../../../components/JsonLd.astro';
+import NewsGallery from '../../../components/NewsGallery.astro';
+import NewsHero from '../../../components/NewsHero.astro';
+import NewsResults from '../../../components/NewsResults.astro';
+import NewsStats from '../../../components/NewsStats.astro';
 import VideoLink from '../../../components/VideoLink.astro';
 import VideoModal from '../../../components/VideoModal.astro';
 import { LANGS, t, type Lang } from '../../../i18n/ui';
@@ -27,6 +31,7 @@ const { Content } = await render(entry);
 const abs = (path: string) => new URL(path, Astro.site).href;
 const url = abs(postPath(lang, post.slug));
 const og = await ogCover(entry);
+const iso = d.date.toISOString().slice(0, 10);
 const video = d.video && videos.find((v) => v.id === d.video);
 if (d.video && !video) throw new Error(`news/${post.slug}/${lang}: video ${d.video} is not in content/videos.json`);
 const LOCALE = { he: 'he_IL', ru: 'ru_RU', en: 'en_US' };
@@ -79,14 +84,24 @@ const share = [
   </Fragment>
   <article class="news post">
     <a class="news-back" href={getRelativeLocaleUrl(lang, 'news/')}>{t(lang, 'newsAll')}</a>
-    <h1 class="h2" style={`view-transition-name: news-${post.slug}`}>{d.title}</h1>
-    <p class="news-meta">
-      <time datetime={d.date.toISOString().slice(0, 10)}>{fmtDate(d.date, lang)}</time>
-      · {t(lang, 'newsBy')} <bdi>{authorName(d.author, lang)}</bdi>
-    </p>
-    <Image class="news-cover" src={d.cover} alt={d.cover_alt ?? ''} widths={[600, 1200]} sizes="(min-width: 800px) 760px, 100vw" />
+    {d.hero ? (
+      <NewsHero slug={post.slug} date={{ iso, text: fmtDate(d.date, lang) }} cover={d.cover} coverAlt={d.cover_alt ?? ''} hero={d.hero} />
+    ) : (
+      <>
+        <h1 class="h2" style={`view-transition-name: news-${post.slug}`}>{d.title}</h1>
+        <p class="news-meta">
+          <time datetime={iso}>{fmtDate(d.date, lang)}</time>
+          · {t(lang, 'newsBy')} <bdi>{authorName(d.author, lang)}</bdi>
+        </p>
+        <Image class="news-cover" src={d.cover} alt={d.cover_alt ?? ''} widths={[600, 1200]} sizes="(min-width: 800px) 760px, 100vw" />
+      </>
+    )}
+    {d.medals && <NewsStats lang={lang} medals={d.medals} />}
     {video && <div class="news-video"><VideoLink v={video} title={video.title[lang]} /></div>}
-    <div class="news-body"><Content /></div>
+    {d.results.length > 0 && <NewsResults groups={d.results} />}
+    <div data-story={d.hero ? '' : undefined} data-reveal={d.hero ? '' : undefined} class="news-body"><Content /></div>
+    {d.hero && <p class="news-by">{t(lang, 'newsBy')} <bdi>{authorName(d.author, lang)}</bdi></p>}
+    {d.gallery.length > 0 && <NewsGallery lang={lang} photos={d.gallery} />}
     <footer class="news-end">
       <nav class="news-share" aria-labelledby="news-share-h">
         <span class="news-share-h" id="news-share-h">{t(lang, 'newsShare')}</span>

@@ -13,6 +13,19 @@
     "full_name",
     "results"
    ]
+  },
+  {
+   "id": "c-2026-002",
+   "ref": "owner confirmed 2026-11-05, names + photos, Cadets Criterion post",
+   "given": "2026-11-05",
+   "scopes": [
+    "site",
+    "youtube",
+    "social",
+    "first_name",
+    "full_name",
+    "results"
+   ]
   }
  ],
  "media": {
@@ -32,6 +45,84 @@
    "minors": true,
    "consents": [
     "c-2026-001"
+   ]
+  },
+  "src/content/news/2026-11-05-cadets-criterion/cover.jpg": {
+   "minors": true,
+   "consents": [
+    "c-2026-002"
+   ]
+  },
+  "src/content/news/2026-11-05-cadets-criterion/photo-01.jpg": {
+   "minors": true,
+   "consents": [
+    "c-2026-002"
+   ]
+  },
+  "src/content/news/2026-11-05-cadets-criterion/photo-02.jpg": {
+   "minors": true,
+   "consents": [
+    "c-2026-002"
+   ]
+  },
+  "src/content/news/2026-11-05-cadets-criterion/photo-03.jpg": {
+   "minors": true,
+   "consents": [
+    "c-2026-002"
+   ]
+  },
+  "src/content/news/2026-11-05-cadets-criterion/photo-04.jpg": {
+   "minors": true,
+   "consents": [
+    "c-2026-002"
+   ]
+  },
+  "src/content/news/2026-11-05-cadets-criterion/photo-05.jpg": {
+   "minors": true,
+   "consents": [
+    "c-2026-002"
+   ]
+  },
+  "src/content/news/2026-11-05-cadets-criterion/photo-06.jpg": {
+   "minors": true,
+   "consents": [
+    "c-2026-002"
+   ]
+  },
+  "src/content/news/2026-11-05-cadets-criterion/photo-07.jpg": {
+   "minors": true,
+   "consents": [
+    "c-2026-002"
+   ]
+  },
+  "src/content/news/2026-11-05-cadets-criterion/photo-08.jpg": {
+   "minors": true,
+   "consents": [
+    "c-2026-002"
+   ]
+  },
+  "src/content/news/2026-11-05-cadets-criterion/photo-09.jpg": {
+   "minors": true,
+   "consents": [
+    "c-2026-002"
+   ]
+  },
+  "src/content/news/2026-11-05-cadets-criterion/photo-10.jpg": {
+   "minors": true,
+   "consents": [
+    "c-2026-002"
+   ]
+  },
+  "src/content/news/2026-11-05-cadets-criterion/photo-11.jpg": {
+   "minors": true,
+   "consents": [
+    "c-2026-002"
+   ]
+  },
+  "src/content/news/2026-11-05-cadets-criterion/wide.jpg": {
+   "minors": true,
+   "consents": [
+    "c-2026-002"
    ]
   }
  }
