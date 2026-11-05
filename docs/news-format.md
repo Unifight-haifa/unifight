@@ -26,13 +26,19 @@ author: ilana-kratysh               # required, a file name in content/coaches/ 
 cover: cover.jpg                    # required, file in the same folder
 cover_alt: What the photo shows     # optional
 video: LVJtDS4MCVM                  # optional; a YouTube id from content/videos.json, shown under the cover
-medals: { gold: 5, silver: 4, bronze: 2, note: One 5th place }  # optional; the cover becomes a hero with the title and medal tally
-results:                            # optional; medal blocks under the hero
+hero:                               # optional; full-width results hero in place of the title and cover
+  eyebrow: Cadets Criterion 2026    #   shown after the date
+  rank: "#1"
+  headline: First place in Israel   #   the page h1, with the subline
+  subline: in the club rankings     #   optional
+  wide: wide.jpg                    #   optional landscape photo for wide screens; phones use cover
+medals: { gold: 5, silver: 4, bronze: 2, note: One 5th place }  # optional; medal count band
+results:                            # optional; podium of medallists
   - medal: gold                     #   gold | silver | bronze
     heading: Gold medals
     athletes:
       - { name: Full Name, weight: up to 66 kg, years: born 2010–2011 }
-gallery:                            # optional; a swipeable photo carousel after the text, tap opens the viewer
+gallery:                            # optional; a swipeable photo stage after the text, tap opens the viewer
   - src: photo-01.jpg               #   file in the same folder
     alt: What the photo shows       #   required, no names of minors
 tags: [tournament]                  # optional

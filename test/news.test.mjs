@@ -184,8 +184,8 @@ test('rendered post bodies contain only safe tags and links', () => {
     for (const d of readdirSync(new URL(`${l}/news/`, dist), { withFileTypes: true })) {
       if (!d.isDirectory()) continue;
       const html = readFileSync(new URL(`${l}/news/${d.name}/index.html`, dist), 'utf8');
-      // the carousel after the body is template markup with its own script, not post content
-      const body = html.split('class="news-body">')[1]?.split(/<footer class="news-end">|<section class="news-gallery"/)[0];
+      // byline and carousel after the body are template markup (the carousel has its own script), not post content
+      const body = html.split('class="news-body">')[1]?.split(/<footer class="news-end">|<p class="news-by">|<section class="gs /)[0];
       assert.ok(body, `${l}/${d.name} has a body`);
       assert.doesNotThrow(() => checkRenderedBody(body), `${l}/${d.name}`);
     }
@@ -301,21 +301,21 @@ test('a post with video: shows the click-to-play player, posts without it do not
   }
 });
 
-test('a post with medals:, results: and gallery: renders the hero, the results and every photo as a lightbox slide', () => {
+test('a post with hero:, results: and gallery: renders the hero, the podium and every photo as a lightbox slide', () => {
   const fm = (p) => readFileSync(new URL(`${p.dir}/index.he.md`, src), 'utf8').split('---')[1];
-  const rich = published.filter((p) => /^medals:/m.test(fm(p)));
-  assert.ok(rich.length > 0, 'expected at least one post with medals:');
+  const rich = published.filter((p) => /^hero:/m.test(fm(p)));
+  assert.ok(rich.length > 0, 'expected at least one post with hero:');
   for (const p of published) {
     for (const l of Object.keys(LANGS)) {
       const html = page(l, p.slug);
       if (!rich.includes(p)) {
-        assert.ok(!html.includes('class="nh"') && html.includes('class="news-cover"'), `${l}/${p.slug}`);
+        assert.ok(!html.includes('class="rh ') && html.includes('class="news-cover"'), `${l}/${p.slug}`);
         continue;
       }
       assert.equal((html.match(/<h1\b/g) ?? []).length, 1, `${l}/${p.slug}: one h1, inside the hero`);
-      assert.match(html, /<header class="nh">[\s\S]*?<h1 /, `${l}/${p.slug}`);
+      assert.match(html, /<header class="rh bleed">[\s\S]*?<h1 /, `${l}/${p.slug}`);
       const names = (fm(p).match(/^\s+- \{ name:/gm) ?? []).length;
-      assert.equal((html.match(/<span class="nr-name">/g) ?? []).length, names, `${l}/${p.slug}`);
+      assert.equal((html.match(/<span class="pd-name">/g) ?? []).length, names, `${l}/${p.slug}`);
       const photos = (fm(p).match(/^\s+- src:/gm) ?? []).length;
       assert.equal((html.match(/<a href="[^"]+\.webp" data-gal-item/g) ?? []).length, photos, `${l}/${p.slug}`);
       assert.ok(html.includes('data-lb') && !/<img [^>]*alt=""/.test(html), `${l}/${p.slug}`);

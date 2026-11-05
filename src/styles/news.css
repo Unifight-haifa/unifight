@@ -34,68 +34,124 @@
 .share-ico[hidden], .news-share.is-native a.share-ico { display: none; }
 .share-status { color: var(--gold-2); font-size: 14px; }
 
-/* medal colours shared by the hero tally and the results groups */
-.md-gold { --mc: var(--gold-2); }
-.md-silver { --mc: #d6d9de; }
-.md-bronze { --mc: #d7925a; }
-.md-disc { display: inline-grid; place-items: center; flex: none; inline-size: 1.9em; block-size: 1.9em; border-radius: 50%; background: radial-gradient(circle at 32% 28%, #fff8 0 8%, transparent 40%), var(--mc); box-shadow: inset 0 0 0 3px rgb(0 0 0 / .18), 0 4px 14px rgb(0 0 0 / .45); color: var(--ink); font: 600 1em/1 var(--disp); }
+/* medal colour and its metallic face, shared by the stats band and the podium */
+.md-gold, .mt-gold { --mc: var(--gold-2); --mg: linear-gradient(180deg, #fff3cc, #f1d38a 34%, #c8952f 68%, #f7df9c); }
+.md-silver, .mt-silver { --mc: #d9dde3; --mg: linear-gradient(180deg, #fff, #d9dde3 36%, #98a0ab 70%, #eef0f3); }
+.md-bronze, .mt-bronze { --mc: #e0a06a; --mg: linear-gradient(180deg, #ffe0c2, #d99459 36%, #97582a 70%, #eab27f); }
 
-/* results hero: the team photo with the headline and medal board over it on phones, side by side on wide screens */
-.nh { position: relative; display: grid; margin-block: 14px 18px; border: 1px solid var(--line); background: var(--ink-2); overflow: hidden; }
-.nh-ph { grid-area: 1 / 1; aspect-ratio: 3 / 4; }
-.nh-ph img { inline-size: 100%; block-size: 100%; object-fit: cover; }
-.nh-txt { grid-area: 1 / 1; z-index: 1; display: flex; flex-direction: column; gap: 12px; padding: 20px 16px 16px; background: linear-gradient(180deg, rgb(10 9 8 / .92), rgb(10 9 8 / .5) 30%, transparent 44%, transparent 70%, rgb(10 9 8 / .92)); }
-.news .nh-h { font-size: clamp(25px, 7.4vw, 34px); line-height: 1.08; text-wrap: balance; text-shadow: 0 2px 14px #000; }
-.nh-board { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-block-start: auto; }
-.nh-rank { font: 600 clamp(54px, 16vw, 80px)/.8 var(--disp); color: var(--gold); letter-spacing: -.02em; text-shadow: 0 0 34px rgb(212 168 75 / .45), 0 3px 0 var(--red-2); }
-.nh-tally { list-style: none; padding: 0; display: flex; gap: clamp(8px, 3vw, 16px); }
-.nh-m { display: grid; justify-items: center; gap: 4px; color: var(--paper); font-size: 13px; }
-.nh-m .md-disc { font-size: clamp(20px, 6vw, 28px); }
-.nh-note { color: var(--paper-2); font-size: 13px; text-align: center; }
-@media (min-width: 900px) {
-  .nh { grid-template-columns: 1fr 380px; }
-  .nh-ph { grid-area: 1 / 2; aspect-ratio: auto; min-block-size: 500px; }
-  .nh-ph img { object-position: 50% 62%; }
-  .nh-txt { grid-area: 1 / 1; justify-content: center; gap: 32px; padding: 48px 44px; background: radial-gradient(120% 90% at 0% 100%, rgb(194 35 46 / .2), transparent 60%); border-inline-end: 3px solid var(--red); }
-  :dir(rtl) .nh-txt { background: radial-gradient(120% 90% at 100% 100%, rgb(194 35 46 / .2), transparent 60%); }
-  .news .nh-h { font-size: clamp(32px, 3.2vw, 44px); text-shadow: none; }
-  .nh-board { justify-content: flex-start; gap: 36px; margin-block-start: 0; }
-  .nh-rank { font-size: 132px; }
-  .nh-m { font-size: 15px; }
-  .nh-m .md-disc { font-size: 36px; }
-  .nh-note { text-align: start; }
+/* full-bleed: out of the post column to the page edges, minus the news rail on wide screens */
+.bleed { margin-inline: calc(50% - (100vw - var(--nr-w, 0px)) / 2); }
+
+/* results hero: the team photo fading to black, a centred #1 and headline over its lower edge */
+.rh { position: relative; margin-block-start: 10px; text-align: center; }
+.rh-pic { position: relative; display: block; }
+.rh-pic::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgb(10 9 8 / .3), transparent 18%, transparent 52%, rgb(10 9 8 / .75) 78%, var(--ink) 97%); }
+.rh-pic img { display: block; inline-size: 100%; block-size: min(48svh, 400px); object-fit: cover; object-position: 50% 100%; }
+.rh-in { position: relative; z-index: 1; margin-block-start: -84px; padding-inline: 20px; }
+.rh-eyebrow { display: inline-flex; flex-direction: column; align-items: center; gap: 2px; color: var(--gold-2); font: 500 14px/1.4 var(--body); letter-spacing: .06em; }
+.rh-eyebrow > [aria-hidden] { display: none; }
+.rh-rank { margin-block: 6px 2px; font: 700 clamp(104px, 30vw, 200px)/.82 var(--font-oswald, "Oswald"), sans-serif; letter-spacing: -.03em; background: linear-gradient(180deg, #fff6d6 8%, #f1d38a 38%, #b9862a 72%, #f3d58c 96%); -webkit-background-clip: text; background-clip: text; color: transparent; filter: drop-shadow(0 10px 36px rgb(212 168 75 / .35)); }
+.rh-h { display: grid; justify-items: center; gap: 10px; margin: 0; }
+.rh-head { font: 600 clamp(38px, 10vw, 80px)/1 var(--disp); color: var(--paper); text-transform: uppercase; letter-spacing: -.005em; text-wrap: balance; }
+:lang(he) .rh-head { font-weight: 400; }
+.rh-sub { color: var(--paper-2); font: 400 clamp(18px, 4.8vw, 28px)/1.25 var(--body); }
+@media (min-width: 700px) {
+  .rh-pic img { block-size: auto; aspect-ratio: 2; max-block-size: 76vh; object-position: 50% 100%; }
+  .rh-pic::after { background: linear-gradient(180deg, rgb(10 9 8 / .3), transparent 16%, transparent 46%, rgb(10 9 8 / .8) 74%, var(--ink) 94%); }
+  .rh-in { margin-block-start: -170px; }
+  .rh-rank { font-size: clamp(120px, 11vw, 168px); }
+  .rh-head { font-size: clamp(44px, 4.6vw, 68px); }
+  .rh-sub { font-size: 24px; }
+  .rh-eyebrow { flex-direction: row; gap: 12px; }
+  .rh-eyebrow > [aria-hidden] { display: inline; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .rh-in > * { animation: rh-rise .9s cubic-bezier(.2, .7, .2, 1) both; }
+  .rh-rank { animation-delay: .1s; }
+  .rh-h { animation-delay: .25s; }
+  @keyframes rh-rise { from { opacity: 0; translate: 0 22px; } }
 }
 
-/* results: one block per medal, athletes as name / weight / birth years rows */
-.nr-res { display: grid; gap: 14px; margin-block: 8px 32px; }
-.nr-g { background: var(--ink-2); border: 1px solid var(--line); border-block-start: 3px solid var(--mc); padding: 14px 16px 6px; }
-.nr-gh { display: flex; align-items: center; gap: 12px; margin-block-end: 6px; color: var(--paper); font: 600 19px/1.2 var(--disp); }
-:lang(he) .nr-gh { font-weight: 400; }
-.nr-gh .md-disc { font-size: 18px; }
-.nr-list { list-style: none; padding: 0; }
-.nr-list li { display: grid; grid-template-columns: 1fr auto; gap: 2px 12px; padding-block: 10px; border-block-start: 1px solid var(--line); }
-.nr-name { grid-row: span 2; align-self: center; color: var(--paper); font-size: 17px; font-weight: 500; }
-.nr-w { color: var(--mc); font-size: 15px; font-variant-numeric: tabular-nums; text-align: end; }
-.nr-y { color: var(--mute); font-size: 13px; text-align: end; }
+/* stats band: the medal count, four equal cells */
+.mt { margin-block: clamp(44px, 9vw, 84px) 0; text-align: center; }
+.mt-row { list-style: none; padding: 0; margin-inline: auto; max-inline-size: 820px; display: grid; grid-template-columns: repeat(4, 1fr); }
+.mt-c { display: grid; justify-items: center; gap: 8px; padding-block: 4px; }
+.mt-c + .mt-c { border-inline-start: 1px solid var(--line); }
+.mt-n { font: 600 clamp(46px, 13vw, 108px)/.9 var(--font-oswald, "Oswald"), sans-serif; font-variant-numeric: tabular-nums; color: var(--paper); }
+.mt-c:not(.mt-all) .mt-n { background: var(--mg); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.mt-l { color: var(--paper-2); font-size: clamp(13px, 3.4vw, 17px); }
+.mt-note { margin-block-start: 20px; color: var(--mute); font-size: 15px; }
+
+/* podium: one column per medal; on wide screens silver, gold, bronze standing on 2/1/3 steps */
+.pd { display: grid; gap: 36px; margin-block: clamp(56px, 10vw, 104px) 0; }
+.pd-col { display: flex; flex-direction: column; gap: 10px; }
+.pd-step { display: flex; align-items: center; gap: 14px; margin: 0; padding: 12px 18px; border-radius: 14px; background: var(--mg); color: var(--ink); font: 600 17px/1.2 var(--disp); }
+:lang(he) .pd-step { font-weight: 400; }
+.pd-place { font: 700 36px/1 var(--font-oswald, "Oswald"), sans-serif; }
+.pd-list { list-style: none; padding: 0; display: grid; gap: 10px; }
+.pd-card { display: grid; align-content: center; gap: 8px; min-block-size: 86px; padding: 14px 18px; border-radius: 16px; background: linear-gradient(180deg, rgb(255 255 255 / .06), rgb(255 255 255 / .02)); border: 1px solid rgb(255 255 255 / .08); }
+.pd-name { color: var(--paper); font-size: 19px; font-weight: 600; line-height: 1.2; }
+.pd-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; }
+.pd-w { padding: 3px 11px; border-radius: 999px; border: 1px solid color-mix(in srgb, var(--mc) 55%, transparent); color: var(--mc); font-size: 14px; font-variant-numeric: tabular-nums; }
+.pd-y { color: var(--mute); font-size: 14px; }
+/* phones: one compact row per athlete, the weight chip at the line end */
+@media (max-width: 899.98px) {
+  .pd-card { grid-template-columns: 1fr auto; gap: 4px 12px; min-block-size: 0; padding: 12px 16px; }
+  .pd-meta { display: contents; }
+  .pd-w { grid-column: 2; grid-row: 1 / span 2; align-self: center; }
+}
 @media (min-width: 900px) {
-  .nr-res { grid-template-columns: repeat(3, 1fr); align-items: start; }
+  .pd { grid-template-columns: repeat(3, 1fr); grid-template-areas: "s g b"; align-items: end; gap: 0 18px; border-block-end: 1px solid rgb(241 211 138 / .35); }
+  .pd .md-gold { grid-area: g; }
+  .pd .md-silver { grid-area: s; }
+  .pd .md-bronze { grid-area: b; }
+  .pd-step { order: 2; flex-direction: column; justify-content: center; gap: 6px; block-size: var(--step); margin-block-start: 8px; padding: 14px; border-radius: 16px 16px 0 0; text-align: center; font-size: 15px; }
+  .pd-place { font-size: 64px; }
+  .md-gold .pd-step { --step: 188px; }
+  .md-silver .pd-step { --step: 146px; }
+  .md-bronze .pd-step { --step: 116px; }
+  .pd-card { text-align: center; justify-items: center; }
+  .pd-meta { justify-content: center; }
 }
 
-/* photo carousel: the landing's .rail strip; a slide and a peek on phones, three across on wide screens */
-.news-gallery { margin-block: 32px 8px; }
-.news-gallery .rail { grid-auto-columns: 86%; margin: 0; scroll-behavior: smooth; }
-@media (min-width: 600px) { .news-gallery .rail { grid-auto-columns: calc((100% - 12px) / 2); } }
-@media (min-width: 900px) { .news-gallery .rail { grid-auto-columns: calc((100% - 24px) / 3); } }
-@media (prefers-reduced-motion: reduce) { .news-gallery .rail { scroll-behavior: auto; } }
-.ng-slide { scroll-snap-align: start; aspect-ratio: 3 / 4; overflow: hidden; background: var(--ink-2); border: 1px solid var(--line); }
-.ng-slide a { display: block; block-size: 100%; cursor: zoom-in; }
-.ng-slide a:focus-visible { outline: 3px solid var(--gold-2); outline-offset: -3px; }
-.ng-slide img { inline-size: 100%; block-size: 100%; object-fit: cover; transition: scale .4s; }
-.ng-slide a:hover img { scale: 1.03; }
-.ng-nav { direction: ltr; display: flex; align-items: center; justify-content: center; gap: 18px; margin-block-start: 6px; }
-.ng-nav[hidden] { display: none; }
-.ng-n { min-inline-size: 6ch; text-align: center; color: var(--paper-2); font: 500 16px/1 var(--disp); letter-spacing: .06em; font-variant-numeric: tabular-nums; }
-.ng-nav .rail-btn:disabled { opacity: .35; cursor: default; border-color: var(--line); }
+/* story: a narrow centred column, the blockquote as a pull quote, the last two lines as the sign-off */
+.news-body[data-story] { margin: clamp(56px, 10vw, 104px) auto 0; max-inline-size: 60ch; font-size: 19px; line-height: 1.75; }
+.news-body[data-story] blockquote { margin: 1.6em 0; padding: 0; text-align: center; color: var(--paper); font: 500 clamp(26px, 5.8vw, 40px)/1.25 var(--disp); text-wrap: balance; }
+.news-body[data-story] blockquote::before { content: ""; display: block; inline-size: 56px; block-size: 3px; margin: 0 auto 22px; border-radius: 3px; background: var(--gold); }
+.news-body[data-story] blockquote p { margin: 0; }
+.news-body[data-story] > p:nth-last-child(2) { margin-block-start: 1.8em; text-align: center; color: var(--gold-2); font: 500 clamp(20px, 4.6vw, 26px)/1.45 var(--disp); text-wrap: balance; }
+.news-body[data-story] > p:last-child { text-align: center; color: var(--mute); font-size: 13px; letter-spacing: .24em; }
+.news-by { margin-block-start: 6px; text-align: center; color: var(--mute); font-size: 14px; }
+
+/* gallery stage: full-bleed strip, the centred photo full size and its neighbours peeking */
+.gs { margin-block: clamp(56px, 10vw, 104px) 0; --sw: 76vw; }
+@media (min-width: 700px) { .gs { --sw: min(440px, 34vw); } }
+.gs-track { list-style: none; margin: 0; display: flex; gap: clamp(10px, 2vw, 22px); overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x mandatory; scroll-behavior: smooth; scrollbar-width: none; padding-block: 10px 16px; padding-inline: calc(50% - var(--sw) / 2); }
+.gs-track::-webkit-scrollbar { display: none; }
+.gs-slide { flex: none; inline-size: var(--sw); aspect-ratio: 3 / 4; overflow: hidden; border-radius: 20px; scroll-snap-align: center; background: var(--ink-2); box-shadow: 0 24px 60px -24px #000; transition: scale .5s cubic-bezier(.2, .7, .2, 1), opacity .5s; }
+.gs:has(.gs-nav:not([hidden])) .gs-slide:not(.is-on) { scale: .9; opacity: .45; }
+.gs-slide a { display: block; block-size: 100%; cursor: zoom-in; }
+.gs-slide a:focus-visible { outline: 3px solid var(--gold-2); outline-offset: -3px; border-radius: 20px; }
+.gs-slide img { inline-size: 100%; block-size: 100%; object-fit: cover; }
+.gs-nav { direction: ltr; display: flex; align-items: center; justify-content: center; gap: 18px; margin-block-start: 6px; }
+.gs-nav[hidden] { display: none; }
+.gs-btn { inline-size: 52px; block-size: 52px; border-radius: 50%; border: 1px solid rgb(241 211 138 / .45); background: rgb(255 255 255 / .04); color: var(--gold-2); font: 400 30px/1 var(--body); cursor: pointer; transition: background .2s, color .2s; }
+.gs-btn:hover { background: var(--gold-2); color: var(--ink); }
+.gs-dots { display: flex; align-items: center; }
+.gs-dots:dir(rtl) { direction: rtl; }
+.gs-dot { display: grid; place-items: center; inline-size: 18px; block-size: 28px; padding: 0; border: 0; background: none; cursor: pointer; }
+.gs-dot::before { content: ""; inline-size: 7px; block-size: 7px; border-radius: 999px; background: rgb(243 234 216 / .28); transition: inline-size .3s, background .3s; }
+.gs-dot[aria-current="true"] { inline-size: 32px; }
+.gs-dot[aria-current="true"]::before { inline-size: 22px; background: var(--gold-2); }
+.gs-n { margin-block-start: 4px; text-align: center; color: var(--mute); font-size: 13px; letter-spacing: .12em; font-variant-numeric: tabular-nums; }
+@media (prefers-reduced-motion: reduce) { .gs-track { scroll-behavior: auto; } .gs-slide { transition: none; } }
+
+/* one reveal: sections rise once in view, the podium columns one after another */
+.reveal-on [data-reveal], .reveal-on .pd-col { transition: opacity .8s ease, translate .8s cubic-bezier(.2, .7, .2, 1); }
+.reveal-on [data-reveal]:not(.is-in) { opacity: 0; translate: 0 28px; }
+.reveal-on .pd:not(.is-in) .pd-col { opacity: 0; translate: 0 48px; }
+.reveal-on .pd .md-silver { transition-delay: .12s; }
+.reveal-on .pd .md-bronze { transition-delay: .24s; }
 
 /* photo viewer (components/Lightbox.astro) for the gallery and posts: fits any viewport, horizontal pans go to the swipe handler */
 .lb { inline-size: 100vw; block-size: 100dvh; max-inline-size: none; max-block-size: none; margin: 0; padding: 0; border: 0; background: rgb(0 0 0 / .94); color: var(--paper); touch-action: pan-y pinch-zoom; }

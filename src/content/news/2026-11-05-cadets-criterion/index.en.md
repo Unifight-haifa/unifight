@@ -5,6 +5,7 @@ date: 2026-11-05
 author: ilana-kratysh
 cover: cover.jpg
 cover_alt: "Club athletes with coaches and medals, Cadets Criterion 2026"
+hero: { eyebrow: "Cadets Criterion 2026", rank: "#1", headline: "First place in Israel", subline: "in the club rankings", wide: wide.jpg }
 medals: { gold: 5, silver: 4, bronze: 2, note: "one 5th place and one 7th place" }
 results:
   - medal: gold
@@ -12,7 +13,7 @@ results:
     athletes:
       - { name: "Raz Kloda", weight: "up to 66 kg", years: "born 2010–2011" }
       - { name: "Maxim Samoylov", weight: "up to 66 kg", years: "born 2012" }
-      - { name: "Arnes Tovnosyan", weight: "up to 46 kg", years: "born 2012" }
+      - { name: "Ernest Tovnosyan", weight: "up to 46 kg", years: "born 2012" }
       - { name: "Maria Kruglyak", weight: "up to 52 kg", years: "born 2010–2012" }
       - { name: "Kirill Pakharev", weight: "up to 38 kg", years: "born 2012" }
   - medal: silver
@@ -58,7 +59,7 @@ Our club's athletes showed impressive ability and outstanding results, finishing
 
 We are very proud of all our athletes for their fighting spirit, determination, commitment and the hard work that brings results!
 
-First place in Israel is the result of daily work, perseverance and belief in the path.
+> First place in Israel is the result of daily work, perseverance and belief in the path.
 
 This is only the start of the season, and we are looking ahead to the next challenges on the national and international stage!
 

@@ -39,6 +39,9 @@ const news = defineCollection({
       cover: image(),
       cover_alt: z.string().optional(),
       video: z.string().regex(/^[A-Za-z0-9_-]{11}$/).optional(),
+      hero: z
+        .object({ eyebrow: z.string().min(1), rank: z.string().min(1), headline: z.string().min(1), subline: z.string().optional(), wide: image().optional() })
+        .optional(),
       gallery: z.array(z.object({ src: image(), alt: z.string().min(1) })).default([]),
       medals: z
         .object({ gold: z.number().int().min(0), silver: z.number().int().min(0), bronze: z.number().int().min(0), note: z.string().optional() })

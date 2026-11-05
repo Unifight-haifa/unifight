@@ -11,54 +11,55 @@ interface Props {
 const { lang, photos } = Astro.props;
 const UI = {
   label: { he: 'תמונות מהתחרות', ru: 'Фото с турнира', en: 'Photos from the event' },
-  prev: { he: 'התמונות הקודמות', ru: 'Предыдущие фото', en: 'Previous photos' },
-  next: { he: 'התמונות הבאות', ru: 'Следующие фото', en: 'Next photos' },
+  prev: { he: 'התמונה הקודמת', ru: 'Предыдущее фото', en: 'Previous photo' },
+  next: { he: 'התמונה הבאה', ru: 'Следующее фото', en: 'Next photo' },
+  photo: { he: 'תמונה', ru: 'Фото', en: 'Photo' },
 };
-// the arrows are physical (as on the landing rail), so in Hebrew the left one goes forward
+// the arrows are physical, so in Hebrew the left one goes forward
 const [left, right] = lang === 'he' ? [UI.next, UI.prev] : [UI.prev, UI.next];
 const slides = await Promise.all(photos.map(async (p) => ({ ...p, large: await getImage({ src: p.src, width: Math.min(1200, p.src.width), format: 'webp' }) })));
 ---
-<section class="news-gallery" aria-roledescription="carousel" aria-label={UI.label[lang]}>
-  <ul class="rail" tabindex="0" aria-label={UI.label[lang]}>
+<section class="gs bleed" aria-roledescription="carousel" aria-label={UI.label[lang]}>
+  <ul class="gs-track" tabindex="0" aria-label={UI.label[lang]}>
     {slides.map((p) => (
-      <li class="ng-slide">
+      <li class="gs-slide">
         <a href={p.large.src} data-gal-item data-caption={p.alt}>
-          <Image src={p.src} alt={p.alt} widths={[600, 1200]} sizes="(min-width: 900px) 300px, (min-width: 600px) 46vw, 86vw" />
+          <Image src={p.src} alt={p.alt} widths={[480, 800, 1200]} sizes="(min-width: 700px) 460px, 76vw" />
         </a>
       </li>
     ))}
   </ul>
-  <div class="ng-nav" hidden>
-    <button type="button" class="rail-btn" data-dir="-1" aria-label={left[lang]}>‹</button>
-    <span class="ng-n" dir="ltr" aria-live="polite"></span>
-    <button type="button" class="rail-btn" data-dir="1" aria-label={right[lang]}>›</button>
+  <div class="gs-nav" hidden>
+    <button type="button" class="gs-btn" data-step={lang === 'he' ? 1 : -1} aria-label={left[lang]}>‹</button>
+    <div class="gs-dots">
+      {slides.map((_, i) => <button type="button" class="gs-dot" data-go={i} aria-label={`${UI.photo[lang]} ${i + 1}`}></button>)}
+    </div>
+    <button type="button" class="gs-btn" data-step={lang === 'he' ? -1 : 1} aria-label={right[lang]}>›</button>
   </div>
+  <p class="gs-n" dir="ltr" aria-live="polite"></p>
 </section>
 <Lightbox lang={lang} />
 <script is:inline>
-  document.querySelectorAll('.news-gallery').forEach(function (g) {
-    var rail = g.querySelector('.rail'), nav = g.querySelector('.ng-nav'), n = nav.querySelector('.ng-n');
-    var btn = nav.querySelectorAll('[data-dir]'), total = rail.children.length;
-    // which slides are in view, read from scrollLeft (negative in RTL) and the slide pitch
+  document.querySelectorAll('.gs').forEach(function (g) {
+    var track = g.querySelector('.gs-track'), slides = [].slice.call(track.children), nav = g.querySelector('.gs-nav');
+    var dots = g.querySelectorAll('.gs-dot'), n = g.querySelector('.gs-n'), cur = -1, raf;
+    var go = function (i) { slides[Math.max(0, Math.min(slides.length - 1, i))].scrollIntoView({ inline: 'center', block: 'nearest' }); };
+    // the slide nearest the track's centre is the active one
     function sync() {
-      var pitch = rail.children[1] ? Math.abs(rail.children[1].offsetLeft - rail.children[0].offsetLeft) : rail.clientWidth;
-      var per = Math.max(1, Math.round(rail.clientWidth / pitch)), x = Math.abs(rail.scrollLeft);
-      var a = Math.min(total - per, Math.round(x / pitch)) + 1, b = a + per - 1;
-      n.textContent = (per > 1 ? a + '–' + b : a) + ' / ' + total;
-      var atStart = x < 4, atEnd = x + rail.clientWidth > rail.scrollWidth - 4, rtl = getComputedStyle(rail).direction === 'rtl';
-      btn[0].disabled = rtl ? atEnd : atStart;
-      btn[1].disabled = rtl ? atStart : atEnd;
+      var r = track.getBoundingClientRect(), mid = r.left + r.width / 2, best = 0, d = Infinity;
+      slides.forEach(function (s, i) { var b = s.getBoundingClientRect(), x = Math.abs(b.left + b.width / 2 - mid); if (x < d) { d = x; best = i; } });
+      if (best === cur) return;
+      cur = best;
+      slides.forEach(function (s, i) { s.classList.toggle('is-on', i === cur); });
+      dots.forEach(function (b, i) { b.setAttribute('aria-current', String(i === cur)); });
+      n.textContent = cur + 1 + ' / ' + slides.length;
     }
     nav.hidden = false;
     nav.addEventListener('click', function (e) {
-      var b = e.target.closest('[data-dir]');
-      if (!b) return;
-      var o = { behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' };
-      o.left = +b.dataset.dir * rail.clientWidth; // set apart: test/css-logical.test.mjs greps .astro for `left:`
-      rail.scrollBy(o);
+      var b = e.target.closest('button');
+      if (b) go(b.dataset.go !== undefined ? +b.dataset.go : cur + +b.dataset.step);
     });
-    var t;
-    rail.addEventListener('scroll', function () { cancelAnimationFrame(t); t = requestAnimationFrame(sync); }, { passive: true });
+    track.addEventListener('scroll', function () { cancelAnimationFrame(raf); raf = requestAnimationFrame(sync); }, { passive: true });
     addEventListener('resize', sync);
     sync();
   });

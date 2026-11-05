@@ -3,14 +3,18 @@ interface Props {
   groups: { medal: 'gold' | 'silver' | 'bronze'; heading: string; athletes: { name: string; weight: string; years: string }[] }[];
 }
 const { groups } = Astro.props;
+const PLACE = { gold: 1, silver: 2, bronze: 3 };
 ---
-<div class="nr-res">
+<div class="pd" data-reveal>
   {groups.map((g) => (
-    <section class={`nr-g md-${g.medal}`}>
-      <h2 class="nr-gh"><b class="md-disc" aria-hidden="true">{g.athletes.length}</b>{g.heading}</h2>
-      <ul class="nr-list">
+    <section class={`pd-col md-${g.medal}`} aria-labelledby={`pd-${g.medal}`}>
+      <h2 class="pd-step" id={`pd-${g.medal}`}><b class="pd-place" aria-hidden="true">{PLACE[g.medal]}</b><span>{g.heading}</span></h2>
+      <ul class="pd-list">
         {g.athletes.map((a) => (
-          <li><span class="nr-name">{a.name}</span><span class="nr-w">{a.weight}</span><span class="nr-y">{a.years}</span></li>
+          <li class="pd-card">
+            <span class="pd-name">{a.name}</span>
+            <span class="pd-meta"><span class="pd-w">{a.weight}</span><span class="pd-y">{a.years}</span></span>
+          </li>
         ))}
       </ul>
     </section>
