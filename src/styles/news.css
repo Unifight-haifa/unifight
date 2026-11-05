@@ -118,6 +118,10 @@
 @media (min-width: 700px) { .gs { --sw: min(440px, 34vw); } }
 .gs-track { list-style: none; margin: 0; display: flex; gap: clamp(10px, 2vw, 22px); overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x mandatory; scroll-behavior: smooth; scrollbar-width: none; padding-block: 10px 16px; padding-inline: calc(50% - var(--sw) / 2); }
 .gs-track::-webkit-scrollbar { display: none; }
+/* neighbours fade out evenly at both edges instead of being clipped */
+.gs-track { -webkit-mask-image: linear-gradient(90deg, transparent, #000 14%, #000 86%, transparent); mask-image: linear-gradient(90deg, transparent, #000 14%, #000 86%, transparent); }
+/* same evenly widened band as the results rows */
+@media (min-width: 1360px) { .news .gs { margin-inline: -64px; } }
 .gs-slide { flex: none; inline-size: var(--sw); aspect-ratio: 3 / 4; overflow: hidden; border-radius: 20px; scroll-snap-align: center; background: var(--ink-2); box-shadow: 0 24px 60px -24px #000; transition: scale .5s cubic-bezier(.2, .7, .2, 1), opacity .5s; }
 .gs:has(.gs-nav:not([hidden])) .gs-slide:not(.is-on) { scale: .9; opacity: .45; }
 .gs-slide a { display: block; block-size: 100%; cursor: zoom-in; }
