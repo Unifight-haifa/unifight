@@ -75,7 +75,7 @@ html[lang=he] :where(main, [data-404]) > :is(h1, h2) {
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  padding-block: 1rem;
+  padding-block: 8px;
 }
 
 .site-header nav {
@@ -88,10 +88,50 @@ html[lang=he] :where(main, [data-404]) > :is(h1, h2) {
   text-decoration: none;
 }
 
-.site-header .site-name {
-  font: 600 20px/1.2 var(--disp);
-  text-transform: uppercase;
+/* mirrors .brand/.plate/.brand-t in night.css; legal, map and bidi pages don't load landing.css */
+.site-header .brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-inline-size: 0;
   color: var(--paper);
+}
+
+.site-header .plate {
+  flex: 0 1 auto;
+  inline-size: 48px;
+  min-inline-size: 36px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #fff;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  box-shadow: 0 0 0 2px var(--ink), 0 0 0 3px var(--gold), 0 8px 24px rgba(0, 0, 0, 0.55);
+}
+
+.site-header .plate img {
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: contain;
+  border-radius: 50%;
+}
+
+.site-header .brand-t {
+  font: 600 17px/1 var(--disp);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* same breakpoints as the landing: the Russian name needs more room */
+@media (max-width: 419px) {
+  .site-header .brand-t { position: absolute; clip-path: inset(50%); inline-size: 1px; block-size: 1px; overflow: hidden; }
+}
+
+@media (max-width: 579px) {
+  html[lang=ru] .site-header .brand-t { position: absolute; clip-path: inset(50%); inline-size: 1px; block-size: 1px; overflow: hidden; }
 }
 
 /* cross-document morph from a news card to its post; browsers without it just navigate */

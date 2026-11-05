@@ -25,7 +25,8 @@ test('every photo renders on all three language pages with its alt text', () => 
 
 test('every img has a non-empty alt, explicit size and a modern format', () => {
   for (const l of ['he', 'ru', 'en']) {
-    const imgs = page(l).match(/<img\b[^>]*>/g);
+    // the header logo is decorative (alt="") and not a gallery photo
+    const imgs = page(l).split('<main')[1].match(/<img\b[^>]*>/g);
     assert.equal(imgs.length, photos.length, l);
     for (const tag of imgs) {
       assert.match(tag, /\balt="[^"]+"/, tag.slice(0, 120));
