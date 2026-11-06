@@ -41,9 +41,26 @@ const slides = await Promise.all(photos.map(async (p) => ({ ...p, large: await g
 <Lightbox lang={lang} />
 <script is:inline>
   document.querySelectorAll('.gs').forEach(function (g) {
-    var track = g.querySelector('.gs-track'), slides = [].slice.call(track.children), nav = g.querySelector('.gs-nav');
-    var dots = g.querySelectorAll('.gs-dot'), n = g.querySelector('.gs-n'), cur = -1, raf;
-    var go = function (i) { slides[Math.max(0, Math.min(slides.length - 1, i))].scrollIntoView({ inline: 'center', block: 'nearest' }); };
+    var track = g.querySelector('.gs-track'), orig = [].slice.call(track.children), N = orig.length, nav = g.querySelector('.gs-nav');
+    var dots = g.querySelectorAll('.gs-dot'), n = g.querySelector('.gs-n'), cur = -1, raf, idle;
+    // a copy of the set on each side makes the strip endless; copies hand clicks to the original
+    function copy(s, i) {
+      var c = s.cloneNode(true), a = c.querySelector('a');
+      c.setAttribute('aria-hidden', 'true'); c.dataset.i = i; a.removeAttribute('data-gal-item'); a.tabIndex = -1;
+      return c;
+    }
+    orig.map(copy).forEach(function (c) { track.insertBefore(c, orig[0]); });
+    orig.map(copy).forEach(function (c) { track.appendChild(c); });
+    var slides = [].slice.call(track.children);
+    function center(s) {
+      var r = track.getBoundingClientRect(), b = s.getBoundingClientRect();
+      track.scrollBy(b.left + b.width / 2 - r.left - r.width / 2, 0);
+    }
+    // same, but instant and without the scale animation
+    function jump(s) {
+      track.classList.add('gs-jump'); center(s);
+      requestAnimationFrame(function () { requestAnimationFrame(function () { track.classList.remove('gs-jump'); }); });
+    }
     // the slide nearest the track's centre is the active one
     function sync() {
       var r = track.getBoundingClientRect(), mid = r.left + r.width / 2, best = 0, d = Infinity;
@@ -51,16 +68,30 @@ const slides = await Promise.all(photos.map(async (p) => ({ ...p, large: await g
       if (best === cur) return;
       cur = best;
       slides.forEach(function (s, i) { s.classList.toggle('is-on', i === cur); });
-      dots.forEach(function (b, i) { b.setAttribute('aria-current', String(i === cur)); });
-      n.textContent = cur + 1 + ' / ' + slides.length;
+      dots.forEach(function (b, i) { b.setAttribute('aria-current', String(i === cur % N)); });
+      n.textContent = (cur % N) + 1 + ' / ' + N;
+    }
+    // once scrolling stops on a copy, jump unseen to the same photo in the middle set
+    function settle() {
+      if (cur >= N && cur < 2 * N) return;
+      var s = slides[N + cur % N];
+      slides[cur].classList.remove('is-on'); s.classList.add('is-on'); cur = N + cur % N; jump(s);
     }
     nav.hidden = false;
     nav.addEventListener('click', function (e) {
       var b = e.target.closest('button');
-      if (b) go(b.dataset.go !== undefined ? +b.dataset.go : cur + +b.dataset.step);
+      if (b) center(slides[b.dataset.go !== undefined ? N + +b.dataset.go : Math.max(0, Math.min(slides.length - 1, cur + +b.dataset.step))]);
     });
-    track.addEventListener('scroll', function () { cancelAnimationFrame(raf); raf = requestAnimationFrame(sync); }, { passive: true });
-    addEventListener('resize', sync);
+    track.addEventListener('click', function (e) {
+      var c = e.target.closest('[data-i]');
+      if (c) { e.preventDefault(); orig[c.dataset.i].querySelector('a').click(); }
+    });
+    track.addEventListener('scroll', function () {
+      cancelAnimationFrame(raf); raf = requestAnimationFrame(sync);
+      clearTimeout(idle); idle = setTimeout(settle, 150);
+    }, { passive: true });
+    addEventListener('resize', function () { jump(slides[cur]); });
+    jump(slides[N]);
     sync();
   });
 </script>
