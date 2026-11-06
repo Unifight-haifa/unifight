@@ -124,6 +124,8 @@
 @media (min-width: 1360px) { .news .gs { margin-inline: -64px; } }
 .gs-slide { flex: none; inline-size: var(--sw); aspect-ratio: 3 / 4; overflow: hidden; border-radius: 20px; scroll-snap-align: center; background: var(--ink-2); box-shadow: 0 24px 60px -24px #000; transition: scale .5s cubic-bezier(.2, .7, .2, 1), opacity .5s; }
 .gs:has(.gs-nav:not([hidden])) .gs-slide:not(.is-on) { scale: .9; opacity: .45; }
+.gs-jump { scroll-behavior: auto; }
+.gs-jump .gs-slide { transition: none; }
 .gs-slide a { display: block; block-size: 100%; cursor: zoom-in; }
 .gs-slide a:focus-visible { outline: 3px solid var(--gold-2); outline-offset: -3px; border-radius: 20px; }
 .gs-slide img { inline-size: 100%; block-size: 100%; object-fit: cover; }
