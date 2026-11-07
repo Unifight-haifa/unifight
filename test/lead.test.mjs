@@ -79,17 +79,20 @@ test('venue cards open the form with their hall and show a group link only when 
 });
 
 // Code.gs against stand-ins for the Apps Script services
-function gas(props = { NOTIFY_EMAIL: 'club@example.org' }) {
+function gas(props = { NOTIFY_EMAIL: 'club@example.org' }, hour = 12) {
   const rows = [], mails = [];
-  const sheet = { appendRow: (r) => rows.push(r), setFrozenRows() {}, getDataRange: () => ({ getValues: () => rows }) };
+  const sheet = {
+    appendRow: (r) => rows.push(r), setFrozenRows() {}, getDataRange: () => ({ getValues: () => rows }),
+    getRange: (r, c) => ({ setValue: (v) => { rows[r - 1][c - 1] = v; } }),
+  };
   const ctx = {
     console,
-    SpreadsheetApp: { getActiveSpreadsheet: () => ({ getSheetByName: () => (rows.length ? sheet : null), insertSheet: () => sheet }) },
+    SpreadsheetApp: { getActiveSpreadsheet: () => ({ getSheetByName: () => (rows.length ? sheet : null), insertSheet: () => sheet, getUrl: () => 'https://sheet' }) },
     LockService: { getScriptLock: () => ({ waitLock() {}, releaseLock() {} }) },
     PropertiesService: { getScriptProperties: () => ({ getProperty: (k) => props[k] ?? null }) },
     MailApp: { sendEmail: (m) => mails.push(m) },
     ContentService: { createTextOutput: (s) => s },
-    Utilities: { formatDate: () => '29.10 10:00' },
+    Utilities: { formatDate: (d, tz, f) => (f === 'H' ? String(hour) : '29.10 10:00') },
   };
   vm.runInNewContext(readFileSync(new URL('../integrations/lead-form/Code.gs', import.meta.url), 'utf8'), ctx);
   return { ctx, rows, mails };
@@ -99,8 +102,8 @@ const LEAD = { lang: 'ru', name: 'Тест', phone: '054-763-2054', who: 'child'
 test('Apps Script: a valid lead becomes a row and an email with a wa.me link', () => {
   const { ctx, rows, mails } = gas();
   assert.equal(ctx.doPost({ parameter: LEAD }), 'ok');
-  assert.deepEqual([...rows[0]], ['time', 'lang', 'hall', 'hall_name', 'name', 'phone', 'who', 'age', 'message', 'status']);
-  assert.deepEqual([...rows[1]].slice(1), ['ru', 'ein-hayam', 'Эйн-ха-Ям', 'Тест', "'0547632054", 'child', '8', '', 'new']);
+  assert.deepEqual([...rows[0]], ['time', 'lang', 'hall', 'hall_name', 'name', 'phone', 'who', 'age', 'message', 'status', 'reminded']);
+  assert.deepEqual([...rows[1]].slice(1), ['ru', 'ein-hayam', 'Эйн-ха-Ям', 'Тест', "'0547632054", 'child', '8', '', 'new', '']);
   assert.ok(rows[1][0] instanceof Date || Object.prototype.toString.call(rows[1][0]) === '[object Date]');
   assert.equal(mails.length, 1);
   assert.equal(mails[0].to, 'club@example.org');
@@ -133,8 +136,31 @@ test('Apps Script: no recipient set keeps the row and sends nothing; digest list
   ctx.dailyDigest();
   const digest = mails.at(-1);
   assert.equal(digest.to, 'b@example.org');
-  assert.match(digest.subject, /: 1$/);
+  assert.match(digest.subject, /\(1\)$/);
   assert.ok(digest.body.includes('Тест') && !digest.body.includes('Done'));
+});
+
+test('Apps Script: one reminder 3 hours on, silent at night, stops once status changes', () => {
+  const hrs = (h) => new Date(Date.now() - h * 3600 * 1000);
+  const { ctx, rows, mails } = gas();
+  ctx.doPost({ parameter: { ...LEAD, name: 'Old' } });
+  ctx.doPost({ parameter: { ...LEAD, name: 'Fresh' } });
+  ctx.doPost({ parameter: { ...LEAD, name: 'Called' } });
+  rows[1][0] = hrs(4); rows[2][0] = hrs(1); rows[3][0] = hrs(5); rows[3][9] = 'called';
+  mails.length = 0;
+  ctx.remind();
+  assert.equal(mails.length, 1);
+  assert.match(mails[0].subject, /\(1\)$/);
+  assert.ok(mails[0].body.includes('Old') && !mails[0].body.includes('Fresh') && !mails[0].body.includes('Called'));
+  assert.ok(mails[0].body.includes('https://sheet'));
+  ctx.remind();
+  assert.equal(mails.length, 1, 'no second reminder for the same lead');
+  const night = gas(undefined, 23);
+  night.ctx.doPost({ parameter: LEAD });
+  night.rows[1][0] = hrs(4);
+  night.mails.length = 0;
+  night.ctx.remind();
+  assert.equal(night.mails.length, 0);
 });
 
 test('the club phone lives only in content/site/contact.json, not in code', () => {
