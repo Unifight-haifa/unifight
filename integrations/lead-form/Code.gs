@@ -1,7 +1,8 @@
 // Site lead form → the bound Sheet, plus an email to the club. Setup: docs/lead-form-setup.ru.md
 // Script Properties: NOTIFY_EMAIL (who gets each lead), DIGEST_EMAIL (optional, defaults to NOTIFY_EMAIL).
 var SHEET = 'Leads';
-var HEADERS = ['time', 'lang', 'hall', 'hall_name', 'name', 'phone', 'who', 'age', 'message', 'status'];
+var HEADERS = ['time', 'lang', 'hall', 'hall_name', 'name', 'phone', 'who', 'age', 'message', 'status', 'reminded'];
+var STATUS = HEADERS.indexOf('status'), REMINDED = HEADERS.indexOf('reminded');
 // same rule as the site: Israeli mobile, landline or 07x number
 var PHONE = /^(?:\+?9720?|0)(?:[57]\d{8}|[2-489]\d{7})$/;
 var WHO = { child: 'ребёнок', adult: 'взрослый' };
@@ -15,7 +16,7 @@ function doPost(e) {
   var lock = LockService.getScriptLock();
   lock.waitLock(10000);
   try {
-    sheet_().appendRow([new Date()].concat(HEADERS.slice(1, -1).map(function (k) { return cell_(lead[k]); }), 'new'));
+    sheet_().appendRow([new Date()].concat(HEADERS.slice(1, STATUS).map(function (k) { return cell_(lead[k]); }), 'new', ''));
   } finally {
     lock.releaseLock();
   }
@@ -65,23 +66,41 @@ function notify_(lead) {
   MailApp.sendEmail({ to: to, subject: 'Заявка с сайта: ' + lead.name + (lead.hall_name ? ', ' + lead.hall_name : ''), body: summary_(lead) });
 }
 
-// Daily list of leads still marked "new"; run setupDigest() once to schedule it.
-function dailyDigest() {
-  var props = PropertiesService.getScriptProperties();
-  var to = props.getProperty('DIGEST_EMAIL') || props.getProperty('NOTIFY_EMAIL');
-  var rows = sheet_().getDataRange().getValues().slice(1).filter(function (r) { return r[HEADERS.length - 1] === 'new'; });
-  if (!to || !rows.length) return;
-  var text = rows.map(function (r) {
+// Mails the open leads picked by pick(row, now) and stamps "reminded" so remind() skips them.
+function mailOpen_(to, subject, pick) {
+  var now = new Date(), sh = sheet_(), rows = sh.getDataRange().getValues(), due = [];
+  rows.forEach(function (r, i) { if (i && r[STATUS] === 'new' && pick(r, now)) due.push(i); });
+  if (!to || !due.length) return;
+  var text = due.map(function (i) {
     var l = {};
-    HEADERS.forEach(function (k, i) { l[k] = String(r[i]); });
-    return Utilities.formatDate(r[0], 'Asia/Jerusalem', 'dd.MM HH:mm') + '\n' + summary_(l);
+    HEADERS.forEach(function (k, j) { l[k] = String(rows[i][j]); });
+    return Utilities.formatDate(rows[i][0], 'Asia/Jerusalem', 'dd.MM HH:mm') + '\n' + summary_(l);
   }).join('\n\n');
-  MailApp.sendEmail({ to: to, subject: 'Необработанные заявки с сайта: ' + rows.length, body: text });
+  var foot = '\n\nПосле звонка впишите в колонку status что угодно, например «позвонили», и напоминания прекратятся.\n' + SpreadsheetApp.getActiveSpreadsheet().getUrl();
+  MailApp.sendEmail({ to: to, subject: subject + ' (' + due.length + ')', body: text + foot });
+  due.forEach(function (i) { if (!rows[i][REMINDED]) sh.getRange(i + 1, REMINDED + 1).setValue(now); });
 }
 
-function setupDigest() {
-  ScriptApp.getProjectTriggers().filter(function (t) { return t.getHandlerFunction() === 'dailyDigest'; }).forEach(function (t) { ScriptApp.deleteTrigger(t); });
-  ScriptApp.newTrigger('dailyDigest').timeBased().everyDays(1).atHour(20).inTimezone('Asia/Jerusalem').create();
+// 09:00 list of every lead still "new".
+function dailyDigest() {
+  var props = PropertiesService.getScriptProperties();
+  mailOpen_(props.getProperty('DIGEST_EMAIL') || props.getProperty('NOTIFY_EMAIL'), 'Необработанные заявки с сайта', function () { return true; });
+}
+
+// Hourly: one reminder for a lead still "new" 3 hours on. Silent 21:00-10:00, the 09:00 digest covers the night.
+function remind() {
+  var hour = +Utilities.formatDate(new Date(), 'Asia/Jerusalem', 'H');
+  if (hour < 10 || hour >= 21) return;
+  mailOpen_(PropertiesService.getScriptProperties().getProperty('NOTIFY_EMAIL'), 'Напоминание: перезвонить', function (r, now) {
+    return !r[REMINDED] && now - r[0] >= 3 * 3600 * 1000;
+  });
+}
+
+// Run once from the editor: schedules the digest and the reminders.
+function setup() {
+  ScriptApp.getProjectTriggers().forEach(function (t) { ScriptApp.deleteTrigger(t); });
+  ScriptApp.newTrigger('dailyDigest').timeBased().everyDays(1).atHour(9).inTimezone('Asia/Jerusalem').create();
+  ScriptApp.newTrigger('remind').timeBased().everyHours(1).create();
 }
 
 function reply_(s) {
