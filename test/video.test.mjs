@@ -73,3 +73,11 @@ test('the videos.json check accepts the real file and rejects bad entries', () =
   assert.throws(() => checkVideos([{ ...ok, thumb: 'nope.jpg' }], thumbs), /not found/);
   assert.throws(() => checkVideos([ok, ok], thumbs), /listed twice/);
 });
+
+test('VideoObject uploadDate is a datetime with a zone, as Google asks', () => {
+  for (const l of ['he', 'ru', 'en']) {
+    const dates = [...page(l).matchAll(/"uploadDate":"([^"]+)"/g)].map((m) => m[1]);
+    assert.equal(dates.length, videos.length, l);
+    for (const d of dates) assert.match(d, /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}[+-]\d{2}:\d{2}$/, `${l}: ${d}`);
+  }
+});
