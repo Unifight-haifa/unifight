@@ -54,7 +54,8 @@ const ld = {
     name: v.title[lang],
     description: v.description[lang],
     thumbnailUrl: [abs(thumb(v))],
-    uploadDate: v.date,
+    // Google wants a full datetime with zone; the day is all we store
+    uploadDate: `${v.date}T12:00:00+02:00`,
     embedUrl: `https://www.youtube-nocookie.com/embed/${v.id}`,
     ...(v.duration && { duration: `PT${v.duration}S` }),
   })),
